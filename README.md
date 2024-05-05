@@ -1,1 +1,1 @@
-# fbooth-photobooth-branch-management-service
+# fbooth-photobooth-branch-service
