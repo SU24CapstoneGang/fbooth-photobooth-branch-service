@@ -11,7 +11,6 @@ namespace PhotoboothBranchService.Application.Common.Interfaces;
 public interface IPrintersRepository
 {
     Task<IEnumerable<Printers>> GetAll(CancellationToken cancellationToken);
-    Task<IEnumerable<Printers>> GetAll(ManufactureStatus status, CancellationToken cancellationToken);
     Task<IEnumerable<Printers>> GetByName(String name, CancellationToken cancellationToken);
     Task AddAsync(Printers printer, CancellationToken cancellationToken);
     Task<Printers?> GetByIdAsync(Guid printerId, CancellationToken cancellationToken);

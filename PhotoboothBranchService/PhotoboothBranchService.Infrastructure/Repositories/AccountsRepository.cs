@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using PhotoboothBranchService.Application.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
@@ -32,7 +34,10 @@ public class AccountsRepository : IAccountsRepository
     {
         return await _dbContext.Accounts.Where(c => c.Status == status).ToListAsync();
     }
-
+    public async Task<Accounts?> Login(string email, string password, CancellationToken cancellationToken)
+    {
+        return await _dbContext.Accounts.FirstOrDefaultAsync(a => a.EmailAddress.Equals(email) && a.Password.Equals(password), cancellationToken);
+    }
     public async Task<IEnumerable<Accounts>> GetListByEmail(string email, CancellationToken cancellationToken)
     {
         return await _dbContext.Accounts.Where(c => c.EmailAddress.Contains(email)).ToListAsync();
@@ -54,4 +59,5 @@ public class AccountsRepository : IAccountsRepository
         _dbContext.Update(account);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
+
 }

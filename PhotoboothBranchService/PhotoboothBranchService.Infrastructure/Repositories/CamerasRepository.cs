@@ -25,11 +25,6 @@ public class CamerasRepository : ICamerasRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Cameras>> GetAll(ManufactureStatus status, CancellationToken cancellationToken)
-    {
-        return await _dbContext.Cameras.Where(c=> c.Status == status).ToListAsync();
-    }
-
     public async Task<IEnumerable<Cameras>> GetAll(CancellationToken cancellationToken)
     {
         return await _dbContext.Cameras.ToListAsync();

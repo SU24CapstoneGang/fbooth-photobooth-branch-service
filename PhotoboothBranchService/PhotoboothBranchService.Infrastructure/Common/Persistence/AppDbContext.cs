@@ -16,7 +16,6 @@ public class AppDbContext: DbContext
 {
     public DbSet<Accounts> Accounts { get; set; } = null;
     public DbSet<Cameras> Cameras { get; set; } = null;
-    public DbSet<DeviceMap> DeviceMaps { get; set; } = null;
     public DbSet<PhotoBoothBranches> PhotoBoothBranches { get; set; } = null;
     public DbSet<Printers> Printers { get; set; } = null;
 
@@ -26,14 +25,15 @@ public class AppDbContext: DbContext
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
         IConfigurationRoot configuration = builder.Build();
-        optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+        optionsBuilder.UseSqlServer(configuration.GetConnectionString("FboothPhotoBranchService"));
     }
-
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    {
+    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new AccountConfigurations());
         modelBuilder.ApplyConfiguration(new CameraConfigurations());
-        modelBuilder.ApplyConfiguration(new DeviceMapConfiguration());
         modelBuilder.ApplyConfiguration(new PhotoBoothBranchesConfiguration());
         modelBuilder.ApplyConfiguration(new PrintersConfiguration());
     }

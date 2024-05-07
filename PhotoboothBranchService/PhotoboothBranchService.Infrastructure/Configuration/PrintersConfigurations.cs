@@ -16,12 +16,9 @@ public class PrintersConfiguration : IEntityTypeConfiguration<Printers>
         builder.ToTable("Printers");
 
         builder.HasKey(p => p.Id);
-
+        builder.Property(u => u.Id).HasColumnName("Printer ID")
+    .ValueGeneratedNever();
         builder.Property(p => p.ModelName).HasMaxLength(255).IsRequired();
-        builder.Property(p => p.Lens).HasMaxLength(255);
-
-        builder.Property(p => p.Status)
-               .IsRequired()
-               .HasConversion<int>(); // Convert enum to int for storage
+        builder.Property(p => p.Price);
     }
 }

@@ -12,14 +12,17 @@ public class Cameras : Entity
 {
     public string ModelName { get; } = null;
     public string SensorType { get; } = null;
-    public ManufactureStatus Status { get; }
     public string Lens { get; } = null;
-    public DeviceMap DeviceMap { get; }
-    public Cameras(Guid id, string modelName, string sensorType, ManufactureStatus status, string lens)
+    public float Price { get; }
+    public virtual PhotoBoothBranches PhotoBoothBranch { get; }
+
+    public Cameras(Guid id, string modelName, string sensorType, string lens, float price)
     {
         ModelName = modelName;
         SensorType = sensorType;
-        Status = status;
         Lens = lens;
+        Price = price;
+    }
+    private Cameras() { 
     }
 }

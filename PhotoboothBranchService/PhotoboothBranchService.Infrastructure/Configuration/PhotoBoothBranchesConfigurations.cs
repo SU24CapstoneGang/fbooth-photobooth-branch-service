@@ -16,20 +16,27 @@ public class PhotoBoothBranchesConfiguration : IEntityTypeConfiguration<PhotoBoo
         builder.ToTable("PhotoBoothBranches");
 
         builder.HasKey(p => p.Id);
-
+        builder.Property(u => u.Id).HasColumnName("PhotoBoothBranch ID")
+            .ValueGeneratedNever();
         builder.Property(p => p.BranchName).HasMaxLength(255).IsRequired();
         builder.Property(p => p.BranchAddress).HasMaxLength(255).IsRequired();
-        builder.Property(p => p.EmailAddress).HasMaxLength(255).IsRequired();
-        builder.Property(p => p.PhoneNumber).HasMaxLength(20).IsRequired();
 
         builder.Property(p => p.Status)
                .IsRequired()
                .HasConversion<int>(); // Convert enum to int for storage
 
         // Configure relationship
-        builder.HasOne(p => p.Account)
+        builder.HasOne(a => a.Account)
                .WithOne()
-               .HasForeignKey<PhotoBoothBranches>(p => p.Account.Id)
+               .HasForeignKey<Accounts>(p => p.Id)
+               .IsRequired(false);
+        builder.HasOne(p => p.Camera)
+               .WithOne()
+               .HasForeignKey<PhotoBoothBranches>(c => c.Id)
+               .IsRequired(false);
+        builder.HasOne(p => p.Printer)
+               .WithOne()
+               .HasForeignKey<PhotoBoothBranches>(p => p.Id)
                .IsRequired(false);
     }
 }

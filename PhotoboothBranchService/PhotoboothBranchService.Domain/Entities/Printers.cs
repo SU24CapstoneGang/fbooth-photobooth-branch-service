@@ -11,14 +11,12 @@ namespace PhotoboothBranchService.Domain.Entities;
 public class Printers : Entity
 {
     public string ModelName { get; } = null;
-    public ManufactureStatus Status { get; }
-    public string Lens { get; } = null;
-    public DeviceMap DeviceMap { get; }
-    public Printers(Guid id, string modelName, ManufactureStatus status, string lens, DeviceMap deviceMap)
+    public float Price { get; }
+    public virtual PhotoBoothBranches PhotoBoothBranch { get; }
+    public Printers(Guid id, string modelName, string lens, float price)
     {
         ModelName = modelName;
-        Status = status;
-        Lens = lens;
-        DeviceMap = deviceMap;
+        Price = price;
     }
+    private Printers() { }
 }

@@ -10,18 +10,26 @@ namespace PhotoboothBranchService.Domain.Entities;
 
 public class PhotoBoothBranches : Entity
 {
-    public String BranchName { get; } = null;
-    public String BranchAddress { get; } = null;
-    public String EmailAddress { get; } = null;
-    public String PhoneNumber { get; } = null;
+    public string BranchName { get; } = null;
+    public string BranchAddress { get; } = null;
     public ManufactureStatus Status { get; }
     public virtual Accounts Account { get; }
-
-    public PhotoBoothBranches(Guid id, String branchName, String branchAddress, String emailAddress, String phoneNumber, ManufactureStatus manufactureStatus) {
+    public virtual Cameras Camera { get; }
+    public virtual Printers Printer { get; }
+    public PhotoBoothBranches(Guid id, string branchName, string branchAddress, ManufactureStatus manufactureStatus) {
         BranchName = branchName;
         BranchAddress = branchAddress;
-        EmailAddress = emailAddress;
-        PhoneNumber = phoneNumber;
         Status = manufactureStatus;
     }
+
+    public PhotoBoothBranches(string branchName, string branchAddress, ManufactureStatus status, Accounts account, Cameras camera, Printers printer)
+    {
+        BranchName = branchName;
+        BranchAddress = branchAddress;
+        Status = status;
+        Account = account;
+        Camera = camera;
+        Printer = printer;
+    }
+    private PhotoBoothBranches() { }
 }

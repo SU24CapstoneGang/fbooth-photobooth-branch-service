@@ -25,11 +25,6 @@ public class PrintersRepository : IPrintersRepository
         return await _dbContext.Printers.ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Printers>> GetAll(ManufactureStatus status, CancellationToken cancellationToken)
-    {
-        return await _dbContext.Printers.Where(p => p.Status == status).ToListAsync(cancellationToken);
-    }
-
     public async Task<IEnumerable<Printers>> GetByName(string name, CancellationToken cancellationToken)
     {
         return await _dbContext.Printers.Where(p => p.ModelName.Contains(name)).ToListAsync(cancellationToken);
