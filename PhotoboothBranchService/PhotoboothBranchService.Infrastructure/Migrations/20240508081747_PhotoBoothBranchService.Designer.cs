@@ -12,7 +12,7 @@ using PhotoboothBranchService.Infrastructure.Common.Persistence;
 namespace PhotoboothBranchService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240507182643_PhotoBoothBranchService")]
+    [Migration("20240508081747_PhotoBoothBranchService")]
     partial class PhotoBoothBranchService
     {
         /// <inheritdoc />
