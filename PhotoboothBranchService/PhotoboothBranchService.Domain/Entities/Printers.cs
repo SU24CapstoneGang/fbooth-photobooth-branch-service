@@ -13,7 +13,7 @@ public class Printers : Entity
     public string ModelName { get; } = null;
     public float Price { get; }
     public virtual PhotoBoothBranches PhotoBoothBranch { get; }
-    public Printers(Guid id, string modelName, string lens, float price)
+    public Printers(Guid id, string modelName, string lens, float price) : base(id)
     {
         ModelName = modelName;
         Price = price;

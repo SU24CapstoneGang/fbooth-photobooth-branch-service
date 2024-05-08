@@ -16,7 +16,7 @@ public class Accounts : Entity
     public AccountRole Role { get; }
     public AccountStatus Status { get; }
     public virtual PhotoBoothBranches PhotoBoothBranch { get; }
-    public Accounts(Guid id, string emailAddress,string phoneNumber, AccountRole role, AccountStatus status)
+    public Accounts(Guid id, string emailAddress,string phoneNumber, AccountRole role, AccountStatus status) : base(id)
    {
         EmailAddress = emailAddress;
         PhoneNumber = phoneNumber;

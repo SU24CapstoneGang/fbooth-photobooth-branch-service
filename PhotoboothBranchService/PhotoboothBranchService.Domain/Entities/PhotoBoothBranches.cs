@@ -16,7 +16,8 @@ public class PhotoBoothBranches : Entity
     public virtual Accounts Account { get; }
     public virtual Cameras Camera { get; }
     public virtual Printers Printer { get; }
-    public PhotoBoothBranches(Guid id, string branchName, string branchAddress, ManufactureStatus manufactureStatus) {
+    public PhotoBoothBranches(Guid id, string branchName, string branchAddress, ManufactureStatus manufactureStatus) : base(id)
+    {
         BranchName = branchName;
         BranchAddress = branchAddress;
         Status = manufactureStatus;

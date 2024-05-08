@@ -16,7 +16,7 @@ public class Cameras : Entity
     public float Price { get; }
     public virtual PhotoBoothBranches PhotoBoothBranch { get; }
 
-    public Cameras(Guid id, string modelName, string sensorType, string lens, float price)
+    public Cameras(Guid id, string modelName, string sensorType, string lens, float price) : base(id)
     {
         ModelName = modelName;
         SensorType = sensorType;
