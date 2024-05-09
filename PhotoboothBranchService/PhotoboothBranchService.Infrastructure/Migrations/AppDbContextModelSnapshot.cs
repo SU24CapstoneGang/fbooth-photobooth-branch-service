@@ -28,10 +28,16 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Account ID");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("EmailAddress")
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -58,6 +64,12 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Camera ID");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Lens")
                         .IsRequired()
@@ -104,6 +116,12 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<Guid>("CameraId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("PrinterId")
                         .HasColumnType("uniqueidentifier");
 
@@ -129,6 +147,12 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Printer ID");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ModelName")
                         .IsRequired()

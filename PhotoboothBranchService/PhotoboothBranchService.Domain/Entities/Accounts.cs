@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Domain.Entities;
 
-public class Accounts : Entity
+public class Accounts : BaseEntity
 {
     public string EmailAddress { get; } = null;
     public string PhoneNumber { get; } = null;

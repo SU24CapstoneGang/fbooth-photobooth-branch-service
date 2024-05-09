@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Domain.Entities;
 
-public class Printers : Entity
+public class Printers : BaseEntity
 {
     public string ModelName { get; } = null;
     public float Price { get; }

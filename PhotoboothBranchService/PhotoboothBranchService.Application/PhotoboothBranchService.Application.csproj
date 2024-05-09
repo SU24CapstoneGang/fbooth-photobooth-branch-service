@@ -6,6 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+	<ItemGroup>
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.0" />
+	</ItemGroup>
+	
   <ItemGroup>
     <ProjectReference Include="..\PhotoboothBranchService.Domain\PhotoboothBranchService.Domain.csproj" />
   </ItemGroup>

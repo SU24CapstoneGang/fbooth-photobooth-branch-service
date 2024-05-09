@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Domain.Entities;
 
-public class PhotoBoothBranches : Entity
+public class PhotoBoothBranches : BaseEntity
 {
     public string BranchName { get; } = null;
     public string BranchAddress { get; } = null;
