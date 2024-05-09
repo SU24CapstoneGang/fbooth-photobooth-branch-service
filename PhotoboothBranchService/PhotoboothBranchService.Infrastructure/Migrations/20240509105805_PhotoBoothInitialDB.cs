@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PhotoboothBranchService.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class PhotoBoothBranchService : Migration
+    public partial class PhotoBoothInitialDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,7 +20,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false)
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -35,7 +37,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     ModelName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     SensorType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Lens = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Price = table.Column<float>(type: "real", nullable: false)
+                    Price = table.Column<float>(type: "real", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -48,7 +52,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     PrinterID = table.Column<Guid>(name: "Printer ID", type: "uniqueidentifier", nullable: false),
                     ModelName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Price = table.Column<float>(type: "real", nullable: false)
+                    Price = table.Column<float>(type: "real", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -62,27 +68,50 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     PhotoBoothBranchID = table.Column<Guid>(name: "PhotoBoothBranch ID", type: "uniqueidentifier", nullable: false),
                     BranchName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     BranchAddress = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false)
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CameraId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PrinterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PhotoBoothBranches", x => x.PhotoBoothBranchID);
                     table.ForeignKey(
-                        name: "FK_PhotoBoothBranches_Accounts_PhotoBoothBranch ID",
-                        column: x => x.PhotoBoothBranchID,
+                        name: "FK_PhotoBoothBranches_Accounts_AccountId",
+                        column: x => x.AccountId,
                         principalTable: "Accounts",
                         principalColumn: "Account ID");
                     table.ForeignKey(
-                        name: "FK_PhotoBoothBranches_Cameras_PhotoBoothBranch ID",
-                        column: x => x.PhotoBoothBranchID,
+                        name: "FK_PhotoBoothBranches_Cameras_CameraId",
+                        column: x => x.CameraId,
                         principalTable: "Cameras",
                         principalColumn: "Camera ID");
                     table.ForeignKey(
-                        name: "FK_PhotoBoothBranches_Printers_PhotoBoothBranch ID",
-                        column: x => x.PhotoBoothBranchID,
+                        name: "FK_PhotoBoothBranches_Printers_PrinterId",
+                        column: x => x.PrinterId,
                         principalTable: "Printers",
                         principalColumn: "Printer ID");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PhotoBoothBranches_AccountId",
+                table: "PhotoBoothBranches",
+                column: "AccountId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PhotoBoothBranches_CameraId",
+                table: "PhotoBoothBranches",
+                column: "CameraId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PhotoBoothBranches_PrinterId",
+                table: "PhotoBoothBranches",
+                column: "PrinterId",
+                unique: true);
         }
 
         /// <inheritdoc />

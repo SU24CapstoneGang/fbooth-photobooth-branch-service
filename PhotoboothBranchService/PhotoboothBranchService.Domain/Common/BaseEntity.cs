@@ -6,15 +6,16 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Domain.Common;
 
-public abstract class Entity
+public abstract class BaseEntity
 {
     public Guid Id { get; private init; }
+    public DateTime Created { get; set; } = DateTime.Now;
+    public DateTime? LastModified { get; set; }
 
-
-    protected Entity(Guid id)
+    protected BaseEntity(Guid id)
     {
         Id = id;
     }
 
-    protected Entity() { }
+    protected BaseEntity() { }
 }

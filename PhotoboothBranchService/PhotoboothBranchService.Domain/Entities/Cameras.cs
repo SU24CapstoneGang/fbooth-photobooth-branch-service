@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Domain.Entities;
 
-public class Cameras : Entity
+public class Cameras : BaseEntity
 {
     public string ModelName { get; } = null;
     public string SensorType { get; } = null;
