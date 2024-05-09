@@ -1,6 +1,7 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PhotoboothBranchService.Api.MiddleWare;
 using PhotoboothBranchService.Application.Common.Interfaces;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using PhotoboothBranchService.Infrastructure.Repositories;
@@ -29,6 +30,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+//configure exceptions to return swagger
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
