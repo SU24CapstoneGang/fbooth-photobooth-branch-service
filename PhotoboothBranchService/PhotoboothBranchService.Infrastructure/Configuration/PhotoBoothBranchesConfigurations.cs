@@ -28,15 +28,15 @@ public class PhotoBoothBranchesConfiguration : IEntityTypeConfiguration<PhotoBoo
         // Configure relationship
         builder.HasOne(a => a.Account)
                .WithOne()
-               .HasForeignKey<Accounts>(p => p.Id)
+               .HasForeignKey<PhotoBoothBranches>(p => p.AccountId)
                .IsRequired(false);
         builder.HasOne(p => p.Camera)
                .WithOne()
-               .HasForeignKey<PhotoBoothBranches>(c => c.Id)
+               .HasForeignKey<PhotoBoothBranches>(c => c.CameraId)
                .IsRequired(false);
         builder.HasOne(p => p.Printer)
                .WithOne()
-               .HasForeignKey<PhotoBoothBranches>(p => p.Id)
+               .HasForeignKey<PhotoBoothBranches>(p => p.PrinterId)
                .IsRequired(false);
     }
 }
