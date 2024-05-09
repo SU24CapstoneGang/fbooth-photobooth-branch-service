@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Api.DTO;
@@ -20,6 +21,8 @@ public class PrintersDTO
         ModelName = modelName;
         Price = price;
     }
+    [JsonConstructor]
+
     public PrintersDTO(string modelName, string lens, float price)
     {
         ModelName = modelName;

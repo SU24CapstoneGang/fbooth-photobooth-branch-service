@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PhotoboothBranchService.Api.DTO;
 using PhotoboothBranchService.Application.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -79,10 +80,13 @@ namespace PhotoboothBranchService.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateAccount(Accounts account, CancellationToken cancellationToken)
+        public async Task<ActionResult> CreateAccount(AccountsDTO accountDTO, CancellationToken cancellationToken)
         {
             try
             {
+                Accounts account = new Accounts(Guid.NewGuid(), accountDTO.EmailAddress, accountDTO.PhoneNumber, 
+                    accountDTO.Password, accountDTO.Role, accountDTO.Status);
+
                 await _accountsRepository.AddAsync(account, cancellationToken);
                 return Ok();
             }
@@ -91,6 +95,20 @@ namespace PhotoboothBranchService.Api.Controllers
                 return StatusCode(500, $"An error occurred while creating the account: {ex.Message}");
             }
         }
+
+        /*   [HttpPost]
+           public async Task<ActionResult> CreateAccount(Accounts account, CancellationToken cancellationToken)
+           {
+               try
+               {
+                   await _accountsRepository.AddAsync(account, cancellationToken);
+                   return Ok();
+               }
+               catch (Exception ex)
+               {
+                   return StatusCode(500, $"An error occurred while creating the account: {ex.Message}");
+               }
+           }*/
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Accounts>> GetAccountById(Guid id, CancellationToken cancellationToken)

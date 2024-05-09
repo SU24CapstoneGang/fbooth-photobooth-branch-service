@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Api.DTO;
@@ -24,6 +25,8 @@ public class PhotoBoothBranchesDTO
         BranchAddress = branchAddress;
         Status = manufactureStatus;
     }
+    [JsonConstructor]
+
     public PhotoBoothBranchesDTO(string branchName, string branchAddress, ManufactureStatus manufactureStatus) {
         BranchName = branchName;
         BranchAddress = branchAddress;

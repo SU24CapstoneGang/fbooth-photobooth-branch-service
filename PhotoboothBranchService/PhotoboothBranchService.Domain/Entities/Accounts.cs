@@ -14,10 +14,10 @@ public class Accounts : Entity
     public string EmailAddress { get; } = null;
     public string PhoneNumber { get; } = null;
     public string Password { get; } = null;
-    public Guid PhotoBoothBrachId { get; }
+    public Guid? PhotoBoothBrachId { get; }
     public AccountRole Role { get; }
     public AccountStatus Status { get; }
-    public virtual PhotoBoothBranches PhotoBoothBranch { get; }
+    public virtual PhotoBoothBranches? PhotoBoothBranch { get; }
     public Accounts(Guid id, string emailAddress, string phoneNumber, AccountRole role, AccountStatus status) : base(id)
     {
         EmailAddress = emailAddress;
@@ -26,14 +26,13 @@ public class Accounts : Entity
         Status = status;
     }
     [JsonConstructor]
-    public Accounts(Guid id, string emailAddress, string phoneNumber, string password, AccountRole role, AccountStatus status, Guid photoBoothBrachId)
+    public Accounts(Guid id, string emailAddress, string phoneNumber, string password, AccountRole role, AccountStatus status) : base(id)
     {
         EmailAddress = emailAddress;
         PhoneNumber = phoneNumber;
         Password = password;
         Role = role;
         Status = status;
-        PhotoBoothBrachId = photoBoothBrachId;
     }
 
     private Accounts()
