@@ -9,9 +9,7 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class CamerasController : ControllerBase
+    public class CamerasController : ControllerBaseApi
     {
         private readonly ICamerasRepository _camerasRepository;
 

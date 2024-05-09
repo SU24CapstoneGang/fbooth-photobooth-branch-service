@@ -10,9 +10,7 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class PhotoBoothBranchesController : ControllerBase
+    public class PhotoBoothBranchesController : ControllerBaseApi
     {
         private readonly IPhotoBoothBranchesRepository _photoBoothBranchesRepository;
 
