@@ -19,8 +19,8 @@ services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Conf
 
 services.AddScoped<IAccountsRepository, AccountsRepository>();
 services.AddScoped<IPrintersRepository, PrintersRepository>();
-services.AddScoped<IAccountsRepository, AccountsRepository>();
-services.AddScoped<IAccountsRepository, AccountsRepository>();
+services.AddScoped<ICamerasRepository, CamerasRepository>();
+services.AddScoped<IPhotoBoothBranchesRepository, PhotoBoothBranchesRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

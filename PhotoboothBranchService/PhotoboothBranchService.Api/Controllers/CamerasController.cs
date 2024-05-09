@@ -2,121 +2,116 @@
 using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Api.Controllers
+namespace PhotoboothBranchService.Api.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class CamerasController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class CamerasController : ControllerBase
+    private readonly ICamerasRepository _camerasRepository;
+
+    public CamerasController(ICamerasRepository camerasRepository)
     {
-        private readonly ICamerasRepository _camerasRepository;
+        _camerasRepository = camerasRepository;
+    }
 
-        public CamerasController(ICamerasRepository camerasRepository)
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Cameras>>> GetAllCameras(CancellationToken cancellationToken)
+    {
+        try
         {
-            _camerasRepository = camerasRepository;
+            var cameras = await _camerasRepository.GetAll(cancellationToken);
+            return Ok(cameras);
         }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cameras>>> GetAllCameras(CancellationToken cancellationToken)
+        catch (Exception ex)
         {
-            try
-            {
-                var cameras = await _camerasRepository.GetAll(cancellationToken);
-                return Ok(cameras);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving cameras: {ex.Message}");
-            }
+            return StatusCode(500, $"An error occurred while retrieving cameras: {ex.Message}");
         }
+    }
 
-        [HttpGet("name/{name}")]
-        public async Task<ActionResult<IEnumerable<Cameras>>> GetCamerasByName(string name, CancellationToken cancellationToken)
+    [HttpGet("name/{name}")]
+    public async Task<ActionResult<IEnumerable<Cameras>>> GetCamerasByName(string name, CancellationToken cancellationToken)
+    {
+        try
         {
-            try
-            {
-                var cameras = await _camerasRepository.GetByName(name, cancellationToken);
-                return Ok(cameras);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving cameras by name: {ex.Message}");
-            }
+            var cameras = await _camerasRepository.GetByName(name, cancellationToken);
+            return Ok(cameras);
         }
-
-        [HttpPost]
-        public async Task<ActionResult> CreateCamera(Cameras camera, CancellationToken cancellationToken)
+        catch (Exception ex)
         {
-            try
-            {
-                await _camerasRepository.AddAsync(camera, cancellationToken);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while creating the camera: {ex.Message}");
-            }
+            return StatusCode(500, $"An error occurred while retrieving cameras by name: {ex.Message}");
         }
+    }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Cameras>> GetCameraById(Guid id, CancellationToken cancellationToken)
+    [HttpPost]
+    public async Task<ActionResult> CreateCamera(Cameras camera, CancellationToken cancellationToken)
+    {
+        try
         {
-            try
-            {
-                var camera = await _camerasRepository.GetByIdAsync(id, cancellationToken);
-                if (camera == null)
-                {
-                    return NotFound();
-                }
-                return Ok(camera);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving the camera by ID: {ex.Message}");
-            }
+            await _camerasRepository.AddAsync(camera, cancellationToken);
+            return Ok();
         }
-
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateCamera(Guid id, Cameras camera, CancellationToken cancellationToken)
+        catch (Exception ex)
         {
-            try
-            {
-                if (id != camera.Id)
-                {
-                    return BadRequest("Invalid ID.");
-                }
-
-                await _camerasRepository.UpdateAsync(camera, cancellationToken);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while updating the camera: {ex.Message}");
-            }
+            return StatusCode(500, $"An error occurred while creating the camera: {ex.Message}");
         }
+    }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteCamera(Guid id, CancellationToken cancellationToken)
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Cameras>> GetCameraById(Guid id, CancellationToken cancellationToken)
+    {
+        try
         {
-            try
+            var camera = await _camerasRepository.GetByIdAsync(id, cancellationToken);
+            if (camera == null)
             {
-                var camera = await _camerasRepository.GetByIdAsync(id, cancellationToken);
-                if (camera == null)
-                {
-                    return NotFound();
-                }
+                return NotFound();
+            }
+            return Ok(camera);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving the camera by ID: {ex.Message}");
+        }
+    }
 
-                await _camerasRepository.RemoveAsync(camera, cancellationToken);
-                return Ok();
-            }
-            catch (Exception ex)
+    [HttpPut("{id}")]
+    public async Task<ActionResult> UpdateCamera(Guid id, Cameras camera, CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (id != camera.Id)
             {
-                return StatusCode(500, $"An error occurred while deleting the camera: {ex.Message}");
+                return BadRequest("Invalid ID.");
             }
+
+            await _camerasRepository.UpdateAsync(camera, cancellationToken);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while updating the camera: {ex.Message}");
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteCamera(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var camera = await _camerasRepository.GetByIdAsync(id, cancellationToken);
+            if (camera == null)
+            {
+                return NotFound();
+            }
+
+            await _camerasRepository.RemoveAsync(camera, cancellationToken);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while deleting the camera: {ex.Message}");
         }
     }
 }

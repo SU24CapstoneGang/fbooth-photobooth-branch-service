@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
+
 namespace PhotoboothBranchService.Application.Common.Interfaces;
 
 public interface ICamerasRepository
