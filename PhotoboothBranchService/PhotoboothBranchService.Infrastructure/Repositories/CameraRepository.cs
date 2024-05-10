@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
-using PhotoboothBranchService.Application.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
+using PhotoboothBranchService.Domain.Interfaces;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using System;
 using System.Collections.Generic;
@@ -12,19 +12,23 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
-public class CamerasRepository : ICamerasRepository
+public class CameraRepository : ICameraRepository
 {
     private readonly AppDbContext _dbContext;
-    public CamerasRepository(AppDbContext dbContext)
+    public CameraRepository(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
-    public async Task AddAsync(Cameras camera, CancellationToken cancellationToken)
+
+    //Create
+    public async Task<Guid> AddAsync(Cameras camera, CancellationToken cancellationToken)
     {
         await _dbContext.AddAsync(camera, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
+        return camera.Id;
     }
 
+    //Read
     public async Task<IEnumerable<Cameras>> GetAll(CancellationToken cancellationToken)
     {
         return await _dbContext.Cameras.ToListAsync();
@@ -40,15 +44,18 @@ public class CamerasRepository : ICamerasRepository
         return await _dbContext.Cameras.Where(c => c.ModelName.Contains(name)).ToListAsync();
     }
 
+    //Update
+    public async Task UpdateAsync(Cameras camera, CancellationToken cancellationToken)
+    {
+        _dbContext.Update(camera);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    //Delete
     public async Task RemoveAsync(Cameras camera, CancellationToken cancellationToken)
     {
         _dbContext.Remove(camera);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task UpdateAsync(Cameras camera, CancellationToken cancellationToken)
-    {
-        _dbContext.Update(camera);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-    }
 }

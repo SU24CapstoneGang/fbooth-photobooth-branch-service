@@ -15,8 +15,9 @@ public class Cameras : BaseEntity
     public string SensorType { get; } = null;
     public string Lens { get; } = null;
     public float Price { get; }
-    public Guid PhotoBoothBranchId {  get; } 
+    public Guid? PhotoBoothBranchId {  get; } 
     public virtual PhotoBoothBranches PhotoBoothBranch { get; }
+
     [JsonConstructor]
     public Cameras(Guid id, string modelName, string sensorType, string lens, float price, Guid photoBoothBranchId) : base(id)
     {

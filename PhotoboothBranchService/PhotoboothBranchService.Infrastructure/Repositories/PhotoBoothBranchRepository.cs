@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PhotoboothBranchService.Application.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
+using PhotoboothBranchService.Domain.Interfaces;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using System;
 using System.Collections.Generic;
@@ -11,15 +11,24 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
-public class PhotoBoothBranchesRepository : IPhotoBoothBranchesRepository
+public class PhotoBoothBranchRepository : IPhotoBoothBranchRepository
 {
     private readonly AppDbContext _dbContext;
 
-    public PhotoBoothBranchesRepository(AppDbContext dbContext)
+    public PhotoBoothBranchRepository(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
+    //Create
+    public async Task<Guid> AddAsync(PhotoBoothBranches photoBoothBranch, CancellationToken cancellationToken)
+    {
+        await _dbContext.AddAsync(photoBoothBranch, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return photoBoothBranch.Id;
+    }
+
+    //Read
     public async Task<IEnumerable<PhotoBoothBranches>> GetAll(CancellationToken cancellationToken)
     {
         return await _dbContext.PhotoBoothBranches.ToListAsync(cancellationToken);
@@ -35,26 +44,22 @@ public class PhotoBoothBranchesRepository : IPhotoBoothBranchesRepository
         return await _dbContext.PhotoBoothBranches.Where(p => p.BranchName.Contains(name)).ToListAsync(cancellationToken);
     }
 
-    public async Task AddAsync(PhotoBoothBranches photoBoothBranch, CancellationToken cancellationToken)
-    {
-        await _dbContext.AddAsync(photoBoothBranch, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-    }
-
     public async Task<PhotoBoothBranches?> GetByIdAsync(Guid photoBoothBranchId, CancellationToken cancellationToken)
     {
         return await _dbContext.PhotoBoothBranches.FindAsync(photoBoothBranchId, cancellationToken);
     }
 
-    public async Task RemoveAsync(PhotoBoothBranches photoBoothBranch, CancellationToken cancellationToken)
-    {
-        _dbContext.Remove(photoBoothBranch);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-    }
-
+    //Update
     public async Task UpdateAsync(PhotoBoothBranches photoBoothBranch, CancellationToken cancellationToken)
     {
         _dbContext.Update(photoBoothBranch);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    //Delete
+    public async Task RemoveAsync(PhotoBoothBranches photoBoothBranch, CancellationToken cancellationToken)
+    {
+        _dbContext.Remove(photoBoothBranch);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

@@ -8,26 +8,28 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Api.DTO;
+namespace PhotoboothBranchService.Application.DTO;
 
-public class PhotoBoothBranchesDTO
+public class PhotoBoothBranchDTO
 {
-    public string PhotoBoothBranchId { get; set; }
+    public Guid? PhotoBoothBranchId { get; set; }
     public string BranchName { get; } = null;
     public string BranchAddress { get; } = null;
     public ManufactureStatus Status { get; }
+    public string AccountId { get; set; } = null;
     public Accounts Account { get; }
 
-    public PhotoBoothBranchesDTO(string photoBoothBranchId, string branchName, string branchAddress, ManufactureStatus manufactureStatus)
+    //contrustor respone
+    public PhotoBoothBranchDTO(Guid? photoBoothBranchId, string branchName, string branchAddress, ManufactureStatus manufactureStatus)
     {
         PhotoBoothBranchId = photoBoothBranchId;
         BranchName = branchName;
         BranchAddress = branchAddress;
         Status = manufactureStatus;
     }
-    [JsonConstructor]
 
-    public PhotoBoothBranchesDTO(string branchName, string branchAddress, ManufactureStatus manufactureStatus) {
+    [JsonConstructor]
+    public PhotoBoothBranchDTO(string branchName, string branchAddress, ManufactureStatus manufactureStatus, Guid? accountID) {
         BranchName = branchName;
         BranchAddress = branchAddress;
         Status = manufactureStatus;

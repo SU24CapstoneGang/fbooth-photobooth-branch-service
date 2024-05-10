@@ -7,32 +7,38 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Api.DTO;
+namespace PhotoboothBranchService.Application.DTO;
 
-public class AccountsDTO
+public class AccountDTO
 {
-    //public string? AccountId { get; set; }
+    public Guid? AccountId { get; set; } = null;
     public string EmailAddress { get; set; }
     public string PhoneNumber { get; set; }
+    public string Password { get; set; }
+    public Guid? PhotoBoothBrachId { get; set; }
     public AccountRole Role { get; }
     public AccountStatus Status { get; }
-    public string Password { get; set; }
-
-   public AccountsDTO(string accountID, string emailAddress,string phoneNumber, AccountRole role, AccountStatus status)
+    
+    //contrustor respone
+   public AccountDTO(Guid accountId, string emailAddress,string phoneNumber, AccountRole role, AccountStatus status, Guid? photoBoothBrachId)
    {
-        //AccountId = accountID;
+        AccountId = accountId;
         EmailAddress = emailAddress;
         PhoneNumber = phoneNumber;
         Role = role;
         Status = status;
+        PhotoBoothBrachId = photoBoothBrachId;
    }
+
+    //contrustor request
     [JsonConstructor]
-    public AccountsDTO( string emailAddress, string phoneNumber, AccountRole role, AccountStatus status, string password)
+    public AccountDTO(string emailAddress, string phoneNumber, AccountRole role, AccountStatus status, string password, Guid? photoBoothBrachId)
     {
         EmailAddress = emailAddress;
         PhoneNumber = phoneNumber;
         Role = role;
         Status = status;
         Password = password;
+        PhotoBoothBrachId = photoBoothBrachId;
     }
 }

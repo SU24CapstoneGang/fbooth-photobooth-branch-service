@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 
-namespace PhotoboothBranchService.Application.Common.Interfaces;
+namespace PhotoboothBranchService.Domain.Interfaces;
 
-public interface ICamerasRepository
+public interface ICameraRepository
 {
     Task<IEnumerable<Cameras>> GetAll(CancellationToken cancellationToken);
-    Task<IEnumerable<Cameras>> GetByName(String name, CancellationToken cancellationToken);
-    Task AddAsync(Cameras camera, CancellationToken cancellationToken);
+    Task<IEnumerable<Cameras>> GetByName(string name, CancellationToken cancellationToken);
+    Task<Guid> AddAsync(Cameras camera, CancellationToken cancellationToken);
     Task<Cameras?> GetByIdAsync(Guid cameraId, CancellationToken cancellationToken);
     Task RemoveAsync(Cameras camera, CancellationToken cancellationToken);
     Task UpdateAsync(Cameras camera, CancellationToken cancellationToken);

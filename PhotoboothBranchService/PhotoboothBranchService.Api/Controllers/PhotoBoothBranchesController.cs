@@ -1,8 +1,8 @@
 ﻿// PhotoBoothBranchesController.cs
 using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
+using PhotoboothBranchService.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -12,9 +12,9 @@ namespace PhotoboothBranchService.Api.Controllers
 {
     public class PhotoBoothBranchesController : ControllerBaseApi
     {
-        private readonly IPhotoBoothBranchesRepository _photoBoothBranchesRepository;
+        private readonly IPhotoBoothBranchRepository _photoBoothBranchesRepository;
 
-        public PhotoBoothBranchesController(IPhotoBoothBranchesRepository photoBoothBranchesRepository)
+        public PhotoBoothBranchesController(IPhotoBoothBranchRepository photoBoothBranchesRepository)
         {
             _photoBoothBranchesRepository = photoBoothBranchesRepository;
         }

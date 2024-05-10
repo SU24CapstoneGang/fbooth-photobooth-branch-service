@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PhotoboothBranchService.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class PhotoBoothInitialDB : Migration
+    public partial class PhotoBoothBranchService : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

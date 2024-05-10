@@ -1,4 +1,4 @@
-﻿namespace PhotoboothBranchService.Api.DTO
+﻿namespace PhotoboothBranchService.Api.Error
 {
     public class ApiException
     {

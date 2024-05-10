@@ -1,7 +1,7 @@
 ﻿// PrintersController.cs
 using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -11,9 +11,9 @@ namespace PhotoboothBranchService.Api.Controllers
 {
     public class PrintersController : ControllerBaseApi
     {
-        private readonly IPrintersRepository _printersRepository;
+        private readonly IPrinterRepository _printersRepository;
 
-        public PrintersController(IPrintersRepository printersRepository)
+        public PrintersController(IPrinterRepository printersRepository)
         {
             _printersRepository = printersRepository;
         }

@@ -11,12 +11,12 @@ namespace PhotoboothBranchService.Domain.Entities;
 
 public class PhotoBoothBranches : BaseEntity
 {
-    public string BranchName { get; } = null;
-    public string BranchAddress { get; } = null;
+    public string BranchName { get; } = null!;
+    public string BranchAddress { get; } = null!;
     public ManufactureStatus Status { get; }
-    public Guid AccountId { get; }
-    public Guid CameraId { get; }
-    public Guid PrinterId { get; }
+    public Guid? AccountId { get; } 
+    public Guid? CameraId { get; }
+    public Guid? PrinterId { get; }
     public virtual Accounts Account { get; }
     public virtual Cameras Camera { get; }
     public virtual Printers Printer { get; }

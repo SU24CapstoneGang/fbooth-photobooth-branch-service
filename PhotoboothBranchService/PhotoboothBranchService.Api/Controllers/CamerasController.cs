@@ -1,7 +1,7 @@
 ﻿// CamerasController.cs
 using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -11,9 +11,9 @@ namespace PhotoboothBranchService.Api.Controllers
 {
     public class CamerasController : ControllerBaseApi
     {
-        private readonly ICamerasRepository _camerasRepository;
+        private readonly ICameraRepository _camerasRepository;
 
-        public CamerasController(ICamerasRepository camerasRepository)
+        public CamerasController(ICameraRepository camerasRepository)
         {
             _camerasRepository = camerasRepository;
         }

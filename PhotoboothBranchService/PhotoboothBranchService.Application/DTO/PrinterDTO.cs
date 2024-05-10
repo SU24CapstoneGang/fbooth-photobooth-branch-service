@@ -7,23 +7,24 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Api.DTO;
+namespace PhotoboothBranchService.Application.DTO;
 
-public class PrintersDTO
+public class PrinterDTO
 {
-    public string PrinterId { get; set; }
+    public Guid? PrinterId { get; set; }
     public string ModelName { get; } = null;
     public float Price { get; }
 
-    public PrintersDTO(string printerId,string modelName, string lens, float price)
+    //contrustor respone
+    public PrinterDTO(Guid? printerId,string modelName, string lens, float price)
     {
         PrinterId = printerId;
         ModelName = modelName;
         Price = price;
     }
-    [JsonConstructor]
 
-    public PrintersDTO(string modelName, string lens, float price)
+    [JsonConstructor]
+    public PrinterDTO(string modelName, string lens, float price)
     {
         ModelName = modelName;
         Price = price;

@@ -11,7 +11,7 @@ namespace PhotoboothBranchService.Domain.Entities;
 
 public class Printers : BaseEntity
 {
-    public string ModelName { get; } = null;
+    public string ModelName { get; } = null!;
     public float Price { get; }
     public Guid PhotoBoothBranchId { get; }
     public virtual PhotoBoothBranches PhotoBoothBranch { get; }

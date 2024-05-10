@@ -2,7 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PhotoboothBranchService.Api.MiddleWare;
-using PhotoboothBranchService.Application.Common.Interfaces;
+using PhotoboothBranchService.Application.Interfaces;
+using PhotoboothBranchService.Application.Mapping;
+using PhotoboothBranchService.Application.Service;
+using PhotoboothBranchService.Domain.Interfaces;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -18,10 +21,14 @@ builder.Services.AddSwaggerGen();
 var services = builder.Services;
 services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("FboothPhotoBranchService")));
 
-services.AddScoped<IAccountsRepository, AccountsRepository>();
-services.AddScoped<IPrintersRepository, PrintersRepository>();
-services.AddScoped<ICamerasRepository, CamerasRepository>();
-services.AddScoped<IPhotoBoothBranchesRepository, PhotoBoothBranchesRepository>();
+services.AddScoped<IAccountRepository, AccountRepository>();
+services.AddScoped<IPrinterRepository, PrinterRepository>();
+services.AddScoped<ICameraRepository, CameraRepository>();
+services.AddScoped<IPhotoBoothBranchRepository, PhotoBoothBranchRepository>();
+
+services.AddScoped<IAccountService, AccountsService>();
+
+services.AddAutoMapper(typeof(MappingProfile));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

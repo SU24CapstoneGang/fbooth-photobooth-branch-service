@@ -1,5 +1,4 @@
-﻿using PhotoboothBranchService.Api.DTO;
-using PhotoboothBranchService.Api.Error;
+﻿using PhotoboothBranchService.Api.Error;
 using PhotoboothBranchService.Application.Exceptions;
 using System.Net;
 using System.Text.Json;
