@@ -21,12 +21,12 @@ builder.Services.AddSwaggerGen();
 var services = builder.Services;
 services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("FboothPhotoBranchService")));
 
-services.AddScoped<IAccountRepository, AccountRepository>();
-services.AddScoped<IPrinterRepository, PrinterRepository>();
-services.AddScoped<ICameraRepository, CameraRepository>();
-services.AddScoped<IPhotoBoothBranchRepository, PhotoBoothBranchRepository>();
+//services.AddScoped<IAccountRepository, AccountRepository>();
+//services.AddScoped<IPrinterRepository, PrinterRepository>();
+//services.AddScoped<ICameraRepository, CameraRepository>();
+//services.AddScoped<IPhotoBoothBranchRepository, PhotoBoothBranchRepository>();
 
-services.AddScoped<IAccountService, AccountsService>();
+//services.AddScoped<IAccountService, AccountsService>();
 
 services.AddAutoMapper(typeof(MappingProfile));
 var app = builder.Build();

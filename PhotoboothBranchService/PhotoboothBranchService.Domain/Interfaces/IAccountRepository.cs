@@ -10,12 +10,12 @@ namespace PhotoboothBranchService.Domain.Interfaces;
 
 public interface IAccountRepository
 {
-    Task<IEnumerable<Accounts>> GetAll(CancellationToken cancellationToken);
-    Task<IEnumerable<Accounts>> GetAll(AccountStatus status, CancellationToken cancellationToken);
-    Task<IEnumerable<Accounts>> GetListByEmail(string email, CancellationToken cancellationToken);
-    Task<Accounts?> Login(string email, string password, CancellationToken cancellationToken);
-    Task<Guid> AddAsync(Accounts account, CancellationToken cancellationToken);
-    Task<Accounts?> GetByIdAsync(Guid accountId, CancellationToken cancellationToken);
-    Task RemoveAsync(Accounts account, CancellationToken cancellationToken);
-    Task UpdateAsync(Accounts account, CancellationToken cancellationToken);
+    //Task<IEnumerable<Account>> GetAll(CancellationToken cancellationToken);
+    //Task<IEnumerable<Account>> GetAll(AccountStatus status, CancellationToken cancellationToken);
+    //Task<IEnumerable<Account>> GetListByEmail(string email, CancellationToken cancellationToken);
+    //Task<Account?> Login(string email, string password, CancellationToken cancellationToken);
+    //Task<Guid> AddAsync(Account account, CancellationToken cancellationToken);
+    //Task<Account?> GetByIdAsync(Guid accountId, CancellationToken cancellationToken);
+    //Task RemoveAsync(Account account, CancellationToken cancellationToken);
+    //Task UpdateAsync(Account account, CancellationToken cancellationToken);
 }

@@ -8,19 +8,37 @@ namespace PhotoboothBranchService.Domain.Enum;
 
 public enum ManufactureStatus
 {
-    good = 1,
-    maintenance = 2,
-    discarded = 3,
+    Good = 1,
+    Maintenance = 2,
+    Discarded = 3,
 }
 
 public enum AccountStatus
 {
-    active = 1,
-    blocked = 2,
+    Active = 1,
+    Blocked = 2,
 }
 
-public enum AccountRole
+public enum StatusUse
 {
-    admin = 1,
-    manager = 2,
+    Available = 1,
+    Unusable = 2,
 }
+public enum PhotoPrivacy
+{
+    Public = 1,
+    Private = 2
+}
+
+public enum PaymentStatus
+{
+    Active = 1,
+    Inactive = 2,
+}
+
+public enum DiscountStatus
+{
+    Active = 1,
+    Expired = 2,
+}
+

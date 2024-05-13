@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
-public class CameraRepository : ICameraRepository
+public class CameraRepository 
 {
     private readonly AppDbContext _dbContext;
     public CameraRepository(AppDbContext dbContext)
@@ -20,42 +20,42 @@ public class CameraRepository : ICameraRepository
         _dbContext = dbContext;
     }
 
-    //Create
-    public async Task<Guid> AddAsync(Cameras camera, CancellationToken cancellationToken)
-    {
-        await _dbContext.AddAsync(camera, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return camera.Id;
-    }
+    ////Create
+    //public async Task<Guid> AddAsync(Camera camera, CancellationToken cancellationToken)
+    //{
+    //    await _dbContext.AddAsync(camera, cancellationToken);
+    //    await _dbContext.SaveChangesAsync(cancellationToken);
+    //    return camera.Id;
+    //}
 
-    //Read
-    public async Task<IEnumerable<Cameras>> GetAll(CancellationToken cancellationToken)
-    {
-        return await _dbContext.Cameras.ToListAsync();
-    }
+    ////Read
+    //public async Task<IEnumerable<Camera>> GetAll(CancellationToken cancellationToken)
+    //{
+    //    return await _dbContext.Cameras.ToListAsync();
+    //}
 
-    public async Task<Cameras?> GetByIdAsync(Guid cameraId, CancellationToken cancellationToken)
-    {
-        return await _dbContext.Cameras.FindAsync(cameraId, cancellationToken);
-    }
+    //public async Task<Camera?> GetByIdAsync(Guid cameraId, CancellationToken cancellationToken)
+    //{
+    //    return await _dbContext.Cameras.FindAsync(cameraId, cancellationToken);
+    //}
 
-    public async Task<IEnumerable<Cameras>> GetByName(string name, CancellationToken cancellationToken)
-    {
-        return await _dbContext.Cameras.Where(c => c.ModelName.Contains(name)).ToListAsync();
-    }
+    //public async Task<IEnumerable<Camera>> GetByName(string name, CancellationToken cancellationToken)
+    //{
+    //    return await _dbContext.Cameras.Where(c => c.ModelName.Contains(name)).ToListAsync();
+    //}
 
-    //Update
-    public async Task UpdateAsync(Cameras camera, CancellationToken cancellationToken)
-    {
-        _dbContext.Update(camera);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-    }
+    ////Update
+    //public async Task UpdateAsync(Camera camera, CancellationToken cancellationToken)
+    //{
+    //    _dbContext.Update(camera);
+    //    await _dbContext.SaveChangesAsync(cancellationToken);
+    //}
 
-    //Delete
-    public async Task RemoveAsync(Cameras camera, CancellationToken cancellationToken)
-    {
-        _dbContext.Remove(camera);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-    }
+    ////Delete
+    //public async Task RemoveAsync(Camera camera, CancellationToken cancellationToken)
+    //{
+    //    _dbContext.Remove(camera);
+    //    await _dbContext.SaveChangesAsync(cancellationToken);
+    //}
 
 }

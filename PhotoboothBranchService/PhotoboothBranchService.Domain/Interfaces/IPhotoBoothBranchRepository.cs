@@ -10,11 +10,11 @@ namespace PhotoboothBranchService.Domain.Interfaces;
 
 public interface IPhotoBoothBranchRepository
 {
-    Task<IEnumerable<PhotoBoothBranches>> GetAll(CancellationToken cancellationToken);
-    Task<IEnumerable<PhotoBoothBranches>> GetAll(ManufactureStatus status, CancellationToken cancellationToken);
-    Task<IEnumerable<PhotoBoothBranches>> GetByName(string name, CancellationToken cancellationToken);
-    Task<Guid> AddAsync(PhotoBoothBranches photoBoothBranch, CancellationToken cancellationToken);
-    Task<PhotoBoothBranches?> GetByIdAsync(Guid photoBoothBranchId, CancellationToken cancellationToken);
-    Task RemoveAsync(PhotoBoothBranches photoBoothBranch, CancellationToken cancellationToken);
-    Task UpdateAsync(PhotoBoothBranches photoBoothBranch, CancellationToken cancellationToken);
+    //Task<IEnumerable<PhotoBoothBranch>> GetAll(CancellationToken cancellationToken);
+    //Task<IEnumerable<PhotoBoothBranch>> GetAll(ManufactureStatus status, CancellationToken cancellationToken);
+    //Task<IEnumerable<PhotoBoothBranch>> GetByName(string name, CancellationToken cancellationToken);
+    //Task<Guid> AddAsync(PhotoBoothBranch photoBoothBranch, CancellationToken cancellationToken);
+    //Task<PhotoBoothBranch?> GetByIdAsync(Guid photoBoothBranchId, CancellationToken cancellationToken);
+    //Task RemoveAsync(PhotoBoothBranch photoBoothBranch, CancellationToken cancellationToken);
+    //Task UpdateAsync(PhotoBoothBranch photoBoothBranch, CancellationToken cancellationToken);
 }

@@ -10,10 +10,10 @@ namespace PhotoboothBranchService.Domain.Interfaces;
 
 public interface IPrinterRepository
 {
-    Task<IEnumerable<Printers>> GetAll(CancellationToken cancellationToken);
-    Task<IEnumerable<Printers>> GetByName(string name, CancellationToken cancellationToken);
-    Task<Guid> AddAsync(Printers printer, CancellationToken cancellationToken);
-    Task<Printers?> GetByIdAsync(Guid printerId, CancellationToken cancellationToken);
-    Task RemoveAsync(Printers printer, CancellationToken cancellationToken);
-    Task UpdateAsync(Printers printera, CancellationToken cancellationToken);
+    //Task<IEnumerable<Printer>> GetAll(CancellationToken cancellationToken);
+    //Task<IEnumerable<Printer>> GetByName(string name, CancellationToken cancellationToken);
+    //Task<Guid> AddAsync(Printer printer, CancellationToken cancellationToken);
+    //Task<Printer?> GetByIdAsync(Guid printerId, CancellationToken cancellationToken);
+    //Task RemoveAsync(Printer printer, CancellationToken cancellationToken);
+    //Task UpdateAsync(Printer printera, CancellationToken cancellationToken);
 }

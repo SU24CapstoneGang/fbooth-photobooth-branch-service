@@ -17,7 +17,7 @@ public class PhotoBoothBranchDTO
     public string BranchAddress { get; } = null;
     public ManufactureStatus Status { get; }
     public string AccountId { get; set; } = null;
-    public Accounts Account { get; }
+    public Account Account { get; }
 
     //contrustor respone
     public PhotoBoothBranchDTO(Guid? photoBoothBranchId, string branchName, string branchAddress, ManufactureStatus manufactureStatus)
