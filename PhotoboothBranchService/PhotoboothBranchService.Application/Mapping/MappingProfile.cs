@@ -16,7 +16,7 @@ public class MappingProfile : Profile
     {
         CreateMap<Accounts, AccountDTO>()
             .ForMember(des => des.AccountId, act => act.MapFrom(src=>src.Id))
-            .ForMember(des => des.PhotoBoothBrachId, act => act.MapFrom(src => src.PhotoBoothBrachId))
+            .ForMember(des => des.PhotoBoothBrachId, act => act.MapFrom(src => src.PhotoBoothBranchId))
             .ReverseMap();
         CreateMap<Cameras, CameraDTO>()
             .ForMember(des => des.CameraId, act => act.MapFrom(src => src.Id))

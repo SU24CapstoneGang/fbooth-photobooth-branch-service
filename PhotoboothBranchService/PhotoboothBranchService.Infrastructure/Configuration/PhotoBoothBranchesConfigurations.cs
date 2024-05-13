@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace PhotoboothBranchService.Infrastructure.Configuration;
 
@@ -24,18 +25,21 @@ public class PhotoBoothBranchesConfiguration : IEntityTypeConfiguration<PhotoBoo
         builder.Property(p => p.Status)
                .IsRequired()
                .HasConversion<int>(); // Convert enum to int for storage
-
+        builder.Property(a => a.Created)
+            .ValueGeneratedOnAdd()
+            .HasDefaultValue(DateTime.UtcNow)
+            .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
         // Configure relationship
         builder.HasOne(a => a.Account)
-               .WithOne()
+               .WithOne(p => p .PhotoBoothBranch)
                .HasForeignKey<PhotoBoothBranches>(p => p.AccountId)
                .IsRequired(false);
         builder.HasOne(p => p.Camera)
-               .WithOne()
+               .WithOne(p => p .PhotoBoothBranch)
                .HasForeignKey<PhotoBoothBranches>(c => c.CameraId)
                .IsRequired(false);
         builder.HasOne(p => p.Printer)
-               .WithOne()
+               .WithOne(p => p .PhotoBoothBranch)
                .HasForeignKey<PhotoBoothBranches>(p => p.PrinterId)
                .IsRequired(false);
     }

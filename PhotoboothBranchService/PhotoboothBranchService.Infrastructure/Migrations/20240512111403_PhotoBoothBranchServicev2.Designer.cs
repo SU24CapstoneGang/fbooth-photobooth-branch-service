@@ -12,8 +12,8 @@ using PhotoboothBranchService.Infrastructure.Common.Persistence;
 namespace PhotoboothBranchService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240509125403_PhotoBoothBranchService")]
-    partial class PhotoBoothBranchService
+    [Migration("20240512111403_PhotoBoothBranchServicev2")]
+    partial class PhotoBoothBranchServicev2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +50,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
+
+                    b.Property<Guid?>("PhotoBoothBranchId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
@@ -103,7 +106,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("PhotoBoothBranch ID");
 
-                    b.Property<Guid>("AccountId")
+                    b.Property<Guid?>("AccountId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BranchAddress")
@@ -116,7 +119,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<Guid>("CameraId")
+                    b.Property<Guid?>("CameraId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Created")
@@ -125,7 +128,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("PrinterId")
+                    b.Property<Guid?>("PrinterId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Status")
@@ -134,13 +137,16 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[AccountId] IS NOT NULL");
 
                     b.HasIndex("CameraId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[CameraId] IS NOT NULL");
 
                     b.HasIndex("PrinterId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[PrinterId] IS NOT NULL");
 
                     b.ToTable("PhotoBoothBranches", (string)null);
                 });
@@ -173,15 +179,15 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.PhotoBoothBranches", b =>
                 {
                     b.HasOne("PhotoboothBranchService.Domain.Entities.Accounts", "Account")
-                        .WithOne()
+                        .WithOne("PhotoBoothBranch")
                         .HasForeignKey("PhotoboothBranchService.Domain.Entities.PhotoBoothBranches", "AccountId");
 
                     b.HasOne("PhotoboothBranchService.Domain.Entities.Cameras", "Camera")
-                        .WithOne()
+                        .WithOne("PhotoBoothBranch")
                         .HasForeignKey("PhotoboothBranchService.Domain.Entities.PhotoBoothBranches", "CameraId");
 
                     b.HasOne("PhotoboothBranchService.Domain.Entities.Printers", "Printer")
-                        .WithOne()
+                        .WithOne("PhotoBoothBranch")
                         .HasForeignKey("PhotoboothBranchService.Domain.Entities.PhotoBoothBranches", "PrinterId");
 
                     b.Navigation("Account");
@@ -189,6 +195,23 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Navigation("Camera");
 
                     b.Navigation("Printer");
+                });
+
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Accounts", b =>
+                {
+                    b.Navigation("PhotoBoothBranch");
+                });
+
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Cameras", b =>
+                {
+                    b.Navigation("PhotoBoothBranch")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Printers", b =>
+                {
+                    b.Navigation("PhotoBoothBranch")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

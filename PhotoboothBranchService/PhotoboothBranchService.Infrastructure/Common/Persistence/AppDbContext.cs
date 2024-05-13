@@ -38,5 +38,6 @@ public class AppDbContext: DbContext
         modelBuilder.ApplyConfiguration(new CameraConfigurations());
         modelBuilder.ApplyConfiguration(new PhotoBoothBranchesConfiguration());
         modelBuilder.ApplyConfiguration(new PrintersConfiguration());
+
     }
 }

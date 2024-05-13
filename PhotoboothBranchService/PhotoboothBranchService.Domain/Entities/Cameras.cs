@@ -11,15 +11,15 @@ namespace PhotoboothBranchService.Domain.Entities;
 
 public class Cameras : BaseEntity
 {
-    public string ModelName { get; } = null;
-    public string SensorType { get; } = null;
-    public string Lens { get; } = null;
-    public float Price { get; }
-    public Guid? PhotoBoothBranchId {  get; } 
-    public virtual PhotoBoothBranches PhotoBoothBranch { get; }
+    public string ModelName { get; set; } = null!;
+    public string SensorType { get; set; } = null!;
+    public string Lens { get; set; } = null!;
+    public float Price { get; set; } 
+    public Guid? PhotoBoothBranchId { get; set; } = null!;
+    public virtual PhotoBoothBranches PhotoBoothBranch { get; set; } = null!;
 
     [JsonConstructor]
-    public Cameras(Guid id, string modelName, string sensorType, string lens, float price, Guid photoBoothBranchId) : base(id)
+    public Cameras(Guid id, string modelName, string sensorType, string lens, float price, Guid? photoBoothBranchId) : base(id)
     {
         ModelName = modelName;
         SensorType = sensorType;

@@ -16,11 +16,11 @@ public class AccountDTO
     public string PhoneNumber { get; set; }
     public string Password { get; set; }
     public Guid? PhotoBoothBrachId { get; set; }
-    public AccountRole Role { get; }
-    public AccountStatus Status { get; }
-    
+    public AccountRole Role { get; set; }
+    public AccountStatus Status { get; set; }
+
     //contrustor respone
-   public AccountDTO(Guid accountId, string emailAddress,string phoneNumber, AccountRole role, AccountStatus status, Guid? photoBoothBrachId)
+    public AccountDTO(Guid accountId, string emailAddress,string phoneNumber, AccountRole role, AccountStatus status, Guid? photoBoothBrachId)
    {
         AccountId = accountId;
         EmailAddress = emailAddress;
@@ -41,4 +41,5 @@ public class AccountDTO
         Password = password;
         PhotoBoothBrachId = photoBoothBrachId;
     }
+    public AccountDTO() { }
 }

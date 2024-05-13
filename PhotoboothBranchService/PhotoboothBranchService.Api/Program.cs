@@ -27,6 +27,9 @@ services.AddScoped<ICameraRepository, CameraRepository>();
 services.AddScoped<IPhotoBoothBranchRepository, PhotoBoothBranchRepository>();
 
 services.AddScoped<IAccountService, AccountsService>();
+services.AddScoped<ICameraService, CameraService>();
+services.AddScoped<IPhotoBoothBranchService, PhotoBoothBranchService>();
+services.AddScoped<IPrinterService, PrinterService>();
 
 services.AddAutoMapper(typeof(MappingProfile));
 var app = builder.Build();

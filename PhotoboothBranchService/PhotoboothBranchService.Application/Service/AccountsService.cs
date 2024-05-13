@@ -23,13 +23,16 @@ public class AccountsService : IAccountService
         _mapper = mapper;
     }
 
-    public Task<Guid> CreateAsync(AccountDTO entity, CancellationToken cancellationToken)
+
+    //Create
+    public async Task<Guid> CreateAsync(AccountDTO entityDTO, CancellationToken cancellationToken)
     {
-        Accounts account = new Accounts(Guid.NewGuid(), entity.EmailAddress, entity.PhoneNumber,
-                    entity.Password, entity.Role, entity.Status, entity.PhotoBoothBrachId);
-        return _accountsRepository.AddAsync(account,cancellationToken);
+        Accounts account = _mapper.Map<Accounts>(entityDTO);
+        account.Id= Guid.NewGuid();
+        return await _accountsRepository.AddAsync(account,cancellationToken);
     }
 
+    //Delete
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
         try
@@ -46,6 +49,7 @@ public class AccountsService : IAccountService
         
     }
 
+    //Read
     public async Task<IEnumerable<AccountDTO>> GetAll(AccountStatus status, CancellationToken cancellationToken)
     {
         var accounts = await _accountsRepository.GetAll(status, cancellationToken);
@@ -76,10 +80,12 @@ public class AccountsService : IAccountService
         return _mapper.Map<AccountDTO>(accounts);
     }
 
-    public async Task UpdateAsync(Guid id, AccountDTO entity, CancellationToken cancellationToken)
+    //Update
+    public async Task UpdateAsync(Guid id, AccountDTO entityDTO, CancellationToken cancellationToken)
     {
-        entity.AccountId = id;
-        Accounts accounts = _mapper.Map<Accounts>(entity);
+        entityDTO.AccountId = id;
+        Accounts accounts = _mapper.Map<Accounts>(entityDTO);
+        accounts.LastModified = DateTime.Now;
         await _accountsRepository.UpdateAsync(accounts,cancellationToken);
     }
 }

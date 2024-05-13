@@ -8,8 +8,8 @@ namespace PhotoboothBranchService.Domain.Common;
 
 public abstract class BaseEntity
 {
-    public Guid Id { get; private init; }
-    public DateTime Created { get; set; } = DateTime.Now;
+    public Guid Id { get; set; }
+    public DateTime Created { get; set; }
     public DateTime? LastModified { get; set; }
 
     protected BaseEntity(Guid id)

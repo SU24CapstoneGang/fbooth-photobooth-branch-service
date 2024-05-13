@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace PhotoboothBranchService.Infrastructure.Configuration;
 
@@ -16,9 +17,17 @@ public class PrintersConfiguration : IEntityTypeConfiguration<Printers>
         builder.ToTable("Printers");
 
         builder.HasKey(p => p.Id);
-        builder.Property(u => u.Id).HasColumnName("Printer ID")
-    .ValueGeneratedNever();
+        builder.Property(u => u.Id).HasColumnName("Printer ID").ValueGeneratedNever();
         builder.Property(p => p.ModelName).HasMaxLength(255).IsRequired();
         builder.Property(p => p.Price);
+
+        builder.Property(a => a.Created)
+            .ValueGeneratedOnAdd()
+            .HasDefaultValue(DateTime.UtcNow)
+            .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+        /* builder.HasOne(a => a.PhotoBoothBranch)
+             .WithOne()
+             .HasForeignKey<Printers>(p => p.PhotoBoothBranchId)
+             .IsRequired(false);*/
     }
 }

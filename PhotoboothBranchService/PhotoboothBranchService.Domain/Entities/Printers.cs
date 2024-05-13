@@ -11,12 +11,12 @@ namespace PhotoboothBranchService.Domain.Entities;
 
 public class Printers : BaseEntity
 {
-    public string ModelName { get; } = null!;
-    public float Price { get; }
-    public Guid PhotoBoothBranchId { get; }
-    public virtual PhotoBoothBranches PhotoBoothBranch { get; }
+    public string ModelName { get; set; } = null!;
+    public float Price { get; set; }
+    public Guid? PhotoBoothBranchId { get; set; } = null!;
+    public virtual PhotoBoothBranches PhotoBoothBranch { get; set; } = null!;
     [JsonConstructor]
-    public Printers(Guid id, string modelName, string lens, float price, Guid photoBoothBranchId) : base(id)
+    public Printers(Guid id, string modelName, float price, Guid? photoBoothBranchId) : base(id)
     {
         ModelName = modelName;
         Price = price;

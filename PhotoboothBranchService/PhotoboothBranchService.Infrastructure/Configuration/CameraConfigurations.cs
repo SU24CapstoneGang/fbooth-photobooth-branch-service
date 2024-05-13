@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
 using System;
@@ -23,5 +24,15 @@ public class CameraConfigurations : IEntityTypeConfiguration<Cameras>
         builder.Property(c => c.SensorType).HasMaxLength(100).IsRequired();
         builder.Property(c => c.Lens).HasMaxLength(255);
         builder.Property(c => c.Price);
+
+        builder.Property(a => a.Created)
+            .ValueGeneratedOnAdd()
+            .HasDefaultValue(DateTime.UtcNow)
+            .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
+        /*   builder.HasOne(a => a.PhotoBoothBranch)
+               .WithOne()
+               .HasForeignKey<Cameras>(p => p.PhotoBoothBranchId)
+               .IsRequired(false);*/
     }
 }

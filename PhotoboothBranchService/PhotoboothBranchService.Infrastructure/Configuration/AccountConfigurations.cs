@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
 using System;
@@ -29,5 +30,14 @@ public class AccountConfigurations : IEntityTypeConfiguration<Accounts>
         builder.Property(a => a.Status)
                .IsRequired()
                .HasConversion<int>(); // Convert enum to int for storage
+        builder.Property(a => a.Created)
+               .ValueGeneratedOnAdd()
+               .HasDefaultValue(DateTime.UtcNow)
+               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
+        /*   builder.HasOne(a => a.PhotoBoothBranch)
+                  .WithOne()
+                  .HasForeignKey<Accounts>(p => p.PhotoBoothBranchId)
+                  .IsRequired(false);*/
     }
 }
