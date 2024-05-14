@@ -14,18 +14,18 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        //CreateMap<Account, AccountDTO>()
-        //    .ForMember(des => des.AccountId, act => act.MapFrom(src=>src.Id))
-        //    .ForMember(des => des.PhotoBoothBrachId, act => act.MapFrom(src => src.PhotoBoothBrachId))
-        //    .ReverseMap();
-        //CreateMap<Camera, CameraDTO>()
-        //    .ForMember(des => des.CameraId, act => act.MapFrom(src => src.Id))
-        //    .ReverseMap();
-        //CreateMap<PhotoBoothBranch, PhotoBoothBranchDTO>()
-        //    .ForMember(des => des.PhotoBoothBranchId, act => act.MapFrom(src => src.Id))
-        //    .ReverseMap();
-        //CreateMap<Printer, PrinterDTO>()
-        //    .ForMember(des => des.PrinterId, act => act.MapFrom(src => src.Id))
-        //    .ReverseMap();
+        CreateMap<Accounts, AccountDTO>()
+            .ForMember(des => des.AccountId, act => act.MapFrom(src=>src.Id))
+            .ForMember(des => des.PhotoBoothBrachId, act => act.MapFrom(src => src.PhotoBoothBranchId))
+            .ReverseMap();
+        CreateMap<Cameras, CameraDTO>()
+            .ForMember(des => des.CameraId, act => act.MapFrom(src => src.Id))
+            .ReverseMap();
+        CreateMap<PhotoBoothBranches, PhotoBoothBranchDTO>()
+            .ForMember(des => des.PhotoBoothBranchId, act => act.MapFrom(src => src.Id))
+            .ReverseMap();
+        CreateMap<Printers, PrinterDTO>()
+            .ForMember(des => des.PrinterId, act => act.MapFrom(src => src.Id))
+            .ReverseMap();
     }
 }

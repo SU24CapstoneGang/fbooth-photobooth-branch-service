@@ -13,11 +13,11 @@ namespace PhotoboothBranchService.Application.DTO;
 public class PhotoBoothBranchDTO
 {
     public Guid? PhotoBoothBranchId { get; set; }
-    public string BranchName { get; } = null;
-    public string BranchAddress { get; } = null;
-    public ManufactureStatus Status { get; }
+    public string BranchName { get; set; } = null;
+    public string BranchAddress { get; set; } = null;
+    public ManufactureStatus Status { get; set; }
     public string AccountId { get; set; } = null;
-    public Account Account { get; }
+    public Accounts Account { get; set; }
 
     //contrustor respone
     public PhotoBoothBranchDTO(Guid? photoBoothBranchId, string branchName, string branchAddress, ManufactureStatus manufactureStatus)
@@ -34,4 +34,5 @@ public class PhotoBoothBranchDTO
         BranchAddress = branchAddress;
         Status = manufactureStatus;
     }
+    public PhotoBoothBranchDTO() { }
 }

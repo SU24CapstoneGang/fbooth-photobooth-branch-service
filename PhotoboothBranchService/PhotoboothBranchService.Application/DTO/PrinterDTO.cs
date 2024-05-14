@@ -12,8 +12,8 @@ namespace PhotoboothBranchService.Application.DTO;
 public class PrinterDTO
 {
     public Guid? PrinterId { get; set; }
-    public string ModelName { get; } = null;
-    public float Price { get; }
+    public string ModelName { get; set; } = null;
+    public float Price { get; set; }
 
     //contrustor respone
     public PrinterDTO(Guid? printerId,string modelName, string lens, float price)
@@ -29,4 +29,5 @@ public class PrinterDTO
         ModelName = modelName;
         Price = price;
     }
+    public PrinterDTO() { }
 }
