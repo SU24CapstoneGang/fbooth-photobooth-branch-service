@@ -16,30 +16,29 @@ public class AccountDTO
     public string PhoneNumber { get; set; }
     public string Password { get; set; }
     public Guid? PhotoBoothBrachId { get; set; }
-    public AccountRole Role { get; set; }
-    public AccountStatus Status { get; set; }
-
+    //public AccountRole Role { get; }
+    public AccountStatus Status { get; }
+    
     //contrustor respone
-    public AccountDTO(Guid accountId, string emailAddress,string phoneNumber, AccountRole role, AccountStatus status, Guid? photoBoothBrachId)
-   {
-        AccountId = accountId;
-        EmailAddress = emailAddress;
-        PhoneNumber = phoneNumber;
-        Role = role;
-        Status = status;
-        PhotoBoothBrachId = photoBoothBrachId;
-   }
+   //public AccountDTO(Guid accountId, string emailAddress,string phoneNumber, AccountRole role, AccountStatus status, Guid? photoBoothBrachId)
+   //{
+   //     AccountId = accountId;
+   //     EmailAddress = emailAddress;
+   //     PhoneNumber = phoneNumber;
+   //     Role = role;
+   //     Status = status;
+   //     PhotoBoothBrachId = photoBoothBrachId;
+   //}
 
     //contrustor request
-    [JsonConstructor]
-    public AccountDTO(string emailAddress, string phoneNumber, AccountRole role, AccountStatus status, string password, Guid? photoBoothBrachId)
-    {
-        EmailAddress = emailAddress;
-        PhoneNumber = phoneNumber;
-        Role = role;
-        Status = status;
-        Password = password;
-        PhotoBoothBrachId = photoBoothBrachId;
-    }
-    public AccountDTO() { }
+    //[JsonConstructor]
+    //public AccountDTO(string emailAddress, string phoneNumber, AccountRole role, AccountStatus status, string password, Guid? photoBoothBrachId)
+    //{
+    //    EmailAddress = emailAddress;
+    //    PhoneNumber = phoneNumber;
+    //    Role = role;
+    //    Status = status;
+    //    Password = password;
+    //    PhotoBoothBrachId = photoBoothBrachId;
+    //}
 }
