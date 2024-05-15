@@ -12,27 +12,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Customers",
-                columns: table => new
-                {
-                    CustomerID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    PasswordSalt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Customers", x => x.CustomerID);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Discounts",
                 columns: table => new
                 {
@@ -150,27 +129,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TransactionHistories",
-                columns: table => new
-                {
-                    TransactionID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FinalPictureNumber = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CustomerID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TransactionHistories", x => x.TransactionID);
-                    table.ForeignKey(
-                        name: "FK_TransactionHistories_Customers_CustomerID",
-                        column: x => x.CustomerID,
-                        principalTable: "Customers",
-                        principalColumn: "CustomerID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Orders",
                 columns: table => new
                 {
@@ -206,7 +164,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     AccountID = table.Column<Guid>(name: "Account ID", type: "uniqueidentifier", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     PasswordSalt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -284,6 +241,27 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     table.PrimaryKey("PK_PhotoBoothBranches", x => x.BranchesID);
                     table.ForeignKey(
                         name: "FK_PhotoBoothBranches_Accounts_AccountID",
+                        column: x => x.AccountID,
+                        principalTable: "Accounts",
+                        principalColumn: "Account ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TransactionHistories",
+                columns: table => new
+                {
+                    TransactionID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FinalPictureNumber = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AccountID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransactionHistories", x => x.TransactionID);
+                    table.ForeignKey(
+                        name: "FK_TransactionHistories_Accounts_AccountID",
                         column: x => x.AccountID,
                         principalTable: "Accounts",
                         principalColumn: "Account ID",
@@ -373,18 +351,11 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     SessionID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CustomerID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     BranchesID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Sessions", x => x.SessionID);
-                    table.ForeignKey(
-                        name: "FK_Sessions_Customers_CustomerID",
-                        column: x => x.CustomerID,
-                        principalTable: "Customers",
-                        principalColumn: "CustomerID",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Sessions_Orders_SessionID",
                         column: x => x.SessionID,
@@ -408,12 +379,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 name: "IX_Accounts_RoleID",
                 table: "Accounts",
                 column: "RoleID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Accounts_UserName",
-                table: "Accounts",
-                column: "UserName",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Cameras_PhotoBoothBranchId",
@@ -484,14 +449,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 column: "BranchesID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sessions_CustomerID",
-                table: "Sessions",
-                column: "CustomerID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TransactionHistories_CustomerID",
+                name: "IX_TransactionHistories_AccountID",
                 table: "TransactionHistories",
-                column: "CustomerID");
+                column: "AccountID");
         }
 
         /// <inheritdoc />
@@ -523,9 +483,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "PhotoBoothBranches");
-
-            migrationBuilder.DropTable(
-                name: "Customers");
 
             migrationBuilder.DropTable(
                 name: "Filters");

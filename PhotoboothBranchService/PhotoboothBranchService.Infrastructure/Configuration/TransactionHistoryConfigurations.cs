@@ -26,9 +26,9 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
                 .IsRequired();
 
             // Relationship with Customer
-            builder.HasOne(th => th.Customer)
+            builder.HasOne(th => th.Account)
                 .WithMany(c => c.TransactionHistories)
-                .HasForeignKey(th => th.CustomerID)
+                .HasForeignKey(th => th.AccountID)
                 .IsRequired();
         }
     }

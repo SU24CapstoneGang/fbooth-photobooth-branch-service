@@ -1,15 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.Interfaces;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -21,51 +16,66 @@ public class AccountRepository : IAccountRepository
         _dbContext = dbContext;
     }
 
-    ////Create
-    //public async Task<Guid> AddAsync(Account account, CancellationToken cancellationToken)
-    //{
-    //    await _dbContext.AddAsync(account, cancellationToken);
-    //    await _dbContext.SaveChangesAsync(cancellationToken);
-    //    return account.Id;
-    //}
+    //Create
+    public async Task<Guid> AddAsync(Account account)
+    {
+        await _dbContext.AddAsync(account);
+        await _dbContext.SaveChangesAsync();
+        return account.AccountID;
+    }
 
-    ////Read
-    //public async Task<IEnumerable<Account>> GetAll(CancellationToken cancellationToken)
-    //{
-    //    return await _dbContext.Accounts.ToListAsync();
-    //}
+    //Read
+    public async Task<IEnumerable<Account>> GetAll()
+    {
+        return await _dbContext.Accounts.ToListAsync();
+    }
 
-    //public async Task<IEnumerable<Account>>  GetAll(AccountStatus status, CancellationToken cancellationToken)
-    //{
-    //    return await _dbContext.Accounts.Where(c => c.Status == status).ToListAsync();
-    //}
+    public async Task<IEnumerable<Account>> GetAll(AccountStatus status)
+    {
+        return await _dbContext.Accounts.Where(c => c.Status == status).ToListAsync();
+    }
 
-    //public async Task<Account?> Login(string email, string password, CancellationToken cancellationToken)
-    //{
-    //    return await _dbContext.Accounts.FirstOrDefaultAsync(a => a.EmailAddress.Equals(email) && a.Password.Equals(password), cancellationToken);
-    //}
+    public async Task<Account?> Login(string email, string password)
+    {
+        var user = await _dbContext.Accounts.Where(a => a.Email == email).FirstOrDefaultAsync();
 
-    //public async Task<IEnumerable<Account>> GetListByEmail(string email, CancellationToken cancellationToken)
-    //{
-    //    return await _dbContext.Accounts.Where(c => c.EmailAddress.Contains(email)).ToListAsync();
-    //}
+        if (user == null)
+        {
+            return null;
+        }
 
-    //public async Task<Account?> GetByIdAsync(Guid accountId, CancellationToken cancellationToken)
-    //{
-    //    return await _dbContext.Accounts.FindAsync(accountId, cancellationToken);
-    //}
+        using var hmac = new HMACSHA512(user.PasswordSalt);
+        var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+       
+        if (computedHash.SequenceEqual(user.PasswordHash))
+        {
+            return null;
+        }
 
-    ////Update
-    //public async Task UpdateAsync(Account account, CancellationToken cancellationToken)
-    //{
-    //    _dbContext.Update(account);
-    //    await _dbContext.SaveChangesAsync(cancellationToken);
-    //}
+        return user;
+    }
 
-    ////Delete
-    //public async Task RemoveAsync(Account account, CancellationToken cancellationToken)
-    //{
-    //    _dbContext.Remove(account);
-    //    await _dbContext.SaveChangesAsync(cancellationToken);
-    //}
+    public async Task<IEnumerable<Account>> GetListByEmail(string email)
+    {
+        return await _dbContext.Accounts.Where(c => c.Email.Contains(email)).ToListAsync();
+    }
+
+    public async Task<Account?> GetByIdAsync(Guid accountId)
+    {
+        return await _dbContext.Accounts.FindAsync(accountId);
+    }
+
+    //Update
+    public async Task UpdateAsync(Account account)
+    {
+        _dbContext.Update(account);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    //Delete
+    public async Task RemoveAsync(Account account)
+    {
+        _dbContext.Remove(account);
+        await _dbContext.SaveChangesAsync();
+    }
 }

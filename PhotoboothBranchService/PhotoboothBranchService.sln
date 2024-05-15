@@ -12,7 +12,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoboothBranchService.Inf
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoboothBranchService.Domain", "PhotoboothBranchService.Domain\PhotoboothBranchService.Domain.csproj", "{CC3EAF27-2968-43FF-B095-EF2155E9BE66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoboothBranchService.Api", "PhotoboothBranchService.Api\PhotoboothBranchService.Api.csproj", "{4E15CF80-307B-4683-9EA9-B6BA668569C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoboothBranchService.Api", "PhotoboothBranchService.Api\PhotoboothBranchService.Api.csproj", "{4E15CF80-307B-4683-9EA9-B6BA668569C8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DF5FB447-B93D-4E03-965F-12F3C8ACFABB}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -26,12 +26,6 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
             builder.Property(s => s.EndTime)
                 .IsRequired();
 
-            // Relationship with Customer
-            builder.HasOne(s => s.Customer)
-                .WithMany(c => c.Sessions)
-                .HasForeignKey(s => s.CustomerID)
-                .IsRequired();
-
             // Relationship with PhotoBoothBranch
             builder.HasOne(s => s.PhotoBoothBranch)
                 .WithMany(pb => pb.Sessions)

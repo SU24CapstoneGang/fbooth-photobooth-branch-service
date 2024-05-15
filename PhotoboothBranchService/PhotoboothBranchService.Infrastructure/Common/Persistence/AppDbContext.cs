@@ -16,7 +16,6 @@ public class AppDbContext: DbContext
 {
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Camera> Cameras { get; set; }
-    public DbSet<Customer> Customers { get; set; }
     public DbSet<Discount> Discounts { get; set; }
     public DbSet<EffectsPack> EffectsPacks { get; set; }
     public DbSet<Filter> Filters { get; set; }
@@ -50,7 +49,6 @@ public class AppDbContext: DbContext
     {
         modelBuilder.ApplyConfiguration(new AccountConfigurations());
         modelBuilder.ApplyConfiguration(new CameraConfigurations());
-        modelBuilder.ApplyConfiguration(new CustomerConfigurations());
         modelBuilder.ApplyConfiguration(new DiscountConfigurations());
         modelBuilder.ApplyConfiguration(new EffectPackConfigurations());
         modelBuilder.ApplyConfiguration(new FilterConfigurations());

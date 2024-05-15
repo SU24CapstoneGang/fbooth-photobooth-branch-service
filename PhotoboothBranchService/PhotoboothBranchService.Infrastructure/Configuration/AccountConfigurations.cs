@@ -23,7 +23,6 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
 
         builder.Property(a => a.FirstName).IsRequired().HasMaxLength(50);
         builder.Property(a => a.LastName).IsRequired().HasMaxLength(50);
-        builder.Property(a => a.UserName).IsRequired().HasMaxLength(50);
         builder.Property(u => u.Email).IsRequired().HasMaxLength(100);
         builder.Property(u => u.PhoneNumber).HasMaxLength(11);
         builder.Property(u => u.PasswordHash).IsRequired();
@@ -35,12 +34,17 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
         builder.HasOne(a => a.Role)
                 .WithMany(r => r.Accounts)
                 .HasForeignKey(a => a.RoleID)
-                .IsRequired();
+                .IsRequired(false);
 
         // Relationship with PhotoBoothBranch
         builder.HasMany(a => a.PhotoBoothBranches)
             .WithOne(pb => pb.Account)
             .HasForeignKey(a => a.AccountID)
+            .IsRequired();
+
+        builder.HasMany(a => a.TransactionHistories)
+            .WithOne(s => s.Account)
+            .HasForeignKey(s => s.AccountID)
             .IsRequired();
 
         // Account status enum mapping
@@ -51,7 +55,6 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
                 v => (AccountStatus)Enum.Parse(typeof(AccountStatus), v));
 
         // Indexes
-        builder.HasIndex(a => a.UserName).IsUnique();
         builder.HasIndex(a => a.Email).IsUnique();
     }
 }

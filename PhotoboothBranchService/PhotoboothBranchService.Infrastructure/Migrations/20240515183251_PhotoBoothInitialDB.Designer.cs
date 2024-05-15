@@ -12,7 +12,7 @@ using PhotoboothBranchService.Infrastructure.Common.Persistence;
 namespace PhotoboothBranchService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240513200409_PhotoBoothInitialDB")]
+    [Migration("20240515183251_PhotoBoothInitialDB")]
     partial class PhotoBoothInitialDB
     {
         /// <inheritdoc />
@@ -67,17 +67,13 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
-                    b.Property<Guid>("RoleID")
+                    b.Property<Guid?>("RoleID")
+                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("AccountID");
 
@@ -85,9 +81,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .IsUnique();
 
                     b.HasIndex("RoleID");
-
-                    b.HasIndex("UserName")
-                        .IsUnique();
 
                     b.ToTable("Accounts", (string)null);
                 });
@@ -125,62 +118,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Cameras", (string)null);
-                });
-
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Customer", b =>
-                {
-                    b.Property<Guid>("CustomerID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<byte[]>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<byte[]>("PasswordSalt")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("CustomerID");
-
-                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Discount", b =>
@@ -529,9 +466,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<Guid>("BranchesID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CustomerID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
 
@@ -541,8 +475,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.HasKey("SessionID");
 
                     b.HasIndex("BranchesID");
-
-                    b.HasIndex("CustomerID");
 
                     b.ToTable("Sessions", (string)null);
                 });
@@ -580,11 +512,11 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("AccountID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CustomerID")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -596,7 +528,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
                     b.HasKey("TransactionID");
 
-                    b.HasIndex("CustomerID");
+                    b.HasIndex("AccountID");
 
                     b.ToTable("TransactionHistories", (string)null);
                 });
@@ -732,17 +664,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PhotoboothBranchService.Domain.Entities.Customer", "Customer")
-                        .WithMany("Sessions")
-                        .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("PhotoboothBranchService.Domain.Entities.Order", "Order")
                         .WithOne("Session")
                         .HasForeignKey("PhotoboothBranchService.Domain.Entities.Session", "SessionID");
-
-                    b.Navigation("Customer");
 
                     b.Navigation("Order");
 
@@ -751,23 +675,18 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.TransactionHistory", b =>
                 {
-                    b.HasOne("PhotoboothBranchService.Domain.Entities.Customer", "Customer")
+                    b.HasOne("PhotoboothBranchService.Domain.Entities.Account", "Account")
                         .WithMany("TransactionHistories")
-                        .HasForeignKey("CustomerID")
+                        .HasForeignKey("AccountID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Customer");
+                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Account", b =>
                 {
                     b.Navigation("PhotoBoothBranches");
-                });
-
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Customer", b =>
-                {
-                    b.Navigation("Sessions");
 
                     b.Navigation("TransactionHistories");
                 });

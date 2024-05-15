@@ -1,13 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTO;
 using PhotoboothBranchService.Application.Interfaces;
-using PhotoboothBranchService.Domain.Entities;
-using PhotoboothBranchService.Domain.Enum;
-using PhotoboothBranchService.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using PhotoboothBranchService.Application.Services.CustomerService;
 
 namespace PhotoboothBranchService.Api.Controllers;
 
@@ -18,6 +12,47 @@ public class AccountsController : ControllerBaseApi
     public AccountsController(IAccountService accountService)
     {
         _accountService = accountService;
+    }
+
+    [HttpPost("login")]
+    public async Task<ActionResult<AccountDTO>> Login([FromBody] LoginDTO loginDTO)
+    {
+        try
+        {
+            var account = await _accountService.Login(loginDTO);
+            if (account == null)
+            {
+                return NotFound("Invalid email or password.");
+            }
+            return Ok(account);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred during login: {ex.Message}");
+        }
+    }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] AccountDTO request)
+    {
+        // Kiểm tra xem request có hợp lệ không
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        // Gọi hàm Register từ service
+        var result = await _accountService.Register(request);
+
+        // Kiểm tra kết quả và trả về phản hồi tương ứng
+        if (result != null)
+        {
+            return Ok(result);
+        }
+        else
+        {
+            return BadRequest("Failed to register account");
+        }
     }
 
     //[HttpGet]
@@ -62,23 +97,7 @@ public class AccountsController : ControllerBaseApi
     //    }
     //}
 
-    //[HttpGet("login")]
-    //public async Task<ActionResult<AccountDTO>> Login([FromQuery] string email, [FromQuery] string password, CancellationToken cancellationToken)
-    //{
-    //    try
-    //    {
-    //        var account = await _accountService.Login(email, password,cancellationToken);
-    //        if (account == null)
-    //        {
-    //            return NotFound("Invalid email or password.");
-    //        }
-    //        return Ok(account);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return StatusCode(500, $"An error occurred during login: {ex.Message}");
-    //    }
-    //}
+
 
     //[HttpPost]
     //public async Task<ActionResult> CreateAccount(AccountDTO accountDTO, CancellationToken cancellationToken)
