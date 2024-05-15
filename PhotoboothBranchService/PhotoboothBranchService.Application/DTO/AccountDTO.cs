@@ -12,34 +12,33 @@ namespace PhotoboothBranchService.Application.DTO;
 public class AccountDTO
 {
     public Guid? AccountId { get; set; } = null;
-    public string EmailAddress { get; set; }
-    public string PhoneNumber { get; set; }
+    public string FirstName { get; set; } = default!;
+    public string LastName { get; set; } = default!;
+    public string UserName { get; set; } = default!;
     public string Password { get; set; }
-    public Guid? PhotoBoothBrachId { get; set; }
-    public AccountRole Role { get; set; }
-    public AccountStatus Status { get; set; }
+    public DateTime DateOfBirth { get; set; } = default!;
+    public string Address { get; set; } = default!;
+    public string Email { get; set; } = default!;
+    public string PhoneNumber { get; set; } = default!;
+    public AccountStatus Status { get; set; } = default!;
+    public Guid RoleID { get; set; }
 
-    //contrustor respone
-    public AccountDTO(Guid accountId, string emailAddress,string phoneNumber, AccountRole role, AccountStatus status, Guid? photoBoothBrachId)
-   {
-        AccountId = accountId;
-        EmailAddress = emailAddress;
-        PhoneNumber = phoneNumber;
-        Role = role;
-        Status = status;
-        PhotoBoothBrachId = photoBoothBrachId;
-   }
-
-    //contrustor request
-    [JsonConstructor]
-    public AccountDTO(string emailAddress, string phoneNumber, AccountRole role, AccountStatus status, string password, Guid? photoBoothBrachId)
+    public AccountDTO()
     {
-        EmailAddress = emailAddress;
-        PhoneNumber = phoneNumber;
-        Role = role;
-        Status = status;
-        Password = password;
-        PhotoBoothBrachId = photoBoothBrachId;
     }
-    public AccountDTO() { }
+
+    [JsonConstructor]
+    public AccountDTO(string firstName, string lastName, string userName, string password, DateTime dateOfBirth, string address, string email, string phoneNumber, AccountStatus status, Guid roleID)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        UserName = userName;
+        Password = password;
+        DateOfBirth = dateOfBirth;
+        Address = address;
+        Email = email;
+        PhoneNumber = phoneNumber;
+        Status = status;
+        RoleID = roleID;
+    }
 }

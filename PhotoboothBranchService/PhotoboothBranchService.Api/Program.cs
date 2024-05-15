@@ -1,10 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PhotoboothBranchService.Api.MiddleWare;
+using PhotoboothBranchService.Application.Common.Utilities;
 using PhotoboothBranchService.Application.Interfaces;
 using PhotoboothBranchService.Application.Mapping;
 using PhotoboothBranchService.Application.Service;
+using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Interfaces;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using PhotoboothBranchService.Infrastructure.Repositories;
@@ -25,11 +29,15 @@ services.AddScoped<IAccountRepository, AccountRepository>();
 services.AddScoped<IPrinterRepository, PrinterRepository>();
 services.AddScoped<ICameraRepository, CameraRepository>();
 services.AddScoped<IPhotoBoothBranchRepository, PhotoBoothBranchRepository>();
+services.AddScoped<IRoleRepository, RoleRepository>();
 
-services.AddScoped<IAccountService, AccountsService>();
+services.AddScoped<IAccountService, AccountService>();
 services.AddScoped<ICameraService, CameraService>();
 services.AddScoped<IPhotoBoothBranchService, PhotoBoothBranchService>();
 services.AddScoped<IPrinterService, PrinterService>();
+services.AddScoped<IRoleService, RoleService>();
+
+services.AddScoped<IPasswordHasher, PasswordHasher>();
 
 services.AddAutoMapper(typeof(MappingProfile));
 var app = builder.Build();

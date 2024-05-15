@@ -24,10 +24,10 @@ public class PrinterService : IPrinterService
 
     public async Task<Guid> CreateAsync(PrinterDTO entityDTO, CancellationToken cancellationToken)
     {
-        Printers printer = _mapper.Map<Printers>(entityDTO);
-        printer.Id = Guid.NewGuid();
+        Printer printer = _mapper.Map<Printer>(entityDTO);
+        printer.PrinterID = Guid.NewGuid();
         await _printerRepository.AddAsync(printer, cancellationToken);
-        return printer.Id;
+        return printer.PrinterID;
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
@@ -67,8 +67,7 @@ public class PrinterService : IPrinterService
     public async Task UpdateAsync(Guid id, PrinterDTO entityDTO, CancellationToken cancellationToken)
     {
         entityDTO.PrinterId = id;
-        Printers printer = _mapper.Map<Printers>(entityDTO);
-        printer.LastModified = DateTime.UtcNow;
+        Printer printer = _mapper.Map<Printer>(entityDTO);
         await _printerRepository.UpdateAsync(printer, cancellationToken);
     }
 }

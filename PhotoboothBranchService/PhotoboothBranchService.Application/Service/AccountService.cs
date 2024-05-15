@@ -1,34 +1,38 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.DTO;
 using PhotoboothBranchService.Application.Interfaces;
+using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Service;
 
-public class AccountsService : IAccountService
+public class AccountService : IAccountService
 {
     private readonly IAccountRepository _accountsRepository;
     private readonly IMapper _mapper;
-
-    public AccountsService(IAccountRepository accountsRepository, IMapper mapper)
+    private readonly IPasswordHasher _passwordHasher;
+    public AccountService(IAccountRepository accountsRepository, IMapper mapper, IPasswordHasher passwordHasher)
     {
         _accountsRepository = accountsRepository;
         _mapper = mapper;
+        _passwordHasher = passwordHasher;
     }
 
 
     //Create
     public async Task<Guid> CreateAsync(AccountDTO entityDTO, CancellationToken cancellationToken)
     {
-        Accounts account = _mapper.Map<Accounts>(entityDTO);
-        account.Id= Guid.NewGuid();
+        Account account = _mapper.Map<Account>(entityDTO);
+        account.AccountID= Guid.NewGuid();
+        account.SetPassword(entityDTO.Password, _passwordHasher);
         return await _accountsRepository.AddAsync(account,cancellationToken);
     }
 
@@ -37,7 +41,7 @@ public class AccountsService : IAccountService
     {
         try
         {
-            Accounts? accounts = await _accountsRepository.GetByIdAsync(id, cancellationToken);
+            Account? accounts = await _accountsRepository.GetByIdAsync(id, cancellationToken);
             if (accounts != null)
             {
                 await _accountsRepository.RemoveAsync(accounts, cancellationToken);
@@ -73,10 +77,23 @@ public class AccountsService : IAccountService
         var accounts = await _accountsRepository.GetListByEmail(email, cancellationToken);
         return _mapper.Map<IEnumerable<AccountDTO>>(accounts);
     }
-
-    public async Task<AccountDTO?> Login(string email, string password, CancellationToken cancellationToken)
+    //Login
+    public async Task<AccountDTO?> LoginWithPassword(string emailOrUsername, string password, CancellationToken cancellationToken)
     {
-        var accounts = await _accountsRepository.Login(email,password, cancellationToken);
+        var accounts = await _accountsRepository.GetByEmail(emailOrUsername);
+        if (accounts == null)
+        {
+            accounts = await _accountsRepository.GetByUsername(emailOrUsername);
+        }
+        if (accounts == null)
+        {
+            return null;
+        }
+        var isPasswordValid = accounts.VerifyPassword(password, _passwordHasher);
+        if (!isPasswordValid)
+        {
+            return null;
+        }
         return _mapper.Map<AccountDTO>(accounts);
     }
 
@@ -84,8 +101,7 @@ public class AccountsService : IAccountService
     public async Task UpdateAsync(Guid id, AccountDTO entityDTO, CancellationToken cancellationToken)
     {
         entityDTO.AccountId = id;
-        Accounts accounts = _mapper.Map<Accounts>(entityDTO);
-        accounts.LastModified = DateTime.Now;
+        Account accounts = _mapper.Map<Account>(entityDTO);
         await _accountsRepository.UpdateAsync(accounts,cancellationToken);
     }
 }

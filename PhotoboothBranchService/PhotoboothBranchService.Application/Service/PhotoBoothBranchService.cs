@@ -25,10 +25,10 @@ public class PhotoBoothBranchService : IPhotoBoothBranchService
 
     public async Task<Guid> CreateAsync(PhotoBoothBranchDTO entityDTO, CancellationToken cancellationToken)
     {
-        PhotoBoothBranches photoBoothBranch = _mapper.Map<PhotoBoothBranches>(entityDTO);
-        photoBoothBranch.Id = Guid.NewGuid();
+        PhotoBoothBranch photoBoothBranch = _mapper.Map<PhotoBoothBranch>(entityDTO);
+        photoBoothBranch.BranchesID = Guid.NewGuid();
         await _photoBoothBranchRepository.AddAsync(photoBoothBranch, cancellationToken);
-        return photoBoothBranch.Id;
+        return photoBoothBranch.BranchesID;
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
@@ -74,8 +74,7 @@ public class PhotoBoothBranchService : IPhotoBoothBranchService
     public async Task UpdateAsync(Guid id, PhotoBoothBranchDTO entityDTO, CancellationToken cancellationToken)
     {
         entityDTO.PhotoBoothBranchId = id;
-        PhotoBoothBranches photoBoothBranch = _mapper.Map<PhotoBoothBranches>(entityDTO);
-        photoBoothBranch.LastModified = DateTime.UtcNow;
+        PhotoBoothBranch photoBoothBranch = _mapper.Map<PhotoBoothBranch>(entityDTO);
         await _photoBoothBranchRepository.UpdateAsync(photoBoothBranch, cancellationToken);
     }
 }

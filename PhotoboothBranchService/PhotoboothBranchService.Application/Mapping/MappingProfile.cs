@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.DTO;
+using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,18 +15,18 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<Accounts, AccountDTO>()
-            .ForMember(des => des.AccountId, act => act.MapFrom(src=>src.Id))
-            .ForMember(des => des.PhotoBoothBrachId, act => act.MapFrom(src => src.PhotoBoothBranchId))
+        CreateMap<Account, AccountDTO>()
+            .ForMember(des => des.AccountId, act => act.MapFrom(src=>src.AccountID))
             .ReverseMap();
-        CreateMap<Cameras, CameraDTO>()
-            .ForMember(des => des.CameraId, act => act.MapFrom(src => src.Id))
+        CreateMap<Camera, CameraDTO>()
+            .ForMember(des => des.CameraId, act => act.MapFrom(src => src.CameraID))
             .ReverseMap();
-        CreateMap<PhotoBoothBranches, PhotoBoothBranchDTO>()
-            .ForMember(des => des.PhotoBoothBranchId, act => act.MapFrom(src => src.Id))
+        CreateMap<PhotoBoothBranch, PhotoBoothBranchDTO>()
+            .ForMember(des => des.PhotoBoothBranchId, act => act.MapFrom(src => src.BranchesID))
             .ReverseMap();
-        CreateMap<Printers, PrinterDTO>()
-            .ForMember(des => des.PrinterId, act => act.MapFrom(src => src.Id))
+        CreateMap<Printer, PrinterDTO>()
+            .ForMember(des => des.PrinterId, act => act.MapFrom(src => src.PrinterID))
             .ReverseMap();
+        CreateMap<Role, RoleDTO>().ReverseMap();
     }
 }

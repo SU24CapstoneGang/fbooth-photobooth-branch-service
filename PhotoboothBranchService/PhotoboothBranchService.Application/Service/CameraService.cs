@@ -26,8 +26,8 @@ public class CameraService : ICameraService
     //Create
     public async Task<Guid> CreateAsync(CameraDTO entityDTO, CancellationToken cancellationToken)
     {
-        Cameras cameras = _mapper.Map<Cameras>(entityDTO);
-        cameras.Id = Guid.NewGuid();
+        Camera cameras = _mapper.Map<Camera>(entityDTO);
+        cameras.CameraID = Guid.NewGuid();
         return await _cameraRepository.AddAsync(cameras, cancellationToken);
     }
 
@@ -36,7 +36,7 @@ public class CameraService : ICameraService
     {
         try
         {
-            Cameras? cameras = await _cameraRepository.GetByIdAsync(id,cancellationToken);
+            Camera? cameras = await _cameraRepository.GetByIdAsync(id,cancellationToken);
             if (cameras != null)
             {
                 await _cameraRepository.RemoveAsync(cameras, cancellationToken);
@@ -72,8 +72,7 @@ public class CameraService : ICameraService
     public async Task UpdateAsync(Guid id, CameraDTO entityDTO, CancellationToken cancellationToken)
     {
         entityDTO.CameraId= id;
-        Cameras cameras = _mapper.Map<Cameras>(entityDTO);
-        cameras.LastModified = DateTime.UtcNow;
+        Camera cameras = _mapper.Map<Camera>(entityDTO);
         await _cameraRepository.UpdateAsync(cameras,cancellationToken);
     }
 }

@@ -12,8 +12,8 @@ using PhotoboothBranchService.Infrastructure.Common.Persistence;
 namespace PhotoboothBranchService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240513200409_PhotoBoothInitialDB")]
-    partial class PhotoBoothInitialDB
+    [Migration("20240515054003_PhotoBooth")]
+    partial class PhotoBooth
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
