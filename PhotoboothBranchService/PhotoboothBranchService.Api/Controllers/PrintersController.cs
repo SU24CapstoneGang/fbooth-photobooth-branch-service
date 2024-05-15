@@ -22,11 +22,11 @@ public class PrintersController : ControllerBaseApi
 
     //Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreatePrinter(PrinterDTO printerDTO, CancellationToken cancellationToken)
+    public async Task<ActionResult<Guid>> CreatePrinter(PrinterDTO printerDTO)
     {
         try
         {
-            var id = await _printerService.CreateAsync(printerDTO, cancellationToken);
+            var id = await _printerService.CreateAsync(printerDTO);
             return Ok(id);
         }
         catch (Exception ex)
@@ -37,11 +37,11 @@ public class PrintersController : ControllerBaseApi
 
     //Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PrinterDTO>>> GetAllPrinters(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<PrinterDTO>>> GetAllPrinters()
     {
         try
         {
-            var printers = await _printerService.GetAllAsync(cancellationToken);
+            var printers = await _printerService.GetAllAsync();
             return Ok(printers);
         }
         catch (Exception ex)
@@ -51,11 +51,11 @@ public class PrintersController : ControllerBaseApi
     }
 
     [HttpGet("name/{name}")]
-    public async Task<ActionResult<IEnumerable<PrinterDTO>>> GetPrintersByName(string name, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<PrinterDTO>>> GetPrintersByName(string name)
     {
         try
         {
-            var printers = await _printerService.GetByName(name, cancellationToken);
+            var printers = await _printerService.GetByName(name);
             return Ok(printers);
         }
         catch (Exception ex)
@@ -65,11 +65,11 @@ public class PrintersController : ControllerBaseApi
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<PrinterDTO>> GetPrinterById(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<PrinterDTO>> GetPrinterById(Guid id)
     {
         try
         {
-            var printer = await _printerService.GetByIdAsync(id, cancellationToken);
+            var printer = await _printerService.GetByIdAsync(id);
             if (printer == null)
             {
                 return NotFound();
@@ -84,11 +84,11 @@ public class PrintersController : ControllerBaseApi
 
     //Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdatePrinter(Guid id, PrinterDTO printerDTO, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdatePrinter(Guid id, PrinterDTO printerDTO)
     {
         try
         {
-            await _printerService.UpdateAsync(id, printerDTO, cancellationToken);
+            await _printerService.UpdateAsync(id, printerDTO);
             return Ok();
         }
         catch (Exception ex)
@@ -99,11 +99,11 @@ public class PrintersController : ControllerBaseApi
 
     //Delete
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeletePrinter(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeletePrinter(Guid id)
     {
         try
         {
-            await _printerService.DeleteAsync(id, cancellationToken);
+            await _printerService.DeleteAsync(id);
             return Ok();
         }
         catch (Exception ex)

@@ -10,10 +10,10 @@ namespace PhotoboothBranchService.Domain.Interfaces;
 
 public interface ICameraRepository
 {
-    Task<IEnumerable<Camera>> GetAll(CancellationToken cancellationToken);
-    Task<IEnumerable<Camera>> GetByName(string name, CancellationToken cancellationToken);
-    Task<Guid> AddAsync(Camera camera, CancellationToken cancellationToken);
-    Task<Camera?> GetByIdAsync(Guid cameraId, CancellationToken cancellationToken);
-    Task RemoveAsync(Camera camera, CancellationToken cancellationToken);
-    Task UpdateAsync(Camera camera, CancellationToken cancellationToken);
+    Task<IEnumerable<Camera>> GetAll();
+    Task<IEnumerable<Camera>> GetByName(string name);
+    Task<Guid> AddAsync(Camera camera);
+    Task<Camera?> GetByIdAsync(Guid cameraId);
+    Task RemoveAsync(Camera camera);
+    Task UpdateAsync(Camera camera);
 }

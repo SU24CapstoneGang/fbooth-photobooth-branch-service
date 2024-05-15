@@ -30,12 +30,22 @@ services.AddScoped<IPrinterRepository, PrinterRepository>();
 services.AddScoped<ICameraRepository, CameraRepository>();
 services.AddScoped<IPhotoBoothBranchRepository, PhotoBoothBranchRepository>();
 services.AddScoped<IRoleRepository, RoleRepository>();
+services.AddScoped<IFrameRepository, FrameRepository>();
+services.AddScoped<IFilterRepository, FilterRepository>();
+services.AddScoped<IStickerRepository, StickerRepository>();
+services.AddScoped<ILayoutRepository, LayoutRepository>();
 
 services.AddScoped<IAccountService, AccountService>();
 services.AddScoped<ICameraService, CameraService>();
 services.AddScoped<IPhotoBoothBranchService, PhotoBoothBranchService>();
 services.AddScoped<IPrinterService, PrinterService>();
 services.AddScoped<IRoleService, RoleService>();
+services.AddScoped<IFilterService, FilterService>();
+services.AddScoped<IFrameService, FrameService>();
+services.AddScoped<IStickerService, StickerService>();
+services.AddScoped<ILayoutService, LayoutService>();
+
+
 
 services.AddScoped<IPasswordHasher, PasswordHasher>();
 

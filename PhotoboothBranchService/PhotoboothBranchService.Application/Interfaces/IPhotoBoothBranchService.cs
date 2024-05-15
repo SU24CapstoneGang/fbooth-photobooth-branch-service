@@ -12,6 +12,6 @@ namespace PhotoboothBranchService.Application.Interfaces;
 
 public interface IPhotoBoothBranchService : IService<PhotoBoothBranchDTO>
 {
-    Task<IEnumerable<PhotoBoothBranchDTO>> GetAll(ManufactureStatus status, CancellationToken cancellationToken);
-    Task<IEnumerable<PhotoBoothBranchDTO>> GetByName(string name, CancellationToken cancellationToken);
+    Task<IEnumerable<PhotoBoothBranchDTO>> GetAll(ManufactureStatus status);
+    Task<IEnumerable<PhotoBoothBranchDTO>> GetByName(string name);
 }

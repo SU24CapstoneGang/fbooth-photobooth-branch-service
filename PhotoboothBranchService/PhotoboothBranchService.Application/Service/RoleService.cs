@@ -22,7 +22,7 @@ public class RoleService : IRoleService
         _mapper = mapper;
     }
 
-    public async Task<Guid> CreateAsync(RoleDTO entityDTO, CancellationToken cancellationToken)
+    public async Task<Guid> CreateAsync(RoleDTO entityDTO)
     {
         Role role = _mapper.Map<Role>(entityDTO);
         role.RoleID = Guid.NewGuid();
@@ -30,7 +30,7 @@ public class RoleService : IRoleService
         return role.RoleID;
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task DeleteAsync(Guid id)
     {
         try
         {
@@ -46,13 +46,13 @@ public class RoleService : IRoleService
         }
     }
 
-    public async Task<IEnumerable<RoleDTO>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<RoleDTO>> GetAllAsync()
     {
         var roles = await _roleRepository.GetAll();
         return _mapper.Map<IEnumerable<RoleDTO>>(roles);
     }
 
-    public async Task<RoleDTO> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<RoleDTO> GetByIdAsync(Guid id)
     {
         var role = await _roleRepository.GetByIdAsync(id);
         return _mapper.Map<RoleDTO>(role);
@@ -64,7 +64,7 @@ public class RoleService : IRoleService
         return _mapper.Map<IEnumerable<RoleDTO>>(roles);
     }
 
-    public async Task UpdateAsync(Guid id, RoleDTO entityDTO, CancellationToken cancellationToken)
+    public async Task UpdateAsync(Guid id, RoleDTO entityDTO)
     {
         entityDTO.RoleID = id;
         Role role = _mapper.Map<Role>(entityDTO);

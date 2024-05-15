@@ -24,22 +24,22 @@ public class CameraService : ICameraService
     }
 
     //Create
-    public async Task<Guid> CreateAsync(CameraDTO entityDTO, CancellationToken cancellationToken)
+    public async Task<Guid> CreateAsync(CameraDTO entityDTO)
     {
         Camera cameras = _mapper.Map<Camera>(entityDTO);
         cameras.CameraID = Guid.NewGuid();
-        return await _cameraRepository.AddAsync(cameras, cancellationToken);
+        return await _cameraRepository.AddAsync(cameras);
     }
 
     //Delete
-    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task DeleteAsync(Guid id)
     {
         try
         {
-            Camera? cameras = await _cameraRepository.GetByIdAsync(id,cancellationToken);
+            Camera? cameras = await _cameraRepository.GetByIdAsync(id);
             if (cameras != null)
             {
-                await _cameraRepository.RemoveAsync(cameras, cancellationToken);
+                await _cameraRepository.RemoveAsync(cameras);
             }
         }
         catch
@@ -49,30 +49,30 @@ public class CameraService : ICameraService
     }
 
     //Read
-    public async Task<IEnumerable<CameraDTO>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<CameraDTO>> GetAllAsync()
     {
-        var cameras = await _cameraRepository.GetAll(cancellationToken);
+        var cameras = await _cameraRepository.GetAll();
         return _mapper.Map<IEnumerable<CameraDTO>>(cameras);
     }
 
-    public async Task<CameraDTO> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<CameraDTO> GetByIdAsync(Guid id)
     {
-        var cameras = await _cameraRepository.GetByIdAsync(id, cancellationToken);
+        var cameras = await _cameraRepository.GetByIdAsync(id);
         return _mapper.Map<CameraDTO>(cameras);
     }
 
-    public async Task<IEnumerable<CameraDTO>> GetByName(string name, CancellationToken cancellationToken)
+    public async Task<IEnumerable<CameraDTO>> GetByName(string name)
     {
-        var cameras = await _cameraRepository.GetByName(name, cancellationToken);
+        var cameras = await _cameraRepository.GetByName(name);
         return _mapper.Map<IEnumerable<CameraDTO>>(cameras);
     }
 
 
     //Update
-    public async Task UpdateAsync(Guid id, CameraDTO entityDTO, CancellationToken cancellationToken)
+    public async Task UpdateAsync(Guid id, CameraDTO entityDTO)
     {
         entityDTO.CameraId= id;
         Camera cameras = _mapper.Map<Camera>(entityDTO);
-        await _cameraRepository.UpdateAsync(cameras,cancellationToken);
+        await _cameraRepository.UpdateAsync(cameras);
     }
 }

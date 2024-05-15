@@ -28,5 +28,9 @@ public class MappingProfile : Profile
             .ForMember(des => des.PrinterId, act => act.MapFrom(src => src.PrinterID))
             .ReverseMap();
         CreateMap<Role, RoleDTO>().ReverseMap();
+        CreateMap<Layout, LayoutDTO>().ReverseMap();
+        CreateMap<Filter, FilterDTO>().ReverseMap();
+        CreateMap<Sticker, StickerDTO>().ReverseMap();
+        CreateMap<Frame, FrameDTO>().ReverseMap();
     }
 }

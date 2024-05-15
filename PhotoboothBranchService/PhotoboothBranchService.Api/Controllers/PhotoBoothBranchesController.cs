@@ -23,11 +23,11 @@ public class PhotoBoothBranchesController : ControllerBaseApi
 
     //Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreatePhotoBoothBranch(PhotoBoothBranchDTO photoBoothBranchDTO, CancellationToken cancellationToken)
+    public async Task<ActionResult<Guid>> CreatePhotoBoothBranch(PhotoBoothBranchDTO photoBoothBranchDTO)
     {
         try
         {
-            var id = await _photoBoothBranchService.CreateAsync(photoBoothBranchDTO, cancellationToken);
+            var id = await _photoBoothBranchService.CreateAsync(photoBoothBranchDTO);
             return Ok(id);
         }
         catch (Exception ex)
@@ -38,11 +38,11 @@ public class PhotoBoothBranchesController : ControllerBaseApi
 
     //Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PhotoBoothBranchDTO>>> GetAllPhotoBoothBranches(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<PhotoBoothBranchDTO>>> GetAllPhotoBoothBranches()
     {
         try
         {
-            var branches = await _photoBoothBranchService.GetAllAsync(cancellationToken);
+            var branches = await _photoBoothBranchService.GetAllAsync();
             return Ok(branches);
         }
         catch (Exception ex)
@@ -52,11 +52,11 @@ public class PhotoBoothBranchesController : ControllerBaseApi
     }
 
     [HttpGet("status/{status}")]
-    public async Task<ActionResult<IEnumerable<PhotoBoothBranchDTO>>> GetPhotoBoothBranchesByStatus(ManufactureStatus status, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<PhotoBoothBranchDTO>>> GetPhotoBoothBranchesByStatus(ManufactureStatus status)
     {
         try
         {
-            var branches = await _photoBoothBranchService.GetAll(status, cancellationToken);
+            var branches = await _photoBoothBranchService.GetAll(status);
             return Ok(branches);
         }
         catch (Exception ex)
@@ -66,11 +66,11 @@ public class PhotoBoothBranchesController : ControllerBaseApi
     }
 
     [HttpGet("name/{name}")]
-    public async Task<ActionResult<IEnumerable<PhotoBoothBranchDTO>>> GetPhotoBoothBranchesByName(string name, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<PhotoBoothBranchDTO>>> GetPhotoBoothBranchesByName(string name)
     {
         try
         {
-            var branches = await _photoBoothBranchService.GetByName(name, cancellationToken);
+            var branches = await _photoBoothBranchService.GetByName(name);
             return Ok(branches);
         }
         catch (Exception ex)
@@ -80,11 +80,11 @@ public class PhotoBoothBranchesController : ControllerBaseApi
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<PhotoBoothBranchDTO>> GetPhotoBoothBranchById(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<PhotoBoothBranchDTO>> GetPhotoBoothBranchById(Guid id)
     {
         try
         {
-            var branch = await _photoBoothBranchService.GetByIdAsync(id, cancellationToken);
+            var branch = await _photoBoothBranchService.GetByIdAsync(id);
             if (branch == null)
             {
                 return NotFound();
@@ -99,11 +99,11 @@ public class PhotoBoothBranchesController : ControllerBaseApi
 
     //Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdatePhotoBoothBranch(Guid id, PhotoBoothBranchDTO photoBoothBranchDTO, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdatePhotoBoothBranch(Guid id, PhotoBoothBranchDTO photoBoothBranchDTO)
     {
         try
         {
-            await _photoBoothBranchService.UpdateAsync(id, photoBoothBranchDTO, cancellationToken);
+            await _photoBoothBranchService.UpdateAsync(id, photoBoothBranchDTO);
             return Ok();
         }
         catch (Exception ex)
@@ -114,11 +114,11 @@ public class PhotoBoothBranchesController : ControllerBaseApi
 
     //Delete
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeletePhotoBoothBranch(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeletePhotoBoothBranch(Guid id)
     {
         try
         {
-            await _photoBoothBranchService.DeleteAsync(id, cancellationToken);
+            await _photoBoothBranchService.DeleteAsync(id);
             return Ok();
         }
         catch (Exception ex)

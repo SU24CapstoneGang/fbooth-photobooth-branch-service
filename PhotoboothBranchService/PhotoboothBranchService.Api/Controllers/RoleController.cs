@@ -19,11 +19,11 @@ public class RoleController : ControllerBaseApi
 
     // Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreateRole(RoleDTO roleDTO, CancellationToken cancellationToken)
+    public async Task<ActionResult<Guid>> CreateRole(RoleDTO roleDTO)
     {
         try
         {
-            var id = await _roleService.CreateAsync(roleDTO, cancellationToken);
+            var id = await _roleService.CreateAsync(roleDTO);
             return Ok(id);
         }
         catch (Exception ex)
@@ -34,11 +34,11 @@ public class RoleController : ControllerBaseApi
 
     // Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<RoleDTO>>> GetAllRoles(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<RoleDTO>>> GetAllRoles()
     {
         try
         {
-            var roles = await _roleService.GetAllAsync(cancellationToken);
+            var roles = await _roleService.GetAllAsync();
             return Ok(roles);
         }
         catch (Exception ex)
@@ -48,7 +48,7 @@ public class RoleController : ControllerBaseApi
     }
 
     [HttpGet("name/{name}")]
-    public async Task<ActionResult<IEnumerable<RoleDTO>>> GetRolesByName(string name, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<RoleDTO>>> GetRolesByName(string name)
     {
         try
         {
@@ -62,11 +62,11 @@ public class RoleController : ControllerBaseApi
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<RoleDTO>> GetRoleById(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<RoleDTO>> GetRoleById(Guid id)
     {
         try
         {
-            var role = await _roleService.GetByIdAsync(id, cancellationToken);
+            var role = await _roleService.GetByIdAsync(id);
             if (role == null)
             {
                 return NotFound();
@@ -81,11 +81,11 @@ public class RoleController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateRole(Guid id, RoleDTO roleDTO, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateRole(Guid id, RoleDTO roleDTO)
     {
         try
         {
-            await _roleService.UpdateAsync(id, roleDTO, cancellationToken);
+            await _roleService.UpdateAsync(id, roleDTO);
             return Ok();
         }
         catch (Exception ex)
@@ -96,11 +96,11 @@ public class RoleController : ControllerBaseApi
 
     // Delete
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteRole(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteRole(Guid id)
     {
         try
         {
-            await _roleService.DeleteAsync(id, cancellationToken);
+            await _roleService.DeleteAsync(id);
             return Ok();
         }
         catch (Exception ex)

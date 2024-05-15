@@ -21,41 +21,41 @@ public class CameraRepository : ICameraRepository
     }
 
     //Create
-    public async Task<Guid> AddAsync(Camera camera, CancellationToken cancellationToken)
+    public async Task<Guid> AddAsync(Camera camera)
     {
-        await _dbContext.AddAsync(camera, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.AddAsync(camera);
+        await _dbContext.SaveChangesAsync();
         return camera.CameraID;
     }
 
     //Read
-    public async Task<IEnumerable<Camera>> GetAll(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Camera>> GetAll()
     {
         return await _dbContext.Cameras.ToListAsync();
     }
 
-    public async Task<Camera?> GetByIdAsync(Guid cameraId, CancellationToken cancellationToken)
+    public async Task<Camera?> GetByIdAsync(Guid cameraId)
     {
-        return await _dbContext.Cameras.FindAsync(cameraId, cancellationToken);
+        return await _dbContext.Cameras.FindAsync(cameraId);
     }
 
-    public async Task<IEnumerable<Camera>> GetByName(string name, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Camera>> GetByName(string name)
     {
         return await _dbContext.Cameras.Where(c => c.ModelName.Contains(name)).ToListAsync();
     }
 
     //Update
-    public async Task UpdateAsync(Camera camera, CancellationToken cancellationToken)
+    public async Task UpdateAsync(Camera camera)
     {
         _dbContext.Update(camera);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync();
     }
 
     //Delete
-    public async Task RemoveAsync(Camera camera, CancellationToken cancellationToken)
+    public async Task RemoveAsync(Camera camera)
     {
         _dbContext.Remove(camera);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync();
     }
 
 }

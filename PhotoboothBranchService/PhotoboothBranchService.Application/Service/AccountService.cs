@@ -28,23 +28,23 @@ public class AccountService : IAccountService
 
 
     //Create
-    public async Task<Guid> CreateAsync(AccountDTO entityDTO, CancellationToken cancellationToken)
+    public async Task<Guid> CreateAsync(AccountDTO entityDTO)
     {
         Account account = _mapper.Map<Account>(entityDTO);
         account.AccountID= Guid.NewGuid();
         account.SetPassword(entityDTO.Password, _passwordHasher);
-        return await _accountsRepository.AddAsync(account,cancellationToken);
+        return await _accountsRepository.AddAsync(account);
     }
 
     //Delete
-    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task DeleteAsync(Guid id)
     {
         try
         {
-            Account? accounts = await _accountsRepository.GetByIdAsync(id, cancellationToken);
+            Account? accounts = await _accountsRepository.GetByIdAsync(id);
             if (accounts != null)
             {
-                await _accountsRepository.RemoveAsync(accounts, cancellationToken);
+                await _accountsRepository.RemoveAsync(accounts);
             }
         } catch (Exception ex)
         {
@@ -54,31 +54,31 @@ public class AccountService : IAccountService
     }
 
     //Read
-    public async Task<IEnumerable<AccountDTO>> GetAll(AccountStatus status, CancellationToken cancellationToken)
+    public async Task<IEnumerable<AccountDTO>> GetAll(AccountStatus status)
     {
-        var accounts = await _accountsRepository.GetAll(status, cancellationToken);
+        var accounts = await _accountsRepository.GetAll(status);
         return _mapper.Map<IEnumerable<AccountDTO>>(accounts);
     }
 
-    public async Task<IEnumerable<AccountDTO>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<AccountDTO>> GetAllAsync()
     {
-        var accounts = await _accountsRepository.GetAll(cancellationToken);
+        var accounts = await _accountsRepository.GetAll();
         return _mapper.Map<IEnumerable<AccountDTO>>(accounts);
     }
 
-    public async Task<AccountDTO> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<AccountDTO> GetByIdAsync(Guid id)
     {
-        var accounts = await _accountsRepository.GetByIdAsync(id,cancellationToken);
+        var accounts = await _accountsRepository.GetByIdAsync(id);
         return _mapper.Map<AccountDTO>(accounts);
     }
 
-    public async Task<IEnumerable<AccountDTO>> GetListByEmail(string email, CancellationToken cancellationToken)
+    public async Task<IEnumerable<AccountDTO>> GetListByEmail(string email)
     {
-        var accounts = await _accountsRepository.GetListByEmail(email, cancellationToken);
+        var accounts = await _accountsRepository.GetListByEmail(email);
         return _mapper.Map<IEnumerable<AccountDTO>>(accounts);
     }
     //Login
-    public async Task<AccountDTO?> LoginWithPassword(string emailOrUsername, string password, CancellationToken cancellationToken)
+    public async Task<AccountDTO?> LoginWithPassword(string emailOrUsername, string password)
     {
         var accounts = await _accountsRepository.GetByEmail(emailOrUsername);
         if (accounts == null)
@@ -98,10 +98,10 @@ public class AccountService : IAccountService
     }
 
     //Update
-    public async Task UpdateAsync(Guid id, AccountDTO entityDTO, CancellationToken cancellationToken)
+    public async Task UpdateAsync(Guid id, AccountDTO entityDTO )
     {
         entityDTO.AccountId = id;
         Account accounts = _mapper.Map<Account>(entityDTO);
-        await _accountsRepository.UpdateAsync(accounts,cancellationToken);
+        await _accountsRepository.UpdateAsync(accounts);
     }
 }

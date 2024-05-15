@@ -21,40 +21,40 @@ public class PrinterRepository : IPrinterRepository
     }
 
     //Create
-    public async Task<Guid> AddAsync(Printer printer, CancellationToken cancellationToken)
+    public async Task<Guid> AddAsync(Printer printer)
     {
-        await _dbContext.AddAsync(printer, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.AddAsync(printer);
+        await _dbContext.SaveChangesAsync();
         return printer.PrinterID;
     }
 
     //Read
-    public async Task<IEnumerable<Printer>> GetAll(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Printer>> GetAll( )
     {
-        return await _dbContext.Printers.ToListAsync(cancellationToken);
+        return await _dbContext.Printers.ToListAsync();
     }
 
-    public async Task<IEnumerable<Printer>> GetByName(string name, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Printer>> GetByName(string name)
     {
-        return await _dbContext.Printers.Where(p => p.ModelName.Contains(name)).ToListAsync(cancellationToken);
+        return await _dbContext.Printers.Where(p => p.ModelName.Contains(name)).ToListAsync();
     }
 
-    public async Task<Printer?> GetByIdAsync(Guid printerId, CancellationToken cancellationToken)
+    public async Task<Printer?> GetByIdAsync(Guid printerId)
     {
-        return await _dbContext.Printers.FindAsync(printerId, cancellationToken);
+        return await _dbContext.Printers.FindAsync(printerId);
     }
 
     //Update
-    public async Task UpdateAsync(Printer printer, CancellationToken cancellationToken)
+    public async Task UpdateAsync(Printer printer)
     {
         _dbContext.Update(printer);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync();
     }
 
     //Delete
-    public async Task RemoveAsync(Printer printer, CancellationToken cancellationToken)
+    public async Task RemoveAsync(Printer printer)
     {
         _dbContext.Printers.Remove(printer);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync();
     }
 }

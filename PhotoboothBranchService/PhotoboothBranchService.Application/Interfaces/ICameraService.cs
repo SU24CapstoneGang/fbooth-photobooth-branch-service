@@ -11,5 +11,5 @@ namespace PhotoboothBranchService.Application.Interfaces;
 
 public interface ICameraService : IService<CameraDTO>
 {
-    Task<IEnumerable<CameraDTO>> GetByName(string name, CancellationToken cancellationToken);
+    Task<IEnumerable<CameraDTO>> GetByName(string name);
 }

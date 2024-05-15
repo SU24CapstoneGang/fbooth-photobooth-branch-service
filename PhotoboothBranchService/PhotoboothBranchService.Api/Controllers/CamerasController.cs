@@ -22,11 +22,11 @@ public class CamerasController : ControllerBaseApi
 
     //Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreateCamera(CameraDTO cameraDTO, CancellationToken cancellationToken)
+    public async Task<ActionResult<Guid>> CreateCamera(CameraDTO cameraDTO)
     {
         try
         {
-            var id = await _cameraService.CreateAsync(cameraDTO, cancellationToken);
+            var id = await _cameraService.CreateAsync(cameraDTO);
             return Ok(id);
         }
         catch (Exception ex)
@@ -37,11 +37,11 @@ public class CamerasController : ControllerBaseApi
 
     //Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CameraDTO>>> GetAllCameras(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<CameraDTO>>> GetAllCameras()
     {
         try
         {
-            var cameras = await _cameraService.GetAllAsync(cancellationToken);
+            var cameras = await _cameraService.GetAllAsync();
             return Ok(cameras);
         }
         catch (Exception ex)
@@ -51,11 +51,11 @@ public class CamerasController : ControllerBaseApi
     }
 
     [HttpGet("name/{name}")]
-    public async Task<ActionResult<IEnumerable<CameraDTO>>> GetCamerasByName(string name, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<CameraDTO>>> GetCamerasByName(string name)
     {
         try
         {
-            var cameras = await _cameraService.GetByName(name, cancellationToken);
+            var cameras = await _cameraService.GetByName(name);
             return Ok(cameras);
         }
         catch (Exception ex)
@@ -65,11 +65,11 @@ public class CamerasController : ControllerBaseApi
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<CameraDTO>> GetCameraById(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<CameraDTO>> GetCameraById(Guid id)
     {
         try
         {
-            var camera = await _cameraService.GetByIdAsync(id, cancellationToken);
+            var camera = await _cameraService.GetByIdAsync(id);
             if (camera == null)
             {
                 return NotFound();
@@ -84,11 +84,11 @@ public class CamerasController : ControllerBaseApi
 
     //Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateCamera(Guid id, CameraDTO cameraDTO, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateCamera(Guid id, CameraDTO cameraDTO)
     {
         try
         {
-            await _cameraService.UpdateAsync(id, cameraDTO, cancellationToken);
+            await _cameraService.UpdateAsync(id, cameraDTO);
             return Ok();
         }
         catch (Exception ex)
@@ -100,11 +100,11 @@ public class CamerasController : ControllerBaseApi
 
     //Delete
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteCamera(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteCamera(Guid id)
     {
         try
         {
-            await _cameraService.DeleteAsync(id, cancellationToken);
+            await _cameraService.DeleteAsync(id);
             return Ok();
         }
         catch (Exception ex)

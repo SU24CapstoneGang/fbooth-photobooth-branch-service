@@ -23,22 +23,22 @@ public class PhotoBoothBranchService : IPhotoBoothBranchService
         _mapper = mapper;
     }
 
-    public async Task<Guid> CreateAsync(PhotoBoothBranchDTO entityDTO, CancellationToken cancellationToken)
+    public async Task<Guid> CreateAsync(PhotoBoothBranchDTO entityDTO)
     {
         PhotoBoothBranch photoBoothBranch = _mapper.Map<PhotoBoothBranch>(entityDTO);
         photoBoothBranch.BranchesID = Guid.NewGuid();
-        await _photoBoothBranchRepository.AddAsync(photoBoothBranch, cancellationToken);
+        await _photoBoothBranchRepository.AddAsync(photoBoothBranch);
         return photoBoothBranch.BranchesID;
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task DeleteAsync(Guid id)
     {
         try
         {
-            var photoBoothBranch = await _photoBoothBranchRepository.GetByIdAsync(id, cancellationToken);
+            var photoBoothBranch = await _photoBoothBranchRepository.GetByIdAsync(id);
             if (photoBoothBranch != null)
             {
-                await _photoBoothBranchRepository.RemoveAsync(photoBoothBranch, cancellationToken);
+                await _photoBoothBranchRepository.RemoveAsync(photoBoothBranch);
             }
         }
         catch
@@ -47,35 +47,35 @@ public class PhotoBoothBranchService : IPhotoBoothBranchService
         }
     }
 
-    public async Task<IEnumerable<PhotoBoothBranchDTO>> GetAll(ManufactureStatus status, CancellationToken cancellationToken)
+    public async Task<IEnumerable<PhotoBoothBranchDTO>> GetAll(ManufactureStatus status)
     {
-        var photoBoothBranches = await _photoBoothBranchRepository.GetAll(status, cancellationToken);
+        var photoBoothBranches = await _photoBoothBranchRepository.GetAll(status);
         return _mapper.Map<IEnumerable<PhotoBoothBranchDTO>>(photoBoothBranches);
     }
 
-    public async Task<IEnumerable<PhotoBoothBranchDTO>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<PhotoBoothBranchDTO>> GetAllAsync()
     {
-        var photoBoothBranches = await _photoBoothBranchRepository.GetAll(cancellationToken);
+        var photoBoothBranches = await _photoBoothBranchRepository.GetAll();
         return _mapper.Map<IEnumerable<PhotoBoothBranchDTO>>(photoBoothBranches);
     }
 
-    public async Task<PhotoBoothBranchDTO> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<PhotoBoothBranchDTO> GetByIdAsync(Guid id)
     {
-        var photoBoothBranch = await _photoBoothBranchRepository.GetByIdAsync(id, cancellationToken);
+        var photoBoothBranch = await _photoBoothBranchRepository.GetByIdAsync(id);
         return _mapper.Map<PhotoBoothBranchDTO>(photoBoothBranch);
     }
 
-    public async Task<IEnumerable<PhotoBoothBranchDTO>> GetByName(string name, CancellationToken cancellationToken)
+    public async Task<IEnumerable<PhotoBoothBranchDTO>> GetByName(string name)
     {
-        var photoBoothBranches = await _photoBoothBranchRepository.GetByName(name, cancellationToken);
+        var photoBoothBranches = await _photoBoothBranchRepository.GetByName(name);
         return _mapper.Map<IEnumerable<PhotoBoothBranchDTO>>(photoBoothBranches);
     }
 
-    public async Task UpdateAsync(Guid id, PhotoBoothBranchDTO entityDTO, CancellationToken cancellationToken)
+    public async Task UpdateAsync(Guid id, PhotoBoothBranchDTO entityDTO)
     {
         entityDTO.PhotoBoothBranchId = id;
         PhotoBoothBranch photoBoothBranch = _mapper.Map<PhotoBoothBranch>(entityDTO);
-        await _photoBoothBranchRepository.UpdateAsync(photoBoothBranch, cancellationToken);
+        await _photoBoothBranchRepository.UpdateAsync(photoBoothBranch);
     }
 }
 

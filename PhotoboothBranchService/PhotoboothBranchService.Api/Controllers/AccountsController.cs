@@ -22,11 +22,11 @@ public class AccountsController : ControllerBaseApi
 
     //Create
     [HttpPost]
-    public async Task<ActionResult> CreateAccount(AccountDTO accountDTO, CancellationToken cancellationToken)
+    public async Task<ActionResult> CreateAccount(AccountDTO accountDTO)
     {
         try
         {
-            var createdAccount = await _accountService.CreateAsync(accountDTO, cancellationToken);
+            var createdAccount = await _accountService.CreateAsync(accountDTO);
             return Ok(createdAccount);
         }
         catch (Exception ex)
@@ -37,11 +37,11 @@ public class AccountsController : ControllerBaseApi
 
     //Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<AccountDTO>>> GetAllAccounts(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<AccountDTO>>> GetAllAccounts()
     {
         try
         {
-            var accounts = await _accountService.GetAllAsync(cancellationToken);
+            var accounts = await _accountService.GetAllAsync();
             return Ok(accounts);
         }
         catch (Exception ex)
@@ -51,11 +51,11 @@ public class AccountsController : ControllerBaseApi
     }
 
     [HttpGet("status/{status}")]
-    public async Task<ActionResult<IEnumerable<AccountDTO>>> GetAccountsByStatus(AccountStatus status, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<AccountDTO>>> GetAccountsByStatus(AccountStatus status)
     {
         try
         {
-            var accounts = await _accountService.GetAll(status, cancellationToken);
+            var accounts = await _accountService.GetAll(status);
             return Ok(accounts);
         }
         catch (Exception ex)
@@ -65,11 +65,11 @@ public class AccountsController : ControllerBaseApi
     }
 
     [HttpGet("email/{email}")]
-    public async Task<ActionResult<IEnumerable<AccountDTO>>> GetAccountsByEmail(string email, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<AccountDTO>>> GetAccountsByEmail(string email)
     {
         try
         {
-            var accounts = await _accountService.GetListByEmail(email, cancellationToken);
+            var accounts = await _accountService.GetListByEmail(email);
             return Ok(accounts);
         }
         catch (Exception ex)
@@ -79,11 +79,11 @@ public class AccountsController : ControllerBaseApi
     }
 
     [HttpGet("login")]
-    public async Task<ActionResult<AccountDTO>> Login([FromQuery] string email, [FromQuery] string password, CancellationToken cancellationToken)
+    public async Task<ActionResult<AccountDTO>> Login([FromQuery] string email, [FromQuery] string password)
     {
         try
         {
-            var account = await _accountService.LoginWithPassword(email, password, cancellationToken);
+            var account = await _accountService.LoginWithPassword(email, password);
             if (account == null)
             {
                 return NotFound("Invalid email or password.");
@@ -97,11 +97,11 @@ public class AccountsController : ControllerBaseApi
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<AccountDTO>> GetAccountById(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<AccountDTO>> GetAccountById(Guid id)
     {
         try
         {
-            var account = await _accountService.GetByIdAsync(id, cancellationToken);
+            var account = await _accountService.GetByIdAsync(id);
             if (account == null)
             {
                 return NotFound();
@@ -116,11 +116,11 @@ public class AccountsController : ControllerBaseApi
 
     //Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateAccount(Guid id, AccountDTO accountDTO, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateAccount(Guid id, AccountDTO accountDTO)
     {
         try
         {
-            await _accountService.UpdateAsync(id, accountDTO, cancellationToken);
+            await _accountService.UpdateAsync(id, accountDTO);
             return Ok();
         }
         catch (Exception ex)
@@ -131,11 +131,11 @@ public class AccountsController : ControllerBaseApi
 
     //Delete
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteAccount(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteAccount(Guid id)
     {
         try
         {
-            await _accountService.DeleteAsync(id, cancellationToken);
+            await _accountService.DeleteAsync(id);
             return Ok();
         }
         catch (Exception ex)
