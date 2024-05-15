@@ -18,6 +18,8 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
 
             // Primary key
             builder.HasKey(s => s.SessionID);
+            builder.Property(s => s.SessionID).HasColumnName("Session ID")
+                .ValueGeneratedOnAdd();
 
             // Other properties
             builder.Property(s => s.StartTime)

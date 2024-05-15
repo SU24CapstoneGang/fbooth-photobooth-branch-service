@@ -18,4 +18,5 @@ public interface IAccountRepository
     Task<Account> GetByIdAsync(Guid accountId);
     Task RemoveAsync(Account account);
     Task UpdateAsync(Account account);
+    Task<bool> IsEmailUnique (string email);
 }

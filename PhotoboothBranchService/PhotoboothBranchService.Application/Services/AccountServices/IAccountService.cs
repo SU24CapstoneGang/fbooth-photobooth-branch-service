@@ -1,13 +1,7 @@
 ﻿using PhotoboothBranchService.Application.DTO;
 using PhotoboothBranchService.Application.Response;
-using PhotoboothBranchService.Domain.Common.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.Services.CustomerService
+namespace PhotoboothBranchService.Application.Services.AccountServices
 {
     public interface IAccountService
     {

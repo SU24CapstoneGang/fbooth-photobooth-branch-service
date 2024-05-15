@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Infrastructure.Configuration;
+using PhotoboothBranchService.Infrastructure.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,6 +43,14 @@ public class AppDbContext: DbContext
     }
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
+    }
+    protected override void ConfigureConventions(ModelConfigurationBuilder builder)
+    {
+        builder.Properties<DateOnly>()
+            .HaveConversion<DateOnlyConverterExtensions>()
+            .HaveColumnType("date");
+
+        base.ConfigureConventions(builder);
     }
 
     public AppDbContext() { }

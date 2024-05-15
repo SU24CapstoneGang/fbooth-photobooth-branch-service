@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.Services.CustomerService
+namespace PhotoboothBranchService.Application.Services.AccountServices
 {
     public class AccountService : IAccountService
     {
@@ -35,7 +35,7 @@ namespace PhotoboothBranchService.Application.Services.CustomerService
             }
             using var hmac = new HMACSHA512(user.PasswordSalt);
             var computeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDTO.Password));
-            for(int i = 0; i < computeHash.Length; i++)
+            for (int i = 0; i < computeHash.Length; i++)
             {
                 if (computeHash[i] != user.PasswordHash[i])
                 {
@@ -56,7 +56,10 @@ namespace PhotoboothBranchService.Application.Services.CustomerService
 
         public async Task<AuthenticationResult> Register(AccountDTO accountDTO)
         {
-
+            if (!await _accountRepository.IsEmailUnique(accountDTO.Email))
+            {
+                throw new Exception("Email is already in use. Please choose a different email.");
+            }
             using var hmac = new HMACSHA512();
 
             // Tạo một đối tượng Account từ AccountDTO
@@ -69,8 +72,8 @@ namespace PhotoboothBranchService.Application.Services.CustomerService
                 DateOfBirth = accountDTO.DateOfBirth,
                 PhoneNumber = accountDTO.PhoneNumber,
                 Status = Domain.Enum.AccountStatus.Active,
-                PasswordSalt = hmac.ComputeHash(Encoding.UTF8.GetBytes(accountDTO.Password)),
-                PasswordHash = hmac.Key
+                PasswordSalt = hmac.Key,
+                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(accountDTO.Password))
             };
 
             var accountId = await _accountRepository.AddAsync(newAccount);

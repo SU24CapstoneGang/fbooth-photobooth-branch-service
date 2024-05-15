@@ -18,6 +18,8 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
 
             // Primary key
             builder.HasKey(p => p.PrinterID);
+            builder.Property(p => p.PrinterID).HasColumnName("Printer ID")
+                .ValueGeneratedOnAdd();
 
             // Other properties
             builder.Property(p => p.ModelName)

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PhotoboothBranchService.Application.Mapping;
-using PhotoboothBranchService.Application.Services.CustomerService;
+using PhotoboothBranchService.Application.Services.AccountServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;

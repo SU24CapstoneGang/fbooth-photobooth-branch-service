@@ -17,7 +17,8 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
             builder.ToTable("Discounts");
             // Primary key
             builder.HasKey(d => d.DiscountID);
-
+            builder.Property(d => d.DiscountID).HasColumnName("Discount ID")
+                .ValueGeneratedOnAdd();
             // Properties
             builder.Property(d => d.DiscountCode)
                 .IsRequired()

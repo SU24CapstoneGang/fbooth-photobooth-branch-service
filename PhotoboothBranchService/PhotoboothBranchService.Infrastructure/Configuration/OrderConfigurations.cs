@@ -18,6 +18,9 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
 
             // Primary key
             builder.HasKey(o => o.OrderID);
+            builder.Property(o => o.OrderID).HasColumnName("Order ID")
+                .ValueGeneratedOnAdd();
+
 
             // Other properties
             builder.Property(o => o.OrderDate)

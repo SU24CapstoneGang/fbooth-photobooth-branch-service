@@ -25,6 +25,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Account", b =>
                 {
                     b.Property<Guid>("AccountID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Account ID");
 
@@ -34,7 +35,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -65,7 +66,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("nvarchar(11)");
 
                     b.Property<Guid?>("RoleID")
-                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
@@ -85,6 +85,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Camera", b =>
                 {
                     b.Property<Guid>("CameraID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Camera ID");
 
@@ -121,7 +122,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("DiscountID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Discount ID");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
@@ -153,7 +155,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("PackID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Pack ID");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
@@ -194,7 +197,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("FilterID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Filter ID");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -221,7 +225,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("PictureID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Picture ID");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
@@ -260,7 +265,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("FrameID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Frame ID");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -287,7 +293,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("LayoutID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Layout ID");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -312,7 +319,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("OrderID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Order ID");
 
                     b.Property<Guid>("DiscountID")
                         .HasColumnType("uniqueidentifier");
@@ -345,7 +353,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("PaymentID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Payment ID");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
@@ -368,7 +377,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("BranchesID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Branches ID");
 
                     b.Property<Guid>("AccountID")
                         .HasColumnType("uniqueidentifier");
@@ -398,7 +408,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("PrintPricingID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("PrintPricing ID");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -418,7 +429,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("PrinterID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Printer ID");
 
                     b.Property<string>("ModelName")
                         .IsRequired()
@@ -443,7 +455,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("RoleID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Role ID");
 
                     b.Property<string>("RoleName")
                         .IsRequired()
@@ -458,7 +471,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Session", b =>
                 {
                     b.Property<Guid>("SessionID")
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Session ID");
 
                     b.Property<Guid>("BranchesID")
                         .HasColumnType("uniqueidentifier");
@@ -480,7 +495,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("StickerId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Sticker ID");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -507,7 +523,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("TransactionID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Transaction ID");
 
                     b.Property<Guid>("AccountID")
                         .HasColumnType("uniqueidentifier");
@@ -534,9 +551,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.HasOne("PhotoboothBranchService.Domain.Entities.Role", "Role")
                         .WithMany("Accounts")
-                        .HasForeignKey("RoleID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RoleID");
 
                     b.Navigation("Role");
                 });

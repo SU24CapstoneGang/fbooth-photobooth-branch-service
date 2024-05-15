@@ -18,6 +18,8 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
 
             // Primary key
             builder.HasKey(r => r.RoleID);
+            builder.Property(r => r.RoleID).HasColumnName("Role ID")
+                .ValueGeneratedOnAdd();
 
             // Other properties
             builder.Property(r => r.RoleName)
@@ -28,7 +30,7 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
             builder.HasMany(r => r.Accounts)
                 .WithOne(a => a.Role)
                 .HasForeignKey(a => a.RoleID)
-                .IsRequired();
+                .IsRequired(false);
         }
     }
 }

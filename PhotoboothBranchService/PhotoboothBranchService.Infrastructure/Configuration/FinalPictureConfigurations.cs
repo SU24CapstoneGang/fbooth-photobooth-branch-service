@@ -19,6 +19,8 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
 
             // Primary key
             builder.HasKey(fp => fp.PictureID);
+            builder.Property(fp => fp.PictureID).HasColumnName("Picture ID")
+                .ValueGeneratedOnAdd();
 
             // Other properties
             builder.Property(fp => fp.PictureURl)

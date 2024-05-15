@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTO;
 using PhotoboothBranchService.Application.Interfaces;
-using PhotoboothBranchService.Application.Services.CustomerService;
+using PhotoboothBranchService.Application.Services.AccountServices;
 
 namespace PhotoboothBranchService.Api.Controllers;
 
@@ -19,6 +19,10 @@ public class AccountsController : ControllerBaseApi
     {
         try
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var account = await _accountService.Login(loginDTO);
             if (account == null)
             {
@@ -35,24 +39,29 @@ public class AccountsController : ControllerBaseApi
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] AccountDTO request)
     {
-        // Kiểm tra xem request có hợp lệ không
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
 
-        // Gọi hàm Register từ service
-        var result = await _accountService.Register(request);
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-        // Kiểm tra kết quả và trả về phản hồi tương ứng
-        if (result != null)
-        {
-            return Ok(result);
+            var result = await _accountService.Register(request);
+
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest("Registration failed. Please try again.");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            return BadRequest("Failed to register account");
-        }
+            return StatusCode(500, $"An error occurred during login: {ex.Message}");
+        };
     }
 
     //[HttpGet]

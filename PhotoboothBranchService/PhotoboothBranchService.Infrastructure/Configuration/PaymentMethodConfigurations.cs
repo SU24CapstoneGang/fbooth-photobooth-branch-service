@@ -19,6 +19,8 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
 
             // Primary key
             builder.HasKey(pm => pm.PaymentID);
+            builder.Property(pm => pm.PaymentID).HasColumnName("Payment ID")
+                .ValueGeneratedOnAdd();
 
             // Other properties
             builder.Property(pm => pm.PaymentName)

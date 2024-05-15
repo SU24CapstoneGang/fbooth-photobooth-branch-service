@@ -17,6 +17,8 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
             builder.ToTable("EffectsPacks");
             // Primary key
             builder.HasKey(ep => ep.PackID);
+            builder.Property(ep => ep.PackID).HasColumnName("Pack ID")
+                .ValueGeneratedOnAdd();
 
             // Other properties
             builder.Property(ep => ep.CreateDate)

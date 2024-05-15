@@ -37,8 +37,7 @@ public class AccountRepository : IAccountRepository
 
     public async Task<Account?> Login(string email, string password)
     {
-        var user = await _dbContext.Accounts.Where(a => a.Email == email).FirstOrDefaultAsync();
-
+        var user = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == email);
         if (user == null)
         {
             return null;
@@ -46,12 +45,11 @@ public class AccountRepository : IAccountRepository
 
         using var hmac = new HMACSHA512(user.PasswordSalt);
         var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-       
-        if (computedHash.SequenceEqual(user.PasswordHash))
+
+        if (!computedHash.SequenceEqual(user.PasswordHash))
         {
             return null;
         }
-
         return user;
     }
 
@@ -77,5 +75,11 @@ public class AccountRepository : IAccountRepository
     {
         _dbContext.Remove(account);
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<bool> IsEmailUnique(string email)
+    {
+        var existingAccounts = await _dbContext.Accounts.Where(c => c.Email.Equals(email)).ToListAsync();
+        return existingAccounts.Count == 0;
     }
 }

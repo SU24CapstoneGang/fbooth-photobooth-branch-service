@@ -18,6 +18,8 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
 
             // Primary key
             builder.HasKey(l => l.LayoutID);
+            builder.Property(l => l.LayoutID).HasColumnName("Layout ID")
+                .ValueGeneratedOnAdd();
 
             // Other properties
             builder.Property(l => l.LayoutURL)

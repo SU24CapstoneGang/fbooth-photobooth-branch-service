@@ -18,6 +18,8 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
 
             // Primary key
             builder.HasKey(s => s.StickerId);
+            builder.Property(s => s.StickerId).HasColumnName("Sticker ID")
+                .ValueGeneratedOnAdd();
 
             // Other properties
             builder.Property(s => s.StickerName)

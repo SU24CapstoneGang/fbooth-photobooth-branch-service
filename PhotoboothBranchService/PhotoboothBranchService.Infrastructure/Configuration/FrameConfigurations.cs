@@ -18,6 +18,8 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
 
             // Primary key
             builder.HasKey(f => f.FrameID);
+            builder.Property(f => f.FrameID).HasColumnName("Frame ID")
+                .ValueGeneratedOnAdd();
 
             // Other properties
             builder.Property(f => f.FrameName)

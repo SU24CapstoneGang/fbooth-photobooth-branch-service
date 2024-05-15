@@ -9,7 +9,7 @@ public class Account
     public string LastName { get; set; } = default!;
     public byte[] PasswordHash { get; set; } = default!;
     public byte[] PasswordSalt { get; set; } = default!;
-    public DateTime DateOfBirth { get; set; } = default!;
+    public DateOnly DateOfBirth { get; set; } = default!;
     public string Address { get; set; } = default!;
     public string Email { get; set; } = default!;
     public string PhoneNumber { get; set; } = default!;

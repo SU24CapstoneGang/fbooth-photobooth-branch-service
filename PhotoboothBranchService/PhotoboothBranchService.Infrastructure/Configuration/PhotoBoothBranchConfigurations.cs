@@ -19,6 +19,8 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
 
             // Primary key
             builder.HasKey(pb => pb.BranchesID);
+            builder.Property(pb => pb.BranchesID).HasColumnName("Branches ID")
+                .ValueGeneratedOnAdd();
 
             // Other properties
             builder.Property(pb => pb.BranchName)
