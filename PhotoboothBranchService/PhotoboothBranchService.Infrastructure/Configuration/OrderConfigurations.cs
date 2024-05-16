@@ -26,10 +26,16 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
             builder.Property(o => o.OrderDate)
                 .IsRequired();
 
-            builder.Property(o => o.PhotoQuantity)
+            builder.Property(o => o.QuantityOfPicture)
                 .IsRequired();
 
             builder.Property(o => o.TotalPrice)
+                .IsRequired();
+
+            // Relationship with Session
+            builder.HasOne(o => o.Session)
+                .WithOne(s => s.Order)
+                .HasForeignKey<Order>(o => o.SessionID)
                 .IsRequired();
 
             // Relationship with PaymentMethod
@@ -45,9 +51,9 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
                 .IsRequired();
 
             // Relationship with FinalPicture
-            builder.HasMany(o => o.FinalPictures)
+            builder.HasOne(o => o.FinalPicture)
                 .WithOne(fp => fp.Order)
-                .HasForeignKey(fp => fp.OrderID)
+                .HasForeignKey<Order>(o => o.PictureID)
                 .IsRequired();
         }
     }

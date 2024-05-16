@@ -35,7 +35,7 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
                 .IsRequired();
 
             // Relationship with EffectsPack
-            builder.HasMany(f => f.EffectsPacks)
+            builder.HasMany(f => f.EffectsPackLogs)
                 .WithOne(ep => ep.Filter)
                 .HasForeignKey(ep => ep.FilterID)
                 .IsRequired();

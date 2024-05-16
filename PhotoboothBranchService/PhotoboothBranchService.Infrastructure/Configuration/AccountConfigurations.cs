@@ -33,7 +33,7 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
         builder.HasOne(a => a.Role)
                 .WithMany(r => r.Accounts)
                 .HasForeignKey(a => a.RoleID)
-                .IsRequired(false);
+                .IsRequired();
 
         // Relationship with PhotoBoothBranch
         builder.HasMany(a => a.PhotoBoothBranches)

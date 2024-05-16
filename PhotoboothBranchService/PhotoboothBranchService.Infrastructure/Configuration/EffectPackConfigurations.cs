@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Configuration
 {
-    public class EffectPackConfigurations : IEntityTypeConfiguration<EffectsPack>
+    public class EffectPackConfigurations : IEntityTypeConfiguration<EffectsPackLog>
     {
-        public void Configure(EntityTypeBuilder<EffectsPack> builder)
+        public void Configure(EntityTypeBuilder<EffectsPackLog> builder)
         {
-            builder.ToTable("EffectsPacks");
+            builder.ToTable("EffectsPackLogs");
             // Primary key
             builder.HasKey(ep => ep.PackID);
             builder.Property(ep => ep.PackID).HasColumnName("Pack ID")
@@ -24,37 +24,28 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
             builder.Property(ep => ep.CreateDate)
                 .IsRequired();
 
-            builder.Property(ep => ep.PackagePrice)
-                .IsRequired();
-
-
             // Relationship with FinalPicture
             builder.HasOne(ep => ep.FinalPicture)
-                .WithOne(fp => fp.EffectsPack)
-                .HasForeignKey<EffectsPack>(ep => ep.PackID)
+                .WithOne(fp => fp.EffectsPackLog)
+                .HasForeignKey<EffectsPackLog>(e => e.PictureID)
                 .IsRequired();
 
-            // Relationship with Layout
-            builder.HasOne(ep => ep.Layout)
-                .WithMany(l => l.EffectsPacks)
-                .HasForeignKey(ep => ep.LayoutID)
-                .IsRequired();
 
             // Relationship with Sticker
-            builder.HasOne(ep => ep.Sticker)
-                .WithMany(s => s.EffectsPacks)
-                .HasForeignKey(ep => ep.StickerID)
+            builder.HasMany(ep => ep.Stickers)
+                .WithOne(s => s.EffectsPackLog)
+                .HasForeignKey(ep => ep.PackID)
                 .IsRequired();
 
             // Relationship with Frame
             builder.HasOne(ep => ep.Frame)
-                .WithMany(f => f.EffectsPacks)
+                .WithMany(f => f.EffectsPackLogs)
                 .HasForeignKey(ep => ep.FrameID)
                 .IsRequired();
 
             // Relationship with Filter
             builder.HasOne(ep => ep.Filter)
-                .WithMany(f => f.EffectsPacks)
+                .WithMany(f => f.EffectsPackLogs)
                 .HasForeignKey(ep => ep.FilterID)
                 .IsRequired();
 

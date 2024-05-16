@@ -4,9 +4,10 @@
     {
         public Guid LayoutID { get; set; }
         public string LayoutURL { get; set; } = default!;
-        public double LayoutPrice { get; set; } = default!;
+        public float LayoutPrice { get; set; } = default!;
         public DateTime CreatedDate { get; set; }
         public DateTime LastModified { get; set; }
-        public virtual List<EffectsPack> EffectsPacks { get; set; }
+
+        public virtual List<FinalPicture> FinalPictures { get; set; }
     }
 }

@@ -7,6 +7,7 @@
         public string StrickerURL { get; set; } = default!;
         public DateTime CreatedDate { get; set; }
         public DateTime LastModified { get; set; }
-        public virtual List<EffectsPack> EffectsPacks { get; set; }
+        public Guid PackID { get; set; }
+        public virtual EffectsPackLog EffectsPackLog { get; set; }
     }
 }

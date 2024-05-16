@@ -29,6 +29,11 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
             builder.Property(p => p.Price)
                 .IsRequired();
 
+            // Status property
+            builder.Property(p => p.Status)
+                .IsRequired()
+                .HasColumnType("int");
+
             // Relationship with PhotoBoothBranch
             builder.HasOne(p => p.PhotoBoothBranch)
                 .WithOne(pb => pb.Printer)

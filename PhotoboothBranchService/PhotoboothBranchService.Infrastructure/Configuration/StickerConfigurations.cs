@@ -36,10 +36,10 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
             builder.Property(s => s.LastModified)
                 .IsRequired();
 
-            // Relationship with EffectsPack
-            builder.HasMany(s => s.EffectsPacks)
-                .WithOne(ep => ep.Sticker)
-                .HasForeignKey(ep => ep.StickerID)
+            // Relationship with EffectsPackLog
+            builder.HasOne(s => s.EffectsPackLog)
+                .WithMany(ep => ep.Stickers)
+                .HasForeignKey(s => s.PackID)
                 .IsRequired();
         }
     }

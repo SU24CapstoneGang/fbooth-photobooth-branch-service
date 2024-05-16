@@ -30,17 +30,32 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
             builder.Property(fp => fp.CreateDate)
                 .IsRequired();
 
+            builder.Property(fp => fp.LastModified)
+                .IsRequired();
+
+            builder.Property(fp => fp.PrintQuantity)
+                .IsRequired();
+
+            builder.Property(fp => fp.PictureCost)
+                .IsRequired();
+
             // Privacy enum mapping
-            builder.Property(fp => fp.Privacy)
+            builder.Property(fp => fp.PicturePrivacy)
                 .IsRequired()
                 .HasConversion(
                     v => v.ToString(),
                     v => (PhotoPrivacy)Enum.Parse(typeof(PhotoPrivacy), v));
 
-            // Relationship with Order
+            // Relationship with Layout
+            builder.HasOne(fp => fp.Layout)
+                .WithMany(l => l.FinalPictures)
+                .HasForeignKey(fp => fp.LayoutID)
+                .IsRequired();
+
+            // Relationship with Order (one-to-one)
             builder.HasOne(fp => fp.Order)
-                .WithMany(o => o.FinalPictures)
-                .HasForeignKey(fp => fp.OrderID)
+                .WithOne(o => o.FinalPicture)
+                .HasForeignKey<Order>(o => o.PictureID)
                 .IsRequired();
 
             // Relationship with PrintPricing
@@ -49,10 +64,10 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
                 .HasForeignKey(fp => fp.PrintPricingID)
                 .IsRequired();
 
-            // Relationship with EffectsPack
-            builder.HasOne(fp => fp.EffectsPack)
+            // Relationship with EffectsPackLog (one-to-one)
+            builder.HasOne(fp => fp.EffectsPackLog)
                 .WithOne(ep => ep.FinalPicture)
-                .HasForeignKey<FinalPicture>(fp => fp.PackID)
+                .HasForeignKey<EffectsPackLog>(ep => ep.PictureID)
                 .IsRequired();
         }
     }

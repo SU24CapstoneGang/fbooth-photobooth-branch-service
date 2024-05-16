@@ -18,7 +18,7 @@ public class AppDbContext: DbContext
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Camera> Cameras { get; set; }
     public DbSet<Discount> Discounts { get; set; }
-    public DbSet<EffectsPack> EffectsPacks { get; set; }
+    public DbSet<EffectsPackLog> EffectsPacks { get; set; }
     public DbSet<Filter> Filters { get; set; }
     public DbSet<FinalPicture> FinalPictures { get; set; }
     public DbSet<Frame> Frames { get; set; }

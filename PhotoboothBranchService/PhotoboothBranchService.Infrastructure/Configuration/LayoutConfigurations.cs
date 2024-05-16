@@ -36,7 +36,7 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
                 .IsRequired();
 
             // Relationship with EffectsPack
-            builder.HasMany(l => l.EffectsPacks)
+            builder.HasMany(l => l.FinalPictures)
                 .WithOne(ep => ep.Layout)
                 .HasForeignKey(ep => ep.LayoutID)
                 .IsRequired();

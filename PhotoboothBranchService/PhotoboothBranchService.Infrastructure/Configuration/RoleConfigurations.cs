@@ -30,7 +30,7 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
             builder.HasMany(r => r.Accounts)
                 .WithOne(a => a.Role)
                 .HasForeignKey(a => a.RoleID)
-                .IsRequired(false);
+                .IsRequired();
         }
     }
 }
