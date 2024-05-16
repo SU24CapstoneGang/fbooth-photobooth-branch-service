@@ -12,8 +12,13 @@ using PhotoboothBranchService.Infrastructure.Common.Persistence;
 namespace PhotoboothBranchService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
+<<<<<<<< HEAD:PhotoboothBranchService/PhotoboothBranchService.Infrastructure/Migrations/20240515203324_PhotoBoothInitialDB.Designer.cs
     [Migration("20240515203324_PhotoBoothInitialDB")]
     partial class PhotoBoothInitialDB
+========
+    [Migration("20240515054003_PhotoBooth")]
+    partial class PhotoBooth
+>>>>>>>> dev-Hoang:PhotoboothBranchService/PhotoboothBranchService.Infrastructure/Migrations/20240515054003_PhotoBooth.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
