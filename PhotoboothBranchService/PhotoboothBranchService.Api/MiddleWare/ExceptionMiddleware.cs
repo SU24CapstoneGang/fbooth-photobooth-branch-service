@@ -63,6 +63,16 @@ namespace PhotoboothBranchService.Api.MiddleWare
                         Type = nameof(ForbiddenAccessException)
                     };
                     break;
+                case UnauthorizedException unauthorized:
+                    statusCode = HttpStatusCode.Unauthorized;
+                    problem = new CustomProblemDetails
+                    {
+                        Title = unauthorized.Message,
+                        Status = (int)statusCode,
+                        Detail = unauthorized.InnerException?.Message,
+                        Type = nameof(UnauthorizedException)
+                    };
+                    break;
                 default:
                     problem = new CustomProblemDetails
                     {

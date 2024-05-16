@@ -4,7 +4,7 @@ using PhotoboothBranchService.Application.Exceptions;
 using PhotoboothBranchService.Application.Response;
 using PhotoboothBranchService.Application.Services.AuthentiacationService;
 using PhotoboothBranchService.Domain.Entities;
-using PhotoboothBranchService.Domain.Interfaces;
+using PhotoboothBranchService.Domain.IRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -87,26 +87,6 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             };
 
             return authResult;
-            //var newAccount = _mapper.Map<AccountDTO, Account>(accountDTO);
-
-            //// Generate salt and hash for password
-            //using var hmac = new HMACSHA512();
-            //newAccount.PasswordSalt = hmac.ComputeHash(Encoding.UTF8.GetBytes(accountDTO.Password));
-            //newAccount.PasswordHash = hmac.Key;
-
-            //var accountId = await _accountRepository.AddAsync(newAccount);
-
-            //var authResult = new AuthenticationResult
-            //{
-            //    Id = accountId,
-            //    FirstName = newAccount.FirstName,
-            //    LastName = newAccount.LastName,
-            //    Email = newAccount.Email,
-            //    Token = _jwtTokenGenerator.GenerateToken(newAccount)
-            //};
-
-            //return authResult;
-
         }
     }
 }
