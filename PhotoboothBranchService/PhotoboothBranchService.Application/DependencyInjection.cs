@@ -2,12 +2,14 @@
 using PhotoboothBranchService.Application.Mapping;
 using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Application.Services.CameraServices;
+using PhotoboothBranchService.Application.Services.DiscountServices;
 using PhotoboothBranchService.Application.Services.FilterServices;
 using PhotoboothBranchService.Application.Services.FrameServices;
 using PhotoboothBranchService.Application.Services.LayoutServices;
 using PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
 using PhotoboothBranchService.Application.Services.PrinterServices;
 using PhotoboothBranchService.Application.Services.RoleServices;
+using PhotoboothBranchService.Application.Services.SessionServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
 using System;
 using System.Collections.Generic;
@@ -31,7 +33,8 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IFrameService, FrameService>();
             services.AddScoped<IStickerService, StickerService>();
             services.AddScoped<ILayoutService, LayoutService>();
-
+            services.AddScoped<IDiscountService, DiscountService>();
+            services.AddScoped<ISessionService, SessionService>();
             //Mapper
             services.AddAutoMapper(typeof(MappingProfile));
             return services;

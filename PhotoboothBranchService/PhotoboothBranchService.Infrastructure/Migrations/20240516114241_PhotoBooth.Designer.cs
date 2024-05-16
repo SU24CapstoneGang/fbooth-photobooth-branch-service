@@ -12,7 +12,7 @@ using PhotoboothBranchService.Infrastructure.Common.Persistence;
 namespace PhotoboothBranchService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240516054500_PhotoBooth")]
+    [Migration("20240516114241_PhotoBooth")]
     partial class PhotoBooth
     {
         /// <inheritdoc />
@@ -68,7 +68,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
-                    b.Property<Guid?>("RoleID")
+                    b.Property<Guid>("RoleID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
@@ -94,8 +94,13 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
                     b.Property<string>("Lens")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("LensType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ModelName")
                         .IsRequired()
@@ -108,10 +113,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<float>("Price")
                         .HasColumnType("real");
 
-                    b.Property<string>("SensorType")
+                    b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CameraID");
 
@@ -154,7 +158,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.ToTable("Discounts", (string)null);
                 });
 
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.EffectsPack", b =>
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.EffectsPackLog", b =>
                 {
                     b.Property<Guid>("PackID")
                         .ValueGeneratedOnAdd()
@@ -170,18 +174,12 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<Guid>("FrameID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("LayoutID")
+                    b.Property<Guid>("PictureID")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<float>("PackagePrice")
-                        .HasColumnType("real");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("StickerID")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("PackID");
 
@@ -189,11 +187,10 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
                     b.HasIndex("FrameID");
 
-                    b.HasIndex("LayoutID");
+                    b.HasIndex("PictureID")
+                        .IsUnique();
 
-                    b.HasIndex("StickerID");
-
-                    b.ToTable("EffectsPacks", (string)null);
+                    b.ToTable("EffectsPackLogs", (string)null);
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Filter", b =>
@@ -234,11 +231,18 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("OrderID")
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LayoutID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("PackID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<float>("PictureCost")
+                        .HasColumnType("real");
+
+                    b.Property<string>("PicturePrivacy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PictureURl")
                         .IsRequired()
@@ -248,16 +252,12 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<Guid>("PrintPricingID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Privacy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PrintQuantity")
+                        .HasColumnType("int");
 
                     b.HasKey("PictureID");
 
-                    b.HasIndex("OrderID");
-
-                    b.HasIndex("PackID")
-                        .IsUnique();
+                    b.HasIndex("LayoutID");
 
                     b.HasIndex("PrintPricingID");
 
@@ -305,8 +305,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<double>("LayoutPrice")
-                        .HasColumnType("float");
+                    b.Property<float>("LayoutPrice")
+                        .HasColumnType("real");
 
                     b.Property<string>("LayoutURL")
                         .IsRequired()
@@ -334,7 +334,10 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<Guid>("PaymentID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("PhotoQuantity")
+                    b.Property<Guid>("PictureID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("QuantityOfPicture")
                         .HasColumnType("int");
 
                     b.Property<Guid>("SessionID")
@@ -348,6 +351,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.HasIndex("DiscountID");
 
                     b.HasIndex("PaymentID");
+
+                    b.HasIndex("PictureID")
+                        .IsUnique();
 
                     b.ToTable("Orders", (string)null);
                 });
@@ -446,6 +452,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<float>("Price")
                         .HasColumnType("real");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.HasKey("PrinterID");
 
                     b.HasIndex("PhotoBoothBranchId")
@@ -507,6 +516,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("PackID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("StickerName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -518,6 +530,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("StickerId");
+
+                    b.HasIndex("PackID");
 
                     b.ToTable("Stickers", (string)null);
                 });
@@ -554,7 +568,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.HasOne("PhotoboothBranchService.Domain.Entities.Role", "Role")
                         .WithMany("Accounts")
-                        .HasForeignKey("RoleID");
+                        .HasForeignKey("RoleID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Role");
                 });
@@ -568,52 +584,38 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Navigation("PhotoBoothBranch");
                 });
 
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.EffectsPack", b =>
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.EffectsPackLog", b =>
                 {
                     b.HasOne("PhotoboothBranchService.Domain.Entities.Filter", "Filter")
-                        .WithMany("EffectsPacks")
+                        .WithMany("EffectsPackLogs")
                         .HasForeignKey("FilterID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("PhotoboothBranchService.Domain.Entities.Frame", "Frame")
-                        .WithMany("EffectsPacks")
+                        .WithMany("EffectsPackLogs")
                         .HasForeignKey("FrameID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PhotoboothBranchService.Domain.Entities.Layout", "Layout")
-                        .WithMany("EffectsPacks")
-                        .HasForeignKey("LayoutID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PhotoboothBranchService.Domain.Entities.Sticker", "Sticker")
-                        .WithMany("EffectsPacks")
-                        .HasForeignKey("StickerID")
+                    b.HasOne("PhotoboothBranchService.Domain.Entities.FinalPicture", "FinalPicture")
+                        .WithOne("EffectsPackLog")
+                        .HasForeignKey("PhotoboothBranchService.Domain.Entities.EffectsPackLog", "PictureID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Filter");
 
+                    b.Navigation("FinalPicture");
+
                     b.Navigation("Frame");
-
-                    b.Navigation("Layout");
-
-                    b.Navigation("Sticker");
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.FinalPicture", b =>
                 {
-                    b.HasOne("PhotoboothBranchService.Domain.Entities.Order", "Order")
+                    b.HasOne("PhotoboothBranchService.Domain.Entities.Layout", "Layout")
                         .WithMany("FinalPictures")
-                        .HasForeignKey("OrderID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PhotoboothBranchService.Domain.Entities.EffectsPack", "EffectsPack")
-                        .WithOne("FinalPicture")
-                        .HasForeignKey("PhotoboothBranchService.Domain.Entities.FinalPicture", "PackID")
+                        .HasForeignKey("LayoutID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -623,9 +625,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("EffectsPack");
-
-                    b.Navigation("Order");
+                    b.Navigation("Layout");
 
                     b.Navigation("PrintPricing");
                 });
@@ -644,7 +644,15 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PhotoboothBranchService.Domain.Entities.FinalPicture", "FinalPicture")
+                        .WithOne("Order")
+                        .HasForeignKey("PhotoboothBranchService.Domain.Entities.Order", "PictureID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Discount");
+
+                    b.Navigation("FinalPicture");
 
                     b.Navigation("PaymentMethod");
                 });
@@ -688,6 +696,17 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Navigation("PhotoBoothBranch");
                 });
 
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Sticker", b =>
+                {
+                    b.HasOne("PhotoboothBranchService.Domain.Entities.EffectsPackLog", "EffectsPackLog")
+                        .WithMany("Stickers")
+                        .HasForeignKey("PackID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EffectsPackLog");
+                });
+
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.TransactionHistory", b =>
                 {
                     b.HasOne("PhotoboothBranchService.Domain.Entities.Account", "Account")
@@ -711,31 +730,37 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Navigation("Orders");
                 });
 
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.EffectsPack", b =>
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.EffectsPackLog", b =>
                 {
-                    b.Navigation("FinalPicture")
-                        .IsRequired();
+                    b.Navigation("Stickers");
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Filter", b =>
                 {
-                    b.Navigation("EffectsPacks");
+                    b.Navigation("EffectsPackLogs");
+                });
+
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.FinalPicture", b =>
+                {
+                    b.Navigation("EffectsPackLog")
+                        .IsRequired();
+
+                    b.Navigation("Order")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Frame", b =>
                 {
-                    b.Navigation("EffectsPacks");
+                    b.Navigation("EffectsPackLogs");
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Layout", b =>
                 {
-                    b.Navigation("EffectsPacks");
+                    b.Navigation("FinalPictures");
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Order", b =>
                 {
-                    b.Navigation("FinalPictures");
-
                     b.Navigation("Session")
                         .IsRequired();
                 });
@@ -764,11 +789,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Role", b =>
                 {
                     b.Navigation("Accounts");
-                });
-
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Sticker", b =>
-                {
-                    b.Navigation("EffectsPacks");
                 });
 #pragma warning restore 612, 618
         }
