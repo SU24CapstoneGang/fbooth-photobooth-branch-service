@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTO;
-using PhotoboothBranchService.Application.Interfaces;
+using PhotoboothBranchService.Application.Services.FrameServices;
 
 namespace PhotoboothBranchService.Api.Controllers;
 

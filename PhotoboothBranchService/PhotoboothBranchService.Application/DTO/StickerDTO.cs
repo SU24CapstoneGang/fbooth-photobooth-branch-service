@@ -9,14 +9,8 @@ namespace PhotoboothBranchService.Application.DTO;
 
 public class StickerDTO
 {
-    public Guid? StickerId { get; set; } = default!;
-    public string StickerName { get; set; } = default!;
-    public string StrickerURL { get; set; } = default!;
+    public Guid? StickerId { get; set; }
+    public string StickerName { get; set; }
+    public string StrickerURL { get; set; }
 
-    [JsonConstructor]
-    public StickerDTO(string stickerName, string strickerURL)
-    {
-        StickerName = stickerName;
-        StrickerURL = strickerURL;
-    }
 }

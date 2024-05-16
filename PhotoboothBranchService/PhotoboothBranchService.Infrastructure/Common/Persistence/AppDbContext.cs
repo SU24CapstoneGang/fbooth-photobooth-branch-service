@@ -39,7 +39,7 @@ public class AppDbContext: DbContext
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
         IConfigurationRoot configuration = builder.Build();
-        optionsBuilder.UseSqlServer(configuration.GetConnectionString("FboothPhotoBranchService"));
+        optionsBuilder.UseSqlServer(configuration.GetConnectionString("Fbooth"));
     }
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {

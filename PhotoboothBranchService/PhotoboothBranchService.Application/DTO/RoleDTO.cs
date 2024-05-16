@@ -8,6 +8,6 @@ namespace PhotoboothBranchService.Application.DTO;
 
 public class RoleDTO
 {
-    public Guid? RoleID { get; set; } = default!;
-    public string RoleName { get; set; } = default!;
+    public Guid? RoleID { get; set; }
+    public string RoleName { get; set; }
 }

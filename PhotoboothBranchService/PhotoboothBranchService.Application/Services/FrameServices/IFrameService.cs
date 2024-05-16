@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.Interfaces;
+namespace PhotoboothBranchService.Application.Services.FrameServices;
 
-public interface ICameraService : IService<CameraDTO>
+public interface IFrameService : IService<FrameDTO>
 {
-    Task<IEnumerable<CameraDTO>> GetByName(string name);
+    Task<IEnumerable<FrameDTO>> GetByName(string name);
 }

@@ -13,15 +13,5 @@ public class FrameDTO
     public Guid? FrameID { get; set; } = default!;
     public string FrameName { get; set; } = default!;
     public string FrameURL { get; set; } = default!;
-    public DateTime CreatedDate { get; set; }
-    public DateTime LastModified { get; set; }
 
-    [JsonConstructor]
-    public FrameDTO(string frameName, string frameURL, DateTime createdDate, DateTime lastModified)
-    {
-        FrameName = frameName;
-        FrameURL = frameURL;
-        CreatedDate = createdDate;
-        LastModified = lastModified;
-    }
 }

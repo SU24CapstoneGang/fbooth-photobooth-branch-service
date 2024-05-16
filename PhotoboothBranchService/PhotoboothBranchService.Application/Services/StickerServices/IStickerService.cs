@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.Interfaces;
+namespace PhotoboothBranchService.Application.Services.StickerServices;
 
 public interface IStickerService : IService<StickerDTO>
 {

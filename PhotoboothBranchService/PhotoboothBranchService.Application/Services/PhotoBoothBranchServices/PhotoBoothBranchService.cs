@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.DTO;
-using PhotoboothBranchService.Application.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.Interfaces;
@@ -10,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.Service;
+namespace PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
 
 public class PhotoBoothBranchService : IPhotoBoothBranchService
 {

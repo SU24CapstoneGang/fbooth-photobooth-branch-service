@@ -13,26 +13,9 @@ namespace PhotoboothBranchService.Application.DTO;
 public class PhotoBoothBranchDTO
 {
     public Guid? PhotoBoothBranchId { get; set; }
-    public string BranchName { get; set; } = null;
-    public string BranchAddress { get; set; } = null;
+    public string BranchName { get; set; }
+    public string BranchAddress { get; set; } 
     public ManufactureStatus Status { get; set; }
-    public string AccountId { get; set; } = null;
-    public Account Account { get; set; }
+    public string AccountId { get; set; }
 
-    //contrustor respone
-    public PhotoBoothBranchDTO(Guid? photoBoothBranchId, string branchName, string branchAddress, ManufactureStatus manufactureStatus)
-    {
-        PhotoBoothBranchId = photoBoothBranchId;
-        BranchName = branchName;
-        BranchAddress = branchAddress;
-        Status = manufactureStatus;
-    }
-
-    [JsonConstructor]
-    public PhotoBoothBranchDTO(string branchName, string branchAddress, ManufactureStatus manufactureStatus, Guid? accountID) {
-        BranchName = branchName;
-        BranchAddress = branchAddress;
-        Status = manufactureStatus;
-    }
-    public PhotoBoothBranchDTO() { }
 }

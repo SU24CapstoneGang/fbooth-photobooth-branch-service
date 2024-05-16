@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.DTO;
-using PhotoboothBranchService.Application.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Interfaces;
 using System;
@@ -9,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.Service;
+namespace PhotoboothBranchService.Application.Services.LayoutServices;
 
 public class LayoutService : ILayoutService
 {

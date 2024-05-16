@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.DTO;
-using PhotoboothBranchService.Application.Interfaces;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Interfaces;
@@ -10,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.Service;
+namespace PhotoboothBranchService.Application.Services.FrameServices;
 
 public class FrameService : IFrameService
 {

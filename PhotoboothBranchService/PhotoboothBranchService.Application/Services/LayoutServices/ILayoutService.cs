@@ -6,9 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.Interfaces;
+namespace PhotoboothBranchService.Application.Services.LayoutServices;
 
-public interface IFilterService : IService<FilterDTO>
+public interface ILayoutService : IService<LayoutDTO>
 {
-    Task<IEnumerable<FilterDTO>> GetByName(string name);
 }

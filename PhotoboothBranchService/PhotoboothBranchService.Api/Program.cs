@@ -16,16 +16,6 @@ var services = builder.Services;
 builder.Services
     .AddApplicaiton()
     .AddInfrastructure(builder.Configuration); 
-//services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("FboothPhotoBranchService")));
-
-//services.AddScoped<IAccountRepository, AccountRepository>();
-//services.AddScoped<IPrinterRepository, PrinterRepository>();
-//services.AddScoped<ICameraRepository, CameraRepository>();
-//services.AddScoped<IPhotoBoothBranchRepository, PhotoBoothBranchRepository>();
-
-//services.AddScoped<IAccountService, AccountsService>();
-
-//services.AddAutoMapper(typeof(MappingProfile));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

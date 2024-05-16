@@ -1,15 +1,14 @@
 ﻿using PhotoboothBranchService.Application.DTO;
 using PhotoboothBranchService.Domain.Common.Interfaces;
-using PhotoboothBranchService.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.Interfaces;
+namespace PhotoboothBranchService.Application.Services.FilterServices;
 
-public interface IFrameService : IService<FrameDTO>
+public interface IFilterService : IService<FilterDTO>
 {
-    Task<IEnumerable<FrameDTO>> GetByName(string name);
+    Task<IEnumerable<FilterDTO>> GetByName(string name);
 }

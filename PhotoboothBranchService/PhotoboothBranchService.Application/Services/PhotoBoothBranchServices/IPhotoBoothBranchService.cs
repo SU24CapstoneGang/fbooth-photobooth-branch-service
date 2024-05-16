@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.Interfaces;
+namespace PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
 
 public interface IPhotoBoothBranchService : IService<PhotoBoothBranchDTO>
 {

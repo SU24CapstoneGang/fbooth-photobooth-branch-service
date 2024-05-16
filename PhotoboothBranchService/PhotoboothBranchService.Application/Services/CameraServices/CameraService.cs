@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.DTO;
-using PhotoboothBranchService.Application.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Interfaces;
 using System;
@@ -10,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace PhotoboothBranchService.Application.Service;
+namespace PhotoboothBranchService.Application.Services.CameraServices;
 
 public class CameraService : ICameraService
 {
@@ -71,7 +70,7 @@ public class CameraService : ICameraService
     //Update
     public async Task UpdateAsync(Guid id, CameraDTO entityDTO)
     {
-        entityDTO.CameraId= id;
+        entityDTO.CameraId = id;
         Camera cameras = _mapper.Map<Camera>(entityDTO);
         await _cameraRepository.UpdateAsync(cameras);
     }

@@ -1,7 +1,7 @@
 ﻿// CamerasController.cs
 using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTO;
-using PhotoboothBranchService.Application.Interfaces;
+using PhotoboothBranchService.Application.Services.CameraServices;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Interfaces;
 using System;
