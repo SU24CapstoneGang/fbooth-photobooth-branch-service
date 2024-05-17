@@ -14,6 +14,8 @@
         public virtual Discount Discount { get; set; }
         public Guid PictureID { get; set; }
         public virtual FinalPicture FinalPicture { get; set; }
+        public Guid? AccountID { get; set; }
+        public virtual Account Account { get; set; }
 
     }
 }

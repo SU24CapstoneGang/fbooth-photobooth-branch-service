@@ -5,7 +5,6 @@ namespace PhotoboothBranchService.Application.DTO;
 
 public class AccountDTO
 {
-    public Guid? AccountID { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string Password { get; set; }

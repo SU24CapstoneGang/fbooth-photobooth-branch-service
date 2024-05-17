@@ -4,6 +4,7 @@ using PhotoboothBranchService.Application.Exceptions;
 using PhotoboothBranchService.Application.Response;
 using PhotoboothBranchService.Application.Services.AuthentiacationService;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Interfaces;
 using PhotoboothBranchService.Domain.IRepository;
 using System;
 using System.Collections.Generic;
@@ -19,28 +20,22 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
     {
         private readonly IAccountRepository _accountRepository;
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
+        private readonly IRoleRepository _roleRepository;
+        private readonly IMapper _mapper;
 
-        public AccountService(IAccountRepository accountRepository,  IJwtTokenGenerator jwtTokenGenerator)
+        public AccountService(IAccountRepository accountRepository,  IJwtTokenGenerator jwtTokenGenerator, IRoleRepository roleRepository, IMapper mapper)
         {
             _accountRepository = accountRepository;
             _jwtTokenGenerator = jwtTokenGenerator;
+            _roleRepository = roleRepository;
+            _mapper = mapper;
         }
         public async Task<AuthenticationResult> Login(LoginDTO loginDTO)
         {
             var user = await _accountRepository.Login(loginDTO.Email, loginDTO.Password);
-
             if (user == null)
             {
                 throw new UnauthorizedException("Invalid email or password");
-            }
-            using var hmac = new HMACSHA512(user.PasswordSalt);
-            var computeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDTO.Password));
-            for (int i = 0; i < computeHash.Length; i++)
-            {
-                if (computeHash[i] != user.PasswordHash[i])
-                {
-                    throw new UnauthorizedException("Invalid email or password");
-                }
             }
 
             return new AuthenticationResult
@@ -56,6 +51,13 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<AuthenticationResult> Register(AccountDTO accountDTO)
         {
+            var userRole = await _roleRepository.GetByName("User");
+
+            if (userRole == null)
+            {
+                throw new Exception("User role does not exist in the system.");
+            }
+
             if (!await _accountRepository.IsEmailUnique(accountDTO.Email))
             {
                 throw new Exception("Email is already in use. Please choose a different email.");
@@ -72,6 +74,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                 DateOfBirth = accountDTO.DateOfBirth,
                 PhoneNumber = accountDTO.PhoneNumber,
                 Status = Domain.Enum.AccountStatus.Active,
+                RoleID = userRole.Single().RoleID,
                 PasswordSalt = hmac.Key,
                 PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(accountDTO.Password))
             };

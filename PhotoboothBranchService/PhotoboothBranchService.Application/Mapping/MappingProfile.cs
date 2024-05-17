@@ -15,14 +15,10 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<Account, AccountDTO>()
-            .ReverseMap();
-        CreateMap<Camera, CameraDTO>()
-            .ReverseMap();
-        CreateMap<PhotoBoothBranch, PhotoBoothBranchDTO>()
-            .ReverseMap();
-        CreateMap<Printer, PrinterDTO>()
-            .ReverseMap();
+        CreateMap<Account, AccountDTO>().ReverseMap();
+        CreateMap<Camera, CameraDTO>().ReverseMap();
+        CreateMap<PhotoBoothBranch, PhotoBoothBranchDTO>().ReverseMap();
+        CreateMap<Printer, PrinterDTO>().ReverseMap();
         CreateMap<Role, RoleDTO>().ReverseMap();
         CreateMap<Layout, LayoutDTO>().ReverseMap();
         CreateMap<Filter, FilterDTO>().ReverseMap();

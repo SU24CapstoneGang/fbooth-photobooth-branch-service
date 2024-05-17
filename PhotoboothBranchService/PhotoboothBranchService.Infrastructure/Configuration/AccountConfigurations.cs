@@ -41,6 +41,13 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
             .HasForeignKey(a => a.AccountID)
             .IsRequired();
 
+        // Relationship with Order
+        builder.HasMany(a => a.Orders)
+                .WithOne(o => o.Account)
+                .HasForeignKey(o => o.AccountID)
+                .IsRequired(false);
+
+        // Relationship with TransactionHistory
         builder.HasMany(a => a.TransactionHistories)
             .WithOne(s => s.Account)
             .HasForeignKey(s => s.AccountID)

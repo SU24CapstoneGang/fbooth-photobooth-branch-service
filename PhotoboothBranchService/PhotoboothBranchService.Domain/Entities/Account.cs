@@ -18,4 +18,5 @@ public class Account
     public virtual Role Role { get; set; }
     public virtual List<PhotoBoothBranch> PhotoBoothBranches { get; set; }
     public virtual List<TransactionHistory> TransactionHistories { get; set; }
+    public virtual List<Order> Orders { get; set; }
 }
