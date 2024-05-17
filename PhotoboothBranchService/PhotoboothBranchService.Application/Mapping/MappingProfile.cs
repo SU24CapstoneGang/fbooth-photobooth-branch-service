@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using PhotoboothBranchService.Application.DTO;
+using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Account;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using System;
@@ -15,7 +16,7 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<Account, AccountDTO>().ReverseMap();
+        CreateMap<Account, CreateAccountRequestModel>().ReverseMap();
         CreateMap<Camera, CameraDTO>().ReverseMap();
         CreateMap<PhotoBoothBranch, PhotoBoothBranchDTO>().ReverseMap();
         CreateMap<Printer, PrinterDTO>().ReverseMap();

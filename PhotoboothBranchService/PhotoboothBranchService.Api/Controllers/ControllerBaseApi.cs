@@ -4,7 +4,7 @@ namespace PhotoboothBranchService.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ControllerBaseApi : ControllerBase
+    public abstract class ControllerBaseApi : ControllerBase
     {
     }
 }

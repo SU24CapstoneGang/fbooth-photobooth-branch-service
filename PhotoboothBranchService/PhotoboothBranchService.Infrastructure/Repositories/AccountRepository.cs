@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PhotoboothBranchService.Application.DTO;
-using PhotoboothBranchService.Application.Exceptions;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;

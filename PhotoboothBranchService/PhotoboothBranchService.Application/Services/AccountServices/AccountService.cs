@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
-using PhotoboothBranchService.Application.DTO;
-using PhotoboothBranchService.Application.Exceptions;
-using PhotoboothBranchService.Application.Response;
-using PhotoboothBranchService.Application.Services.AuthentiacationService;
+using PhotoboothBranchService.Application.Common.Exceptions;
+using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Account;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Authentication;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Authentication;
+using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Interfaces;
 using PhotoboothBranchService.Domain.IRepository;
@@ -30,7 +32,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             _roleRepository = roleRepository;
             _mapper = mapper;
         }
-        public async Task<AuthenticationResult> Login(LoginDTO loginDTO)
+        public async Task<AuthenticationResult> Login(LoginRequestModel loginDTO)
         {
             var user = await _accountRepository.Login(loginDTO.Email, loginDTO.Password);
             if (user == null)
@@ -49,7 +51,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
         }
 
 
-        public async Task<AuthenticationResult> Register(AccountDTO accountDTO)
+        public async Task<AuthenticationResult> Register(CreateAccountRequestModel accountDTO)
         {
             var userRole = await _roleRepository.GetByName("User");
 

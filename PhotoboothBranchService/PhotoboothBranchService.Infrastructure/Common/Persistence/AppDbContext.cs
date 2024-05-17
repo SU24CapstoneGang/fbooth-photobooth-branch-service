@@ -1,15 +1,8 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using PhotoboothBranchService.Domain.Entities;
-using PhotoboothBranchService.Infrastructure.Configuration;
-using PhotoboothBranchService.Infrastructure.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PhotoboothBranchService.Infrastructure.Common.Configuration;
+using PhotoboothBranchService.Infrastructure.Common.Extensions;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Persistence;
 

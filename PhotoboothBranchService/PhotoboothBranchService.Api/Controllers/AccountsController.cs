@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTO;
+using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Account;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Authentication;
 using PhotoboothBranchService.Application.Services.AccountServices;
 
 namespace PhotoboothBranchService.Api.Controllers;
@@ -14,20 +16,18 @@ public class AccountsController : ControllerBaseApi
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<AccountDTO>> Login([FromBody] LoginDTO loginDTO)
+    public async Task<ActionResult<CreateAccountRequestModel>> Login([FromBody] LoginRequestModel loginDTO)
     {
         try
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
+
             var account = await _accountService.Login(loginDTO);
             if (account == null)
-            {
                 return NotFound("Invalid email or password.");
-            }
             return Ok(account);
+
         }
         catch (Exception ex)
         {
@@ -36,26 +36,19 @@ public class AccountsController : ControllerBaseApi
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] AccountDTO request)
+    public async Task<IActionResult> Register([FromBody] CreateAccountRequestModel request)
     {
 
         try
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
             var result = await _accountService.Register(request);
-
             if (result != null)
-            {
                 return Ok(result);
-            }
-            else
-            {
-                return BadRequest("Registration failed. Please try again.");
-            }
+            return BadRequest("Registration failed. Please try again.");
+
         }
         catch (Exception ex)
         {

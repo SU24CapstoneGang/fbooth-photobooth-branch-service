@@ -1,11 +1,13 @@
-﻿using PhotoboothBranchService.Application.DTO;
-using PhotoboothBranchService.Application.Response;
+﻿using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Account;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Authentication;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Authentication;
 
 namespace PhotoboothBranchService.Application.Services.AccountServices
 {
     public interface IAccountService
     {
-        Task<AuthenticationResult> Register(AccountDTO accountDTO);
-        Task<AuthenticationResult> Login(LoginDTO loginDTO);
+        Task<AuthenticationResult> Register(CreateAccountRequestModel accountDTO);
+        Task<AuthenticationResult> Login(LoginRequestModel loginDTO);
     }
 }

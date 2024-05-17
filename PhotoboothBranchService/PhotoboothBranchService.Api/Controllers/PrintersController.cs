@@ -1,6 +1,6 @@
 ﻿// PrintersController.cs
 using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTO;
+using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.Services.PrinterServices;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Interfaces;

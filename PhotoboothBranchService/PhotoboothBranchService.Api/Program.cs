@@ -1,4 +1,4 @@
-﻿using PhotoboothBranchService.Api.MiddleWare;
+﻿using PhotoboothBranchService.Api.Common.MiddleWare;
 using PhotoboothBranchService.Application;
 using PhotoboothBranchService.Infrastructure;
 using System.Text.Json.Serialization;
@@ -13,24 +13,27 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var services = builder.Services;
 builder.Services
-    .AddApplicaiton()
+    .AddApplicaiton(builder.Configuration)
     .AddInfrastructure(builder.Configuration); 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 //configure exceptions to return swagger
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
+app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.UseAuthentication();
 app.UseAuthorization();
 

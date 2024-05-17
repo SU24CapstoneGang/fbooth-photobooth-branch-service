@@ -1,4 +1,4 @@
-﻿using PhotoboothBranchService.Application.DTO;
+﻿using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using System;
