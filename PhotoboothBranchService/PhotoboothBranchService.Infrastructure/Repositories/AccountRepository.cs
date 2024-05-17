@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PhotoboothBranchService.Application.DTO;
+using PhotoboothBranchService.Application.Exceptions;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
@@ -44,11 +46,13 @@ public class AccountRepository : IAccountRepository
         }
 
         using var hmac = new HMACSHA512(user.PasswordSalt);
-        var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-        if (!computedHash.SequenceEqual(user.PasswordHash))
+        var computeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+        for (int i = 0; i < computeHash.Length; i++)
         {
-            return null;
+            if (computeHash[i] != user.PasswordHash[i])
+            {
+                return null;
+            }
         }
         return user;
     }

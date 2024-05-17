@@ -44,6 +44,12 @@ namespace PhotoboothBranchService.Infrastructure.Configuration
                 .HasForeignKey(o => o.PaymentID)
                 .IsRequired();
 
+            // Relationship with Account
+            builder.HasOne(o => o.Account)
+                .WithMany(a => a.Orders)
+                .HasForeignKey(o => o.AccountID)
+                .IsRequired(false);
+
             // Relationship with Discount
             builder.HasOne(o => o.Discount)
                 .WithMany(d => d.Orders)

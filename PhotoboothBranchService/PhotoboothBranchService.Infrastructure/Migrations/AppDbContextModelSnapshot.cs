@@ -322,6 +322,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Order ID");
 
+                    b.Property<Guid?>("AccountID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("DiscountID")
                         .HasColumnType("uniqueidentifier");
 
@@ -344,6 +347,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("real");
 
                     b.HasKey("OrderID");
+
+                    b.HasIndex("AccountID");
 
                     b.HasIndex("DiscountID");
 
@@ -629,6 +634,10 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Order", b =>
                 {
+                    b.HasOne("PhotoboothBranchService.Domain.Entities.Account", "Account")
+                        .WithMany("Orders")
+                        .HasForeignKey("AccountID");
+
                     b.HasOne("PhotoboothBranchService.Domain.Entities.Discount", "Discount")
                         .WithMany("Orders")
                         .HasForeignKey("DiscountID")
@@ -646,6 +655,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasForeignKey("PhotoboothBranchService.Domain.Entities.Order", "PictureID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Account");
 
                     b.Navigation("Discount");
 
@@ -717,6 +728,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Account", b =>
                 {
+                    b.Navigation("Orders");
+
                     b.Navigation("PhotoBoothBranches");
 
                     b.Navigation("TransactionHistories");
