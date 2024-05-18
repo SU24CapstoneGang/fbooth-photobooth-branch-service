@@ -2,7 +2,7 @@
 using Microsoft.Identity.Client;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
-using PhotoboothBranchService.Domain.Interfaces;
+using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using System;
 using System.Collections.Generic;

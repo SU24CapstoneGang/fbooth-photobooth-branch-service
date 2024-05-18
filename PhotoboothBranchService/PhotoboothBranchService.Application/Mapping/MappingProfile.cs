@@ -25,5 +25,7 @@ public class MappingProfile : Profile
         CreateMap<Filter, FilterDTO>().ReverseMap();
         CreateMap<Sticker, StickerDTO>().ReverseMap();
         CreateMap<Frame, FrameDTO>().ReverseMap();
+        CreateMap<Discount, DiscountDTO>().ReverseMap();
+        CreateMap<Session, SessionDTO>().ReverseMap();
     }
 }

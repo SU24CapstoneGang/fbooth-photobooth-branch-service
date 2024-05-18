@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
-using PhotoboothBranchService.Application.Common.Exceptions;
-using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Account;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Authentication;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Authentication;
-using PhotoboothBranchService.Application.Services.JwtServices;
+using PhotoboothBranchService.Application.DTO;
+using PhotoboothBranchService.Application.Exceptions;
+using PhotoboothBranchService.Application.Response;
+using PhotoboothBranchService.Application.Services.AuthentiacationService;
+using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
-using PhotoboothBranchService.Domain.Interfaces;
 using PhotoboothBranchService.Domain.IRepository;
 using System;
 using System.Collections.Generic;
@@ -24,18 +22,23 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
         private readonly IRoleRepository _roleRepository;
         private readonly IMapper _mapper;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public AccountService(IAccountRepository accountRepository,  IJwtTokenGenerator jwtTokenGenerator, IRoleRepository roleRepository, IMapper mapper)
+        public AccountService(IAccountRepository accountRepository,  IJwtTokenGenerator jwtTokenGenerator, IRoleRepository roleRepository, IMapper mapper, IPasswordHasher passwordHasher)
         {
             _accountRepository = accountRepository;
             _jwtTokenGenerator = jwtTokenGenerator;
             _roleRepository = roleRepository;
             _mapper = mapper;
+            _passwordHasher = passwordHasher;
         }
-        public async Task<AuthenticationResult> Login(LoginRequestModel loginDTO)
+        public async Task<AuthenticationResult> Login(LoginDTO loginDTO)
         {
-            var user = await _accountRepository.Login(loginDTO.Email, loginDTO.Password);
+            var user = await _accountRepository.GetByEmail(loginDTO.Email);
             if (user == null)
+            {
+                throw new UnauthorizedException("Invalid email or password");
+            } else if (user.VerifyPassword(loginDTO.Password, _passwordHasher))
             {
                 throw new UnauthorizedException("Invalid email or password");
             }
@@ -51,11 +54,12 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
         }
 
 
-        public async Task<AuthenticationResult> Register(CreateAccountRequestModel accountDTO)
+        public async Task<AuthenticationResult> Register(AccountDTO accountDTO)
         {
             var userRole = await _roleRepository.GetByName("User");
 
-            if (userRole == null)
+            //validation in db
+            if (userRole.Count() == 0)
             {
                 throw new Exception("User role does not exist in the system.");
             }
@@ -64,23 +68,11 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             {
                 throw new Exception("Email is already in use. Please choose a different email.");
             }
-            using var hmac = new HMACSHA512();
 
             // Tạo một đối tượng Account từ AccountDTO
-            var newAccount = new Account
-            {
-                FirstName = accountDTO.FirstName,
-                LastName = accountDTO.LastName,
-                Email = accountDTO.Email,
-                Address = accountDTO.Address,
-                DateOfBirth = accountDTO.DateOfBirth,
-                PhoneNumber = accountDTO.PhoneNumber,
-                Status = Domain.Enum.AccountStatus.Active,
-                RoleID = userRole.Single().RoleID,
-                PasswordSalt = hmac.Key,
-                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(accountDTO.Password))
-            };
-
+            Account newAccount = _mapper.Map<Account>(accountDTO);
+            newAccount.SetPassword(accountDTO.Password, _passwordHasher);
+            newAccount.RoleID = userRole.ElementAt(0).RoleID;
             var accountId = await _accountRepository.AddAsync(newAccount);
             var authResult = new AuthenticationResult
             {

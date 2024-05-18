@@ -13,7 +13,7 @@ public interface IAccountRepository
     Task<IEnumerable<Account>> GetAll();
     Task<IEnumerable<Account>> GetAll(AccountStatus status);
     Task<IEnumerable<Account>> GetListByEmail(string email);
-    Task<Account> Login(string email, string password);
+    Task<Account?> GetByEmail(string email);
     Task<Guid> AddAsync(Account account);
     Task<Account> GetByIdAsync(Guid accountId);
     Task RemoveAsync(Account account);

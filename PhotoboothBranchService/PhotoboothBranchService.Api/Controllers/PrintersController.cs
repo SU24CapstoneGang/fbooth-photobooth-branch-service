@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.Services.PrinterServices;
 using PhotoboothBranchService.Domain.Entities;
-using PhotoboothBranchService.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading;

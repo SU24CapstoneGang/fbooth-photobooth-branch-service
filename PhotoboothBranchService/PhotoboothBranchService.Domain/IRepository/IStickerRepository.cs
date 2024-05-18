@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Domain.Interfaces;
+namespace PhotoboothBranchService.Domain.IRepository;
 
 public interface IStickerRepository
 {
