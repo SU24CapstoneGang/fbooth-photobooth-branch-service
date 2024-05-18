@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 
-namespace PhotoboothBranchService.Domain.Interfaces;
+namespace PhotoboothBranchService.Domain.IRepository;
 
 public interface ICameraRepository
 {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Mapping;
 using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Application.Services.CameraServices;
@@ -11,6 +12,7 @@ using PhotoboothBranchService.Application.Services.PrinterServices;
 using PhotoboothBranchService.Application.Services.RoleServices;
 using PhotoboothBranchService.Application.Services.SessionServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
+using PhotoboothBranchService.Domain.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +39,8 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<ISessionService, SessionService>();
             //Mapper
             services.AddAutoMapper(typeof(MappingProfile));
+
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
             return services;
         }
     }

@@ -1,4 +1,5 @@
-﻿using PhotoboothBranchService.Domain.Enum;
+﻿using PhotoboothBranchService.Domain.Common.Interfaces;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Domain.Entities;
 
@@ -19,4 +20,16 @@ public class Account
     public virtual List<PhotoBoothBranch> PhotoBoothBranches { get; set; }
     public virtual List<TransactionHistory> TransactionHistories { get; set; }
     public virtual List<Order> Orders { get; set; }
+
+    public void SetPassword(string plainTextPassword, IPasswordHasher passwordHasher)
+    {
+        PasswordSalt = passwordHasher.GenerateSalt();
+        PasswordHash = passwordHasher.HashPassword(plainTextPassword, PasswordSalt);
+    }
+
+    public bool VerifyPassword(string plainTextPassword, IPasswordHasher passwordHasher)
+    {
+        var hash = passwordHasher.HashPassword(plainTextPassword, PasswordSalt);
+        return hash.SequenceEqual(PasswordHash);
+    }
 }

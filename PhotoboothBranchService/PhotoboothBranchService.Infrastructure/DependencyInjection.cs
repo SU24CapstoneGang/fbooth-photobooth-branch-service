@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using PhotoboothBranchService.Application.Services.AuthentiacationService;
-using PhotoboothBranchService.Domain.Interfaces;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Authentication;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;

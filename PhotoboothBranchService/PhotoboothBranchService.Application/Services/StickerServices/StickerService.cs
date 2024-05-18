@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.DTO;
 using PhotoboothBranchService.Domain.Entities;
-using PhotoboothBranchService.Domain.Interfaces;
+using PhotoboothBranchService.Domain.IRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;

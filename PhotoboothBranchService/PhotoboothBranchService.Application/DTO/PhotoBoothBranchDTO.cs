@@ -16,6 +16,6 @@ public class PhotoBoothBranchDTO
     public string BranchName { get; set; }
     public string BranchAddress { get; set; } 
     public ManufactureStatus Status { get; set; }
-    public string AccountId { get; set; }
+    public Guid AccountID { get; set; }
 
 }

@@ -37,26 +37,6 @@ public class AccountRepository : IAccountRepository
         return await _dbContext.Accounts.Where(c => c.Status == status).ToListAsync();
     }
 
-    public async Task<Account?> Login(string email, string password)
-    {
-        var user = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == email);
-        if (user == null)
-        {
-            return null;
-        }
-
-        using var hmac = new HMACSHA512(user.PasswordSalt);
-        var computeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-        for (int i = 0; i < computeHash.Length; i++)
-        {
-            if (computeHash[i] != user.PasswordHash[i])
-            {
-                return null;
-            }
-        }
-        return user;
-    }
-
     public async Task<IEnumerable<Account>> GetListByEmail(string email)
     {
         return await _dbContext.Accounts.Where(c => c.Email.Contains(email)).ToListAsync();
@@ -85,5 +65,10 @@ public class AccountRepository : IAccountRepository
     {
         var existingAccounts = await _dbContext.Accounts.Where(c => c.Email.Equals(email)).ToListAsync();
         return existingAccounts.Count == 0;
+    }
+
+    public async Task<Account?> GetByEmail(string email)
+    {
+        return await _dbContext.Accounts.FirstOrDefaultAsync(c => c.Email.Contains(email));
     }
 }

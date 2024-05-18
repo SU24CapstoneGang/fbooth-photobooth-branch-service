@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.Common.Utilities;
+namespace PhotoboothBranchService.Application.Common;
 
 public class PasswordHasher : IPasswordHasher
 {
