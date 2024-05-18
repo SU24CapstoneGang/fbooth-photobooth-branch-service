@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTO;
+using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.Services.DiscountServices;
 
 namespace PhotoboothBranchService.Api.Controllers;

@@ -1,8 +1,10 @@
 ﻿using AutoMapper.Internal;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Mapping;
 using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Application.Services.CameraServices;
@@ -14,6 +16,7 @@ using PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
 using PhotoboothBranchService.Application.Services.PrinterServices;
 using PhotoboothBranchService.Application.Services.RoleServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
+using PhotoboothBranchService.Domain.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +40,9 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IFrameService, FrameService>();
             services.AddScoped<IStickerService, StickerService>();
             services.AddScoped<ILayoutService, LayoutService>();
+
+
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
 
             //jwt service
             services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
