@@ -7,13 +7,6 @@ using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.AccountServices
 {
@@ -25,7 +18,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
         private readonly IMapper _mapper;
         private readonly IPasswordHasher _passwordHasher;
 
-        public AccountService(IAccountRepository accountRepository,  IJwtTokenGenerator jwtTokenGenerator, IRoleRepository roleRepository, IMapper mapper, IPasswordHasher passwordHasher)
+        public AccountService(IAccountRepository accountRepository, IJwtTokenGenerator jwtTokenGenerator, IRoleRepository roleRepository, IMapper mapper, IPasswordHasher passwordHasher)
         {
             _accountRepository = accountRepository;
             _jwtTokenGenerator = jwtTokenGenerator;
@@ -33,13 +26,17 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             _mapper = mapper;
             _passwordHasher = passwordHasher;
         }
-        public async Task<AuthenticationResult> Login(LoginRequestModel loginDTO)
+
+        //Login using Email and password
+        public async Task<AuthenticationResult> Login(LoginRequestModel loginRequestModel)
         {
-            var user = await _accountRepository.GetByEmail(loginDTO.Email);
+            var users = await _accountRepository.GetAsync(l => l.Email.Equals(loginRequestModel));
+            var user = users.FirstOrDefault();
             if (user == null)
             {
                 throw new UnauthorizedException("Invalid email or password");
-            } else if (user.VerifyPassword(loginDTO.Password, _passwordHasher))
+            }
+            else if (user.VerifyPassword(loginRequestModel.Password, _passwordHasher))
             {
                 throw new UnauthorizedException("Invalid email or password");
             }
@@ -53,25 +50,29 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                 Token = _jwtTokenGenerator.GenerateToken(user),
             };
         }
-        public async Task<AuthenticationResult> Register(CreateAccountRequestModel accountDTO)
-        {
-            var userRole = await _roleRepository.GetByName("User");
 
+        //Register for role input
+        public async Task<AuthenticationResult> Register(CreateAccountRequestModel createAccountRequestModel, String roleName)
+        {
+            var userRoles = await _roleRepository.GetAsync(r => r.RoleName.Equals(roleName));
+            var userRole = userRoles.FirstOrDefault();
             //validation in db
-            if (userRole.Count() == 0)
+            if (userRole == null)
             {
                 throw new Exception("User role does not exist in the system.");
             }
 
-            if (!await _accountRepository.IsEmailUnique(accountDTO.Email))
+            if (!await _accountRepository.IsEmailUnique(createAccountRequestModel.Email))
             {
                 throw new Exception("Email is already in use. Please choose a different email.");
             }
 
-            // Tạo một đối tượng Account từ AccountDTO
-            Account newAccount = _mapper.Map<Account>(accountDTO);
-            newAccount.SetPassword(accountDTO.Password, _passwordHasher);
-            newAccount.RoleID = userRole.ElementAt(0).RoleID;
+            // Create User entity
+            Account newAccount = _mapper.Map<Account>(createAccountRequestModel);
+            newAccount.SetPassword(createAccountRequestModel.Password, _passwordHasher);
+            newAccount.RoleID = userRole.RoleID;
+
+            //Add user
             var accountId = await _accountRepository.AddAsync(newAccount);
             var authResult = new AuthenticationResult
             {

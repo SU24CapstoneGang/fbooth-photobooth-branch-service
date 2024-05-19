@@ -2,11 +2,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
@@ -18,8 +13,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.ToTable("PhotoBoothBranches");
 
             // Primary key
-            builder.HasKey(pb => pb.BranchesID);
-            builder.Property(pb => pb.BranchesID).HasColumnName("Branches ID")
+            builder.HasKey(pb => pb.PhotoBoothBranchID);
+            builder.Property(pb => pb.PhotoBoothBranchID).HasColumnName("Branches ID")
                 .ValueGeneratedOnAdd();
 
             // Other properties

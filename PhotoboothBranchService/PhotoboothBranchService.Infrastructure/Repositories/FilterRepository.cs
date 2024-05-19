@@ -1,12 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhotoboothBranchService.Domain.Entities;
+﻿using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -19,6 +14,7 @@ public class FilterRepository : IFilterRepository
         _dbContext = dbContext;
     }
 
+    //Create
     public async Task<Guid> AddAsync(Filter filter)
     {
         await _dbContext.AddAsync(filter);
@@ -26,27 +22,24 @@ public class FilterRepository : IFilterRepository
         return filter.FilterID;
     }
 
-    public async Task<IEnumerable<Filter>> GetAll()
+    //Read
+    public async Task<IQueryable<Filter>> GetAllAsync()
     {
-        return await _dbContext.Filters.ToListAsync();
+        return await Task.FromResult(_dbContext.Filters);
     }
 
-    public async Task<Filter?> GetByIdAsync(Guid filterId)
+    public async Task<IQueryable<Filter>> GetAsync(Expression<Func<Filter, bool>> predicate)
     {
-        return await _dbContext.Filters.FindAsync(filterId);
+        return await Task.FromResult(_dbContext.Filters.Where(predicate));
     }
 
-    public async Task<IEnumerable<Filter>> GetByName(string name)
-    {
-        return await _dbContext.Filters.Where(c => c.FilterName.Contains(name)).ToListAsync();
-    }
-
+    //Delete
     public async Task RemoveAsync(Filter filter)
     {
         _dbContext.Remove(filter);
         await _dbContext.SaveChangesAsync();
     }
-
+    //Update
     public async Task UpdateAsync(Filter filter)
     {
         _dbContext.Update(filter);

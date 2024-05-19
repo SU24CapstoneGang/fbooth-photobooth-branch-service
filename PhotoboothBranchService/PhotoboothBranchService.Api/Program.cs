@@ -15,7 +15,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services
     .AddApplicaiton(builder.Configuration)
-    .AddInfrastructure(builder.Configuration); 
+    .AddInfrastructure(builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

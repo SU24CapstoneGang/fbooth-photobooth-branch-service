@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.RequestModels.Account;
 using PhotoboothBranchService.Application.DTOs.RequestModels.Authentication;
 using PhotoboothBranchService.Application.Services.AccountServices;
@@ -44,7 +43,7 @@ public class AccountsController : ControllerBaseApi
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _accountService.Register(request);
+            var result = await _accountService.Register(request, "User");
             if (result != null)
                 return Ok(result);
             return BadRequest("Registration failed. Please try again.");
@@ -56,6 +55,6 @@ public class AccountsController : ControllerBaseApi
         };
     }
 
-   
+
 }
 

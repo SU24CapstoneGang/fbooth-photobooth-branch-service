@@ -7,7 +7,6 @@
         public float LayoutPrice { get; set; } = default!;
         public DateTime CreatedDate { get; set; }
         public DateTime LastModified { get; set; }
-
         public virtual List<FinalPicture> FinalPictures { get; set; }
     }
 }

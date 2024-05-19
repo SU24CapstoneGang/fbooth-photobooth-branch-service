@@ -1,12 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhotoboothBranchService.Domain.Entities;
+﻿using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -19,6 +14,8 @@ public class StickerRepository : IStickerRepository
         _dbContext = dbContext;
     }
 
+
+    //Create
     public async Task<Guid> AddAsync(Sticker sticker)
     {
         await _dbContext.AddAsync(sticker);
@@ -26,27 +23,25 @@ public class StickerRepository : IStickerRepository
         return sticker.StickerId;
     }
 
-    public async Task<IEnumerable<Sticker>> GetAll()
+    //Read
+    public async Task<IQueryable<Sticker>> GetAllAsync()
     {
-        return await _dbContext.Stickers.ToListAsync();
+        return await Task.FromResult(_dbContext.Stickers);
     }
 
-    public async Task<Sticker?> GetByIdAsync(Guid stickerId)
+    public async Task<IQueryable<Sticker>> GetAsync(Expression<Func<Sticker, bool>> predicate)
     {
-        return await _dbContext.Stickers.FindAsync(stickerId);
+        return await Task.FromResult(_dbContext.Stickers.Where(predicate));
     }
 
-    public async Task<IEnumerable<Sticker>> GetByName(string name)
-    {
-        return await _dbContext.Stickers.Where(c => c.StickerName.Contains(name)).ToListAsync();
-    }
-
+    //Delete
     public async Task RemoveAsync(Sticker sticker)
     {
         _dbContext.Remove(sticker);
         await _dbContext.SaveChangesAsync();
     }
 
+    //Update
     public async Task UpdateAsync(Sticker sticker)
     {
         _dbContext.Update(sticker);

@@ -1,14 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhotoboothBranchService.Domain.Entities;
+﻿using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -20,7 +13,7 @@ public class RoleRepository : IRoleRepository
     {
         _dbContext = dbContext;
     }
-
+    //Create
     public async Task<Guid> AddAsync(Role Role)
     {
         await _dbContext.AddAsync(Role);
@@ -28,27 +21,25 @@ public class RoleRepository : IRoleRepository
         return Role.RoleID;
     }
 
-    public async Task<IEnumerable<Role>> GetAll()
+    //Read
+    public async Task<IQueryable<Role>> GetAllAsync()
     {
-        return await _dbContext.Roles.ToListAsync();
+        return await Task.FromResult(_dbContext.Roles);
     }
 
-    public async Task<Role?> GetByIdAsync(Guid RoleID)
+    public async Task<IQueryable<Role>> GetAsync(Expression<Func<Role, bool>> predicate)
     {
-        return await _dbContext.Roles.FindAsync(RoleID);
+        return await Task.FromResult(_dbContext.Roles.Where(predicate));
     }
 
-    public async Task<IEnumerable<Role>> GetByName(string name)
-    {
-        return await _dbContext.Roles.Where(p => p.RoleName.Contains(name)).ToListAsync();
-    }
-
+    //Delete
     public async Task RemoveAsync(Role Role)
     {
         _dbContext.Roles.Remove(Role);
         await _dbContext.SaveChangesAsync();
     }
 
+    //Update
     public async Task UpdateAsync(Role Role)
     {
         _dbContext.Update(Role);

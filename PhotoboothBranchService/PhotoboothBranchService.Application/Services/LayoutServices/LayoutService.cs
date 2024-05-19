@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
+using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Layout;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Layout;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.LayoutServices;
 
@@ -22,10 +21,9 @@ public class LayoutService : ILayoutService
     }
 
     // Create
-    public async Task<Guid> CreateAsync(LayoutDTO entityDTO)
+    public async Task<Guid> CreateAsync(CreateLayoutRequest createModel)
     {
-        Layout layout = _mapper.Map<Layout>(entityDTO);
-        layout.LayoutID = Guid.NewGuid();
+        Layout layout = _mapper.Map<Layout>(createModel);
         return await _layoutRepository.AddAsync(layout);
     }
 
@@ -34,7 +32,7 @@ public class LayoutService : ILayoutService
     {
         try
         {
-            Layout? layout = await _layoutRepository.GetByIdAsync(id);
+            Layout? layout = (await _layoutRepository.GetAsync(l => l.LayoutID == id)).FirstOrDefault();
             if (layout != null)
             {
                 await _layoutRepository.RemoveAsync(layout);
@@ -47,25 +45,38 @@ public class LayoutService : ILayoutService
     }
 
     // Read
-    public async Task<IEnumerable<LayoutDTO>> GetAllAsync()
+    public async Task<IEnumerable<Layoutresponse>> GetAllAsync()
     {
-        var layouts = await _layoutRepository.GetAll();
-        return _mapper.Map<IEnumerable<LayoutDTO>>(layouts);
+        var layouts = await _layoutRepository.GetAllAsync();
+        return _mapper.Map<IEnumerable<Layoutresponse>>(layouts.ToList());
     }
 
-    public async Task<LayoutDTO> GetByIdAsync(Guid id)
+    public async Task<IEnumerable<Layoutresponse>> GetAllPagingAsync(LayoutFilter filter, PagingModel paging)
     {
-        var layout = await _layoutRepository.GetByIdAsync(id);
-        return _mapper.Map<LayoutDTO>(layout);
+        var layouts = (await _layoutRepository.GetAllAsync()).AutoPaging(paging.PageSize,paging.PageIndex);
+        var listLayoutresponse = _mapper.Map<IEnumerable<Layoutresponse>>(layouts.ToList());
+        listLayoutresponse.AutoFilter(filter);
+        return listLayoutresponse;
+    }
+
+    public async Task<Layoutresponse> GetByIdAsync(Guid id)
+    {
+        var layout = (await _layoutRepository.GetAsync(l => l.LayoutID == id)).FirstOrDefault();
+        return _mapper.Map<Layoutresponse>(layout);
     }
 
     // Update
-    public async Task UpdateAsync(Guid id, LayoutDTO entityDTO)
+    public async Task UpdateAsync(Guid id, UpdateLayoutRequest updateMdel)
     {
-        entityDTO.LayoutID = id;
-        Layout layout = _mapper.Map<Layout>(entityDTO);
-        layout.LastModified = DateTime.UtcNow;
-        await _layoutRepository.UpdateAsync(layout);
+        var layout = (await _layoutRepository.GetAsync(l => l.LayoutID == id)).FirstOrDefault();
+        if (layout == null)
+        {
+            throw new KeyNotFoundException("Layout not found.");
+        }
+
+        var updateLayout = _mapper.Map(updateMdel, layout);
+        updateLayout.LastModified = DateTime.UtcNow;
+        await _layoutRepository.UpdateAsync(updateLayout);
     }
 }
 

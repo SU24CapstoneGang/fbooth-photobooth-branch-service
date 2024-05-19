@@ -1,18 +1,8 @@
-﻿using PhotoboothBranchService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PhotoboothBranchService.Domain.Common.Interfaces;
+using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Domain.IRepository;
 
-public interface IStickerRepository
+public interface IStickerRepository : IRepositoryBase<Sticker>
 {
-    Task<IEnumerable<Sticker>> GetAll();
-    Task<IEnumerable<Sticker>> GetByName(string name);
-    Task<Guid> AddAsync(Sticker sticker);
-    Task<Sticker?> GetByIdAsync(Guid stickerId);
-    Task RemoveAsync(Sticker sticker);
-    Task UpdateAsync(Sticker sticker);
 }

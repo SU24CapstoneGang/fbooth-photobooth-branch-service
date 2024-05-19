@@ -1,14 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
-using PhotoboothBranchService.Domain.Entities;
-using PhotoboothBranchService.Domain.Enum;
+﻿using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -29,19 +22,13 @@ public class CameraRepository : ICameraRepository
     }
 
     //Read
-    public async Task<IEnumerable<Camera>> GetAll()
+    public async Task<IQueryable<Camera>> GetAllAsync()
     {
-        return await _dbContext.Cameras.ToListAsync();
+        return await Task.FromResult(_dbContext.Cameras.AsQueryable());
     }
-
-    public async Task<Camera?> GetByIdAsync(Guid cameraId)
+    public async Task<IQueryable<Camera>> GetAsync(Expression<Func<Camera, bool>> predicate)
     {
-        return await _dbContext.Cameras.FindAsync(cameraId);
-    }
-
-    public async Task<IEnumerable<Camera>> GetByName(string name)
-    {
-        return await _dbContext.Cameras.Where(c => c.ModelName.Contains(name)).ToListAsync();
+        return await Task.FromResult(_dbContext.Cameras.Where(predicate).AsQueryable());
     }
 
     //Update
@@ -57,5 +44,4 @@ public class CameraRepository : ICameraRepository
         _dbContext.Remove(camera);
         await _dbContext.SaveChangesAsync();
     }
-
 }

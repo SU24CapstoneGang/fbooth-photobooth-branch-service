@@ -1,13 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhotoboothBranchService.Domain.Entities;
-using PhotoboothBranchService.Domain.Enum;
+﻿using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -29,14 +23,14 @@ public class PrinterRepository : IPrinterRepository
     }
 
     //Read
-    public async Task<IEnumerable<Printer>> GetAll( )
+    public async Task<IQueryable<Printer>> GetAllAsync()
     {
-        return await _dbContext.Printers.ToListAsync();
+        return await Task.FromResult(_dbContext.Printers);
     }
 
-    public async Task<IEnumerable<Printer>> GetByName(string name)
+    public async Task<IQueryable<Printer>> GetAsync(Expression<Func<Printer, bool>> predicate)
     {
-        return await _dbContext.Printers.Where(p => p.ModelName.Contains(name)).ToListAsync();
+        return await Task.FromResult(_dbContext.Printers.Where(predicate));
     }
 
     public async Task<Printer?> GetByIdAsync(Guid printerId)

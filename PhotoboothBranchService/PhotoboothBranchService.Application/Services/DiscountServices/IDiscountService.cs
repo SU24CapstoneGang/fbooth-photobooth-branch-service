@@ -1,14 +1,13 @@
 ﻿using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Discount;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Discount;
 using PhotoboothBranchService.Domain.Common.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.DiscountServices;
 
-public interface IDiscountService : IService<DiscountDTO>
+public interface IDiscountService : IService<Discountresponse,CreateDiscountRequest,UpdateDiscountRequest,DiscountFilter,PagingModel>
 {
-    Task<IEnumerable<DiscountDTO>> GetByCode(string code);
+    Task<IEnumerable<Discountresponse>> SearchByCode(string code);
+    Task<Discountresponse> GetByCode(string code);
 }

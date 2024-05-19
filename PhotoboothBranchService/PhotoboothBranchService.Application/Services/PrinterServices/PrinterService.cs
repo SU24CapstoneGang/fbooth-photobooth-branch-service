@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
+using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Printer;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Printer;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.PrinterServices;
 
@@ -21,10 +20,9 @@ public class PrinterService : IPrinterService
         _mapper = mapper;
     }
 
-    public async Task<Guid> CreateAsync(PrinterDTO entityDTO)
+    public async Task<Guid> CreateAsync(CreatePrinterRequest createModel)
     {
-        Printer printer = _mapper.Map<Printer>(entityDTO);
-        printer.PrinterID = Guid.NewGuid();
+        Printer printer = _mapper.Map<Printer>(createModel);
         await _printerRepository.AddAsync(printer);
         return printer.PrinterID;
     }
@@ -33,7 +31,7 @@ public class PrinterService : IPrinterService
     {
         try
         {
-            var printer = await _printerRepository.GetByIdAsync(id);
+            var printer = (await _printerRepository.GetAsync(p => p.PrinterID == id)).FirstOrDefault();
             if (printer != null)
             {
                 await _printerRepository.RemoveAsync(printer);
@@ -45,29 +43,42 @@ public class PrinterService : IPrinterService
         }
     }
 
-    public async Task<IEnumerable<PrinterDTO>> GetAllAsync()
+    public async Task<IEnumerable<PrinterResponse>> GetAllAsync()
     {
-        var printers = await _printerRepository.GetAll();
-        return _mapper.Map<IEnumerable<PrinterDTO>>(printers);
+        var printers = await _printerRepository.GetAllAsync();
+        return _mapper.Map<IEnumerable<PrinterResponse>>(printers.ToList());
     }
 
-    public async Task<PrinterDTO> GetByIdAsync(Guid id)
+    public async Task<IEnumerable<PrinterResponse>> GetAllPagingAsync(PrinterFilter filter, PagingModel paging)
     {
-        var printer = await _printerRepository.GetByIdAsync(id);
-        return _mapper.Map<PrinterDTO>(printer);
+        var printers = (await _printerRepository.GetAllAsync()).AutoPaging(paging.PageSize,paging.PageIndex);
+        var listPrinterresponse = _mapper.Map<IEnumerable<PrinterResponse>>(printers.ToList());
+        listPrinterresponse.AutoFilter(filter);
+        return listPrinterresponse;
     }
 
-    public async Task<IEnumerable<PrinterDTO>> GetByName(string name)
+    public async Task<PrinterResponse> GetByIdAsync(Guid id)
     {
-        var printers = await _printerRepository.GetByName(name);
-        return _mapper.Map<IEnumerable<PrinterDTO>>(printers);
+        var printer = (await _printerRepository.GetAsync(p => p.PrinterID == id)).FirstOrDefault();
+        return _mapper.Map<PrinterResponse>(printer);
     }
 
-    public async Task UpdateAsync(Guid id, PrinterDTO entityDTO)
+    public async Task<IEnumerable<PrinterResponse>> GetByName(string name)
     {
-        entityDTO.PrinterId = id;
-        Printer printer = _mapper.Map<Printer>(entityDTO);
-        await _printerRepository.UpdateAsync(printer);
+        var printers = await _printerRepository.GetAsync(p => p.ModelName.Contains(name));
+        return _mapper.Map<IEnumerable<PrinterResponse>>(printers.ToList());
+    }
+
+    public async Task UpdateAsync(Guid id, UpdatePrinterRequest updateModel)
+    {
+        var printer = (await _printerRepository.GetAsync(p => p.PrinterID == id)).FirstOrDefault();
+        if (printer == null)
+        {
+            throw new KeyNotFoundException("Printer not found.");
+        }
+
+        var updatePrinter = _mapper.Map(updateModel, printer);
+        await _printerRepository.UpdateAsync(updatePrinter);
     }
 }
 

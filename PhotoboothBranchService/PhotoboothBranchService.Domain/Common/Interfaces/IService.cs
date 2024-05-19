@@ -1,10 +1,11 @@
 ﻿namespace PhotoboothBranchService.Domain.Common.Interfaces;
 
-public interface IService<TEntityDTO>
+public interface IService<responseModel, CreateModel, UpdateModel, Filter, Paging>
 {
-    Task<TEntityDTO> GetByIdAsync(Guid id);
-    Task<IEnumerable<TEntityDTO>> GetAllAsync();
-    Task<Guid> CreateAsync(TEntityDTO entityDTO);
-    Task UpdateAsync(Guid id, TEntityDTO entityDTO);
-    Task DeleteAsync(Guid id);
+    public Task<responseModel> GetByIdAsync(Guid id);
+    public Task<IEnumerable<responseModel>> GetAllAsync();
+    public Task<IEnumerable<responseModel>> GetAllPagingAsync(Filter filter, Paging paging);
+    public Task<Guid> CreateAsync(CreateModel createModel);
+    public Task UpdateAsync(Guid id, UpdateModel updateModel);
+    public Task DeleteAsync(Guid id);
 }

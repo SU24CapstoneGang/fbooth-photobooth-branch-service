@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
+using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.PhotoBoothBranch;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.PhotoBoothBranch;
+using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
 
@@ -21,20 +22,19 @@ public class PhotoBoothBranchService : IPhotoBoothBranchService
         _photoBoothBranchRepository = photoBoothBranchRepository;
         _mapper = mapper;
     }
-
-    public async Task<Guid> CreateAsync(PhotoBoothBranchDTO entityDTO)
+    //Create
+    public async Task<Guid> CreateAsync(CreatePhotoBoothBranchRequest createModel)
     {
-        PhotoBoothBranch photoBoothBranch = _mapper.Map<PhotoBoothBranch>(entityDTO);
-        photoBoothBranch.BranchesID = Guid.NewGuid();
+        PhotoBoothBranch photoBoothBranch = _mapper.Map<PhotoBoothBranch>(createModel);
         await _photoBoothBranchRepository.AddAsync(photoBoothBranch);
-        return photoBoothBranch.BranchesID;
+        return photoBoothBranch.PhotoBoothBranchID;
     }
-
+    //Delete
     public async Task DeleteAsync(Guid id)
     {
         try
         {
-            var photoBoothBranch = await _photoBoothBranchRepository.GetByIdAsync(id);
+            var photoBoothBranch = (await _photoBoothBranchRepository.GetAsync(p => p.PhotoBoothBranchID == id)).FirstOrDefault();
             if (photoBoothBranch != null)
             {
                 await _photoBoothBranchRepository.RemoveAsync(photoBoothBranch);
@@ -45,36 +45,50 @@ public class PhotoBoothBranchService : IPhotoBoothBranchService
             throw;
         }
     }
-
-    public async Task<IEnumerable<PhotoBoothBranchDTO>> GetAll(ManufactureStatus status)
+    //read
+    public async Task<IEnumerable<PhotoBoothBranchresponse>> GetAllAsync()
     {
-        var photoBoothBranches = await _photoBoothBranchRepository.GetAll(status);
-        return _mapper.Map<IEnumerable<PhotoBoothBranchDTO>>(photoBoothBranches);
+        var photoBoothBranches = await _photoBoothBranchRepository.GetAllAsync();
+        return _mapper.Map<IEnumerable<PhotoBoothBranchresponse>>(photoBoothBranches.ToList());
     }
 
-    public async Task<IEnumerable<PhotoBoothBranchDTO>> GetAllAsync()
+    public async Task<IEnumerable<PhotoBoothBranchresponse>> GetAllPagingAsync(PhotoBoothBranchFilter filter, PagingModel paging)
     {
-        var photoBoothBranches = await _photoBoothBranchRepository.GetAll();
-        return _mapper.Map<IEnumerable<PhotoBoothBranchDTO>>(photoBoothBranches);
+        var photoBoothBranches = (await _photoBoothBranchRepository.GetAllAsync()).AutoPaging(paging.PageSize,paging.PageIndex);
+        var listPhotoBoothBranchresponse = _mapper.Map<IEnumerable<PhotoBoothBranchresponse>>(photoBoothBranches.ToList());
+        listPhotoBoothBranchresponse.AutoFilter(filter);
+        return listPhotoBoothBranchresponse;
     }
 
-    public async Task<PhotoBoothBranchDTO> GetByIdAsync(Guid id)
+    public async Task<PhotoBoothBranchresponse> GetByIdAsync(Guid id)
     {
-        var photoBoothBranch = await _photoBoothBranchRepository.GetByIdAsync(id);
-        return _mapper.Map<PhotoBoothBranchDTO>(photoBoothBranch);
+        var photoBoothBranch = (await _photoBoothBranchRepository.GetAsync(p => p.PhotoBoothBranchID == id)).FirstOrDefault();
+        return _mapper.Map<PhotoBoothBranchresponse>(photoBoothBranch);
     }
 
-    public async Task<IEnumerable<PhotoBoothBranchDTO>> GetByName(string name)
+    public async Task<IEnumerable<PhotoBoothBranchresponse>> GetByStatus(ManufactureStatus status)
     {
-        var photoBoothBranches = await _photoBoothBranchRepository.GetByName(name);
-        return _mapper.Map<IEnumerable<PhotoBoothBranchDTO>>(photoBoothBranches);
+        var photoBoothBranch = await _photoBoothBranchRepository.GetAsync(p => p.Status == status);
+        return _mapper.Map<IEnumerable<PhotoBoothBranchresponse>>(photoBoothBranch);
     }
 
-    public async Task UpdateAsync(Guid id, PhotoBoothBranchDTO entityDTO)
+    public async Task<IEnumerable<PhotoBoothBranchresponse>> SearchByName(string name)
     {
-        entityDTO.PhotoBoothBranchId = id;
-        PhotoBoothBranch photoBoothBranch = _mapper.Map<PhotoBoothBranch>(entityDTO);
-        await _photoBoothBranchRepository.UpdateAsync(photoBoothBranch);
+        var photoBoothBranch = await _photoBoothBranchRepository.GetAsync(p => p.BranchName.Contains(name));
+        return _mapper.Map<IEnumerable<PhotoBoothBranchresponse>>(photoBoothBranch);
+    }
+
+    //update
+    public async Task UpdateAsync(Guid id, UpdatePhotoBoothBranchRequest updateModel)
+    {
+        var photobranch = (await _photoBoothBranchRepository.GetAsync(p => p.PhotoBoothBranchID == id)).FirstOrDefault();
+        if (photobranch == null)
+        {
+            throw new KeyNotFoundException("Branch not found.");
+        }
+
+        var updatePhotoBoothBranch = _mapper.Map(updateModel, photobranch);
+        await _photoBoothBranchRepository.UpdateAsync(updatePhotoBoothBranch);
     }
 }
 

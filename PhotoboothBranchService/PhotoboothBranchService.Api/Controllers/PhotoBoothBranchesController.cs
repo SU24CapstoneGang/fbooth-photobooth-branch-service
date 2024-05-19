@@ -1,13 +1,11 @@
 ﻿// PhotoBoothBranchesController.cs
 using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels.PhotoBoothBranch;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.PhotoBoothBranch;
 using PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
-using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Api.Controllers;
 
@@ -22,11 +20,11 @@ public class PhotoBoothBranchesController : ControllerBaseApi
 
     //Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreatePhotoBoothBranch(PhotoBoothBranchDTO photoBoothBranchDTO)
+    public async Task<ActionResult<Guid>> CreatePhotoBoothBranch(CreatePhotoBoothBranchRequest createPhotoBoothBranchRequest)
     {
         try
         {
-            var id = await _photoBoothBranchService.CreateAsync(photoBoothBranchDTO);
+            var id = await _photoBoothBranchService.CreateAsync(createPhotoBoothBranchRequest);
             return Ok(id);
         }
         catch (Exception ex)
@@ -37,7 +35,7 @@ public class PhotoBoothBranchesController : ControllerBaseApi
 
     //Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PhotoBoothBranchDTO>>> GetAllPhotoBoothBranches()
+    public async Task<ActionResult<IEnumerable<PhotoBoothBranchresponse>>> GetAllPhotoBoothBranches()
     {
         try
         {
@@ -49,13 +47,28 @@ public class PhotoBoothBranchesController : ControllerBaseApi
             return StatusCode(500, $"An error occurred while retrieving branches: {ex.Message}");
         }
     }
-
-    [HttpGet("status/{status}")]
-    public async Task<ActionResult<IEnumerable<PhotoBoothBranchDTO>>> GetPhotoBoothBranchesByStatus(ManufactureStatus status)
+    //get all with filter and paging
+    [HttpGet("paging")]
+    public async Task<ActionResult<IEnumerable<PhotoBoothBranchresponse>>> GetAllPhotoBoothBranches(
+        [FromBody] FilterPagingModel<PhotoBoothBranchFilter> filterPagingModel)
     {
         try
         {
-            var branches = await _photoBoothBranchService.GetAll(status);
+            var branches = await _photoBoothBranchService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            return Ok(branches);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving branches: {ex.Message}");
+        }
+    }
+
+    [HttpGet("status/{status}")]
+    public async Task<ActionResult<IEnumerable<PhotoBoothBranchresponse>>> GetPhotoBoothBranchesByStatus(ManufactureStatus status)
+    {
+        try
+        {
+            var branches = await _photoBoothBranchService.GetByStatus(status);
             return Ok(branches);
         }
         catch (Exception ex)
@@ -65,11 +78,11 @@ public class PhotoBoothBranchesController : ControllerBaseApi
     }
 
     [HttpGet("name/{name}")]
-    public async Task<ActionResult<IEnumerable<PhotoBoothBranchDTO>>> GetPhotoBoothBranchesByName(string name)
+    public async Task<ActionResult<IEnumerable<PhotoBoothBranchresponse>>> GetPhotoBoothBranchesByName(string name)
     {
         try
         {
-            var branches = await _photoBoothBranchService.GetByName(name);
+            var branches = await _photoBoothBranchService.SearchByName(name);
             return Ok(branches);
         }
         catch (Exception ex)
@@ -79,7 +92,7 @@ public class PhotoBoothBranchesController : ControllerBaseApi
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<PhotoBoothBranchDTO>> GetPhotoBoothBranchById(Guid id)
+    public async Task<ActionResult<PhotoBoothBranchresponse>> GetPhotoBoothBranchById(Guid id)
     {
         try
         {
@@ -98,11 +111,11 @@ public class PhotoBoothBranchesController : ControllerBaseApi
 
     //Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdatePhotoBoothBranch(Guid id, PhotoBoothBranchDTO photoBoothBranchDTO)
+    public async Task<ActionResult> UpdatePhotoBoothBranch(Guid id, UpdatePhotoBoothBranchRequest updatePhotoBoothBranchRequest)
     {
         try
         {
-            await _photoBoothBranchService.UpdateAsync(id, photoBoothBranchDTO);
+            await _photoBoothBranchService.UpdateAsync(id, updatePhotoBoothBranchRequest);
             return Ok();
         }
         catch (Exception ex)

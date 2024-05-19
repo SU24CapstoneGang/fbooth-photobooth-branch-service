@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using PhotoboothBranchService.Application.Services.RoleServices;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Role;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Role;
+using PhotoboothBranchService.Application.Services.RoleServices;
 
 namespace PhotoboothBranchService.Api.Controllers;
 
@@ -19,11 +18,11 @@ public class RoleController : ControllerBaseApi
 
     // Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreateRole(RoleDTO roleDTO)
+    public async Task<ActionResult<Guid>> CreateRole(CreateRoleRequest createRoleRequest)
     {
         try
         {
-            var id = await _roleService.CreateAsync(roleDTO);
+            var id = await _roleService.CreateAsync(createRoleRequest);
             return Ok(id);
         }
         catch (Exception ex)
@@ -34,7 +33,7 @@ public class RoleController : ControllerBaseApi
 
     // Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<RoleDTO>>> GetAllRoles()
+    public async Task<ActionResult<IEnumerable<RoleResponse>>> GetAllRoles()
     {
         try
         {
@@ -47,8 +46,24 @@ public class RoleController : ControllerBaseApi
         }
     }
 
+    //get all with filter and paging
+    [HttpGet("paging")]
+    public async Task<ActionResult<IEnumerable<RoleResponse>>> GetAllRoles(
+        [FromBody] FilterPagingModel<RoleFilter> filterPagingModel)
+    {
+        try
+        {
+            var roles = await _roleService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            return Ok(roles);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving roles: {ex.Message}");
+        }
+    }
+
     [HttpGet("name/{name}")]
-    public async Task<ActionResult<IEnumerable<RoleDTO>>> GetRolesByName(string name)
+    public async Task<ActionResult<IEnumerable<RoleResponse>>> GetRolesByName(string name)
     {
         try
         {
@@ -62,7 +77,7 @@ public class RoleController : ControllerBaseApi
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<RoleDTO>> GetRoleById(Guid id)
+    public async Task<ActionResult<RoleResponse>> GetRoleById(Guid id)
     {
         try
         {
@@ -81,11 +96,11 @@ public class RoleController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateRole(Guid id, RoleDTO roleDTO)
+    public async Task<ActionResult> UpdateRole(Guid id, UpdateRoleRequest updateRoleRequest)
     {
         try
         {
-            await _roleService.UpdateAsync(id, roleDTO);
+            await _roleService.UpdateAsync(id, updateRoleRequest);
             return Ok();
         }
         catch (Exception ex)

@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Filter;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Filter;
 using PhotoboothBranchService.Application.Services.FilterServices;
 
 namespace PhotoboothBranchService.Api.Controllers;
@@ -15,11 +18,11 @@ public class FilterController : ControllerBaseApi
 
     // Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreateFilter(FilterDTO filterDTO)
+    public async Task<ActionResult<Guid>> CreateFilter(CreateFilterRequest createFilterRequest)
     {
         try
         {
-            var id = await _filterService.CreateAsync(filterDTO);
+            var id = await _filterService.CreateAsync(createFilterRequest);
             return Ok(id);
         }
         catch (Exception ex)
@@ -30,7 +33,7 @@ public class FilterController : ControllerBaseApi
 
     // Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<FilterDTO>>> GetAllFilters()
+    public async Task<ActionResult<IEnumerable<Filterresponse>>> GetAllFilters()
     {
         try
         {
@@ -43,8 +46,24 @@ public class FilterController : ControllerBaseApi
         }
     }
 
+    // Read with paging and filter
+    [HttpGet("paging")]
+    public async Task<ActionResult<IEnumerable<Filterresponse>>> GetAllFilters(
+        [FromBody] FilterPagingModel<FilterFilter> filterPagingModel)
+    {
+        try
+        {
+            var filters = await _filterService.GetAllPagingAsync(filterPagingModel.Filter,filterPagingModel.Paging);
+            return Ok(filters);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving filters: {ex.Message}");
+        }
+    }
+
     [HttpGet("name/{name}")]
-    public async Task<ActionResult<IEnumerable<FilterDTO>>> GetFiltersByName(string name)
+    public async Task<ActionResult<IEnumerable<Filterresponse>>> GetFiltersByName(string name)
     {
         try
         {
@@ -58,7 +77,7 @@ public class FilterController : ControllerBaseApi
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<FilterDTO>> GetFilterById(Guid id)
+    public async Task<ActionResult<Filterresponse>> GetFilterById(Guid id)
     {
         try
         {
@@ -77,11 +96,11 @@ public class FilterController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateFilter(Guid id, FilterDTO filterDTO)
+    public async Task<ActionResult> UpdateFilter(Guid id, UpdateFilterRequest updateFilterRequest)
     {
         try
         {
-            await _filterService.UpdateAsync(id, filterDTO);
+            await _filterService.UpdateAsync(id, updateFilterRequest);
             return Ok();
         }
         catch (Exception ex)

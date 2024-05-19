@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
+using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Domain.Common.Interfaces;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Frame;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Frame;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.FrameServices;
 
@@ -23,10 +21,9 @@ public class FrameService : IFrameService
     }
 
     // Create
-    public async Task<Guid> CreateAsync(FrameDTO entityDTO)
+    public async Task<Guid> CreateAsync(CreateFrameRequest createModel)
     {
-        Frame frame = _mapper.Map<Frame>(entityDTO);
-        frame.FrameID = Guid.NewGuid();
+        Frame frame = _mapper.Map<Frame>(createModel);
         return await _frameRepository.AddAsync(frame);
     }
 
@@ -35,7 +32,7 @@ public class FrameService : IFrameService
     {
         try
         {
-            Frame? frame = await _frameRepository.GetByIdAsync(id);
+            Frame? frame = (await _frameRepository.GetAsync(f => f.FrameID == id)).FirstOrDefault();
             if (frame != null)
             {
                 await _frameRepository.RemoveAsync(frame);
@@ -48,30 +45,43 @@ public class FrameService : IFrameService
     }
 
     // Read
-    public async Task<IEnumerable<FrameDTO>> GetAllAsync()
+    public async Task<IEnumerable<FrameResponse>> GetAllAsync()
     {
-        var frames = await _frameRepository.GetAll();
-        return _mapper.Map<IEnumerable<FrameDTO>>(frames);
+        var frames = await _frameRepository.GetAllAsync();
+        return _mapper.Map<IEnumerable<FrameResponse>>(frames.ToList());
     }
 
-    public async Task<FrameDTO> GetByIdAsync(Guid id)
+    public async Task<IEnumerable<FrameResponse>> GetAllPagingAsync(FrameFilter filter, PagingModel paging)
     {
-        var frame = await _frameRepository.GetByIdAsync(id);
-        return _mapper.Map<FrameDTO>(frame);
+        var frames = (await _frameRepository.GetAllAsync()).AutoPaging(paging.PageSize,paging.PageIndex);
+        var listFrameresponse = _mapper.Map<IEnumerable<FrameResponse>>(frames.ToList());
+        listFrameresponse.AutoFilter(filter);
+        return listFrameresponse;
     }
 
-    public async Task<IEnumerable<FrameDTO>> GetByName(string name)
+    public async Task<FrameResponse> GetByIdAsync(Guid id)
     {
-        var frames = await _frameRepository.GetByName(name);
-        return _mapper.Map<IEnumerable<FrameDTO>>(frames);
+        var frame = (await _frameRepository.GetAsync(f => f.FrameID == id)).FirstOrDefault();
+        return _mapper.Map<FrameResponse>(frame);
+    }
+
+    public async Task<IEnumerable<FrameResponse>> GetByName(string name)
+    {
+        var frames = await _frameRepository.GetAsync(f => f.FrameName.Contains(name));
+        return _mapper.Map<IEnumerable<FrameResponse>>(frames.ToList());
     }
 
     // Update
-    public async Task UpdateAsync(Guid id, FrameDTO entityDTO)
+    public async Task UpdateAsync(Guid id, UpdateFrameRequest updateModel)
     {
-        entityDTO.FrameID = id;
-        Frame frame = _mapper.Map<Frame>(entityDTO);
-        await _frameRepository.UpdateAsync(frame);
+        var frame = (await _frameRepository.GetAsync(f => f.FrameID == id)).FirstOrDefault();
+        if (frame == null)
+        {
+            throw new KeyNotFoundException("Printer not found.");
+        }
+
+        var updateFrame = _mapper.Map(updateModel, frame);
+        await _frameRepository.UpdateAsync(updateFrame);
     }
 }
 

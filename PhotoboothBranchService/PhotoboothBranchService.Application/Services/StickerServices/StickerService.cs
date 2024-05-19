@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
+using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Sticker;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Sticker;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.StickerServices;
 
@@ -22,10 +21,9 @@ public class StickerService : IStickerService
     }
 
     // Create
-    public async Task<Guid> CreateAsync(StickerDTO entityDTO)
+    public async Task<Guid> CreateAsync(CreateStickerRequest createModel)
     {
-        Sticker sticker = _mapper.Map<Sticker>(entityDTO);
-        sticker.StickerId = Guid.NewGuid();
+        Sticker sticker = _mapper.Map<Sticker>(createModel);
         return await _stickerRepository.AddAsync(sticker);
     }
 
@@ -34,7 +32,7 @@ public class StickerService : IStickerService
     {
         try
         {
-            Sticker? sticker = await _stickerRepository.GetByIdAsync(id);
+            Sticker? sticker = (await _stickerRepository.GetAsync(s => s.StickerId == id)).FirstOrDefault();
             if (sticker != null)
             {
                 await _stickerRepository.RemoveAsync(sticker);
@@ -47,31 +45,43 @@ public class StickerService : IStickerService
     }
 
     // Read
-    public async Task<IEnumerable<StickerDTO>> GetAllAsync()
+    public async Task<IEnumerable<StickerResponse>> GetAllAsync()
     {
-        var stickers = await _stickerRepository.GetAll();
-        return _mapper.Map<IEnumerable<StickerDTO>>(stickers);
+        var stickers = await _stickerRepository.GetAllAsync();
+        return _mapper.Map<IEnumerable<StickerResponse>>(stickers.ToList());
     }
 
-    public async Task<StickerDTO> GetByIdAsync(Guid id)
+    public async Task<IEnumerable<StickerResponse>> GetAllPagingAsync(StickerFilter filter, PagingModel paging)
     {
-        var sticker = await _stickerRepository.GetByIdAsync(id);
-        return _mapper.Map<StickerDTO>(sticker);
+        var stickers = (await _stickerRepository.GetAllAsync()).AutoPaging(paging.PageSize,paging.PageIndex);
+        var listStickerresponse = _mapper.Map<IEnumerable<StickerResponse>>(stickers.ToList());
+        listStickerresponse.AutoFilter(filter);
+        return listStickerresponse;
     }
 
-    public async Task<IEnumerable<StickerDTO>> GetByName(string name)
+    public async Task<StickerResponse> GetByIdAsync(Guid id)
     {
-        var stickers = await _stickerRepository.GetByName(name);
-        return _mapper.Map<IEnumerable<StickerDTO>>(stickers);
+        var sticker = (await _stickerRepository.GetAsync(s => s.StickerId == id)).FirstOrDefault();
+        return _mapper.Map<StickerResponse>(sticker);
+    }
+
+    public async Task<IEnumerable<StickerResponse>> GetByName(string name)
+    {
+        var stickers = await _stickerRepository.GetAsync(s => s.StickerName.Contains(name));
+        return _mapper.Map<IEnumerable<StickerResponse>>(stickers.ToList());
     }
 
     // Update
-    public async Task UpdateAsync(Guid id, StickerDTO entityDTO)
+    public async Task UpdateAsync(Guid id, UpdateStickerRequest updateModel)
     {
-        entityDTO.StickerId = id;
-        Sticker sticker = _mapper.Map<Sticker>(entityDTO);
-        sticker.LastModified = DateTime.UtcNow;
-        await _stickerRepository.UpdateAsync(sticker);
+        var sticker = (await _stickerRepository.GetAsync(s => s.StickerId == id)).FirstOrDefault();
+        if (sticker == null)
+        {
+            throw new KeyNotFoundException("Sticker not found.");
+        }
+        var updatedSticker = _mapper.Map(updateModel, sticker);
+        updatedSticker.LastModified = DateTime.UtcNow;
+        await _stickerRepository.UpdateAsync(updatedSticker);
     }
 }
 

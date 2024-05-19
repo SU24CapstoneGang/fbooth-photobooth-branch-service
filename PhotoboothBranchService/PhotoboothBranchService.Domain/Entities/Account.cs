@@ -3,7 +3,7 @@ using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Domain.Entities;
 
-public class Account 
+public class Account
 {
     public Guid AccountID { get; set; }
     public string FirstName { get; set; }

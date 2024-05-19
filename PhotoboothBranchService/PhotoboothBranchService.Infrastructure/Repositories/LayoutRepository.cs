@@ -1,12 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhotoboothBranchService.Domain.Entities;
+﻿using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -18,30 +13,31 @@ public class LayoutRepository : ILayoutRepository
     {
         _dbContext = dbContext;
     }
-
+    //Create
     public async Task<Guid> AddAsync(Layout layout)
     {
         await _dbContext.AddAsync(layout);
         await _dbContext.SaveChangesAsync();
         return layout.LayoutID;
     }
-
-    public async Task<IEnumerable<Layout>> GetAll()
+    //Read
+    public async Task<IQueryable<Layout>> GetAllAsync()
     {
-        return await _dbContext.Layouts.ToListAsync();
+        return await Task.FromResult(_dbContext.Layouts);
     }
 
-    public async Task<Layout?> GetByIdAsync(Guid layoutId)
+    public async Task<IQueryable<Layout>> GetAsync(Expression<Func<Layout, bool>> predicate)
     {
-        return await _dbContext.Layouts.FindAsync(layoutId);
+        return await Task.FromResult(_dbContext.Layouts.Where(predicate));
     }
 
+    //Delete
     public async Task RemoveAsync(Layout layout)
     {
         _dbContext.Remove(layout);
         await _dbContext.SaveChangesAsync();
     }
-
+    //Update
     public async Task UpdateAsync(Layout layout)
     {
         _dbContext.Update(layout);

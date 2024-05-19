@@ -1,108 +1,130 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Discount;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Discount;
 using PhotoboothBranchService.Application.Services.DiscountServices;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Api.Controllers;
-
-public class DiscountController : ControllerBaseApi
+namespace PhotoboothBranchService.Api.Controllers
 {
-    private readonly IDiscountService _discountService;
-
-    public DiscountController(IDiscountService discountService)
+    public class DiscountController : ControllerBaseApi
     {
-        _discountService = discountService;
-    }
+        private readonly IDiscountService _discountService;
 
-    // Create
-    [HttpPost]
-    public async Task<ActionResult<Guid>> CreateDiscount(DiscountDTO discountDTO)
-    {
-        try
+        public DiscountController(IDiscountService discountService)
         {
-            var id = await _discountService.CreateAsync(discountDTO);
-            return Ok(id);
+            _discountService = discountService;
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while creating the discount: {ex.Message}");
-        }
-    }
 
-    // Read
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<DiscountDTO>>> GetAllDiscounts()
-    {
-        try
+        // Create
+        [HttpPost]
+        public async Task<ActionResult<Guid>> CreateDiscount(CreateDiscountRequest createDiscountRequest)
         {
-            var discounts = await _discountService.GetAllAsync();
-            return Ok(discounts);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving discounts: {ex.Message}");
-        }
-    }
-
-    [HttpGet("code/{code}")]
-    public async Task<ActionResult<IEnumerable<DiscountDTO>>> GetDiscountsByCode(string code)
-    {
-        try
-        {
-            var discounts = await _discountService.GetByCode(code);
-            return Ok(discounts);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving discounts by code: {ex.Message}");
-        }
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<DiscountDTO>> GetDiscountById(Guid id)
-    {
-        try
-        {
-            var discount = await _discountService.GetByIdAsync(id);
-            if (discount == null)
+            try
             {
-                return NotFound();
+                var id = await _discountService.CreateAsync(createDiscountRequest);
+                return Ok(id);
             }
-            return Ok(discount);
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while creating the discount: {ex.Message}");
+            }
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving the discount by ID: {ex.Message}");
-        }
-    }
 
-    // Update
-    [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateDiscount(Guid id, DiscountDTO discountDTO)
-    {
-        try
+        // Read all
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Discountresponse>>> GetAllDiscounts()
         {
-            await _discountService.UpdateAsync(id, discountDTO);
-            return Ok();
+            try
+            {
+                var discounts = await _discountService.GetAllAsync();
+                return Ok(discounts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while retrieving discounts: {ex.Message}");
+            }
         }
-        catch (Exception ex)
+        // Read all with filter and paging
+        [HttpGet("paging")]
+        public async Task<ActionResult<IEnumerable<Discountresponse>>> GetPagingDiscounts(
+            [FromBody] FilterPagingModel<DiscountFilter> filterPagingModel)
         {
-            return StatusCode(500, $"An error occurred while updating the discount: {ex.Message}");
+            try
+            {
+                var discounts = await _discountService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+                return Ok(discounts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while retrieving discounts: {ex.Message}");
+            }
         }
-    }
+        // Read by code
+        [HttpGet("code/{code}")]
+        public async Task<ActionResult<IEnumerable<Discountresponse>>> GetDiscountsByCode(string code)
+        {
+            try
+            {
+                var discounts = await _discountService.SearchByCode(code);
+                return Ok(discounts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while retrieving discounts by code: {ex.Message}");
+            }
+        }
 
-    // Delete
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteDiscount(Guid id)
-    {
-        try
+        // Read by ID
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Discountresponse>> GetDiscountById(Guid id)
         {
-            await _discountService.DeleteAsync(id);
-            return Ok();
+            try
+            {
+                var discount = await _discountService.GetByIdAsync(id);
+                if (discount == null)
+                {
+                    return NotFound();
+                }
+                return Ok(discount);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while retrieving the discount by ID: {ex.Message}");
+            }
         }
-        catch (Exception ex)
+
+        // Update
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateDiscount(Guid id, UpdateDiscountRequest updateDiscountRequest)
         {
-            return StatusCode(500, $"An error occurred while deleting the discount: {ex.Message}");
+            try
+            {
+                await _discountService.UpdateAsync(id, updateDiscountRequest);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while updating the discount: {ex.Message}");
+            }
+        }
+
+        // Delete
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteDiscount(Guid id)
+        {
+            try
+            {
+                await _discountService.DeleteAsync(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while deleting the discount: {ex.Message}");
+            }
         }
     }
 }
-

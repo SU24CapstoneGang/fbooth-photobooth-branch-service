@@ -2,11 +2,7 @@
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -27,16 +23,15 @@ public class SessionRepository : ISessionRepository
         return session.SessionID;
     }
 
-    // Get all sessions
-    public async Task<IEnumerable<Session>> GetAll()
+    //Read
+    public async Task<IQueryable<Session>> GetAllAsync()
     {
-        return await _dbContext.Sessions.ToListAsync();
+        return await Task.FromResult(_dbContext.Sessions);
     }
 
-    // Get a session by ID
-    public async Task<Session?> GetByIdAsync(Guid sessionId)
+    public async Task<IQueryable<Session>> GetAsync(Expression<Func<Session, bool>> predicate)
     {
-        return await _dbContext.Sessions.FindAsync(sessionId);
+        return await Task.FromResult(_dbContext.Sessions.Where(predicate));
     }
 
     // Remove a session

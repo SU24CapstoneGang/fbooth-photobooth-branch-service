@@ -1,12 +1,10 @@
 ﻿// PrintersController.cs
 using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Printer;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Printer;
 using PhotoboothBranchService.Application.Services.PrinterServices;
-using PhotoboothBranchService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Api.Controllers;
 
@@ -21,11 +19,11 @@ public class PrintersController : ControllerBaseApi
 
     //Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreatePrinter(PrinterDTO printerDTO)
+    public async Task<ActionResult<Guid>> CreatePrinter(CreatePrinterRequest createPrinterRequest)
     {
         try
         {
-            var id = await _printerService.CreateAsync(printerDTO);
+            var id = await _printerService.CreateAsync(createPrinterRequest);
             return Ok(id);
         }
         catch (Exception ex)
@@ -36,7 +34,7 @@ public class PrintersController : ControllerBaseApi
 
     //Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PrinterDTO>>> GetAllPrinters()
+    public async Task<ActionResult<IEnumerable<PrinterResponse>>> GetAllPrinters()
     {
         try
         {
@@ -48,9 +46,24 @@ public class PrintersController : ControllerBaseApi
             return StatusCode(500, $"An error occurred while retrieving printers: {ex.Message}");
         }
     }
+    //get all with filter and paging
+    [HttpGet("paging")]
+    public async Task<ActionResult<IEnumerable<PrinterResponse>>> GetAllPrinters(
+        [FromBody] FilterPagingModel<PrinterFilter> filterPagingModel)
+    {
+        try
+        {
+            var printers = await _printerService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            return Ok(printers);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving printers: {ex.Message}");
+        }
+    }
 
     [HttpGet("name/{name}")]
-    public async Task<ActionResult<IEnumerable<PrinterDTO>>> GetPrintersByName(string name)
+    public async Task<ActionResult<IEnumerable<PrinterResponse>>> GetPrintersByName(string name)
     {
         try
         {
@@ -64,7 +77,7 @@ public class PrintersController : ControllerBaseApi
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<PrinterDTO>> GetPrinterById(Guid id)
+    public async Task<ActionResult<PrinterResponse>> GetPrinterById(Guid id)
     {
         try
         {
@@ -83,11 +96,11 @@ public class PrintersController : ControllerBaseApi
 
     //Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdatePrinter(Guid id, PrinterDTO printerDTO)
+    public async Task<ActionResult> UpdatePrinter(Guid id, UpdatePrinterRequest updatePrinterRequest)
     {
         try
         {
-            await _printerService.UpdateAsync(id, printerDTO);
+            await _printerService.UpdateAsync(id, updatePrinterRequest);
             return Ok();
         }
         catch (Exception ex)

@@ -6,7 +6,7 @@ using PhotoboothBranchService.Infrastructure.Common.Extensions;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Persistence;
 
-public class AppDbContext: DbContext
+public class AppDbContext : DbContext
 {
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Camera> Cameras { get; set; }

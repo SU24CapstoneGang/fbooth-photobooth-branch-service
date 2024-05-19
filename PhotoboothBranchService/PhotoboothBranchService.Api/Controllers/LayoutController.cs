@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Layout;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Layout;
 using PhotoboothBranchService.Application.Services.LayoutServices;
 
 namespace PhotoboothBranchService.Api.Controllers;
@@ -15,11 +18,11 @@ public class LayoutController : ControllerBaseApi
 
     // Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreateLayout(LayoutDTO layoutDTO)
+    public async Task<ActionResult<Guid>> CreateLayout(CreateLayoutRequest createLayoutRequest)
     {
         try
         {
-            var id = await _layoutService.CreateAsync(layoutDTO);
+            var id = await _layoutService.CreateAsync(createLayoutRequest);
             return Ok(id);
         }
         catch (Exception ex)
@@ -30,7 +33,7 @@ public class LayoutController : ControllerBaseApi
 
     // Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<LayoutDTO>>> GetAllLayouts()
+    public async Task<ActionResult<IEnumerable<Layoutresponse>>> GetAllLayouts()
     {
         try
         {
@@ -43,8 +46,24 @@ public class LayoutController : ControllerBaseApi
         }
     }
 
+    // gat all with filter and paging
+    [HttpGet("paging")]
+    public async Task<ActionResult<IEnumerable<Layoutresponse>>> GetAllLayouts(
+        [FromBody] FilterPagingModel<LayoutFilter> filterPagingModel)
+    {
+        try
+        {
+            var layouts = await _layoutService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            return Ok(layouts);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving layouts: {ex.Message}");
+        }
+    }
+
     [HttpGet("{id}")]
-    public async Task<ActionResult<LayoutDTO>> GetLayoutById(Guid id)
+    public async Task<ActionResult<Layoutresponse>> GetLayoutById(Guid id)
     {
         try
         {
@@ -63,11 +82,11 @@ public class LayoutController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateLayout(Guid id, LayoutDTO layoutDTO)
+    public async Task<ActionResult> UpdateLayout(Guid id, UpdateLayoutRequest updateLayoutRequest)
     {
         try
         {
-            await _layoutService.UpdateAsync(id, layoutDTO);
+            await _layoutService.UpdateAsync(id, updateLayoutRequest);
             return Ok();
         }
         catch (Exception ex)

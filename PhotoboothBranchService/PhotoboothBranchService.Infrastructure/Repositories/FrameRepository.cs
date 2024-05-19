@@ -1,13 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhotoboothBranchService.Domain.Entities;
+﻿using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -18,7 +12,7 @@ public class FrameRepository : IFrameRepository
     {
         _dbContext = dbContext;
     }
-
+    //Create
     public async Task<Guid> AddAsync(Frame frame)
     {
         await _dbContext.AddAsync(frame);
@@ -26,27 +20,25 @@ public class FrameRepository : IFrameRepository
         return frame.FrameID;
     }
 
-    public async Task<IEnumerable<Frame>> GetAll()
+    //Read
+    public async Task<IQueryable<Frame>> GetAllAsync()
     {
-        return await _dbContext.Frames.ToListAsync();
+        return await Task.FromResult(_dbContext.Frames);
     }
 
-    public async Task<Frame?> GetByIdAsync(Guid frameId)
+    public async Task<IQueryable<Frame>> GetAsync(Expression<Func<Frame, bool>> predicate)
     {
-        return await _dbContext.Frames.FindAsync(frameId);
+        return await Task.FromResult(_dbContext.Frames.Where(predicate));
     }
 
-    public async Task<IEnumerable<Frame>> GetByName(string name)
-    {
-        return await _dbContext.Frames.Where(c => c.FrameName.Contains(name)).ToListAsync();
-    }
-
+    //Delete
     public async Task RemoveAsync(Frame frame)
     {
         _dbContext.Remove(frame);
         await _dbContext.SaveChangesAsync();
     }
 
+    //Update
     public async Task UpdateAsync(Frame frame)
     {
         _dbContext.Update(frame);

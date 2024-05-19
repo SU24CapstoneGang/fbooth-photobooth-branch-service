@@ -1,18 +1,8 @@
-﻿using PhotoboothBranchService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PhotoboothBranchService.Domain.Common.Interfaces;
+using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Domain.IRepository;
 
-public interface IDiscountRepository
+public interface IDiscountRepository : IRepositoryBase<Discount>
 {
-    Task<IEnumerable<Discount>> GetAll();
-    Task<IEnumerable<Discount>> GetByCode(string code);
-    Task<Guid> AddAsync(Discount discount);
-    Task<Discount?> GetByIdAsync(Guid discountId);
-    Task RemoveAsync(Discount discount);
-    Task UpdateAsync(Discount discount);
 }

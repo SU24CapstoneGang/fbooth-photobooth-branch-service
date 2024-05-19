@@ -1,17 +1,8 @@
-﻿using PhotoboothBranchService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PhotoboothBranchService.Domain.Common.Interfaces;
+using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Domain.IRepository;
 
-public interface ILayoutRepository
+public interface ILayoutRepository : IRepositoryBase<Layout>
 {
-    Task<IEnumerable<Layout>> GetAll();
-    Task<Guid> AddAsync(Layout layout);
-    Task<Layout?> GetByIdAsync(Guid layoutId);
-    Task RemoveAsync(Layout layout);
-    Task UpdateAsync(Layout layout);
 }

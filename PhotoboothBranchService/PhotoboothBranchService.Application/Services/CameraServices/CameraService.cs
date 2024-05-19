@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
-using PhotoboothBranchService.Application.DTOs;
+using Beanbox.Business.Commons.Helpers;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Camera;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Camera;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace PhotoboothBranchService.Application.Services.CameraServices;
 
@@ -21,24 +18,22 @@ public class CameraService : ICameraService
         _cameraRepository = cameraRepository;
         _mapper = mapper;
     }
-
     //Create
-    public async Task<Guid> CreateAsync(CameraDTO entityDTO)
+    public async Task<Guid> CreateAsync(CreateCameraRequest createModel)
     {
-        Camera cameras = _mapper.Map<Camera>(entityDTO);
-        cameras.CameraID = Guid.NewGuid();
+        Camera cameras = _mapper.Map<Camera>(createModel);
         return await _cameraRepository.AddAsync(cameras);
     }
-
     //Delete
     public async Task DeleteAsync(Guid id)
     {
         try
         {
-            Camera? cameras = await _cameraRepository.GetByIdAsync(id);
-            if (cameras != null)
+            var cameras = await _cameraRepository.GetAsync(c => c.CameraID == id);
+            var camera = cameras.FirstOrDefault();
+            if (camera != null)
             {
-                await _cameraRepository.RemoveAsync(cameras);
+                await _cameraRepository.RemoveAsync(camera);
             }
         }
         catch
@@ -46,32 +41,44 @@ public class CameraService : ICameraService
             throw;
         }
     }
-
     //Read
-    public async Task<IEnumerable<CameraDTO>> GetAllAsync()
+    public async Task<IEnumerable<Cameraresponse>> GetAllAsync()
     {
-        var cameras = await _cameraRepository.GetAll();
-        return _mapper.Map<IEnumerable<CameraDTO>>(cameras);
+        var cameras = await _cameraRepository.GetAllAsync();
+        return _mapper.Map<IEnumerable<Cameraresponse>>(cameras.ToList());
     }
 
-    public async Task<CameraDTO> GetByIdAsync(Guid id)
+    public async Task<IEnumerable<Cameraresponse>> GetAllPagingAsync(CameraFilter filter, PagingModel paging)
     {
-        var cameras = await _cameraRepository.GetByIdAsync(id);
-        return _mapper.Map<CameraDTO>(cameras);
+        var cameras = (await _cameraRepository.GetAllAsync()).AutoPaging(paging.PageSize, paging.PageIndex);
+        var listCameraresponse =  _mapper.Map<IEnumerable<Cameraresponse>>(cameras.ToList());
+        listCameraresponse.AutoFilter(filter);
+        return listCameraresponse;
     }
 
-    public async Task<IEnumerable<CameraDTO>> GetByName(string name)
+    public async Task<Cameraresponse> GetByIdAsync(Guid id)
     {
-        var cameras = await _cameraRepository.GetByName(name);
-        return _mapper.Map<IEnumerable<CameraDTO>>(cameras);
+        var cameras = await _cameraRepository.GetAsync(c => c.CameraID == id);
+        return _mapper.Map<Cameraresponse>(cameras);
     }
 
+    public async Task<IEnumerable<Cameraresponse>> GetByName(string name)
+    {
+        var cameras = await _cameraRepository.GetAsync(c => c.ModelName.Equals(name));
+        return _mapper.Map<IEnumerable<Cameraresponse>>(cameras.ToList());
+    }
 
     //Update
-    public async Task UpdateAsync(Guid id, CameraDTO entityDTO)
+    public async Task UpdateAsync(Guid id, UpdateCameraRequest updateModel)
     {
-        entityDTO.CameraId = id;
-        Camera cameras = _mapper.Map<Camera>(entityDTO);
-        await _cameraRepository.UpdateAsync(cameras);
+        var camera = (await _cameraRepository.GetAsync(c => c.CameraID == id)).FirstOrDefault();
+        if (camera == null)
+        {
+            throw new KeyNotFoundException("Printer not found.");
+        }
+
+        var updateCamera = _mapper.Map(updateModel, camera);
+        await _cameraRepository.UpdateAsync(updateCamera);
     }
+
 }

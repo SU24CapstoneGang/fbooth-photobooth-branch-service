@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
+using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Filter;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Filter;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.FilterServices;
 
@@ -22,10 +21,9 @@ public class FilterService : IFilterService
     }
 
     // Create
-    public async Task<Guid> CreateAsync(FilterDTO entityDTO)
+    public async Task<Guid> CreateAsync(CreateFilterRequest createModel)
     {
-        Filter filter = _mapper.Map<Filter>(entityDTO);
-        filter.FilterID = Guid.NewGuid();
+        Filter filter = _mapper.Map<Filter>(createModel);
         return await _filterRepository.AddAsync(filter);
     }
 
@@ -34,7 +32,7 @@ public class FilterService : IFilterService
     {
         try
         {
-            Filter? filter = await _filterRepository.GetByIdAsync(id);
+            Filter? filter = (await _filterRepository.GetAsync(f => f.FilterID == id)).FirstOrDefault();
             if (filter != null)
             {
                 await _filterRepository.RemoveAsync(filter);
@@ -47,30 +45,45 @@ public class FilterService : IFilterService
     }
 
     // Read
-    public async Task<IEnumerable<FilterDTO>> GetAllAsync()
+    public async Task<IEnumerable<Filterresponse>> GetAllAsync()
     {
-        var filters = await _filterRepository.GetAll();
-        return _mapper.Map<IEnumerable<FilterDTO>>(filters);
+        var filters = await _filterRepository.GetAllAsync();
+        return _mapper.Map<IEnumerable<Filterresponse>>(filters.ToList());
     }
 
-    public async Task<FilterDTO> GetByIdAsync(Guid id)
+    public async Task<IEnumerable<Filterresponse>> GetAllPagingAsync(FilterFilter filter, PagingModel paging)
     {
-        var filter = await _filterRepository.GetByIdAsync(id);
-        return _mapper.Map<FilterDTO>(filter);
+        var filters = (await _filterRepository.GetAllAsync()).AutoPaging(paging.PageSize, paging.PageIndex);
+        var listFilterresponse = _mapper.Map<IEnumerable<Filterresponse>>(filters.ToList());
+        listFilterresponse.AutoFilter(filter);
+        return listFilterresponse;
     }
 
-    public async Task<IEnumerable<FilterDTO>> GetByName(string name)
+    public async Task<Filterresponse> GetByIdAsync(Guid id)
     {
-        var filters = await _filterRepository.GetByName(name);
-        return _mapper.Map<IEnumerable<FilterDTO>>(filters);
+        var filter = (await _filterRepository.GetAsync(f => f.FilterID == id)).FirstOrDefault();
+        return _mapper.Map<Filterresponse>(filter);
+    }
+
+    public async Task<IEnumerable<Filterresponse>> GetByName(string name)
+    {
+        var filters = await _filterRepository.GetAsync(f => f.FilterName.Contains(name));
+        return _mapper.Map<IEnumerable<Filterresponse>>(filters.ToList());
     }
 
     // Update
-    public async Task UpdateAsync(Guid id, FilterDTO entityDTO)
+    public async Task UpdateAsync(Guid id, UpdateFilterRequest updateModel)
     {
-        entityDTO.FilterID = id;
-        Filter filter = _mapper.Map<Filter>(entityDTO);
-        await _filterRepository.UpdateAsync(filter);
+        var filters = await _filterRepository.GetAsync(d => d.FilterID == id);
+        var filter = filters.FirstOrDefault();
+        if (filter == null)
+        {
+            throw new KeyNotFoundException("Filter not found.");
+        }
+
+        var updatedFilter = _mapper.Map(updateModel, filter);
+        updatedFilter.LastModified = DateTime.UtcNow;
+        await _filterRepository.UpdateAsync(updatedFilter);
     }
 }
 

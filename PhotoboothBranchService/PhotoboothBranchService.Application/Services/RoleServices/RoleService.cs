@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
+using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Role;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Role;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.RoleServices;
 
@@ -21,9 +20,9 @@ public class RoleService : IRoleService
         _mapper = mapper;
     }
 
-    public async Task<Guid> CreateAsync(RoleDTO entityDTO)
+    public async Task<Guid> CreateAsync(CreateRoleRequest createModel)
     {
-        Role role = _mapper.Map<Role>(entityDTO);
+        Role role = _mapper.Map<Role>(createModel);
         role.RoleID = Guid.NewGuid();
         await _roleRepository.AddAsync(role);
         return role.RoleID;
@@ -33,7 +32,7 @@ public class RoleService : IRoleService
     {
         try
         {
-            var role = await _roleRepository.GetByIdAsync(id);
+            var role = (await _roleRepository.GetAsync(r => r.RoleID == id)).FirstOrDefault();
             if (role != null)
             {
                 await _roleRepository.RemoveAsync(role);
@@ -45,29 +44,42 @@ public class RoleService : IRoleService
         }
     }
 
-    public async Task<IEnumerable<RoleDTO>> GetAllAsync()
+    public async Task<IEnumerable<RoleResponse>> GetAllAsync()
     {
-        var roles = await _roleRepository.GetAll();
-        return _mapper.Map<IEnumerable<RoleDTO>>(roles);
+        var roles = await _roleRepository.GetAllAsync();
+        return _mapper.Map<IEnumerable<RoleResponse>>(roles.ToList());
     }
 
-    public async Task<RoleDTO> GetByIdAsync(Guid id)
+    public async Task<IEnumerable<RoleResponse>> GetAllPagingAsync(RoleFilter filter, PagingModel paging)
     {
-        var role = await _roleRepository.GetByIdAsync(id);
-        return _mapper.Map<RoleDTO>(role);
+        var roles = (await _roleRepository.GetAllAsync()).AutoPaging(paging.PageSize,paging.PageIndex);
+        var listRoleresponse = _mapper.Map<IEnumerable<RoleResponse>>(roles.ToList());
+        listRoleresponse.AutoFilter(filter);
+        return listRoleresponse;
     }
 
-    public async Task<IEnumerable<RoleDTO>> GetByName(string name)
+    public async Task<RoleResponse> GetByIdAsync(Guid id)
     {
-        var roles = await _roleRepository.GetByName(name);
-        return _mapper.Map<IEnumerable<RoleDTO>>(roles);
+        var role = (await _roleRepository.GetAsync(r => r.RoleID == id)).FirstOrDefault();
+        return _mapper.Map<RoleResponse>(role);
     }
 
-    public async Task UpdateAsync(Guid id, RoleDTO entityDTO)
+    public async Task<IEnumerable<RoleResponse>> GetByName(string name)
     {
-        entityDTO.RoleID = id;
-        Role role = _mapper.Map<Role>(entityDTO);
-        await _roleRepository.UpdateAsync(role);
+        var roles = await _roleRepository.GetAsync(r => r.RoleName.Contains(name));
+        return _mapper.Map<IEnumerable<RoleResponse>>(roles);
+    }
+
+    public async Task UpdateAsync(Guid id, UpdateRoleRequest updateModel)
+    {
+        var role = (await _roleRepository.GetAsync(r => r.RoleID == id)).FirstOrDefault();
+        if (role == null)
+        {
+            throw new KeyNotFoundException("Role not found.");
+        }
+
+        var updatedRole = _mapper.Map(updateModel, role);
+        await _roleRepository.UpdateAsync(updatedRole);
     }
 }
 

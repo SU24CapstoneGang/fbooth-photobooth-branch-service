@@ -1,11 +1,9 @@
 ﻿using AutoMapper.Internal;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using PhotoboothBranchService.Application.Common;
-using PhotoboothBranchService.Application.Mapping;
 using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Application.Services.CameraServices;
 using PhotoboothBranchService.Application.Services.FilterServices;
@@ -17,12 +15,8 @@ using PhotoboothBranchService.Application.Services.PrinterServices;
 using PhotoboothBranchService.Application.Services.RoleServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application
 {

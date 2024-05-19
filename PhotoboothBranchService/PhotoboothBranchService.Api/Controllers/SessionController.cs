@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Session;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Session;
 using PhotoboothBranchService.Application.Services.SessionServices;
 
 namespace PhotoboothBranchService.Api.Controllers;
@@ -15,11 +18,11 @@ public class SessionController : ControllerBaseApi
 
     // Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreateSession(SessionDTO sessionDTO)
+    public async Task<ActionResult<Guid>> CreateSession(CreateSessionRequest createSessionRequest)
     {
         try
         {
-            var id = await _sessionService.CreateAsync(sessionDTO);
+            var id = await _sessionService.CreateAsync(createSessionRequest);
             return Ok(id);
         }
         catch (Exception ex)
@@ -30,7 +33,7 @@ public class SessionController : ControllerBaseApi
 
     // Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<SessionDTO>>> GetAllSessions()
+    public async Task<ActionResult<IEnumerable<SessionResponse>>> GetAllSessions()
     {
         try
         {
@@ -42,9 +45,23 @@ public class SessionController : ControllerBaseApi
             return StatusCode(500, $"An error occurred while retrieving sessions: {ex.Message}");
         }
     }
-
+    //get all with filter and paging
+    [HttpGet("paging")]
+    public async Task<ActionResult<IEnumerable<SessionResponse>>> GetAllSessions(
+        [FromBody] FilterPagingModel<SessionFilter> filterPagingModel)
+    {
+        try
+        {
+            var sessions = await _sessionService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            return Ok(sessions);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving sessions: {ex.Message}");
+        }
+    }
     [HttpGet("{id}")]
-    public async Task<ActionResult<SessionDTO>> GetSessionById(Guid id)
+    public async Task<ActionResult<SessionResponse>> GetSessionById(Guid id)
     {
         try
         {
@@ -63,11 +80,11 @@ public class SessionController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateSession(Guid id, SessionDTO sessionDTO)
+    public async Task<ActionResult> UpdateSession(Guid id, UpdateSessionRequest updateSessionRequest)
     {
         try
         {
-            await _sessionService.UpdateAsync(id, sessionDTO);
+            await _sessionService.UpdateAsync(id, updateSessionRequest);
             return Ok();
         }
         catch (Exception ex)

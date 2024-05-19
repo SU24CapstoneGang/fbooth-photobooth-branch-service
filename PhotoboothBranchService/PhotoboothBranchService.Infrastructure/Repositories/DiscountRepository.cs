@@ -2,11 +2,7 @@
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -22,16 +18,20 @@ public class DiscountRepository : IDiscountRepository
     // Add a new Discount to the database
     public async Task<Guid> AddAsync(Discount discount)
     {
-        discount.DiscountID = Guid.NewGuid();
         await _dbContext.Discounts.AddAsync(discount);
         await _dbContext.SaveChangesAsync();
         return discount.DiscountID;
     }
 
     // Get all Discounts from the database
-    public async Task<IEnumerable<Discount>> GetAll()
+    public async Task<IQueryable<Discount>> GetAllAsync()
     {
-        return await _dbContext.Discounts.ToListAsync();
+        return await Task.FromResult(_dbContext.Discounts);
+    }
+
+    public async Task<IQueryable<Discount>> GetAsync(Expression<Func<Discount, bool>> predicate)
+    {
+        return await Task.FromResult(_dbContext.Discounts.Where(predicate));
     }
 
     public async Task<IEnumerable<Discount>> GetByCode(string code)
@@ -44,12 +44,14 @@ public class DiscountRepository : IDiscountRepository
         return await _dbContext.Discounts.FindAsync(discountId);
     }
 
+    //Delete
     public async Task RemoveAsync(Discount discount)
     {
         _dbContext.Discounts.Remove(discount);
         await _dbContext.SaveChangesAsync();
     }
 
+    //Update
     public async Task UpdateAsync(Discount discount)
     {
         _dbContext.Discounts.Update(discount);

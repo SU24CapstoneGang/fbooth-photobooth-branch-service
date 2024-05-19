@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PhotoboothBranchService.Domain.Entities;
-using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System.Security.Cryptography;
-using System.Text;
+using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -22,27 +20,6 @@ public class AccountRepository : IAccountRepository
         await _dbContext.AddAsync(account);
         await _dbContext.SaveChangesAsync();
         return account.AccountID;
-    }
-
-    //Read
-    public async Task<IEnumerable<Account>> GetAll()
-    {
-        return await _dbContext.Accounts.ToListAsync();
-    }
-
-    public async Task<IEnumerable<Account>> GetAll(AccountStatus status)
-    {
-        return await _dbContext.Accounts.Where(c => c.Status == status).ToListAsync();
-    }
-
-    public async Task<IEnumerable<Account>> GetListByEmail(string email)
-    {
-        return await _dbContext.Accounts.Where(c => c.Email.Contains(email)).ToListAsync();
-    }
-
-    public async Task<Account?> GetByIdAsync(Guid accountId)
-    {
-        return await _dbContext.Accounts.FindAsync(accountId);
     }
 
     //Update
@@ -65,8 +42,14 @@ public class AccountRepository : IAccountRepository
         return existingAccounts.Count == 0;
     }
 
-    public async Task<Account?> GetByEmail(string email)
+    //Read
+    public async Task<IQueryable<Account>> GetAllAsync()
     {
-        return await _dbContext.Accounts.FirstOrDefaultAsync(c => c.Email.Contains(email));
+        return await Task.FromResult(_dbContext.Accounts.AsQueryable());
+    }
+
+    public async Task<IQueryable<Account>> GetAsync(Expression<Func<Account, bool>> predicate)
+    {
+        return await Task.FromResult(_dbContext.Accounts.Where(predicate).AsQueryable());
     }
 }

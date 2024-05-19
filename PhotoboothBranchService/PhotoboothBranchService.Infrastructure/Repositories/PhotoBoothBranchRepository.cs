@@ -1,13 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhotoboothBranchService.Domain.Entities;
-using PhotoboothBranchService.Domain.Enum;
+﻿using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -25,28 +19,18 @@ public class PhotoBoothBranchRepository : IPhotoBoothBranchRepository
     {
         await _dbContext.AddAsync(photoBoothBranch);
         await _dbContext.SaveChangesAsync();
-        return photoBoothBranch.BranchesID;
+        return photoBoothBranch.PhotoBoothBranchID;
     }
 
     //Read
-    public async Task<IEnumerable<PhotoBoothBranch>> GetAll( )
+    public async Task<IQueryable<PhotoBoothBranch>> GetAllAsync()
     {
-        return await _dbContext.PhotoBoothBranches.ToListAsync();
+        return await Task.FromResult(_dbContext.PhotoBoothBranches);
     }
 
-    public async Task<IEnumerable<PhotoBoothBranch>> GetAll(ManufactureStatus status)
+    public async Task<IQueryable<PhotoBoothBranch>> GetAsync(Expression<Func<PhotoBoothBranch, bool>> predicate)
     {
-        return await _dbContext.PhotoBoothBranches.Where(p => p.Status == status).ToListAsync();
-    }
-
-    public async Task<IEnumerable<PhotoBoothBranch>> GetByName(string name)
-    {
-        return await _dbContext.PhotoBoothBranches.Where(p => p.BranchName.Contains(name)).ToListAsync();
-    }
-
-    public async Task<PhotoBoothBranch?> GetByIdAsync(Guid photoBoothBranchId)
-    {
-        return await _dbContext.PhotoBoothBranches.FindAsync(photoBoothBranchId);
+        return await Task.FromResult(_dbContext.PhotoBoothBranches.Where(predicate));
     }
 
     //Update

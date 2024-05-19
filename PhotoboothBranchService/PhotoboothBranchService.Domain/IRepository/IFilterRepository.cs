@@ -1,18 +1,8 @@
-﻿using PhotoboothBranchService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PhotoboothBranchService.Domain.Common.Interfaces;
+using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Domain.IRepository;
 
-public interface IFilterRepository
+public interface IFilterRepository : IRepositoryBase<Filter>
 {
-    Task<IEnumerable<Filter>> GetAll();
-    Task<IEnumerable<Filter>> GetByName(string name);
-    Task<Guid> AddAsync(Filter filter);
-    Task<Filter?> GetByIdAsync(Guid filterId);
-    Task RemoveAsync(Filter filter);
-    Task UpdateAsync(Filter filter);
 }

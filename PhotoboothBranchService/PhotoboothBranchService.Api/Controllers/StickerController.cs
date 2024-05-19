@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Sticker;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Sticker;
 using PhotoboothBranchService.Application.Services.StickerServices;
 
 namespace PhotoboothBranchService.Api.Controllers;
@@ -15,11 +18,11 @@ public class StickerController : ControllerBaseApi
 
     // Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreateSticker(StickerDTO stickerDTO)
+    public async Task<ActionResult<Guid>> CreateSticker(CreateStickerRequest createStickerRequest)
     {
         try
         {
-            var id = await _stickerService.CreateAsync(stickerDTO);
+            var id = await _stickerService.CreateAsync(createStickerRequest);
             return Ok(id);
         }
         catch (Exception ex)
@@ -30,7 +33,7 @@ public class StickerController : ControllerBaseApi
 
     // Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<StickerDTO>>> GetAllStickers()
+    public async Task<ActionResult<IEnumerable<StickerResponse>>> GetAllStickers()
     {
         try
         {
@@ -42,9 +45,23 @@ public class StickerController : ControllerBaseApi
             return StatusCode(500, $"An error occurred while retrieving stickers: {ex.Message}");
         }
     }
-
+    //get all with filter and paging
+    [HttpGet("paging")]
+    public async Task<ActionResult<IEnumerable<StickerResponse>>> GetAllStickers(
+        [FromBody] FilterPagingModel<StickerFilter> filterPagingModel)
+    {
+        try
+        {
+            var stickers = await _stickerService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            return Ok(stickers);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving stickers: {ex.Message}");
+        }
+    }
     [HttpGet("name/{name}")]
-    public async Task<ActionResult<IEnumerable<StickerDTO>>> GetStickersByName(string name)
+    public async Task<ActionResult<IEnumerable<StickerResponse>>> GetStickersByName(string name)
     {
         try
         {
@@ -58,7 +75,7 @@ public class StickerController : ControllerBaseApi
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<StickerDTO>> GetStickerById(Guid id)
+    public async Task<ActionResult<StickerResponse>> GetStickerById(Guid id)
     {
         try
         {
@@ -77,11 +94,11 @@ public class StickerController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateSticker(Guid id, StickerDTO stickerDTO)
+    public async Task<ActionResult> UpdateSticker(Guid id, UpdateStickerRequest updateStickerRequest)
     {
         try
         {
-            await _stickerService.UpdateAsync(id, stickerDTO);
+            await _stickerService.UpdateAsync(id, updateStickerRequest);
             return Ok();
         }
         catch (Exception ex)

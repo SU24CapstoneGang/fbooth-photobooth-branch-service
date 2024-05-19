@@ -9,7 +9,7 @@ namespace PhotoboothBranchService.Domain.Entities
         public int RemaniningUsage { get; set; }
         public Decimal DiscountRate { get; set; }
         public DateTime CreateDate { get; set; }
-        public DateTime LastModified { get; set; }
+        public DateTime? LastModified { get; set; }
         public DiscountStatus Status { get; set; }
         public virtual List<Order> Orders { get; set; }
     }

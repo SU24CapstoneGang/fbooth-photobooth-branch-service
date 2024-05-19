@@ -1,13 +1,11 @@
 ﻿using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Session;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Session;
 using PhotoboothBranchService.Domain.Common.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.SessionServices;
 
-public interface ISessionService : IService<SessionDTO>
+public interface ISessionService : IService<SessionResponse,CreateSessionRequest,UpdateSessionRequest,SessionFilter,PagingModel>
 {
 }

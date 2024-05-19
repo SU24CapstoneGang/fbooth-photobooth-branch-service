@@ -1,20 +1,8 @@
-﻿using PhotoboothBranchService.Domain.Entities;
-using PhotoboothBranchService.Domain.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PhotoboothBranchService.Domain.Common.Interfaces;
+using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Domain.IRepository;
 
-public interface IPhotoBoothBranchRepository
+public interface IPhotoBoothBranchRepository : IRepositoryBase<PhotoBoothBranch>
 {
-    Task<IEnumerable<PhotoBoothBranch>> GetAll();
-    Task<IEnumerable<PhotoBoothBranch>> GetAll(ManufactureStatus status);
-    Task<IEnumerable<PhotoBoothBranch>> GetByName(string name);
-    Task<Guid> AddAsync(PhotoBoothBranch photoBoothBranch);
-    Task<PhotoBoothBranch?> GetByIdAsync(Guid photoBoothBranchId);
-    Task RemoveAsync(PhotoBoothBranch photoBoothBranch);
-    Task UpdateAsync(PhotoBoothBranch photoBoothBranch);
 }

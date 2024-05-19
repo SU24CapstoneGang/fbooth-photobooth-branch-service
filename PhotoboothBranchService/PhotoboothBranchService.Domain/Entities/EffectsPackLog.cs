@@ -2,7 +2,7 @@
 
 namespace PhotoboothBranchService.Domain.Entities
 {
-    public class EffectsPackLog 
+    public class EffectsPackLog
     {
         public Guid PackID { get; set; }
         public DateTime CreateDate { get; set; }

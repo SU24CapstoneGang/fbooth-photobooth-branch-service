@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace PhotoboothBranchService.Domain.Entities
+﻿namespace PhotoboothBranchService.Domain.Entities
 {
     public class Frame
     {

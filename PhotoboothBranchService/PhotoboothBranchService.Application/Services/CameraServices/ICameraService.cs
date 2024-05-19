@@ -1,15 +1,11 @@
-﻿using PhotoboothBranchService.Application.DTOs;
+﻿using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Camera;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Camera;
 using PhotoboothBranchService.Domain.Common.Interfaces;
-using PhotoboothBranchService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.CameraServices;
 
-public interface ICameraService : IService<CameraDTO>
+public interface ICameraService : IService<Cameraresponse, CreateCameraRequest, UpdateCameraRequest, CameraFilter, PagingModel>
 {
-    Task<IEnumerable<CameraDTO>> GetByName(string name);
+    Task<IEnumerable<Cameraresponse>> GetByName(string name);
 }

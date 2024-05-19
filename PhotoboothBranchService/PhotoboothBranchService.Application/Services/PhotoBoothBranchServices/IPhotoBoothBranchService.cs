@@ -1,17 +1,19 @@
 ﻿using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.PhotoBoothBranch;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.PhotoBoothBranch;
 using PhotoboothBranchService.Domain.Common.Interfaces;
-using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
 
-public interface IPhotoBoothBranchService : IService<PhotoBoothBranchDTO>
+public interface IPhotoBoothBranchService : IService<PhotoBoothBranchresponse, 
+    CreatePhotoBoothBranchRequest, 
+    UpdatePhotoBoothBranchRequest, 
+    PhotoBoothBranchFilter, 
+    PagingModel>
 {
-    Task<IEnumerable<PhotoBoothBranchDTO>> GetAll(ManufactureStatus status);
-    Task<IEnumerable<PhotoBoothBranchDTO>> GetByName(string name);
+    Task<IEnumerable<PhotoBoothBranchresponse>> SearchByName(string name);
+    Task<IEnumerable<PhotoBoothBranchresponse>> GetByStatus(ManufactureStatus status);
+
 }

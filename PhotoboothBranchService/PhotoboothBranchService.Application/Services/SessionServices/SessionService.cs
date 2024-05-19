@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
+using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Session;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Session;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.SessionServices;
 
@@ -22,16 +21,16 @@ public class SessionService : ISessionService
     }
 
     // Create a new session
-    public async Task<Guid> CreateAsync(SessionDTO entityDTO)
+    public async Task<Guid> CreateAsync(CreateSessionRequest createModel)
     {
-        var session = _mapper.Map<Session>(entityDTO);
+        var session = _mapper.Map<Session>(createModel);
         return await _sessionRepository.AddAsync(session);
     }
 
     // Delete a session by ID
     public async Task DeleteAsync(Guid id)
     {
-        var session = await _sessionRepository.GetByIdAsync(id);
+        var session = (await _sessionRepository.GetAsync(s => s.SessionID == id)).FirstOrDefault();
         if (session != null)
         {
             await _sessionRepository.RemoveAsync(session);
@@ -43,33 +42,40 @@ public class SessionService : ISessionService
     }
 
     // Get all sessions
-    public async Task<IEnumerable<SessionDTO>> GetAllAsync()
+    public async Task<IEnumerable<SessionResponse>> GetAllAsync()
     {
-        var sessions = await _sessionRepository.GetAll();
-        return _mapper.Map<IEnumerable<SessionDTO>>(sessions);
+        var sessions = await _sessionRepository.GetAllAsync();
+        return _mapper.Map<IEnumerable<SessionResponse>>(sessions.ToList());
+    }
+
+    public async Task<IEnumerable<SessionResponse>> GetAllPagingAsync(SessionFilter filter, PagingModel paging)
+    {
+        var sessions = (await _sessionRepository.GetAllAsync()).AutoPaging(paging.PageSize,paging.PageIndex);
+        var listSessionresponse = _mapper.Map<IEnumerable<SessionResponse>>(sessions.ToList());
+        listSessionresponse.AutoFilter(filter);
+        return listSessionresponse;
     }
 
     // Get a session by ID
-    public async Task<SessionDTO> GetByIdAsync(Guid id)
+    public async Task<SessionResponse> GetByIdAsync(Guid id)
     {
-        var session = await _sessionRepository.GetByIdAsync(id);
+        var session = (await _sessionRepository.GetAsync(s => s.SessionID == id)).FirstOrDefault();
         if (session == null)
         {
             throw new KeyNotFoundException("Session not found.");
         }
-        return _mapper.Map<SessionDTO>(session);
+        return _mapper.Map<SessionResponse>(session);
     }
 
     // Update a session
-    public async Task UpdateAsync(Guid id, SessionDTO entityDTO)
+    public async Task UpdateAsync(Guid id, UpdateSessionRequest updateModel)
     {
-        var session = await _sessionRepository.GetByIdAsync(id);
+        var session = (await _sessionRepository.GetAsync(s => s.SessionID == id)).FirstOrDefault();
         if (session == null)
         {
             throw new KeyNotFoundException("Session not found.");
         }
-
-        var updatedSession = _mapper.Map(entityDTO, session);
+        var updatedSession = _mapper.Map(updateModel, session);
         await _sessionRepository.UpdateAsync(updatedSession);
     }
 }

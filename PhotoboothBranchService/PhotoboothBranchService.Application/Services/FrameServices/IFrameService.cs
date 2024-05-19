@@ -1,15 +1,12 @@
 ﻿using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Frame;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Frame;
 using PhotoboothBranchService.Domain.Common.Interfaces;
-using PhotoboothBranchService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.FrameServices;
 
-public interface IFrameService : IService<FrameDTO>
+public interface IFrameService : IService<FrameResponse,CreateFrameRequest,UpdateFrameRequest,FrameFilter,PagingModel>
 {
-    Task<IEnumerable<FrameDTO>> GetByName(string name);
+    Task<IEnumerable<FrameResponse>> GetByName(string name);
 }
