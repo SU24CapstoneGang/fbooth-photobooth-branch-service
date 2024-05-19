@@ -1,19 +1,12 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.Common.Exceptions;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Account;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Authentication;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Authentication;
+using PhotoboothBranchService.Application.DTOs.Account;
+using PhotoboothBranchService.Application.DTOs.Authentication;
+using PhotoboothBranchService.Application.Services.FirebaseServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.AccountServices
 {
@@ -24,65 +17,70 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
         private readonly IRoleRepository _roleRepository;
         private readonly IMapper _mapper;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IJwtService _jwtService;
+        private readonly IFirebaseService _firebaseService;
 
-        public AccountService(IAccountRepository accountRepository,  IJwtTokenGenerator jwtTokenGenerator, IRoleRepository roleRepository, IMapper mapper, IPasswordHasher passwordHasher)
+        public AccountService(IAccountRepository accountRepository,  IJwtTokenGenerator jwtTokenGenerator, 
+            IRoleRepository roleRepository, IMapper mapper, IPasswordHasher passwordHasher,
+            IJwtService jwtService, IFirebaseService firebaseService)
         {
             _accountRepository = accountRepository;
             _jwtTokenGenerator = jwtTokenGenerator;
             _roleRepository = roleRepository;
             _mapper = mapper;
             _passwordHasher = passwordHasher;
+            _jwtService = jwtService;
+            _firebaseService = firebaseService;
         }
-        public async Task<AuthenticationResult> Login(LoginRequestModel loginDTO)
+   
+        public async Task<LoginResponeModel> Login(LoginRequestModel request)
         {
-            var user = await _accountRepository.GetByEmail(loginDTO.Email);
-            if (user == null)
+            var loginViewModel = await _jwtService.GetForCredentialsAsync(request.Email, request.Password);
+            if (loginViewModel != null)
             {
-                throw new UnauthorizedException("Invalid email or password");
-            } else if (user.VerifyPassword(loginDTO.Password, _passwordHasher))
-            {
-                throw new UnauthorizedException("Invalid email or password");
+                return loginViewModel;
             }
-
-            return new AuthenticationResult
-            {
-                Id = user.AccountID,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                Token = _jwtTokenGenerator.GenerateToken(user),
-            };
+            throw new BadRequestException("Login fail!!!");
         }
-        public async Task<AuthenticationResult> Register(CreateAccountRequestModel accountDTO)
+
+        public async Task<LoginResponeModel> RefreshToken(RefreshTokenRequestModel request)
         {
-            var userRole = await _roleRepository.GetByName("User");
+            var loginViewModel = await _jwtService.RefreshToken(request.RefreshToken);
+            if (loginViewModel != null)
+            {
+                return loginViewModel;
+            }
+            throw new BadRequestException("Refresh token fail!!!");
+        }
+
+        public async Task<AccountRespone> Register(CreateAccountRequestModel request)
+        {
+            var userRole = await _roleRepository.GetByName("CUSTOMER");
 
             //validation in db
-            if (userRole.Count() == 0)
+            if (userRole != null || userRole.Any())
             {
-                throw new Exception("User role does not exist in the system.");
+                var uid = await _firebaseService.RegisterAsync(request.Email, request.Password);
+                if (uid != null)
+                {
+
+
+                    if (!await _accountRepository.IsEmailUnique(request.Email))
+                    {
+                        throw new Exception("Email is already in use. Please choose a different email.");
+                    }
+
+                    var newAccount = _mapper.Map<Account>(request);
+                    newAccount.SetPassword(request.Password, _passwordHasher);
+                    newAccount.RoleID = userRole.ElementAt(0).RoleID;
+
+                    var result = await _accountRepository.AddAsync(newAccount);
+                    var accountRespone = _mapper.Map<AccountRespone>(result);
+                    return accountRespone;
+                }
+                throw new BadRequestException("Register fail!!!");
             }
-
-            if (!await _accountRepository.IsEmailUnique(accountDTO.Email))
-            {
-                throw new Exception("Email is already in use. Please choose a different email.");
-            }
-
-            // Tạo một đối tượng Account từ AccountDTO
-            Account newAccount = _mapper.Map<Account>(accountDTO);
-            newAccount.SetPassword(accountDTO.Password, _passwordHasher);
-            newAccount.RoleID = userRole.ElementAt(0).RoleID;
-            var accountId = await _accountRepository.AddAsync(newAccount);
-            var authResult = new AuthenticationResult
-            {
-                Id = accountId,
-                FirstName = newAccount.FirstName,
-                LastName = newAccount.LastName,
-                Email = newAccount.Email,
-                Token = _jwtTokenGenerator.GenerateToken(newAccount)
-            };
-
-            return authResult;
+            throw new Exception("User role does not exist in the system.");
         }
     }
 }

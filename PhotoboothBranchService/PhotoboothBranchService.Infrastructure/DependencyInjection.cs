@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
@@ -21,8 +22,6 @@ namespace PhotoboothBranchService.Infrastructure
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("Fbooth"),
             b => b.MigrationsAssembly(typeof(ServiceContainer).Assembly.FullName)),
             ServiceLifetime.Scoped);
-
-            
 
             //Repositories
             services.AddScoped<IAccountRepository, AccountRepository>();

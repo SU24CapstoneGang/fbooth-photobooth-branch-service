@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using PhotoboothBranchService.Application.Services.RoleServices;
 using PhotoboothBranchService.Application.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PhotoboothBranchService.Api.Controllers;
 
@@ -34,6 +35,7 @@ public class RoleController : ControllerBaseApi
 
     // Read
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<RoleDTO>>> GetAllRoles()
     {
         try

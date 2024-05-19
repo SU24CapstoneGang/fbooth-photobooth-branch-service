@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Account;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Authentication;
+using PhotoboothBranchService.Application.DTOs.Account;
+using PhotoboothBranchService.Application.DTOs.Authentication;
 using PhotoboothBranchService.Application.Services.AccountServices;
 
 namespace PhotoboothBranchService.Api.Controllers;
@@ -16,23 +16,12 @@ public class AccountsController : ControllerBaseApi
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<CreateAccountRequestModel>> Login([FromBody] LoginRequestModel loginDTO)
+    public async Task<IActionResult> Login(LoginRequestModel request)
     {
-        try
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var account = await _accountService.Login(loginDTO);
-            if (account == null)
-                return NotFound("Invalid email or password.");
-            return Ok(account);
-
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred during login: {ex.Message}");
-        }
+        var token = await _accountService.Login(request);
+        if (token != null)
+            return Ok(token);
+        return BadRequest("Login fail!!!");
     }
 
     [HttpPost("register")]
@@ -56,6 +45,13 @@ public class AccountsController : ControllerBaseApi
         };
     }
 
-   
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestModel request)
+    {
+        var token = await _accountService.RefreshToken(request);
+        if (token != null)
+            return Ok(token);
+        return BadRequest("Login fail!!!");
+    }
 }
 

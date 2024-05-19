@@ -27,10 +27,4 @@
     <ProjectReference Include="..\PhotoboothBranchService.Application\PhotoboothBranchService.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

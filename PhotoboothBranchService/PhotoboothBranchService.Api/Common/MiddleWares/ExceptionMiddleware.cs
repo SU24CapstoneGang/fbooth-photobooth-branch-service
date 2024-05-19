@@ -2,7 +2,7 @@
 using PhotoboothBranchService.Application.Common.Exceptions;
 using System.Net;
 
-namespace PhotoboothBranchService.Api.Common.MiddleWare
+namespace PhotoboothBranchService.Api.Common.MiddleWares
 {
     public class ExceptionMiddleware
     {

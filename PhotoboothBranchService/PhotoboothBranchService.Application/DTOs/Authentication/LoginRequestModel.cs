@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.DTOs
+namespace PhotoboothBranchService.Application.DTOs.Authentication
 {
-    public class LoginDTO
+    public class LoginRequestModel
     {
         [Required, EmailAddress]
-        public string Email { get; set; } = default!;
+        public string Email { get; set; }
         [Required]
-        public string Password { get; set; } = default!;
+        public string Password { get; set; }
     }
 }

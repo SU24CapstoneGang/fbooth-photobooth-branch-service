@@ -1,7 +1,7 @@
 ﻿using PhotoboothBranchService.Domain.Enum;
 using System.ComponentModel.DataAnnotations;
 
-namespace PhotoboothBranchService.Application.DTOs.RequestModels.Account;
+namespace PhotoboothBranchService.Application.DTOs.Account;
 
 public class CreateAccountRequestModel
 {
