@@ -15,11 +15,11 @@ public class AccountRepository : IAccountRepository
     }
 
     //Create
-    public async Task<Guid> AddAsync(Account account)
+    public async Task<Account> AddAsync(Account account)
     {
-        await _dbContext.AddAsync(account);
+       var result =  await _dbContext.AddAsync(account);
         await _dbContext.SaveChangesAsync();
-        return account.AccountID;
+        return result.Entity;
     }
 
     //Update
