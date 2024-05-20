@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using System.Reflection;
 
-namespace PhotoboothBranchService.Application.Common.Helper;
+namespace PhotoboothBranchService.Application.Common.Helpers;
 
 public static class TypeHelper
 {

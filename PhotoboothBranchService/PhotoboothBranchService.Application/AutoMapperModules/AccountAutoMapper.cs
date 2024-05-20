@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.AutoMapperModules
 {
-    public class AccountAutoMapperModule : Profile
+    public class AccountAutoMapper : Profile
     {
-        public AccountAutoMapperModule()
+        public AccountAutoMapper()
         {
             CreateMap<Account, AccountRespone>().ReverseMap();
             CreateMap<CreateAccountRequestModel, Account>()

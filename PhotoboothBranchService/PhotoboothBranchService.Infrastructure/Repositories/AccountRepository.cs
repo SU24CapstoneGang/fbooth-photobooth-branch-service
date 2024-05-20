@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
@@ -51,5 +52,10 @@ public class AccountRepository : IAccountRepository
     public async Task<IQueryable<Account>> GetAsync(Expression<Func<Account, bool>> predicate)
     {
         return await Task.FromResult(_dbContext.Accounts.Where(predicate).AsQueryable());
+    }
+
+    Task<Guid> IRepositoryBase<Account>.AddAsync(Account entity)
+    {
+        throw new NotImplementedException();
     }
 }

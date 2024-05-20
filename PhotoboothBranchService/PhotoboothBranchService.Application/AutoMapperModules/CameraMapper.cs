@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using PhotoboothBranchService.Application.Common.Helper;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.RequestModels.Camera;
 using PhotoboothBranchService.Application.DTOs.ResponseModels.Camera;
 using PhotoboothBranchService.Domain.Entities;

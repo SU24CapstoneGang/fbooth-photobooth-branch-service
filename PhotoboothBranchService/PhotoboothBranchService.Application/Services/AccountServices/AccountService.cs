@@ -55,7 +55,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<AccountRespone> Register(CreateAccountRequestModel request)
         {
-            var userRole = await _roleRepository.GetByName("CUSTOMER");
+            var userRole = (await _roleRepository.GetAsync(r => r.RoleName.Equals("CUSTOMER"))).ToList();
 
             //validation in db
             if (userRole != null || userRole.Any())

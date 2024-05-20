@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using PhotoboothBranchService.Application.Common.Helper;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.RequestModels.Discount;
 using PhotoboothBranchService.Application.DTOs.ResponseModels.Discount;
 using PhotoboothBranchService.Domain.Entities;
