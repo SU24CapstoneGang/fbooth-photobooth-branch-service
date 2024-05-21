@@ -25,14 +25,21 @@ public class AppDbContext : DbContext
     public DbSet<Session> Sessions { get; set; }
     public DbSet<Sticker> Stickers { get; set; }
     public DbSet<TransactionHistory> TransactionHistories { get; set; }
+    public DbSet<ThemeFilter> ThemeFilters { get; set; }
+    public DbSet<ThemeFrame> ThemeFrames { get; set; }
+    public DbSet<ThemeSticker> ThemeStickers { get; set; }
+    public DbSet<MapSticker> MapStickers { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var builder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-        IConfigurationRoot configuration = builder.Build();
-        optionsBuilder.UseSqlServer(configuration.GetConnectionString("Fbooth"));
+        IConfigurationRoot configuration = new ConfigurationBuilder()
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile("appsettings.json", true, true)
+                    .Build();
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("Fbooth"));
+        }
     }
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
@@ -66,5 +73,9 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new SessionConfigurations());
         modelBuilder.ApplyConfiguration(new StickerConfigurations());
         modelBuilder.ApplyConfiguration(new TransactionHistoryConfigurations());
+        modelBuilder.ApplyConfiguration(new ThemeFilterConfigurations());
+        modelBuilder.ApplyConfiguration(new ThemeFrameConfigurations());
+        modelBuilder.ApplyConfiguration(new ThemeStickerConfigurations());
+        modelBuilder.ApplyConfiguration(new MapStickerConfigurations());
     }
 }

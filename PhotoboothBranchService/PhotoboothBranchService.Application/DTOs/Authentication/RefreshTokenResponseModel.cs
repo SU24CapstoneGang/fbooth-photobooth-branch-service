@@ -2,7 +2,7 @@
 
 namespace PhotoboothBranchService.Application.DTOs.Authentication
 {
-    public class AuthenRefreshTokenResponseModel
+    public class RefreshTokenResponseModel
     {
         [JsonPropertyName("access_token")]
         public string AccessToken { get; set; }

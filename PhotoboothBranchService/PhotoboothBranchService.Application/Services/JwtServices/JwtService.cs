@@ -50,7 +50,7 @@ namespace PhotoboothBranchService.Application.Services.JwtServices
             var response = await _httpClient.PostAsJsonAsync("https://securetoken.googleapis.com/v1/token?key=" + API_KEY, request);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                var authToken = await response.Content.ReadFromJsonAsync<AuthenRefreshTokenResponseModel>();
+                var authToken = await response.Content.ReadFromJsonAsync<RefreshTokenResponseModel>();
                 if (authToken != null)
                 {
                     return new LoginResponeModel

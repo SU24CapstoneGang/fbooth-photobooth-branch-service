@@ -11,8 +11,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
         {
             builder.ToTable("EffectsPackLogs");
             // Primary key
-            builder.HasKey(ep => ep.PackID);
-            builder.Property(ep => ep.PackID).HasColumnName("Pack ID")
+            builder.HasKey(ep => ep.PacklogID);
+            builder.Property(ep => ep.PacklogID).HasColumnName("Pack ID")
                 .ValueGeneratedOnAdd();
 
             // Other properties
@@ -26,10 +26,10 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired();
 
 
-            // Relationship with Sticker
-            builder.HasMany(ep => ep.Stickers)
-                .WithOne(s => s.EffectsPackLog)
-                .HasForeignKey(ep => ep.PackID)
+            // Relationship with MapSticker
+            builder.HasMany(epl => epl.MapStickers)
+                .WithOne(ms => ms.EffectsPackLog) 
+                .HasForeignKey(ms => ms.PackLogID)
                 .IsRequired();
 
             // Relationship with Frame

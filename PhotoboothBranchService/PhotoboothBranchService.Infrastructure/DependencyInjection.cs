@@ -19,9 +19,8 @@ namespace PhotoboothBranchService.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services,
             ConfigurationManager configuration)
         {
-            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("Fbooth"),
-            b => b.MigrationsAssembly(typeof(ServiceContainer).Assembly.FullName)),
-            ServiceLifetime.Scoped);
+            services.AddDbContext<AppDbContext>(options
+                => options.UseSqlServer(configuration.GetConnectionString("Fbooth")));
 
             //Repositories
             services.AddScoped<IAccountRepository, AccountRepository>();

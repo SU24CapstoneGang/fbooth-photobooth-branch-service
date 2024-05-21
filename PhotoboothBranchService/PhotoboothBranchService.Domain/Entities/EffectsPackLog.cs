@@ -4,12 +4,12 @@ namespace PhotoboothBranchService.Domain.Entities
 {
     public class EffectsPackLog
     {
-        public Guid PackID { get; set; }
+        public Guid PacklogID { get; set; }
         public DateTime CreateDate { get; set; }
         public StatusUse Status { get; set; }
         public Guid PictureID { get; set; }
         public virtual FinalPicture FinalPicture { get; set; }
-        public virtual List<Sticker> Stickers { get; set; }
+        public virtual List<MapSticker> MapStickers { get; set; }
         public Guid FrameID { get; set; }
         public virtual Frame Frame { get; set; }
         public Guid FilterID { get; set; }

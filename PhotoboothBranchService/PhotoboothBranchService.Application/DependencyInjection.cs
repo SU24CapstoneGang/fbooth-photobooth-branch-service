@@ -57,30 +57,6 @@ namespace PhotoboothBranchService.Application
                 options.TokenValidationParameters.ValidIssuer = configuration["FirebaseJwt:Issuer"];
             });
 
-
-            //jwt service
-            //services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
-            //services.AddAuthentication(options =>
-            //{
-            //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            //}).AddJwtBearer(options =>
-            //{
-            //    options.TokenValidationParameters = new TokenValidationParameters
-            //    {
-            //        ValidateIssuer = true,
-            //        ValidateAudience = true,
-            //        ValidateIssuerSigningKey = true,
-            //        ValidateLifetime = true,
-            //        ValidIssuer = configuration["JwtSettings:Issuer"],
-            //        ValidAudience = configuration["JwtSettings:Audience"],
-            //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]!))
-            //    };
-            //});
-
-            //Mapper
-            //services.AddAutoMapper(typeof(MappingProfile));
-
             return services;
         }
     }

@@ -18,7 +18,6 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(option =>
 {
-
     option.DescribeAllParametersInCamelCase();
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

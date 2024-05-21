@@ -31,11 +31,11 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(s => s.LastModified)
                 .IsRequired();
 
-            // Relationship with EffectsPackLog
-            builder.HasOne(s => s.EffectsPackLog)
-                .WithMany(ep => ep.Stickers)
-                .HasForeignKey(s => s.PackID)
-                .IsRequired();
+            // Relationship with MapSticker
+            builder.HasMany(s => s.MapStickers)
+               .WithOne(ms => ms.Sticker)
+               .HasForeignKey(ms => ms.StickerId)
+               .IsRequired();
         }
     }
 }

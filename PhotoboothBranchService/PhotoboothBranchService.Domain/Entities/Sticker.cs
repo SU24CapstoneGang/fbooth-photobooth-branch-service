@@ -7,7 +7,8 @@
         public string StrickerURL { get; set; } = default!;
         public DateTime CreatedDate { get; set; }
         public DateTime LastModified { get; set; }
-        public Guid PackID { get; set; }
-        public virtual EffectsPackLog EffectsPackLog { get; set; }
+        public virtual List<MapSticker> MapStickers { get; set; }
+        public Guid ThemeStickerID { get; set; }
+        public virtual ThemeSticker ThemeSticker { get; set; }
     }
 }
