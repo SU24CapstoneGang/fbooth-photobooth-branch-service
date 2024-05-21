@@ -2,10 +2,12 @@
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Authentication;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
 using PhotoboothBranchService.Application.Services.FirebaseServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.AccountServices
@@ -32,7 +34,27 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             _jwtService = jwtService;
             _firebaseService = firebaseService;
         }
-   
+
+        public Task<Guid> CreateAsync(CreateAccountRequestModel createModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<AccountRespone>> GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<AccountRespone> GetByIdAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<LoginResponeModel> Login(LoginRequestModel request)
         {
             var loginViewModel = await _jwtService.GetForCredentialsAsync(request.Email, request.Password);
@@ -53,18 +75,16 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             throw new BadRequestException("Refresh token fail!!!");
         }
 
-        public async Task<AccountRespone> Register(CreateAccountRequestModel request)
+        public async Task<AccountRespone> Register(CreateAccountRequestModel request, UserRole role)
         {
-            var userRole = (await _roleRepository.GetAsync(r => r.RoleName.Equals("CUSTOMER"))).ToList();
+            var userRole = (await _roleRepository.GetAsync(r => r.RoleName == role.ToString())).FirstOrDefault();
 
             //validation in db
-            if (userRole != null || userRole.Any())
+            if (userRole != null)
             {
                 var uid = await _firebaseService.RegisterAsync(request.Email, request.Password);
                 if (uid != null)
                 {
-
-
                     if (!await _accountRepository.IsEmailUnique(request.Email))
                     {
                         throw new Exception("Email is already in use. Please choose a different email.");
@@ -72,7 +92,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
                     var newAccount = _mapper.Map<Account>(request);
                     newAccount.SetPassword(request.Password, _passwordHasher);
-                    newAccount.RoleID = userRole.ElementAt(0).RoleID;
+                    newAccount.RoleID = userRole.RoleID;
 
                     var result = await _accountRepository.AddAsync(newAccount);
                     var accountRespone = _mapper.Map<AccountRespone>(result);
@@ -81,6 +101,16 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                 throw new BadRequestException("Register fail!!!");
             }
             throw new Exception("User role does not exist in the system.");
+        }
+
+        public Task UpdateAsync(Guid id, UpdateAccountRequestModel updateModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IEnumerable<AccountRespone>> IService<AccountRespone, CreateAccountRequestModel, UpdateAccountRequestModel, AccountFilter, PagingModel>.GetAllPagingAsync(AccountFilter filter, PagingModel paging)
+        {
+            throw new NotImplementedException();
         }
     }
 }

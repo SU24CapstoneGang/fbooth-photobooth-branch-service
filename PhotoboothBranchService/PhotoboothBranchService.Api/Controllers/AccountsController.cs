@@ -3,6 +3,7 @@ using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Authentication;
 using PhotoboothBranchService.Application.Services.AccountServices;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Api.Controllers;
 
@@ -25,7 +26,7 @@ public class AccountsController : ControllerBaseApi
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] CreateAccountRequestModel request)
+    public async Task<IActionResult> Register([FromBody] CreateAccountRequestModel request, UserRole userRole)
     {
 
         try
@@ -33,7 +34,7 @@ public class AccountsController : ControllerBaseApi
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _accountService.Register(request);
+            var result = await _accountService.Register(request, userRole);
             if (result != null)
                 return Ok(result);
             return BadRequest("Registration failed. Please try again.");
