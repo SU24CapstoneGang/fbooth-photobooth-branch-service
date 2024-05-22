@@ -3,6 +3,7 @@ using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Frame;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.FrameServices;
@@ -22,6 +23,7 @@ public class FrameService : IFrameService
     public async Task<Guid> CreateAsync(CreateFrameRequest createModel)
     {
         Frame frame = _mapper.Map<Frame>(createModel);
+        frame.Status = StatusUse.Available;
         return await _frameRepository.AddAsync(frame);
     }
 

@@ -33,7 +33,7 @@ public class AccountsController : ControllerBaseApi
 
     // Read all
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<AccountRespone>>> GetAllAccount()
+    public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAllAccount()
     {
         try
         {
@@ -47,7 +47,7 @@ public class AccountsController : ControllerBaseApi
     }
     // Read all with paging and filter
     [HttpGet("paging")]
-    public async Task<ActionResult<IEnumerable<AccountRespone>>> GetPagingAccounts(
+    public async Task<ActionResult<IEnumerable<AccountResponse>>> GetPagingAccounts(
         [FromQuery] AccountFilter accountFilter, [FromQuery] PagingModel pagingModel)
     {
         try
@@ -62,7 +62,7 @@ public class AccountsController : ControllerBaseApi
     }
     // Read by name
     [HttpGet("email/{email}")]
-    public async Task<ActionResult<IEnumerable<AccountRespone>>> GetAccountByEmail(string email)
+    public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAccountByEmail(string email)
     {
         try
         {
@@ -77,7 +77,7 @@ public class AccountsController : ControllerBaseApi
 
     // Read by ID
     [HttpGet("{id}")]
-    public async Task<ActionResult<AccountRespone>> GetAccountById(Guid id)
+    public async Task<ActionResult<AccountResponse>> GetAccountById(Guid id)
     {
         try
         {

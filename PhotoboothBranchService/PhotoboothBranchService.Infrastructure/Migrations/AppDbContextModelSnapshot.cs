@@ -130,7 +130,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnName("Discount ID");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 5, 22, 22, 2, 9, 616, DateTimeKind.Utc).AddTicks(7884));
 
                     b.Property<string>("DiscountCode")
                         .IsRequired()
@@ -141,7 +143,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("LastModified")
-                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<int>("RemaniningUsage")
@@ -175,10 +176,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<Guid>("PictureID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("PacklogID");
 
                     b.HasIndex("FilterID");
@@ -199,7 +196,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnName("Filter ID");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 5, 22, 22, 2, 9, 618, DateTimeKind.Utc).AddTicks(5964));
 
                     b.Property<string>("FilterName")
                         .IsRequired()
@@ -211,8 +210,12 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime>("LastModified")
+                    b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ThemeFilterID")
                         .HasColumnType("uniqueidentifier");
@@ -232,9 +235,12 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnName("Picture ID");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 5, 22, 22, 2, 9, 620, DateTimeKind.Utc).AddTicks(2678));
 
-                    b.Property<DateTime>("LastModified")
+                    b.Property<DateTime?>("LastModified")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("LayoutID")
@@ -275,7 +281,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnName("Frame ID");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 5, 22, 22, 2, 9, 620, DateTimeKind.Utc).AddTicks(4848));
 
                     b.Property<string>("FrameName")
                         .IsRequired()
@@ -287,8 +295,12 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime>("LastModified")
+                    b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ThemeFrameID")
                         .HasColumnType("uniqueidentifier");
@@ -308,9 +320,11 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnName("Layout ID");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 5, 22, 22, 2, 9, 620, DateTimeKind.Utc).AddTicks(7298));
 
-                    b.Property<DateTime>("LastModified")
+                    b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
                     b.Property<float>("LayoutPrice")
@@ -363,7 +377,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("PaymentID")
+                    b.Property<Guid>("PaymentMethodID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PictureID")
@@ -384,7 +398,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
                     b.HasIndex("DiscountID");
 
-                    b.HasIndex("PaymentID");
+                    b.HasIndex("PaymentMethodID");
 
                     b.HasIndex("PictureID")
                         .IsUnique();
@@ -394,15 +408,17 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.PaymentMethod", b =>
                 {
-                    b.Property<Guid>("PaymentID")
+                    b.Property<Guid>("PaymentMethodID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
-                        .HasColumnName("Payment ID");
+                        .HasColumnName("Payment Method ID");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 5, 22, 22, 2, 9, 621, DateTimeKind.Utc).AddTicks(4512));
 
-                    b.Property<string>("PaymentName")
+                    b.Property<string>("PaymentMethodName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -411,7 +427,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("PaymentID");
+                    b.HasKey("PaymentMethodID");
 
                     b.ToTable("PaymentMethods", (string)null);
                 });
@@ -455,10 +471,20 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnName("PrintPricing ID");
 
                     b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 5, 22, 22, 2, 9, 622, DateTimeKind.Utc).AddTicks(6331));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("LastModified")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("PrintName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("UnitPrice")
                         .HasColumnType("real");
@@ -545,10 +571,16 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnName("Sticker ID");
 
                     b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 5, 22, 22, 2, 9, 624, DateTimeKind.Utc).AddTicks(1841));
+
+                    b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("LastModified")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("StickerName")
                         .IsRequired()
@@ -577,6 +609,10 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("ThemeFilter ID");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ThemeFilterDescription")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -598,6 +634,10 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("ThemeFrame ID");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ThemeFrameDescription")
                         .IsRequired()
@@ -621,6 +661,10 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("ThemeSticker ID");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ThemeStickerDescription")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -643,7 +687,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Transaction ID");
 
-                    b.Property<Guid>("AccountID")
+                    b.Property<Guid?>("AccountID")
+                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedDate")
@@ -785,7 +830,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
                     b.HasOne("PhotoboothBranchService.Domain.Entities.PaymentMethod", "PaymentMethod")
                         .WithMany("Orders")
-                        .HasForeignKey("PaymentID")
+                        .HasForeignKey("PaymentMethodID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -8,7 +8,7 @@ public class PasswordHasher : IPasswordHasher
 {
     public byte[] GenerateSalt()
     {
-        using (var rng = new RNGCryptoServiceProvider())
+        using (var rng = RandomNumberGenerator.Create())
         {
             var salt = new byte[16];
             rng.GetBytes(salt);

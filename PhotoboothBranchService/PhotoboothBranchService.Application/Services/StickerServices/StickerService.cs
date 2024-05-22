@@ -3,6 +3,7 @@ using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Sticker;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.StickerServices;
@@ -22,6 +23,7 @@ public class StickerService : IStickerService
     public async Task<Guid> CreateAsync(CreateStickerRequest createModel)
     {
         Sticker sticker = _mapper.Map<Sticker>(createModel);
+        sticker.Status = StatusUse.Available;
         return await _stickerRepository.AddAsync(sticker);
     }
 
@@ -52,7 +54,7 @@ public class StickerService : IStickerService
     public async Task<IEnumerable<StickerResponse>> GetAllPagingAsync(StickerFilter filter, PagingModel paging)
     {
         var stickers = (await _stickerRepository.GetAllAsync()).ToList().AutoFilter(filter);
-        var listStickerresponse = _mapper.Map<IEnumerable<StickerResponse>>(stickers.ToList());
+        var listStickerresponse = _mapper.Map<IEnumerable<StickerResponse>>(stickers);
         listStickerresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         return listStickerresponse;
     }

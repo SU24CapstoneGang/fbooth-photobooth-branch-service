@@ -2,7 +2,7 @@
 
 namespace PhotoboothBranchService.Application.DTOs.Account
 {
-    public class AccountRespone
+    public class AccountResponse
     {
         public Guid AccountID { get; set; }
         public string FirstName { get; set; }

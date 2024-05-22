@@ -3,6 +3,7 @@ using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Filter;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.FilterServices;
@@ -22,6 +23,7 @@ public class FilterService : IFilterService
     public async Task<Guid> CreateAsync(CreateFilterRequest createModel)
     {
         Filter filter = _mapper.Map<Filter>(createModel);
+        filter.Status = StatusUse.Available;
         return await _filterRepository.AddAsync(filter);
     }
 

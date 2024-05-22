@@ -43,13 +43,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .WithMany(f => f.EffectsPackLogs)
                 .HasForeignKey(ep => ep.FilterID)
                 .IsRequired();
-
-            // Status enum mapping
-            builder.Property(ep => ep.Status)
-                .IsRequired()
-                .HasConversion(
-                    v => v.ToString(),
-                    v => (StatusUse)Enum.Parse(typeof(StatusUse), v));
         }
     }
 }

@@ -49,7 +49,7 @@ public class SessionService : ISessionService
     public async Task<IEnumerable<SessionResponse>> GetAllPagingAsync(SessionFilter filter, PagingModel paging)
     {
         var sessions = (await _sessionRepository.GetAllAsync()).ToList().AutoFilter(filter);
-        var listSessionresponse = _mapper.Map<IEnumerable<SessionResponse>>(sessions.ToList());
+        var listSessionresponse = _mapper.Map<IEnumerable<SessionResponse>>(sessions);
         listSessionresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         return listSessionresponse;
     }

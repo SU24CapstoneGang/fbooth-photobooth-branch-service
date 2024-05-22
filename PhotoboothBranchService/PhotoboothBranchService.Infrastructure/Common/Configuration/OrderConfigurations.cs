@@ -36,7 +36,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             // Relationship with PaymentMethod
             builder.HasOne(o => o.PaymentMethod)
                 .WithMany(d => d.Orders)
-                .HasForeignKey(o => o.PaymentID)
+                .HasForeignKey(o => o.PaymentMethodID)
                 .IsRequired();
 
             // Relationship with Account

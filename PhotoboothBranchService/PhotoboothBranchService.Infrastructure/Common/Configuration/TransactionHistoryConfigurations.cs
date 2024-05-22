@@ -30,8 +30,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             // Relationship with Customer
             builder.HasOne(th => th.Account)
                 .WithMany(c => c.TransactionHistories)
-                .HasForeignKey(th => th.AccountID)
-                .IsRequired();
+                .HasForeignKey(th => th.AccountID);
         }
     }
 }

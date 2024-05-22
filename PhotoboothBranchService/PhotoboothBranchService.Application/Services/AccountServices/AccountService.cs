@@ -63,16 +63,16 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             }
         }
 
-        public async Task<IEnumerable<AccountRespone>> GetAllAsync()
+        public async Task<IEnumerable<AccountResponse>> GetAllAsync()
         {
             var accounts = await _accountRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<AccountRespone>>(accounts.ToList());
+            return _mapper.Map<IEnumerable<AccountResponse>>(accounts.ToList());
         }
 
-        public async Task<AccountRespone> GetByIdAsync(Guid id)
+        public async Task<AccountResponse> GetByIdAsync(Guid id)
         {
             var account = await _accountRepository.GetAsync(a => a.AccountID == id);
-            return _mapper.Map<AccountRespone>(account);
+            return _mapper.Map<AccountResponse>(account);
         }
 
         public async Task UpdateAsync(Guid id, UpdateAccountRequestModel updateModel)
@@ -87,10 +87,10 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             await _accountRepository.UpdateAsync(updateCamera);
         }
 
-        public async Task<IEnumerable<AccountRespone>> GetAllPagingAsync(AccountFilter filter, PagingModel paging)
+        public async Task<IEnumerable<AccountResponse>> GetAllPagingAsync(AccountFilter filter, PagingModel paging)
         {
             var cameras = (await _accountRepository.GetAllAsync()).ToList().AutoFilter(filter);
-            var listAccountresponse = _mapper.Map<IEnumerable<AccountRespone>>(cameras);
+            var listAccountresponse = _mapper.Map<IEnumerable<AccountResponse>>(cameras);
             listAccountresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
             return listAccountresponse;
         }
@@ -149,10 +149,10 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             throw new Exception("User role does not exist in the system.");
         }
 
-        public async Task<IEnumerable<AccountRespone>> GetByEmail(string email)
+        public async Task<IEnumerable<AccountResponse>> GetByEmail(string email)
         {
             var account = (await _accountRepository.GetAsync(a => a.Email.Equals(email)));
-            return _mapper.Map<IEnumerable<AccountRespone>>(account.ToList());
+            return _mapper.Map<IEnumerable<AccountResponse>>(account.ToList());
         }
     }
 }

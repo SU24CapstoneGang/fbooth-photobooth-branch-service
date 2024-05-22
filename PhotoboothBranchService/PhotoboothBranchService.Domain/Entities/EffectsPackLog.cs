@@ -6,7 +6,6 @@ namespace PhotoboothBranchService.Domain.Entities
     {
         public Guid PacklogID { get; set; }
         public DateTime CreateDate { get; set; }
-        public StatusUse Status { get; set; }
         public Guid PictureID { get; set; }
         public virtual FinalPicture FinalPicture { get; set; }
         public virtual List<MapSticker> MapStickers { get; set; }

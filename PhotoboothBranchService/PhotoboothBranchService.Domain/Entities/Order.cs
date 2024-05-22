@@ -8,7 +8,7 @@
         public float TotalPrice { get; set; }
         public Guid SessionID { get; set; }
         public virtual Session Session { get; set; }
-        public Guid PaymentID { get; set; }
+        public Guid PaymentMethodID { get; set; }
         public virtual PaymentMethod PaymentMethod { get; set; }
         public Guid DiscountID { get; set; }
         public virtual Discount Discount { get; set; }

@@ -8,16 +8,28 @@ using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Application.Services.CameraServices;
 using PhotoboothBranchService.Application.Services.DiscountServices;
+using PhotoboothBranchService.Application.Services.EffectsPackLogServices;
 using PhotoboothBranchService.Application.Services.FilterServices;
+using PhotoboothBranchService.Application.Services.FinalPictureServices;
 using PhotoboothBranchService.Application.Services.FirebaseServices;
 using PhotoboothBranchService.Application.Services.FrameServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Application.Services.LayoutServices;
+using PhotoboothBranchService.Application.Services.MapStickerServices;
+using PhotoboothBranchService.Application.Services.OrderServices;
+using PhotoboothBranchService.Application.Services.PaymentMethodServices;
 using PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
 using PhotoboothBranchService.Application.Services.PrinterServices;
+using PhotoboothBranchService.Application.Services.PrintPricingServices;
 using PhotoboothBranchService.Application.Services.RoleServices;
+using PhotoboothBranchService.Application.Services.SessionServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
+using PhotoboothBranchService.Application.Services.ThemeFilterServices;
+using PhotoboothBranchService.Application.Services.ThemeFrameServices;
+using PhotoboothBranchService.Application.Services.ThemeStickerServices;
+using PhotoboothBranchService.Application.Services.TransactionHistoryServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
+using PhotoboothBranchService.Domain.IRepository;
 using System.Reflection;
 
 namespace PhotoboothBranchService.Application
@@ -30,15 +42,27 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ICameraService, CameraService>();
             services.AddScoped<IDiscountService, DiscountService>();
+            services.AddScoped<IEffectsPackLogService, EffectsPackLogService>();
+            services.AddScoped<IFilterService, FilterService>();
+            services.AddScoped<IFinalPictureService, FinalPictureService>();
+            services.AddScoped<IFrameService, FrameService>();
+            services.AddScoped<ILayoutService, LayoutService>();
+            services.AddScoped<IMapStickerService, MapStickerService>();
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IPaymentMethodService, PaymentMethodService>();
             services.AddScoped<IPhotoBoothBranchService, PhotoBoothBranchService>();
             services.AddScoped<IPrinterService, PrinterService>();
+            services.AddScoped<IPrintPricingService, PrintPricingService>();
             services.AddScoped<IRoleService, RoleService>();
-            services.AddScoped<IFilterService, FilterService>();
-            services.AddScoped<IFrameService, FrameService>();
+            services.AddScoped<ISessionService, SessionService>();
             services.AddScoped<IStickerService, StickerService>();
-            services.AddScoped<ILayoutService, LayoutService>();
-            services.AddScoped<IFirebaseService, FirebaseService>();
+            services.AddScoped<IThemeFilterService,ThemeFilterService>();
+            services.AddScoped<IThemeFrameService, ThemeFrameService>();
+            services.AddScoped<IThemeStickerService, ThemeStickerService>();
+            services.AddScoped<ITransactionHistoryService, TransactionHistoryService>();
 
+            //Firebase
+            services.AddScoped<IFirebaseService, FirebaseService>();
 
             //Password hasher
             services.AddScoped<IPasswordHasher, PasswordHasher>();

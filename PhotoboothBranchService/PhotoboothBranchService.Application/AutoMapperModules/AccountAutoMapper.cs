@@ -9,7 +9,7 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
         public AccountAutoMapper()
         {
             CreateMap<Account, AccountRegisterResponse>().ReverseMap();
-            CreateMap<Account, AccountRespone>().ReverseMap();
+            CreateMap<Account, AccountResponse>().ReverseMap();
             CreateMap<CreateAccountRequestModel, Account>()
             .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
             .ForMember(dest => dest.PasswordSalt, opt => opt.Ignore())

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
@@ -24,6 +25,13 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasMany(ts => ts.Stickers)
                 .WithOne(s => s.ThemeSticker)
                 .HasForeignKey(s => s.ThemeStickerID);
+
+            // Status enum mapping
+            builder.Property(ts => ts.Status)
+                .IsRequired()
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (StatusUse)Enum.Parse(typeof(StatusUse), v));
         }
     }
 }

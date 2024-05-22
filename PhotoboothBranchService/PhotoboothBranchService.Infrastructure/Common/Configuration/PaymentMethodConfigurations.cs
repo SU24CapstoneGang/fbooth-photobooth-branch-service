@@ -14,12 +14,12 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.ToTable("PaymentMethods");
 
             // Primary key
-            builder.HasKey(pm => pm.PaymentID);
-            builder.Property(pm => pm.PaymentID).HasColumnName("Payment ID")
+            builder.HasKey(pm => pm.PaymentMethodID);
+            builder.Property(pm => pm.PaymentMethodID).HasColumnName("Payment Method ID")
                 .ValueGeneratedOnAdd();
 
             // Other properties
-            builder.Property(pm => pm.PaymentName)
+            builder.Property(pm => pm.PaymentMethodName)
                 .IsRequired()
                 .HasMaxLength(50);
 
@@ -36,7 +36,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             // Relationship with Order
             builder.HasMany(pm => pm.Orders)
                 .WithOne(o => o.PaymentMethod)
-                .HasForeignKey(o => o.PaymentID)
+                .HasForeignKey(o => o.PaymentMethodID)
                 .IsRequired();
 
             //auto add CreateDate and ignore change after update

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
@@ -38,10 +39,17 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                .IsRequired();
 
             //auto add CreateDate and ignore change after update
-            builder.Property(a => a.CreatedDate)
+            builder.Property(s => s.CreatedDate)
               .ValueGeneratedOnAdd()
               .HasDefaultValue(DateTime.UtcNow)
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
+            // Status enum mapping
+            builder.Property(s => s.Status)
+                .IsRequired()
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (StatusUse)Enum.Parse(typeof(StatusUse), v));
         }
     }
 }
