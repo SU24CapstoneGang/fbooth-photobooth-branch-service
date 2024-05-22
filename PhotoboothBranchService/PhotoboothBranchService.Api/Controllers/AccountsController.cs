@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Authentication;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
 using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Domain.Enum;
 
@@ -48,11 +48,11 @@ public class AccountsController : ControllerBaseApi
     // Read all with paging and filter
     [HttpGet("paging")]
     public async Task<ActionResult<IEnumerable<AccountRespone>>> GetPagingAccounts(
-        [FromBody] FilterPagingModel<AccountFilter> filterPagingModel)
+        [FromQuery] AccountFilter accountFilter, [FromQuery] PagingModel pagingModel)
     {
         try
         {
-            var account = await _accountService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            var account = await _accountService.GetAllPagingAsync(accountFilter,pagingModel);
             return Ok(account);
         }
         catch (Exception ex)

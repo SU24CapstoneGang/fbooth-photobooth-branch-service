@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
 
@@ -28,14 +29,19 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(s => s.CreatedDate)
                 .IsRequired();
 
-            builder.Property(s => s.LastModified)
-                .IsRequired();
+            builder.Property(s => s.LastModified);
 
             // Relationship with MapSticker
             builder.HasMany(s => s.MapStickers)
                .WithOne(ms => ms.Sticker)
                .HasForeignKey(ms => ms.StickerId)
                .IsRequired();
+
+            //auto add CreateDate and ignore change after update
+            builder.Property(a => a.CreatedDate)
+              .ValueGeneratedOnAdd()
+              .HasDefaultValue(DateTime.UtcNow)
+              .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
         }
     }
 }
