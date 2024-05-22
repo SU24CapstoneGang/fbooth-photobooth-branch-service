@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
-using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Sticker;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Sticker;
+using PhotoboothBranchService.Application.DTOs.Sticker;
+using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 
@@ -53,9 +51,9 @@ public class StickerService : IStickerService
 
     public async Task<IEnumerable<StickerResponse>> GetAllPagingAsync(StickerFilter filter, PagingModel paging)
     {
-        var stickers = (await _stickerRepository.GetAllAsync()).AutoPaging(paging.PageSize,paging.PageIndex);
+        var stickers = (await _stickerRepository.GetAllAsync()).ToList().AutoFilter(filter);
         var listStickerresponse = _mapper.Map<IEnumerable<StickerResponse>>(stickers.ToList());
-        listStickerresponse.AutoFilter(filter);
+        listStickerresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         return listStickerresponse;
     }
 

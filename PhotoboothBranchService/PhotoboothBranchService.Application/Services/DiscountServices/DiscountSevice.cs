@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
-using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Discount;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Discount;
+using PhotoboothBranchService.Application.DTOs.Discount;
+using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 
@@ -36,9 +34,9 @@ public class DiscountService : IDiscountService
 
     public async Task<IEnumerable<Discountresponse>> GetAllPagingAsync(DiscountFilter filter, PagingModel paging)
     {
-        var discounts = (await _discountRepository.GetAllAsync()).AutoPaging(paging.PageSize, paging.PageIndex);
-        var listDiscountresponse = _mapper.Map<IEnumerable<Discountresponse>>(discounts.ToList());
-        listDiscountresponse.AutoFilter(filter);
+        var discounts = (await _discountRepository.GetAllAsync()).ToList().AutoFilter(filter);
+        var listDiscountresponse = _mapper.Map<IEnumerable<Discountresponse>>(discounts);
+        listDiscountresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         return listDiscountresponse;
     }
 

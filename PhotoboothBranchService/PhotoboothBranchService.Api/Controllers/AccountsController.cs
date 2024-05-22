@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Authentication;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
 using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Domain.Enum;
 
@@ -52,7 +52,7 @@ public class AccountsController : ControllerBaseApi
     {
         try
         {
-            var account = await _accountService.GetAllPagingAsync(accountFilter,pagingModel);
+            var account = await _accountService.GetAllPagingAsync(accountFilter, pagingModel);
             return Ok(account);
         }
         catch (Exception ex)

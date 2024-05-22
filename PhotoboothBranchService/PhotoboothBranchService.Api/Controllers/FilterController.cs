@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Filter;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Filter;
+using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Filter;
 using PhotoboothBranchService.Application.Services.FilterServices;
 
 namespace PhotoboothBranchService.Api.Controllers;

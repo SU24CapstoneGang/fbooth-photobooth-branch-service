@@ -1,8 +1,7 @@
 ﻿// PrintersController.cs
 using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Printer;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Printer;
+using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Printer;
 using PhotoboothBranchService.Application.Services.PrinterServices;
 
 namespace PhotoboothBranchService.Api.Controllers;

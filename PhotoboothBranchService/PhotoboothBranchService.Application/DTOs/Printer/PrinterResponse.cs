@@ -1,6 +1,6 @@
 ﻿using PhotoboothBranchService.Domain.Enum;
 
-namespace PhotoboothBranchService.Application.DTOs.ResponseModels.Printer
+namespace PhotoboothBranchService.Application.DTOs.Printer
 {
     public class PrinterResponse
     {

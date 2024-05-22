@@ -1,4 +1,4 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.ResponseModels.Role
+﻿namespace PhotoboothBranchService.Application.DTOs.Role
 {
     public class RoleResponse
     {

@@ -1,4 +1,4 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.ResponseModels.Sticker
+﻿namespace PhotoboothBranchService.Application.DTOs.Sticker
 {
     public class StickerResponse
     {

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Layout;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Layout;
+using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Layout;
 using PhotoboothBranchService.Application.Services.LayoutServices;
 
 namespace PhotoboothBranchService.Api.Controllers;

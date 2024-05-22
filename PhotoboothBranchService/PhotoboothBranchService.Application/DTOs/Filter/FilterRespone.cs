@@ -1,4 +1,4 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.ResponseModels.Filter
+﻿namespace PhotoboothBranchService.Application.DTOs.Filter
 {
     public class Filterresponse
     {

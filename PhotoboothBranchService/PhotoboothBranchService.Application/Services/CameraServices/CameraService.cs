@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
-using Beanbox.Business.Commons.Helpers;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Camera;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Camera;
+using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Camera;
+using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 
@@ -50,9 +49,9 @@ public class CameraService : ICameraService
 
     public async Task<IEnumerable<Cameraresponse>> GetAllPagingAsync(CameraFilter filter, PagingModel paging)
     {
-        var cameras = (await _cameraRepository.GetAllAsync()).AutoPaging(paging.PageSize, paging.PageIndex);
-        var listCameraresponse =  _mapper.Map<IEnumerable<Cameraresponse>>(cameras.ToList());
-        listCameraresponse.AutoFilter(filter);
+        var cameras = (await _cameraRepository.GetAllAsync()).ToList().AutoFilter(filter); 
+        var listCameraresponse = _mapper.Map<IEnumerable<Cameraresponse>>(cameras);
+        listCameraresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         return listCameraresponse;
     }
 

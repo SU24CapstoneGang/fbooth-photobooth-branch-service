@@ -28,7 +28,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             // Relationship with MapSticker
             builder.HasMany(epl => epl.MapStickers)
-                .WithOne(ms => ms.EffectsPackLog) 
+                .WithOne(ms => ms.EffectsPackLog)
                 .HasForeignKey(ms => ms.PackLogID)
                 .IsRequired();
 

@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
-using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Role;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Role;
+using PhotoboothBranchService.Application.DTOs.Role;
+using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 
@@ -52,9 +50,9 @@ public class RoleService : IRoleService
 
     public async Task<IEnumerable<RoleResponse>> GetAllPagingAsync(RoleFilter filter, PagingModel paging)
     {
-        var roles = (await _roleRepository.GetAllAsync()).AutoPaging(paging.PageSize,paging.PageIndex);
-        var listRoleresponse = _mapper.Map<IEnumerable<RoleResponse>>(roles.ToList());
-        listRoleresponse.AutoFilter(filter);
+        var roles = (await _roleRepository.GetAllAsync()).ToList().AutoFilter(filter);
+        var listRoleresponse = _mapper.Map<IEnumerable<RoleResponse>>(roles);
+        listRoleresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         return listRoleresponse;
     }
 

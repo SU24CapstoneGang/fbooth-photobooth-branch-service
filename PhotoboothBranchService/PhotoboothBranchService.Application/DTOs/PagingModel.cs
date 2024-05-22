@@ -1,4 +1,4 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.RequestModels;
+﻿namespace PhotoboothBranchService.Application.DTOs;
 
 public class PagingModel
 {

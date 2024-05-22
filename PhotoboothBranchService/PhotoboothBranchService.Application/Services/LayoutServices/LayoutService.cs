@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
-using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Layout;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Layout;
+using PhotoboothBranchService.Application.DTOs.Layout;
+using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 
@@ -53,9 +51,9 @@ public class LayoutService : ILayoutService
 
     public async Task<IEnumerable<Layoutresponse>> GetAllPagingAsync(LayoutFilter filter, PagingModel paging)
     {
-        var layouts = (await _layoutRepository.GetAllAsync()).AutoPaging(paging.PageSize,paging.PageIndex);
-        var listLayoutresponse = _mapper.Map<IEnumerable<Layoutresponse>>(layouts.ToList());
-        listLayoutresponse.AutoFilter(filter);
+        var layouts = (await _layoutRepository.GetAllAsync()).ToList().AutoFilter(filter);
+        var listLayoutresponse = _mapper.Map<IEnumerable<Layoutresponse>>(layouts);
+        listLayoutresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         return listLayoutresponse;
     }
 

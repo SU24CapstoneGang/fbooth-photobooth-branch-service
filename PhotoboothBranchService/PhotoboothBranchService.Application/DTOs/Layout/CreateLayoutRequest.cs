@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PhotoboothBranchService.Application.DTOs.RequestModels.Layout
+﻿namespace PhotoboothBranchService.Application.DTOs.Layout
 {
     public class CreateLayoutRequest
     {

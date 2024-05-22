@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
@@ -61,5 +60,5 @@ public class AccountRepository : IAccountRepository
         return await Task.FromResult(_dbContext.Accounts.Where(predicate).AsQueryable());
     }
 
-    
+
 }

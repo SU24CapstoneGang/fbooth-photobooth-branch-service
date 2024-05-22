@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
-using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Frame;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Frame;
+using PhotoboothBranchService.Application.DTOs.Frame;
+using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 
@@ -53,9 +51,9 @@ public class FrameService : IFrameService
 
     public async Task<IEnumerable<FrameResponse>> GetAllPagingAsync(FrameFilter filter, PagingModel paging)
     {
-        var frames = (await _frameRepository.GetAllAsync()).AutoPaging(paging.PageSize,paging.PageIndex);
-        var listFrameresponse = _mapper.Map<IEnumerable<FrameResponse>>(frames.ToList());
-        listFrameresponse.AutoFilter(filter);
+        var frames = (await _frameRepository.GetAllAsync()).ToList().AutoFilter(filter);
+        var listFrameresponse = _mapper.Map<IEnumerable<FrameResponse>>(frames);
+        listFrameresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         return listFrameresponse;
     }
 

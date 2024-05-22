@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Sticker;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Sticker;
+using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Sticker;
 using PhotoboothBranchService.Application.Services.StickerServices;
 
 namespace PhotoboothBranchService.Api.Controllers;

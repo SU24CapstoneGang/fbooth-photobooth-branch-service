@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PhotoboothBranchService.Application.DTOs.RequestModels.Filter
+﻿namespace PhotoboothBranchService.Application.DTOs.Filter
 {
     public class UpdateFilterRequest
     {

@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
-using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Session;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Session;
+using PhotoboothBranchService.Application.DTOs.Session;
+using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 
@@ -50,9 +48,9 @@ public class SessionService : ISessionService
 
     public async Task<IEnumerable<SessionResponse>> GetAllPagingAsync(SessionFilter filter, PagingModel paging)
     {
-        var sessions = (await _sessionRepository.GetAllAsync()).AutoPaging(paging.PageSize,paging.PageIndex);
+        var sessions = (await _sessionRepository.GetAllAsync()).ToList().AutoFilter(filter);
         var listSessionresponse = _mapper.Map<IEnumerable<SessionResponse>>(sessions.ToList());
-        listSessionresponse.AutoFilter(filter);
+        listSessionresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         return listSessionresponse;
     }
 

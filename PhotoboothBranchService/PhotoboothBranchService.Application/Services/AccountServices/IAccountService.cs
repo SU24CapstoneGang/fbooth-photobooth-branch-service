@@ -1,7 +1,6 @@
-﻿using PhotoboothBranchService.Application.DTOs.Account;
+﻿using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Authentication;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Camera;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Enum;
 

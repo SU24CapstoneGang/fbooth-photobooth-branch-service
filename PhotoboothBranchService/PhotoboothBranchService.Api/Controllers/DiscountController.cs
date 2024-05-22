@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Discount;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Discount;
+using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Discount;
 using PhotoboothBranchService.Application.Services.DiscountServices;
 
 namespace PhotoboothBranchService.Api.Controllers

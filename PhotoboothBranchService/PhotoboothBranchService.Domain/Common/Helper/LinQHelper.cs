@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 
-namespace Beanbox.Business.Commons.Helpers
+namespace PhotoboothBranchService.Domain.Common.Helper
 {
     public static class LinQHelper
     {
-        public static IEnumerable<TEntity>? AutoFilter<TEntity, TFilter>(this IEnumerable<TEntity> query, TFilter filterObject)
+        public static List<TEntity>? AutoFilter<TEntity, TFilter>(this List<TEntity> query, TFilter filterObject)
         {
             Func<TEntity, TFilter, bool> isContain = (TEntity e, TFilter filterObject) =>
             {

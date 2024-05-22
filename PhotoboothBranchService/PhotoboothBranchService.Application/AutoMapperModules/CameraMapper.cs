@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.Common.Helpers;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Camera;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Camera;
+using PhotoboothBranchService.Application.DTOs.Camera;
 using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Application.AutoMapperModules;

@@ -1,4 +1,4 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.RequestModels.Session
+﻿namespace PhotoboothBranchService.Application.DTOs.Session
 {
     public class SessionFilter
     {

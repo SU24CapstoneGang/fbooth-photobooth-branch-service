@@ -1,6 +1,6 @@
 ﻿using PhotoboothBranchService.Domain.Enum;
 
-namespace PhotoboothBranchService.Application.DTOs.ResponseModels.Camera;
+namespace PhotoboothBranchService.Application.DTOs.Camera;
 
 public class Cameraresponse
 {

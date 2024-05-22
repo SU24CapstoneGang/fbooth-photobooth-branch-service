@@ -1,18 +1,15 @@
 ﻿using AutoMapper;
-using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.Common.Exceptions;
+using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Authentication;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Camera;
 using PhotoboothBranchService.Application.Services.FirebaseServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
+using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
-using System.Data;
-using System.Security.Principal;
 
 namespace PhotoboothBranchService.Application.Services.AccountServices
 {
@@ -26,7 +23,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
         private readonly IJwtService _jwtService;
         private readonly IFirebaseService _firebaseService;
 
-        public AccountService(IAccountRepository accountRepository,  IJwtTokenGenerator jwtTokenGenerator, 
+        public AccountService(IAccountRepository accountRepository, IJwtTokenGenerator jwtTokenGenerator,
             IRoleRepository roleRepository, IMapper mapper, IPasswordHasher passwordHasher,
             IJwtService jwtService, IFirebaseService firebaseService)
         {
@@ -92,9 +89,9 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<IEnumerable<AccountRespone>> GetAllPagingAsync(AccountFilter filter, PagingModel paging)
         {
-            var cameras = (await _accountRepository.GetAllAsync()).AutoPaging(paging.PageSize, paging.PageIndex);
-            var listAccountresponse = _mapper.Map<IEnumerable<AccountRespone>>(cameras.ToList());
-            listAccountresponse.AutoFilter(filter);
+            var cameras = (await _accountRepository.GetAllAsync()).ToList().AutoFilter(filter);
+            var listAccountresponse = _mapper.Map<IEnumerable<AccountRespone>>(cameras);
+            listAccountresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
             return listAccountresponse;
         }
 
@@ -136,7 +133,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                     var newAccount = _mapper.Map<Account>(request);
                     newAccount.SetPassword(request.Password, _passwordHasher);
                     newAccount.RoleID = userRole.RoleID;
-                    newAccount.Status = AccountStatus.Active;   
+                    newAccount.Status = AccountStatus.Active;
 
                     var result = await _accountRepository.CreateAccount(newAccount);
                     var accountRespone = _mapper.Map<AccountRegisterResponse>(result);
@@ -157,5 +154,5 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             var account = (await _accountRepository.GetAsync(a => a.Email.Equals(email)));
             return _mapper.Map<IEnumerable<AccountRespone>>(account.ToList());
         }
-    } 
+    }
 }

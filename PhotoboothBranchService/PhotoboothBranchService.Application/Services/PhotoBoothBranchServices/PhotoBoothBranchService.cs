@@ -1,14 +1,10 @@
 ﻿using AutoMapper;
-using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.PhotoBoothBranch;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.PhotoBoothBranch;
-using PhotoboothBranchService.Domain.Common.Interfaces;
+using PhotoboothBranchService.Application.DTOs.PhotoBoothBranch;
+using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
-using System.Xml.Linq;
 
 namespace PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
 
@@ -54,9 +50,9 @@ public class PhotoBoothBranchService : IPhotoBoothBranchService
 
     public async Task<IEnumerable<PhotoBoothBranchresponse>> GetAllPagingAsync(PhotoBoothBranchFilter filter, PagingModel paging)
     {
-        var photoBoothBranches = (await _photoBoothBranchRepository.GetAllAsync()).AutoPaging(paging.PageSize,paging.PageIndex);
-        var listPhotoBoothBranchresponse = _mapper.Map<IEnumerable<PhotoBoothBranchresponse>>(photoBoothBranches.ToList());
-        listPhotoBoothBranchresponse.AutoFilter(filter);
+        var photoBoothBranches = (await _photoBoothBranchRepository.GetAllAsync()).ToList().AutoFilter(filter);
+        var listPhotoBoothBranchresponse = _mapper.Map<IEnumerable<PhotoBoothBranchresponse>>(photoBoothBranches);
+        listPhotoBoothBranchresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         return listPhotoBoothBranchresponse;
     }
 

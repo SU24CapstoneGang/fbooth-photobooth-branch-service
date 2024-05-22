@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.AutoMapperModules
 {

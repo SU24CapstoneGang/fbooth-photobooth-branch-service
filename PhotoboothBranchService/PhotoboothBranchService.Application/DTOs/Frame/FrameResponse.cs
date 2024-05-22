@@ -1,4 +1,4 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.ResponseModels.Frame
+﻿namespace PhotoboothBranchService.Application.DTOs.Frame
 {
     public class FrameResponse
     {

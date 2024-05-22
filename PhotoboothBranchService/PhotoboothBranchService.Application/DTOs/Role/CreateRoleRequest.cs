@@ -1,4 +1,4 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.RequestModels.Role
+﻿namespace PhotoboothBranchService.Application.DTOs.Role
 {
     public class CreateRoleRequest
     {

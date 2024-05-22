@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Camera;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Camera;
+using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Camera;
 using PhotoboothBranchService.Application.Services.CameraServices;
 
 namespace PhotoboothBranchService.Api.Controllers
@@ -47,7 +46,7 @@ namespace PhotoboothBranchService.Api.Controllers
         // Read all with paging and filter
         [HttpGet("paging")]
         public async Task<ActionResult<IEnumerable<Cameraresponse>>> GetPagingCameras(
-            [FromQuery] CameraFilter cameraFilter, PagingModel pagingModel)
+            [FromQuery] CameraFilter cameraFilter, [FromQuery] PagingModel pagingModel)
         {
             try
             {

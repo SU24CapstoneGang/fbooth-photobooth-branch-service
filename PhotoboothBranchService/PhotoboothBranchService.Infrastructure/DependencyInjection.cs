@@ -1,16 +1,10 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using PhotoboothBranchService.Application.Common.Helpers;
-using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using PhotoboothBranchService.Infrastructure.Repositories;
-using System.ComponentModel.Design;
-using System.Text;
 
 namespace PhotoboothBranchService.Infrastructure
 {

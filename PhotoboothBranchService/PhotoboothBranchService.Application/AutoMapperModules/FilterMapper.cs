@@ -1,13 +1,7 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.Common.Helpers;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Filter;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Filter;
+using PhotoboothBranchService.Application.DTOs.Filter;
 using PhotoboothBranchService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.AutoMapperModules
 {
@@ -15,7 +9,7 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
     {
         public FilterMapper()
         {
-            CreateMap<CreateFilterRequest,Filter>().ReverseMap().HandleNullProperty();
+            CreateMap<CreateFilterRequest, Filter>().ReverseMap().HandleNullProperty();
             CreateMap<UpdateFilterRequest, Filter>().ReverseMap().HandleNullProperty();
             CreateMap<Filterresponse, Filter>().ReverseMap().HandleNullProperty();
         }

@@ -1,6 +1,5 @@
-﻿using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Camera;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Camera;
+﻿using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Camera;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 
 namespace PhotoboothBranchService.Application.Services.CameraServices;

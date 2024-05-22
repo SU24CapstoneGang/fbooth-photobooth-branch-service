@@ -1,4 +1,4 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.RequestModels.Sticker
+﻿namespace PhotoboothBranchService.Application.DTOs.Sticker
 {
     public class StickerFilter
     {

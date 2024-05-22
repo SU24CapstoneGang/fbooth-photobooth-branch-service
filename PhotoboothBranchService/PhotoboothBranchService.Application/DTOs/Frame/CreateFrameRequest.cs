@@ -1,4 +1,4 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.RequestModels.Frame
+﻿namespace PhotoboothBranchService.Application.DTOs.Frame
 {
     public class CreateFrameRequest
     {

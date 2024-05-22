@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
-using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Filter;
-using PhotoboothBranchService.Application.DTOs.ResponseModels.Filter;
+using PhotoboothBranchService.Application.DTOs.Filter;
+using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 
@@ -53,9 +51,9 @@ public class FilterService : IFilterService
 
     public async Task<IEnumerable<Filterresponse>> GetAllPagingAsync(FilterFilter filter, PagingModel paging)
     {
-        var filters = (await _filterRepository.GetAllAsync()).AutoPaging(paging.PageSize, paging.PageIndex);
-        var listFilterresponse = _mapper.Map<IEnumerable<Filterresponse>>(filters.ToList());
-        listFilterresponse.AutoFilter(filter);
+        var filters = (await _filterRepository.GetAllAsync()).ToList().AutoFilter(filter);
+        var listFilterresponse = _mapper.Map<IEnumerable<Filterresponse>>(filters);
+        listFilterresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         return listFilterresponse;
     }
 
