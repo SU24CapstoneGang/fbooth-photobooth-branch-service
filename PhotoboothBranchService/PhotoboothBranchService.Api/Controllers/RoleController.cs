@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
 using PhotoboothBranchService.Application.DTOs.RequestModels.Role;
 using PhotoboothBranchService.Application.DTOs.ResponseModels.Role;
 using PhotoboothBranchService.Application.Services.RoleServices;
@@ -49,11 +48,11 @@ public class RoleController : ControllerBaseApi
     //get all with filter and paging
     [HttpGet("paging")]
     public async Task<ActionResult<IEnumerable<RoleResponse>>> GetAllRoles(
-        [FromBody] FilterPagingModel<RoleFilter> filterPagingModel)
+        [FromQuery] RoleFilter roleFilter, [FromQuery] PagingModel pagingModel)
     {
         try
         {
-            var roles = await _roleService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            var roles = await _roleService.GetAllPagingAsync(roleFilter, pagingModel);
             return Ok(roles);
         }
         catch (Exception ex)

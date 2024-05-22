@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
 using PhotoboothBranchService.Application.DTOs.RequestModels.Sticker;
 using PhotoboothBranchService.Application.DTOs.ResponseModels.Sticker;
 using PhotoboothBranchService.Application.Services.StickerServices;
@@ -48,11 +47,11 @@ public class StickerController : ControllerBaseApi
     //get all with filter and paging
     [HttpGet("paging")]
     public async Task<ActionResult<IEnumerable<StickerResponse>>> GetAllStickers(
-        [FromBody] FilterPagingModel<StickerFilter> filterPagingModel)
+        [FromQuery] StickerFilter stickerFilter, PagingModel pagingModel)
     {
         try
         {
-            var stickers = await _stickerService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            var stickers = await _stickerService.GetAllPagingAsync(stickerFilter, pagingModel);
             return Ok(stickers);
         }
         catch (Exception ex)

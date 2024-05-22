@@ -1,7 +1,6 @@
 ﻿// PrintersController.cs
 using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
 using PhotoboothBranchService.Application.DTOs.RequestModels.Printer;
 using PhotoboothBranchService.Application.DTOs.ResponseModels.Printer;
 using PhotoboothBranchService.Application.Services.PrinterServices;
@@ -49,11 +48,11 @@ public class PrintersController : ControllerBaseApi
     //get all with filter and paging
     [HttpGet("paging")]
     public async Task<ActionResult<IEnumerable<PrinterResponse>>> GetAllPrinters(
-        [FromBody] FilterPagingModel<PrinterFilter> filterPagingModel)
+        [FromQuery] PrinterFilter printerFilter, [FromQuery] PagingModel pagingModel)
     {
         try
         {
-            var printers = await _printerService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            var printers = await _printerService.GetAllPagingAsync(printerFilter, pagingModel);
             return Ok(printers);
         }
         catch (Exception ex)

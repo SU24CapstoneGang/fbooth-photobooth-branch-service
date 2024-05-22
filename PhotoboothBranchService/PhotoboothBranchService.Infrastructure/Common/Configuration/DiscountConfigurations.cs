@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -28,8 +29,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(d => d.CreateDate)
                 .IsRequired();
 
-            builder.Property(d => d.LastModified)
-                .IsRequired();
+            builder.Property(d => d.LastModified);
 
             // Discount status enum mapping
             builder.Property(d => d.Status)
@@ -43,6 +43,12 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .WithOne(o => o.Discount)
                 .HasForeignKey(o => o.DiscountID)
                 .IsRequired(false); // Một ưu đãi có thể không được sử dụng trong bất kỳ đơn hàng nào
+
+            //auto add CreateDate and ignore change after update
+            builder.Property(a => a.CreateDate)
+              .ValueGeneratedOnAdd()
+              .HasDefaultValue(DateTime.UtcNow)
+              .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
         }
     }
 }

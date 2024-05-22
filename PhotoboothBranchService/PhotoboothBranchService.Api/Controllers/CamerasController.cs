@@ -1,13 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.RequestModels;
 using PhotoboothBranchService.Application.DTOs.RequestModels.Camera;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
 using PhotoboothBranchService.Application.DTOs.ResponseModels.Camera;
 using PhotoboothBranchService.Application.Services.CameraServices;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
@@ -52,11 +47,11 @@ namespace PhotoboothBranchService.Api.Controllers
         // Read all with paging and filter
         [HttpGet("paging")]
         public async Task<ActionResult<IEnumerable<Cameraresponse>>> GetPagingCameras(
-            [FromBody] FilterPagingModel<CameraFilter> filterPagingModel)
+            [FromQuery] CameraFilter cameraFilter, PagingModel pagingModel)
         {
             try
             {
-                var cameras = await _cameraService.GetAllPagingAsync(filterPagingModel.Filter,filterPagingModel.Paging);
+                var cameras = await _cameraService.GetAllPagingAsync(cameraFilter, pagingModel);
                 return Ok(cameras);
             }
             catch (Exception ex)

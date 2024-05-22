@@ -6,7 +6,7 @@
         public string FilterName { get; set; }
         public string FilterURL { get; set; }
         public DateTime CreatedDate { get; set; }
-        public DateTime LastModified { get; set; }
+        public DateTime? LastModified { get; set; }
         public virtual List<EffectsPackLog> EffectsPackLogs { get; set; }
         public Guid ThemeFilterID { get; set; }
         public virtual ThemeFilter ThemeFilter { get; set; }

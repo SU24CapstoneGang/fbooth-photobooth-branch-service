@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
 using PhotoboothBranchService.Application.DTOs.RequestModels.Frame;
 using PhotoboothBranchService.Application.DTOs.ResponseModels.Frame;
 using PhotoboothBranchService.Application.Services.FrameServices;
@@ -50,11 +48,11 @@ public class FrameController : ControllerBaseApi
     // Read with paging and filter
     [HttpGet("paging")]
     public async Task<ActionResult<IEnumerable<FrameResponse>>> GetPagingFrames(
-        [FromBody] FilterPagingModel<FrameFilter> filterPagingModel)
+        [FromQuery] FrameFilter frameFilter, [FromQuery] PagingModel pagingModel)
     {
         try
         {
-            var frames = await _frameService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            var frames = await _frameService.GetAllPagingAsync(frameFilter, pagingModel);
             return Ok(frames);
         }
         catch (Exception ex)
