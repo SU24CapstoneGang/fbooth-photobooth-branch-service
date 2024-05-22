@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
 
@@ -28,14 +29,19 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(f => f.CreatedDate)
                 .IsRequired();
 
-            builder.Property(f => f.LastModified)
-                .IsRequired();
+            builder.Property(f => f.LastModified);
 
             // Relationship with EffectsPack
             builder.HasMany(f => f.EffectsPackLogs)
                 .WithOne(ep => ep.Frame)
                 .HasForeignKey(ep => ep.FrameID)
                 .IsRequired();
+
+            //auto add CreateDate and ignore change after update
+            builder.Property(a => a.CreatedDate)
+              .ValueGeneratedOnAdd()
+              .HasDefaultValue(DateTime.UtcNow)
+              .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
         }
     }
 }

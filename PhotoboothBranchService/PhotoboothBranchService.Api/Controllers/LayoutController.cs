@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
 using PhotoboothBranchService.Application.DTOs.RequestModels.Layout;
 using PhotoboothBranchService.Application.DTOs.ResponseModels.Layout;
 using PhotoboothBranchService.Application.Services.LayoutServices;
@@ -49,11 +48,11 @@ public class LayoutController : ControllerBaseApi
     // gat all with filter and paging
     [HttpGet("paging")]
     public async Task<ActionResult<IEnumerable<Layoutresponse>>> GetAllLayouts(
-        [FromBody] FilterPagingModel<LayoutFilter> filterPagingModel)
+        [FromQuery] LayoutFilter layoutFilter, [FromQuery] PagingModel pagingModel)
     {
         try
         {
-            var layouts = await _layoutService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            var layouts = await _layoutService.GetAllPagingAsync(layoutFilter, pagingModel);
             return Ok(layouts);
         }
         catch (Exception ex)

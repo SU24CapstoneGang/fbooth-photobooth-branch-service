@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
 using PhotoboothBranchService.Application.DTOs.RequestModels.Filter;
 using PhotoboothBranchService.Application.DTOs.ResponseModels.Filter;
 using PhotoboothBranchService.Application.Services.FilterServices;
@@ -49,11 +48,11 @@ public class FilterController : ControllerBaseApi
     // Read with paging and filter
     [HttpGet("paging")]
     public async Task<ActionResult<IEnumerable<Filterresponse>>> GetAllFilters(
-        [FromBody] FilterPagingModel<FilterFilter> filterPagingModel)
+        [FromQuery] FilterFilter filterFilter, [FromQuery] PagingModel pagingModel)
     {
         try
         {
-            var filters = await _filterService.GetAllPagingAsync(filterPagingModel.Filter,filterPagingModel.Paging);
+            var filters = await _filterService.GetAllPagingAsync(filterFilter, pagingModel);
             return Ok(filters);
         }
         catch (Exception ex)

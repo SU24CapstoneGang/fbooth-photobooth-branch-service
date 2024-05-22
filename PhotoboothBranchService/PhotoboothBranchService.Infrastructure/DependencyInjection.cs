@@ -25,8 +25,9 @@ namespace PhotoboothBranchService.Infrastructure
 
             //Repositories
             services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<IPrinterRepository, PrinterRepository>();
             services.AddScoped<ICameraRepository, CameraRepository>();
+            services.AddScoped<IDiscountRepository, DiscountRepository>();
+            services.AddScoped<IPrinterRepository, PrinterRepository>();
             services.AddScoped<IPhotoBoothBranchRepository, PhotoBoothBranchRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IFrameRepository, FrameRepository>();

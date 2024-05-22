@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Application.Services.CameraServices;
+using PhotoboothBranchService.Application.Services.DiscountServices;
 using PhotoboothBranchService.Application.Services.FilterServices;
 using PhotoboothBranchService.Application.Services.FirebaseServices;
 using PhotoboothBranchService.Application.Services.FrameServices;
@@ -28,6 +29,7 @@ namespace PhotoboothBranchService.Application
             //Service
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ICameraService, CameraService>();
+            services.AddScoped<IDiscountService, DiscountService>();
             services.AddScoped<IPhotoBoothBranchService, PhotoBoothBranchService>();
             services.AddScoped<IPrinterService, PrinterService>();
             services.AddScoped<IRoleService, RoleService>();
@@ -36,7 +38,11 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IStickerService, StickerService>();
             services.AddScoped<ILayoutService, LayoutService>();
             services.AddScoped<IFirebaseService, FirebaseService>();
+
+
+            //Password hasher
             services.AddScoped<IPasswordHasher, PasswordHasher>();
+            //JWT service
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
             // Add http client
             services.AddHttpClient<IJwtService, JwtService>();

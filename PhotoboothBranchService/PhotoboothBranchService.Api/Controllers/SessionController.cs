@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
 using PhotoboothBranchService.Application.DTOs.RequestModels.Session;
 using PhotoboothBranchService.Application.DTOs.ResponseModels.Session;
 using PhotoboothBranchService.Application.Services.SessionServices;
@@ -48,11 +47,11 @@ public class SessionController : ControllerBaseApi
     //get all with filter and paging
     [HttpGet("paging")]
     public async Task<ActionResult<IEnumerable<SessionResponse>>> GetAllSessions(
-        [FromBody] FilterPagingModel<SessionFilter> filterPagingModel)
+        [FromQuery] SessionFilter sessionFilter, [FromQuery] PagingModel pagingModel)
     {
         try
         {
-            var sessions = await _sessionService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            var sessions = await _sessionService.GetAllPagingAsync(sessionFilter, pagingModel);
             return Ok(sessions);
         }
         catch (Exception ex)

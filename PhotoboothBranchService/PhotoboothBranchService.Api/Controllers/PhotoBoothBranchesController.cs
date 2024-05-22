@@ -1,7 +1,6 @@
 ﻿// PhotoBoothBranchesController.cs
 using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
+using PhotoboothBranchService.Application.DTOs.RequestModels;
 using PhotoboothBranchService.Application.DTOs.RequestModels.PhotoBoothBranch;
 using PhotoboothBranchService.Application.DTOs.ResponseModels.PhotoBoothBranch;
 using PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
@@ -50,11 +49,11 @@ public class PhotoBoothBranchesController : ControllerBaseApi
     //get all with filter and paging
     [HttpGet("paging")]
     public async Task<ActionResult<IEnumerable<PhotoBoothBranchresponse>>> GetAllPhotoBoothBranches(
-        [FromBody] FilterPagingModel<PhotoBoothBranchFilter> filterPagingModel)
+        [FromQuery] PhotoBoothBranchFilter photoBoothBranchFilter, [FromQuery] PagingModel pagingModel)
     {
         try
         {
-            var branches = await _photoBoothBranchService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            var branches = await _photoBoothBranchService.GetAllPagingAsync(photoBoothBranchFilter, pagingModel);
             return Ok(branches);
         }
         catch (Exception ex)

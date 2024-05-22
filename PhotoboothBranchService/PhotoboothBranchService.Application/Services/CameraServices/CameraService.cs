@@ -64,7 +64,7 @@ public class CameraService : ICameraService
 
     public async Task<IEnumerable<Cameraresponse>> GetByName(string name)
     {
-        var cameras = await _cameraRepository.GetAsync(c => c.ModelName.Equals(name));
+        var cameras = await _cameraRepository.GetAsync(c => c.ModelName.Contains(name));
         return _mapper.Map<IEnumerable<Cameraresponse>>(cameras.ToList());
     }
 

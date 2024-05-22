@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs.RequestModels;
-using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
 using PhotoboothBranchService.Application.DTOs.RequestModels.Discount;
 using PhotoboothBranchService.Application.DTOs.ResponseModels.Discount;
 using PhotoboothBranchService.Application.Services.DiscountServices;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
@@ -51,11 +47,11 @@ namespace PhotoboothBranchService.Api.Controllers
         // Read all with filter and paging
         [HttpGet("paging")]
         public async Task<ActionResult<IEnumerable<Discountresponse>>> GetPagingDiscounts(
-            [FromBody] FilterPagingModel<DiscountFilter> filterPagingModel)
+            [FromQuery] DiscountFilter discountFilter, [FromQuery] PagingModel pagingModel)
         {
             try
             {
-                var discounts = await _discountService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+                var discounts = await _discountService.GetAllPagingAsync(discountFilter, pagingModel);
                 return Ok(discounts);
             }
             catch (Exception ex)
