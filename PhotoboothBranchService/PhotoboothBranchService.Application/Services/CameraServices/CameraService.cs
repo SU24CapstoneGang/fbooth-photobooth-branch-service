@@ -64,7 +64,7 @@ public class CameraService : ICameraService
 
     public async Task<IEnumerable<Cameraresponse>> GetByName(string name)
     {
-        var cameras = await _cameraRepository.GetAsync(c => c.ModelName.Equals(name));
+        var cameras = await _cameraRepository.GetAsync(c => c.ModelName.Contains(name));
         return _mapper.Map<IEnumerable<Cameraresponse>>(cameras.ToList());
     }
 
@@ -74,7 +74,7 @@ public class CameraService : ICameraService
         var camera = (await _cameraRepository.GetAsync(c => c.CameraID == id)).FirstOrDefault();
         if (camera == null)
         {
-            throw new KeyNotFoundException("Printer not found.");
+            throw new KeyNotFoundException("Camera not found.");
         }
 
         var updateCamera = _mapper.Map(updateModel, camera);

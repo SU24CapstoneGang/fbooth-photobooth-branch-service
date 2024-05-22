@@ -16,11 +16,18 @@ public class AccountRepository : IAccountRepository
     }
 
     //Create
-    public async Task<Account> AddAsync(Account account)
+    public async Task<Account> CreateAccount(Account account)
     {
-       var result =  await _dbContext.AddAsync(account);
+        var result = await _dbContext.AddAsync(account);
         await _dbContext.SaveChangesAsync();
         return result.Entity;
+    }
+
+    public async Task<Guid> AddAsync(Account account)
+    {
+        await _dbContext.AddAsync(account);
+        await _dbContext.SaveChangesAsync();
+        return account.AccountID;
     }
 
     //Update
@@ -54,8 +61,5 @@ public class AccountRepository : IAccountRepository
         return await Task.FromResult(_dbContext.Accounts.Where(predicate).AsQueryable());
     }
 
-    Task<Guid> IRepositoryBase<Account>.AddAsync(Account entity)
-    {
-        throw new NotImplementedException();
-    }
+    
 }

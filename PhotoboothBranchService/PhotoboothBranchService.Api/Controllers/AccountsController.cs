@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Authentication;
+using PhotoboothBranchService.Application.DTOs.RequestModels.Common;
 using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Domain.Enum;
 
@@ -15,6 +15,117 @@ public class AccountsController : ControllerBaseApi
     {
         _accountService = accountService;
     }
+
+    //// Create
+    //[HttpPost]
+    //public async Task<ActionResult<Guid>> CreateAccount(CreateAccountRequestModel createAccountRequest)
+    //{
+    //    try
+    //    {
+    //        var id = await _accountService.CreateAsync(createAccountRequest);
+    //        return Ok(id);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, $"An error occurred while creating the account: {ex.Message}");
+    //    }
+    //}
+
+    // Read all
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<AccountRespone>>> GetAllAccount()
+    {
+        try
+        {
+            var account = await _accountService.GetAllAsync();
+            return Ok(account);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving accounts: {ex.Message}");
+        }
+    }
+    // Read all with paging and filter
+    [HttpGet("paging")]
+    public async Task<ActionResult<IEnumerable<AccountRespone>>> GetPagingAccounts(
+        [FromBody] FilterPagingModel<AccountFilter> filterPagingModel)
+    {
+        try
+        {
+            var account = await _accountService.GetAllPagingAsync(filterPagingModel.Filter, filterPagingModel.Paging);
+            return Ok(account);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving accounts: {ex.Message}");
+        }
+    }
+    // Read by name
+    [HttpGet("email/{email}")]
+    public async Task<ActionResult<IEnumerable<AccountRespone>>> GetAccountByEmail(string email)
+    {
+        try
+        {
+            var account = await _accountService.GetByEmail(email);
+            return Ok(account);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving account by name: {ex.Message}");
+        }
+    }
+
+    // Read by ID
+    [HttpGet("{id}")]
+    public async Task<ActionResult<AccountRespone>> GetAccountById(Guid id)
+    {
+        try
+        {
+            var account = await _accountService.GetByIdAsync(id);
+            if (account == null)
+            {
+                return NotFound();
+            }
+            return Ok(account);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving the account by ID: {ex.Message}");
+        }
+    }
+
+    // Update
+    [HttpPut("{id}")]
+    public async Task<ActionResult> UpdateAccount(Guid id, UpdateAccountRequestModel updateAccountRequest)
+    {
+        try
+        {
+            await _accountService.UpdateAsync(id, updateAccountRequest);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while updating the account: {ex.Message}");
+        }
+    }
+
+    // Delete
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteAccount(Guid id)
+    {
+        try
+        {
+            await _accountService.DeleteAsync(id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while deleting the account: {ex.Message}");
+        }
+    }
+
+
+
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequestModel request)

@@ -1,14 +1,18 @@
 ﻿using AutoMapper;
+using Beanbox.Business.Commons.Helpers;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Authentication;
 using PhotoboothBranchService.Application.DTOs.RequestModels;
+using PhotoboothBranchService.Application.DTOs.ResponseModels.Camera;
 using PhotoboothBranchService.Application.Services.FirebaseServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
+using System.Data;
+using System.Security.Principal;
 
 namespace PhotoboothBranchService.Application.Services.AccountServices
 {
@@ -35,24 +39,63 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             _firebaseService = firebaseService;
         }
 
-        public Task<Guid> CreateAsync(CreateAccountRequestModel createModel)
+        public async Task<Guid> CreateAsync(CreateAccountRequestModel createModel)
         {
-            throw new NotImplementedException();
+            Account account = _mapper.Map<Account>(createModel);
+            return await _accountRepository.AddAsync(account);
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var accounts = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
+                if (accounts != null)
+                {
+                    var userRole = (await _roleRepository.GetAsync(r => r.RoleName == UserRole.Admin.ToString())).FirstOrDefault();
+                    if (userRole != null)
+                    {
+                        throw new Exception("Admin account cannit be delete!");
+                    }
+                    await _accountRepository.RemoveAsync(accounts);
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
 
-        public Task<IEnumerable<AccountRespone>> GetAllAsync()
+        public async Task<IEnumerable<AccountRespone>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var accounts = await _accountRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<AccountRespone>>(accounts.ToList());
         }
 
-        public Task<AccountRespone> GetByIdAsync(Guid id)
+        public async Task<AccountRespone> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var account = await _accountRepository.GetAsync(a => a.AccountID == id);
+            return _mapper.Map<AccountRespone>(account);
+        }
+
+        public async Task UpdateAsync(Guid id, UpdateAccountRequestModel updateModel)
+        {
+            var account = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
+            if (account == null)
+            {
+                throw new KeyNotFoundException("Account not found.");
+            }
+
+            var updateCamera = _mapper.Map(updateModel, account);
+            await _accountRepository.UpdateAsync(updateCamera);
+        }
+
+        public async Task<IEnumerable<AccountRespone>> GetAllPagingAsync(AccountFilter filter, PagingModel paging)
+        {
+            var cameras = (await _accountRepository.GetAllAsync()).AutoPaging(paging.PageSize, paging.PageIndex);
+            var listAccountresponse = _mapper.Map<IEnumerable<AccountRespone>>(cameras.ToList());
+            listAccountresponse.AutoFilter(filter);
+            return listAccountresponse;
         }
 
         public async Task<LoginResponeModel> Login(LoginRequestModel request)
@@ -75,7 +118,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             throw new BadRequestException("Refresh token fail!!!");
         }
 
-        public async Task<AccountRespone> Register(CreateAccountRequestModel request, UserRole role)
+        public async Task<AccountRegisterResponse> Register(CreateAccountRequestModel request, UserRole role)
         {
             var userRole = (await _roleRepository.GetAsync(r => r.RoleName == role.ToString())).FirstOrDefault();
 
@@ -93,9 +136,15 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                     var newAccount = _mapper.Map<Account>(request);
                     newAccount.SetPassword(request.Password, _passwordHasher);
                     newAccount.RoleID = userRole.RoleID;
+                    newAccount.Status = AccountStatus.Active;   
 
-                    var result = await _accountRepository.AddAsync(newAccount);
-                    var accountRespone = _mapper.Map<AccountRespone>(result);
+                    var result = await _accountRepository.CreateAccount(newAccount);
+                    var accountRespone = _mapper.Map<AccountRegisterResponse>(result);
+
+                    var loginViewModel = await _jwtService.GetForCredentialsAsync(request.Email, request.Password);
+                    accountRespone.TokenId = loginViewModel.TokenId;
+                    accountRespone.RefreshToken = loginViewModel.RefreshToken;
+
                     return accountRespone;
                 }
                 throw new BadRequestException("Register fail!!!");
@@ -103,14 +152,10 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             throw new Exception("User role does not exist in the system.");
         }
 
-        public Task UpdateAsync(Guid id, UpdateAccountRequestModel updateModel)
+        public async Task<IEnumerable<AccountRespone>> GetByEmail(string email)
         {
-            throw new NotImplementedException();
+            var account = (await _accountRepository.GetAsync(a => a.Email.Equals(email)));
+            return _mapper.Map<IEnumerable<AccountRespone>>(account.ToList());
         }
-
-        Task<IEnumerable<AccountRespone>> IService<AccountRespone, CreateAccountRequestModel, UpdateAccountRequestModel, AccountFilter, PagingModel>.GetAllPagingAsync(AccountFilter filter, PagingModel paging)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    } 
 }
