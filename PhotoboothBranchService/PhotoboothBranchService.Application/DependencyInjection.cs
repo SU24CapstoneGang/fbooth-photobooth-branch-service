@@ -16,7 +16,6 @@ using PhotoboothBranchService.Application.Services.FrameServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Application.Services.LayoutServices;
 using PhotoboothBranchService.Application.Services.MapStickerServices;
-using PhotoboothBranchService.Application.Services.OrderServices;
 using PhotoboothBranchService.Application.Services.PaymentMethodServices;
 using PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
 using PhotoboothBranchService.Application.Services.PrinterServices;
@@ -29,7 +28,6 @@ using PhotoboothBranchService.Application.Services.ThemeFrameServices;
 using PhotoboothBranchService.Application.Services.ThemeStickerServices;
 using PhotoboothBranchService.Application.Services.TransactionHistoryServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
-using PhotoboothBranchService.Domain.IRepository;
 using System.Reflection;
 
 namespace PhotoboothBranchService.Application
@@ -48,7 +46,6 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IFrameService, FrameService>();
             services.AddScoped<ILayoutService, LayoutService>();
             services.AddScoped<IMapStickerService, MapStickerService>();
-            services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IPaymentMethodService, PaymentMethodService>();
             services.AddScoped<IPhotoBoothBranchService, PhotoBoothBranchService>();
             services.AddScoped<IPrinterService, PrinterService>();

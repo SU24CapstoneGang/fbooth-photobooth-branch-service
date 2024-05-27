@@ -21,16 +21,19 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(pp => pp.UnitPrice)
                 .IsRequired();
 
+            builder.Property(pp => pp.MinQuantity)
+            .IsRequired(); // Số lượng tối thiểu
+
             builder.Property(pp => pp.CreatedDate)
                 .IsRequired();
 
             builder.Property(pp => pp.LastModified);
 
             // Relationship with FinalPicture
-            builder.HasMany(pp => pp.FinalPictures)
-                .WithOne(fp => fp.PrintPricing)
-                .HasForeignKey(fp => fp.PrintPricingID)
-                .IsRequired();
+            builder.HasMany(pp => pp.Sessions)
+            .WithOne(s => s.PrintPricing)
+            .HasForeignKey(s => s.PrintPricingID)
+            .IsRequired();
 
             //auto add CreateDate and ignore change after update
             builder.Property(a => a.CreatedDate)

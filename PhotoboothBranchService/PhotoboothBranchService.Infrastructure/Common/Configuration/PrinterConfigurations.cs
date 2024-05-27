@@ -33,7 +33,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasOne(p => p.PhotoBoothBranch)
                 .WithOne(pb => pb.Printer)
                 .HasForeignKey<Printer>(p => p.PhotoBoothBranchId)
-                .IsRequired();
+                .IsRequired(false);
         }
     }
 }

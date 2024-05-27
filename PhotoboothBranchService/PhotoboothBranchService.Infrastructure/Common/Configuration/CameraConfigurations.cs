@@ -24,9 +24,6 @@ public class CameraConfigurations : IEntityTypeConfiguration<Camera>
         builder.Property(c => c.LensType)
             .HasMaxLength(50);
 
-        builder.Property(c => c.Lens)
-            .HasMaxLength(100);
-
         builder.Property(c => c.Price)
             .IsRequired();
 
@@ -41,6 +38,6 @@ public class CameraConfigurations : IEntityTypeConfiguration<Camera>
         builder.HasOne(c => c.PhotoBoothBranch)
             .WithOne(pb => pb.Camera)
             .HasForeignKey<Camera>(c => c.PhotoBoothBranchId)
-            .IsRequired();
+            .IsRequired(false);
     }
 }

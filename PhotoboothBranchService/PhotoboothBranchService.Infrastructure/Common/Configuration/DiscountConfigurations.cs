@@ -39,10 +39,10 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     v => (DiscountStatus)Enum.Parse(typeof(DiscountStatus), v));
 
             // Relationship with Order
-            builder.HasMany(d => d.Orders)
-                .WithOne(o => o.Discount)
-                .HasForeignKey(o => o.DiscountID)
-                .IsRequired(false); // Một ưu đãi có thể không được sử dụng trong bất kỳ đơn hàng nào
+            builder.HasMany(d => d.Sessions)
+                .WithOne(s => s.Discount)
+                .HasForeignKey(s => s.DiscountID)
+                .IsRequired(false); // Một ưu đãi có thể không được sử dụng trong bất kỳ Sessions nào
 
             //auto add CreateDate and ignore change after update
             builder.Property(a => a.CreateDate)

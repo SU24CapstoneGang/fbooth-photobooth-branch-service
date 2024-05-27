@@ -16,21 +16,28 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(th => th.TransactionID).HasColumnName("Transaction ID")
                 .ValueGeneratedOnAdd();
 
+            
             // Other properties
-            builder.Property(th => th.FinalPictureNumber)
-                .IsRequired();
 
             builder.Property(th => th.Description)
                 .IsRequired()
-                .HasMaxLength(255);
+                .HasMaxLength(500);
 
             builder.Property(th => th.CreatedDate)
                 .IsRequired();
 
-            // Relationship with Customer
-            builder.HasOne(th => th.Account)
-                .WithMany(c => c.TransactionHistories)
-                .HasForeignKey(th => th.AccountID);
+            builder.Property(th => th.LastModified).IsRequired(false);
+
+            // Mối quan hệ một-một giữa TransactionHistory và Session
+            builder.HasOne(th => th.Session)
+                .WithOne(s => s.TransactionHistory)
+                .HasForeignKey<TransactionHistory>(th => th.SessionID)
+                .IsRequired();
+
+            builder.HasOne(th => th.PaymentMethod)
+            .WithMany(pt => pt.TransactionHistories) // Một PaymentMethod có thể được sử dụng trong nhiều TransactionHistory
+            .HasForeignKey(th => th.PaymentMethodID)
+            .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

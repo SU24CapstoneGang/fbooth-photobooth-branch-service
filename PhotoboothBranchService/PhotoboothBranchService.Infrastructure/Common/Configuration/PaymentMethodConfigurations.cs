@@ -33,11 +33,11 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     v => v.ToString(),
                     v => (PaymentStatus)Enum.Parse(typeof(PaymentStatus), v));
 
-            // Relationship with Order
-            builder.HasMany(pm => pm.Orders)
-                .WithOne(o => o.PaymentMethod)
-                .HasForeignKey(o => o.PaymentMethodID)
-                .IsRequired();
+            // Mối quan hệ một-nhiều giữa PaymentMethod và TransactionHistory
+            builder.HasMany(pm => pm.TransactionHistories)
+            .WithOne(th => th.PaymentMethod)
+            .HasForeignKey(th => th.PaymentMethodID)
+            .IsRequired();
 
             //auto add CreateDate and ignore change after update
             builder.Property(a => a.CreateDate)

@@ -16,7 +16,6 @@ public class AppDbContext : DbContext
     public DbSet<FinalPicture> FinalPictures { get; set; }
     public DbSet<Frame> Frames { get; set; }
     public DbSet<Layout> Layouts { get; set; }
-    public DbSet<Order> Orders { get; set; }
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<PhotoBoothBranch> PhotoBoothBranches { get; set; }
     public DbSet<Printer> Printers { get; set; }
@@ -64,7 +63,6 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new FinalPictureConfigurations());
         modelBuilder.ApplyConfiguration(new FrameConfigurations());
         modelBuilder.ApplyConfiguration(new LayoutConfigurations());
-        modelBuilder.ApplyConfiguration(new OrderConfigurations());
         modelBuilder.ApplyConfiguration(new PaymentMethodConfigurations());
         modelBuilder.ApplyConfiguration(new PhotoBoothBranchConfigurations());
         modelBuilder.ApplyConfiguration(new PrinterConfigurations());

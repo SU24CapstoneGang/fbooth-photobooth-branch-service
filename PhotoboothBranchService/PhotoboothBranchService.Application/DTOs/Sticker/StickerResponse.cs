@@ -1,4 +1,8 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.Sticker
+﻿
+
+using PhotoboothBranchService.Application.DTOs.ThemeSticker;
+
+namespace PhotoboothBranchService.Application.DTOs.Sticker
 {
     public class StickerResponse
     {

@@ -25,7 +25,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasOne(ms => ms.Sticker)
                 .WithMany(s => s.MapStickers) // Assuming Sticker has a collection of MapStickers
                 .HasForeignKey(ms => ms.StickerId)
-                .IsRequired();
+                .IsRequired(false);
         }
     }
 }

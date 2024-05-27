@@ -17,6 +17,13 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .ValueGeneratedOnAdd();
 
             // Other properties
+            builder.Property(s => s.PhotosTaken)
+            .IsRequired(); // Số ảnh đã chụp
+
+            builder.Property(s => s.TotalPrice)
+                .IsRequired(); // Tổng giá
+
+
             builder.Property(s => s.StartTime)
                 .IsRequired();
 
@@ -29,11 +36,41 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasForeignKey(s => s.BranchesID)
                 .IsRequired();
 
-            // Relationship with Order
-            builder.HasOne(s => s.Order)
-                .WithOne(o => o.Session)
-                .HasForeignKey<Session>(s => s.SessionID)
+            // Relationship with Layout
+            builder.HasOne(s => s.Layout)
+                .WithMany(l => l.Sessions)
+                .HasForeignKey(s => s.LayoutID)
+                .IsRequired();
+
+            // Mối quan hệ một-nhieu giữa Session và Discount
+            builder.HasOne(s => s.Discount)
+                .WithMany(d => d.Sessions)
+                .HasForeignKey(s => s.DiscountID)
                 .IsRequired(false);
+
+            // Mối quan hệ một-nhieu giữa Session và PrintPricing
+            builder.HasOne(s => s.PrintPricing)
+                .WithMany(p => p.Sessions)
+                .HasForeignKey(s => s.PrintPricingID)
+                .IsRequired();
+
+            // Mối quan hệ một-nhieu giữa Session và Account
+            builder.HasOne(s => s.Account)
+                .WithMany(a => a.Sessions)
+                .HasForeignKey(s => s.AccountID)
+                .IsRequired(false);
+
+            // Mối quan hệ một-một giữa Session và TransactionHistory
+            builder.HasOne(s => s.TransactionHistory)
+                .WithOne(th => th.Session)
+                .HasForeignKey<TransactionHistory>(th => th.SessionID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Mối quan hệ một-một giữa Session và FinalPicture
+            builder.HasOne(s => s.FinalPicture)
+                .WithOne(fp => fp.Session)
+                .HasForeignKey<FinalPicture>(fp => fp.SessionID)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

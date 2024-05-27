@@ -9,9 +9,11 @@ namespace PhotoboothBranchService.Domain.Entities
         public Guid PictureID { get; set; }
         public virtual FinalPicture FinalPicture { get; set; }
         public virtual List<MapSticker> MapStickers { get; set; }
-        public Guid FrameID { get; set; }
+        public Guid? FrameID { get; set; }
         public virtual Frame Frame { get; set; }
-        public Guid FilterID { get; set; }
+        public Guid? FilterID { get; set; }
         public virtual Filter Filter { get; set; }
+        public Guid LayoutID { get; set; }
+        public virtual Layout Layout { get; set; }
     }
 }

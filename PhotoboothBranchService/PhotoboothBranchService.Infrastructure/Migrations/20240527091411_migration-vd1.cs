@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PhotoboothBranchService.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class PhotoBooth : Migration
+    public partial class migrationvd1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     DiscountCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     RemaniningUsage = table.Column<int>(type: "int", nullable: false),
                     DiscountRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 22, 22, 2, 9, 616, DateTimeKind.Utc).AddTicks(7884)),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 27, 9, 14, 11, 774, DateTimeKind.Utc).AddTicks(6655)),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -35,7 +35,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     LayoutID = table.Column<Guid>(name: "Layout ID", type: "uniqueidentifier", nullable: false),
                     LayoutURL = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LayoutPrice = table.Column<float>(type: "real", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 22, 22, 2, 9, 620, DateTimeKind.Utc).AddTicks(7298)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 27, 9, 14, 11, 778, DateTimeKind.Utc).AddTicks(5901)),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
@@ -49,7 +49,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     PaymentMethodID = table.Column<Guid>(name: "Payment Method ID", type: "uniqueidentifier", nullable: false),
                     PaymentMethodName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 22, 22, 2, 9, 621, DateTimeKind.Utc).AddTicks(4512)),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 27, 9, 14, 11, 778, DateTimeKind.Utc).AddTicks(9564)),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -65,7 +65,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     PrintName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UnitPrice = table.Column<float>(type: "real", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 22, 22, 2, 9, 622, DateTimeKind.Utc).AddTicks(6331)),
+                    MinQuantity = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 27, 9, 14, 11, 780, DateTimeKind.Utc).AddTicks(3867)),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
@@ -128,37 +129,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FinalPictures",
-                columns: table => new
-                {
-                    PictureID = table.Column<Guid>(name: "Picture ID", type: "uniqueidentifier", nullable: false),
-                    PictureURl = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 22, 22, 2, 9, 620, DateTimeKind.Utc).AddTicks(2678)),
-                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PicturePrivacy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PrintQuantity = table.Column<int>(type: "int", nullable: false),
-                    PictureCost = table.Column<float>(type: "real", nullable: false),
-                    LayoutID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PrintPricingID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FinalPictures", x => x.PictureID);
-                    table.ForeignKey(
-                        name: "FK_FinalPictures_Layouts_LayoutID",
-                        column: x => x.LayoutID,
-                        principalTable: "Layouts",
-                        principalColumn: "Layout ID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_FinalPictures_PrintPricings_PrintPricingID",
-                        column: x => x.PrintPricingID,
-                        principalTable: "PrintPricings",
-                        principalColumn: "PrintPricing ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Accounts",
                 columns: table => new
                 {
@@ -193,7 +163,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     FilterName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     FilterURL = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 22, 22, 2, 9, 618, DateTimeKind.Utc).AddTicks(5964)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 27, 9, 14, 11, 777, DateTimeKind.Utc).AddTicks(1149)),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ThemeFilterID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
@@ -216,7 +186,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     FrameName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     FrameURL = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 22, 22, 2, 9, 620, DateTimeKind.Utc).AddTicks(4848)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 27, 9, 14, 11, 778, DateTimeKind.Utc).AddTicks(1040)),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ThemeFrameID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
@@ -239,7 +209,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     StickerName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     StrickerURL = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 22, 22, 2, 9, 624, DateTimeKind.Utc).AddTicks(1841)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 27, 9, 14, 11, 781, DateTimeKind.Utc).AddTicks(4975)),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ThemeStickerID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
@@ -255,56 +225,15 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Orders",
-                columns: table => new
-                {
-                    OrderID = table.Column<Guid>(name: "Order ID", type: "uniqueidentifier", nullable: false),
-                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    QuantityOfPicture = table.Column<int>(type: "int", nullable: false),
-                    TotalPrice = table.Column<float>(type: "real", nullable: false),
-                    SessionID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PaymentMethodID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DiscountID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PictureID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AccountID = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Orders", x => x.OrderID);
-                    table.ForeignKey(
-                        name: "FK_Orders_Accounts_AccountID",
-                        column: x => x.AccountID,
-                        principalTable: "Accounts",
-                        principalColumn: "Account ID");
-                    table.ForeignKey(
-                        name: "FK_Orders_Discounts_DiscountID",
-                        column: x => x.DiscountID,
-                        principalTable: "Discounts",
-                        principalColumn: "Discount ID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Orders_FinalPictures_PictureID",
-                        column: x => x.PictureID,
-                        principalTable: "FinalPictures",
-                        principalColumn: "Picture ID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Orders_PaymentMethods_PaymentMethodID",
-                        column: x => x.PaymentMethodID,
-                        principalTable: "PaymentMethods",
-                        principalColumn: "Payment Method ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "PhotoBoothBranches",
                 columns: table => new
                 {
                     BranchesID = table.Column<Guid>(name: "Branches ID", type: "uniqueidentifier", nullable: false),
                     BranchName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     BranchAddress = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AccountID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    AccountID = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -313,62 +242,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         name: "FK_PhotoBoothBranches_Accounts_AccountID",
                         column: x => x.AccountID,
                         principalTable: "Accounts",
-                        principalColumn: "Account ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TransactionHistories",
-                columns: table => new
-                {
-                    TransactionID = table.Column<Guid>(name: "Transaction ID", type: "uniqueidentifier", nullable: false),
-                    FinalPictureNumber = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AccountID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TransactionHistories", x => x.TransactionID);
-                    table.ForeignKey(
-                        name: "FK_TransactionHistories_Accounts_AccountID",
-                        column: x => x.AccountID,
-                        principalTable: "Accounts",
-                        principalColumn: "Account ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EffectsPackLogs",
-                columns: table => new
-                {
-                    PackID = table.Column<Guid>(name: "Pack ID", type: "uniqueidentifier", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PictureID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FrameID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FilterID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EffectsPackLogs", x => x.PackID);
-                    table.ForeignKey(
-                        name: "FK_EffectsPackLogs_Filters_FilterID",
-                        column: x => x.FilterID,
-                        principalTable: "Filters",
-                        principalColumn: "Filter ID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EffectsPackLogs_FinalPictures_PictureID",
-                        column: x => x.PictureID,
-                        principalTable: "FinalPictures",
-                        principalColumn: "Picture ID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EffectsPackLogs_Frames_FrameID",
-                        column: x => x.FrameID,
-                        principalTable: "Frames",
-                        principalColumn: "Frame ID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Account ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -378,10 +252,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     CameraID = table.Column<Guid>(name: "Camera ID", type: "uniqueidentifier", nullable: false),
                     ModelName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     LensType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Lens = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Price = table.Column<float>(type: "real", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhotoBoothBranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    PhotoBoothBranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -401,7 +274,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     ModelName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Price = table.Column<float>(type: "real", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    PhotoBoothBranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    PhotoBoothBranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -410,8 +283,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         name: "FK_Printers_PhotoBoothBranches_PhotoBoothBranchId",
                         column: x => x.PhotoBoothBranchId,
                         principalTable: "PhotoBoothBranches",
-                        principalColumn: "Branches ID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Branches ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -419,23 +291,137 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 columns: table => new
                 {
                     SessionID = table.Column<Guid>(name: "Session ID", type: "uniqueidentifier", nullable: false),
+                    PhotosTaken = table.Column<int>(type: "int", nullable: false),
+                    TotalPrice = table.Column<double>(type: "float", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    BranchesID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    BranchesID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DiscountID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    PrintPricingID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AccountID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    LayoutID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Sessions", x => x.SessionID);
                     table.ForeignKey(
-                        name: "FK_Sessions_Orders_Session ID",
-                        column: x => x.SessionID,
-                        principalTable: "Orders",
-                        principalColumn: "Order ID");
+                        name: "FK_Sessions_Accounts_AccountID",
+                        column: x => x.AccountID,
+                        principalTable: "Accounts",
+                        principalColumn: "Account ID");
+                    table.ForeignKey(
+                        name: "FK_Sessions_Discounts_DiscountID",
+                        column: x => x.DiscountID,
+                        principalTable: "Discounts",
+                        principalColumn: "Discount ID");
+                    table.ForeignKey(
+                        name: "FK_Sessions_Layouts_LayoutID",
+                        column: x => x.LayoutID,
+                        principalTable: "Layouts",
+                        principalColumn: "Layout ID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Sessions_PhotoBoothBranches_BranchesID",
                         column: x => x.BranchesID,
                         principalTable: "PhotoBoothBranches",
                         principalColumn: "Branches ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Sessions_PrintPricings_PrintPricingID",
+                        column: x => x.PrintPricingID,
+                        principalTable: "PrintPricings",
+                        principalColumn: "PrintPricing ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FinalPictures",
+                columns: table => new
+                {
+                    PictureID = table.Column<Guid>(name: "Picture ID", type: "uniqueidentifier", nullable: false),
+                    PictureURl = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 27, 9, 14, 11, 777, DateTimeKind.Utc).AddTicks(7312)),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PicturePrivacy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SessionID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FinalPictures", x => x.PictureID);
+                    table.ForeignKey(
+                        name: "FK_FinalPictures_Sessions_SessionID",
+                        column: x => x.SessionID,
+                        principalTable: "Sessions",
+                        principalColumn: "Session ID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TransactionHistories",
+                columns: table => new
+                {
+                    TransactionID = table.Column<Guid>(name: "Transaction ID", type: "uniqueidentifier", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TransactionStatus = table.Column<int>(type: "int", nullable: false),
+                    SessionID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PaymentMethodID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransactionHistories", x => x.TransactionID);
+                    table.ForeignKey(
+                        name: "FK_TransactionHistories_PaymentMethods_PaymentMethodID",
+                        column: x => x.PaymentMethodID,
+                        principalTable: "PaymentMethods",
+                        principalColumn: "Payment Method ID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TransactionHistories_Sessions_SessionID",
+                        column: x => x.SessionID,
+                        principalTable: "Sessions",
+                        principalColumn: "Session ID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EffectsPackLogs",
+                columns: table => new
+                {
+                    PackID = table.Column<Guid>(name: "Pack ID", type: "uniqueidentifier", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PictureID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FrameID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FilterID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LayoutID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EffectsPackLogs", x => x.PackID);
+                    table.ForeignKey(
+                        name: "FK_EffectsPackLogs_Filters_FilterID",
+                        column: x => x.FilterID,
+                        principalTable: "Filters",
+                        principalColumn: "Filter ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EffectsPackLogs_FinalPictures_PictureID",
+                        column: x => x.PictureID,
+                        principalTable: "FinalPictures",
+                        principalColumn: "Picture ID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EffectsPackLogs_Frames_FrameID",
+                        column: x => x.FrameID,
+                        principalTable: "Frames",
+                        principalColumn: "Frame ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EffectsPackLogs_Layouts_LayoutID",
+                        column: x => x.LayoutID,
+                        principalTable: "Layouts",
+                        principalColumn: "Layout ID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -445,7 +431,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     MapStickerID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PackLogID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StickerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    StickerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -460,8 +446,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         name: "FK_MapStickers_Stickers_StickerId",
                         column: x => x.StickerId,
                         principalTable: "Stickers",
-                        principalColumn: "Sticker ID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Sticker ID");
                 });
 
             migrationBuilder.CreateIndex(
@@ -479,7 +464,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 name: "IX_Cameras_PhotoBoothBranchId",
                 table: "Cameras",
                 column: "PhotoBoothBranchId",
-                unique: true);
+                unique: true,
+                filter: "[PhotoBoothBranchId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EffectsPackLogs_FilterID",
@@ -490,6 +476,11 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 name: "IX_EffectsPackLogs_FrameID",
                 table: "EffectsPackLogs",
                 column: "FrameID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EffectsPackLogs_LayoutID",
+                table: "EffectsPackLogs",
+                column: "LayoutID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EffectsPackLogs_PictureID",
@@ -503,14 +494,10 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 column: "ThemeFilterID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FinalPictures_LayoutID",
+                name: "IX_FinalPictures_SessionID",
                 table: "FinalPictures",
-                column: "LayoutID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FinalPictures_PrintPricingID",
-                table: "FinalPictures",
-                column: "PrintPricingID");
+                column: "SessionID",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Frames_ThemeFrameID",
@@ -528,27 +515,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 column: "StickerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_AccountID",
-                table: "Orders",
-                column: "AccountID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orders_DiscountID",
-                table: "Orders",
-                column: "DiscountID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orders_PaymentMethodID",
-                table: "Orders",
-                column: "PaymentMethodID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orders_PictureID",
-                table: "Orders",
-                column: "PictureID",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_PhotoBoothBranches_AccountID",
                 table: "PhotoBoothBranches",
                 column: "AccountID");
@@ -557,7 +523,13 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 name: "IX_Printers_PhotoBoothBranchId",
                 table: "Printers",
                 column: "PhotoBoothBranchId",
-                unique: true);
+                unique: true,
+                filter: "[PhotoBoothBranchId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_AccountID",
+                table: "Sessions",
+                column: "AccountID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sessions_BranchesID",
@@ -565,14 +537,35 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 column: "BranchesID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Sessions_DiscountID",
+                table: "Sessions",
+                column: "DiscountID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_LayoutID",
+                table: "Sessions",
+                column: "LayoutID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_PrintPricingID",
+                table: "Sessions",
+                column: "PrintPricingID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Stickers_ThemeStickerID",
                 table: "Stickers",
                 column: "ThemeStickerID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TransactionHistories_AccountID",
+                name: "IX_TransactionHistories_PaymentMethodID",
                 table: "TransactionHistories",
-                column: "AccountID");
+                column: "PaymentMethodID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransactionHistories_SessionID",
+                table: "TransactionHistories",
+                column: "SessionID",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -588,9 +581,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 name: "Printers");
 
             migrationBuilder.DropTable(
-                name: "Sessions");
-
-            migrationBuilder.DropTable(
                 name: "TransactionHistories");
 
             migrationBuilder.DropTable(
@@ -600,13 +590,13 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 name: "Stickers");
 
             migrationBuilder.DropTable(
-                name: "Orders");
-
-            migrationBuilder.DropTable(
-                name: "PhotoBoothBranches");
+                name: "PaymentMethods");
 
             migrationBuilder.DropTable(
                 name: "Filters");
+
+            migrationBuilder.DropTable(
+                name: "FinalPictures");
 
             migrationBuilder.DropTable(
                 name: "Frames");
@@ -615,28 +605,28 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 name: "ThemeStickers");
 
             migrationBuilder.DropTable(
-                name: "Discounts");
-
-            migrationBuilder.DropTable(
-                name: "FinalPictures");
-
-            migrationBuilder.DropTable(
-                name: "PaymentMethods");
-
-            migrationBuilder.DropTable(
-                name: "Accounts");
-
-            migrationBuilder.DropTable(
                 name: "ThemeFilters");
+
+            migrationBuilder.DropTable(
+                name: "Sessions");
 
             migrationBuilder.DropTable(
                 name: "ThemeFrames");
 
             migrationBuilder.DropTable(
+                name: "Discounts");
+
+            migrationBuilder.DropTable(
                 name: "Layouts");
 
             migrationBuilder.DropTable(
+                name: "PhotoBoothBranches");
+
+            migrationBuilder.DropTable(
                 name: "PrintPricings");
+
+            migrationBuilder.DropTable(
+                name: "Accounts");
 
             migrationBuilder.DropTable(
                 name: "Roles");

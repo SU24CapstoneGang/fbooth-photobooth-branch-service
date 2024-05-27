@@ -26,6 +26,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired()
                 .HasMaxLength(255);
 
+            builder.Property(pb => pb.CreateDate)
+            .IsRequired();
+
             // ManufactureStatus enum mapping
             builder.Property(pb => pb.Status)
                 .IsRequired()
@@ -37,7 +40,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasOne(pb => pb.Account)
                 .WithMany(a => a.PhotoBoothBranches)
                 .HasForeignKey(pb => pb.AccountID)
-                .IsRequired();
+                .IsRequired(false);
 
             // Relationship with Camera
             builder.HasOne(pb => pb.Camera)

@@ -36,3 +36,9 @@ public enum DiscountStatus
     Expired = 2,
 }
 
+public enum TransactionStatus
+{
+    Success = 1,
+    Fail = 2,
+}
+

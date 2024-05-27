@@ -23,6 +23,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasOne(ep => ep.FinalPicture)
                 .WithOne(fp => fp.EffectsPackLog)
                 .HasForeignKey<EffectsPackLog>(e => e.PictureID)
+                .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired();
 
 
@@ -36,13 +37,19 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasOne(ep => ep.Frame)
                 .WithMany(f => f.EffectsPackLogs)
                 .HasForeignKey(ep => ep.FrameID)
-                .IsRequired();
+                .IsRequired(false);
 
             // Relationship with Filter
             builder.HasOne(ep => ep.Filter)
                 .WithMany(f => f.EffectsPackLogs)
                 .HasForeignKey(ep => ep.FilterID)
-                .IsRequired();
+                .IsRequired(false);
+
+            // Relationship with Layout
+            builder.HasOne(epl => epl.Layout)
+            .WithMany(l => l.EffectsPackLogs)
+            .HasForeignKey(epl => epl.LayoutID)
+            .IsRequired();
         }
     }
 }

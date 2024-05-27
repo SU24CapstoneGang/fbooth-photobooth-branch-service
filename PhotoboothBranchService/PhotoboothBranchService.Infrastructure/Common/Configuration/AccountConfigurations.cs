@@ -34,16 +34,10 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
         builder.HasMany(a => a.PhotoBoothBranches)
             .WithOne(pb => pb.Account)
             .HasForeignKey(a => a.AccountID)
-            .IsRequired();
+            .IsRequired(false);
 
-        // Relationship with Order
-        builder.HasMany(a => a.Orders)
-                .WithOne(o => o.Account)
-                .HasForeignKey(o => o.AccountID)
-                .IsRequired(false);
-
-        // Relationship with TransactionHistory
-        builder.HasMany(a => a.TransactionHistories)
+        // Relationship with Sessions
+        builder.HasMany(a => a.Sessions)
             .WithOne(s => s.Account)
             .HasForeignKey(s => s.AccountID)
             .IsRequired();
