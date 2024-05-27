@@ -12,7 +12,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.ToTable("EffectsPackLogs");
             // Primary key
             builder.HasKey(ep => ep.PacklogID);
-            builder.Property(ep => ep.PacklogID).HasColumnName("Pack ID")
+            builder.Property(ep => ep.PacklogID).HasColumnName("PackID")
                 .ValueGeneratedOnAdd();
 
             // Other properties

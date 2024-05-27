@@ -9,6 +9,5 @@ public class Camera
     public string LensType { get; set; } = default!;
     public float Price { get; set; }
     public ManufactureStatus Status { get; set; }
-    public Guid? PhotoBoothBranchId { get; set; }
     public virtual PhotoBoothBranch PhotoBoothBranch { get; set; }
 }

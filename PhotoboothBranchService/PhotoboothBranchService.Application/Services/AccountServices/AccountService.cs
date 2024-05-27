@@ -50,16 +50,17 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                 if (accounts != null)
                 {
                     var userRole = (await _roleRepository.GetAsync(r => r.RoleName == UserRole.Admin.ToString())).FirstOrDefault();
-                    if (userRole != null)
+                    if (accounts.RoleID == userRole.RoleID)
                     {
-                        throw new Exception("Admin account cannit be delete!");
+                        throw new Exception("Admin account cannot be delete!");
                     }
+                    await _firebaseService.DeleteUserAsync(accounts.Email);
                     await _accountRepository.RemoveAsync(accounts);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                throw new Exception("An error occurred while deleting the account: " + ex.Message);
             }
         }
 
@@ -71,20 +72,30 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<AccountResponse> GetByIdAsync(Guid id)
         {
-            var account = await _accountRepository.GetAsync(a => a.AccountID == id);
+            var account = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
             return _mapper.Map<AccountResponse>(account);
         }
 
         public async Task UpdateAsync(Guid id, UpdateAccountRequestModel updateModel)
         {
-            var account = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
-            if (account == null)
+            try
             {
-                throw new KeyNotFoundException("Account not found.");
-            }
+                var account = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
+                if (account == null)
+                {
+                    throw new KeyNotFoundException("Account not found.");
+                }
 
-            var updateCamera = _mapper.Map(updateModel, account);
-            await _accountRepository.UpdateAsync(updateCamera);
+                var updateAccount = _mapper.Map(updateModel, account);
+                updateAccount.SetPassword(updateModel.Password, _passwordHasher);
+
+                await _firebaseService.UpdatePasswordOnFirebase(account.Email, updateModel.Password);
+                await _accountRepository.UpdateAsync(updateAccount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while update the account: " + ex.Message);
+            }
         }
 
         public async Task<IEnumerable<AccountResponse>> GetAllPagingAsync(AccountFilter filter, PagingModel paging)
@@ -97,12 +108,19 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<LoginResponeModel> Login(LoginRequestModel request)
         {
-            var loginViewModel = await _jwtService.GetForCredentialsAsync(request.Email, request.Password);
-            if (loginViewModel != null)
+            try
             {
-                return loginViewModel;
+                var loginViewModel = await _jwtService.GetForCredentialsAsync(request.Email, request.Password);
+                if (loginViewModel != null)
+                {
+                    return loginViewModel;
+                }
+                throw new BadRequestException("Login fail!!!");
             }
-            throw new BadRequestException("Login fail!!!");
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while login the account: " + ex.Message);
+            }
         }
 
         public async Task<LoginResponeModel> RefreshToken(RefreshTokenRequestModel request)
@@ -117,42 +135,48 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<AccountRegisterResponse> Register(CreateAccountRequestModel request, UserRole role)
         {
-            var userRole = (await _roleRepository.GetAsync(r => r.RoleName == role.ToString())).FirstOrDefault();
-
-            //validation in db
-            if (userRole != null)
+            try
             {
-                var uid = await _firebaseService.RegisterAsync(request.Email, request.Password);
-                if (uid != null)
+                var userRole = (await _roleRepository.GetAsync(r => r.RoleName.Trim() == role.ToString().Trim())).FirstOrDefault();
+
+                //validation in db
+                if (userRole != null)
                 {
-                    if (!await _accountRepository.IsEmailUnique(request.Email))
+                    var uid = await _firebaseService.RegisterAsync(request.Email, request.Password);
+                    if (uid != null)
                     {
-                        throw new Exception("Email is already in use. Please choose a different email.");
+                        if (!await _accountRepository.IsEmailUnique(request.Email))
+                        {
+                            throw new Exception("Email is already in use. Please choose a different email.");
+                        }
+
+                        var newAccount = _mapper.Map<Account>(request);
+                        newAccount.AccountFBID = uid;
+                        newAccount.SetPassword(request.Password, _passwordHasher);
+                        newAccount.RoleID = userRole.RoleID;
+                        newAccount.Status = AccountStatus.Active;
+
+                        var result = await _accountRepository.CreateAccount(newAccount);
+
+                        var accountRespone = _mapper.Map<AccountRegisterResponse>(result);
+                        accountRespone.RoleName = userRole.RoleName;
+
+                        return accountRespone;
                     }
-
-                    var newAccount = _mapper.Map<Account>(request);
-                    newAccount.SetPassword(request.Password, _passwordHasher);
-                    newAccount.RoleID = userRole.RoleID;
-                    newAccount.Status = AccountStatus.Active;
-
-                    var result = await _accountRepository.CreateAccount(newAccount);
-                    var accountRespone = _mapper.Map<AccountRegisterResponse>(result);
-
-                    var loginViewModel = await _jwtService.GetForCredentialsAsync(request.Email, request.Password);
-                    accountRespone.TokenId = loginViewModel.TokenId;
-                    accountRespone.RefreshToken = loginViewModel.RefreshToken;
-
-                    return accountRespone;
+                    throw new BadRequestException("Register fail!!!");
                 }
-                throw new BadRequestException("Register fail!!!");
+                throw new Exception("User role does not exist in the system.");
             }
-            throw new Exception("User role does not exist in the system.");
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while register the account: " + ex.Message);
+            }
         }
 
-        public async Task<IEnumerable<AccountResponse>> GetByEmail(string email)
+        public async Task<AccountResponse> GetByEmail(string email)
         {
-            var account = (await _accountRepository.GetAsync(a => a.Email.Equals(email)));
-            return _mapper.Map<IEnumerable<AccountResponse>>(account.ToList());
+            var account = (await _accountRepository.GetAsync(a => a.Email.Equals(email))).FirstOrDefault();
+            return _mapper.Map<AccountResponse>(account);
         }
     }
 }

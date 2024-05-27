@@ -14,7 +14,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             // Primary key
             builder.HasKey(pb => pb.PhotoBoothBranchID);
-            builder.Property(pb => pb.PhotoBoothBranchID).HasColumnName("Branches ID")
+            builder.Property(pb => pb.PhotoBoothBranchID).HasColumnName("PhotoBoothBranchID")
                 .ValueGeneratedOnAdd();
 
             // Other properties
@@ -45,13 +45,13 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             // Relationship with Camera
             builder.HasOne(pb => pb.Camera)
                 .WithOne(c => c.PhotoBoothBranch)
-                .HasForeignKey<Camera>(c => c.PhotoBoothBranchId)
+                .HasForeignKey<Camera>(c => c.CameraID)
                 .IsRequired(false);
 
             // Relationship with Printer
             builder.HasOne(pb => pb.Printer)
                 .WithOne(p => p.PhotoBoothBranch)
-                .HasForeignKey<Printer>(p => p.PhotoBoothBranchId)
+                .HasForeignKey<Printer>(p => p.PrinterID)
                 .IsRequired(false);
 
             // Relationship with Session

@@ -12,9 +12,10 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
         builder.ToTable("Accounts");
         // Primary key
         builder.HasKey(u => u.AccountID);
-        builder.Property(u => u.AccountID).HasColumnName("Account ID")
+        builder.Property(u => u.AccountID).HasColumnName("AccountID")
             .ValueGeneratedOnAdd();
 
+        builder.Property(a => a.AccountFBID).IsRequired();
         builder.Property(a => a.FirstName).IsRequired().HasMaxLength(50);
         builder.Property(a => a.LastName).IsRequired().HasMaxLength(50);
         builder.Property(u => u.Email).IsRequired().HasMaxLength(100);

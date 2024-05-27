@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Camera;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.CameraServices;
@@ -20,8 +22,17 @@ public class CameraService : ICameraService
     //Create
     public async Task<Guid> CreateAsync(CreateCameraRequest createModel)
     {
-        Camera cameras = _mapper.Map<Camera>(createModel);
-        return await _cameraRepository.AddAsync(cameras);
+
+        try
+        {
+            Camera cameras = _mapper.Map<Camera>(createModel);
+            cameras.Status = ManufactureStatus.Active;
+            return await _cameraRepository.AddAsync(cameras);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while create the account: " + ex.Message);
+        } 
     }
     //Delete
     public async Task DeleteAsync(Guid id)

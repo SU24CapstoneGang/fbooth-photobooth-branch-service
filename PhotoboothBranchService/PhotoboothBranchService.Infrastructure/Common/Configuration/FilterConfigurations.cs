@@ -13,7 +13,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.ToTable("Filters");
             // Primary key
             builder.HasKey(f => f.FilterID);
-            builder.Property(f => f.FilterID).HasColumnName("Filter ID")
+            builder.Property(f => f.FilterID).HasColumnName("FilterID")
                 .ValueGeneratedOnAdd();
 
             // Other properties

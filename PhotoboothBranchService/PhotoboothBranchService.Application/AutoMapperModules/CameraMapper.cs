@@ -11,8 +11,6 @@ public class CameraMapper : Profile
     {
         CreateMap<CreateCameraRequest, Camera>().ReverseMap().HandleNullProperty();
         CreateMap<UpdateCameraRequest, Camera>().ReverseMap().HandleNullProperty();
-        CreateMap<Cameraresponse, Camera>()
-            .ForPath(des => des.PhotoBoothBranch.BranchName, opt => opt.MapFrom(src => src.PhotoBoothBranchName))
-            .ReverseMap().HandleNullProperty();
+        CreateMap<Cameraresponse, Camera>().ReverseMap().HandleNullProperty();
     }
 }

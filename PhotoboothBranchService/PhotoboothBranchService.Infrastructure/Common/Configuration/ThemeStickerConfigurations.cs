@@ -12,7 +12,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.ToTable("ThemeStickers");
 
             builder.HasKey(ts => ts.ThemeStickerID);
-            builder.Property(ts => ts.ThemeStickerID).HasColumnName("ThemeSticker ID")
+            builder.Property(ts => ts.ThemeStickerID).HasColumnName("ThemeStickerID")
            .ValueGeneratedOnAdd();
 
             builder.Property(ts => ts.ThemeStickerName)

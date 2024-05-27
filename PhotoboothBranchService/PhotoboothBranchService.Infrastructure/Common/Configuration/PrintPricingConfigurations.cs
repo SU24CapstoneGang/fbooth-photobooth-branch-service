@@ -14,7 +14,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             // Primary key
             builder.HasKey(pp => pp.PrintPricingID);
-            builder.Property(pp => pp.PrintPricingID).HasColumnName("PrintPricing ID")
+            builder.Property(pp => pp.PrintPricingID).HasColumnName("PrintPricingID")
                 .ValueGeneratedOnAdd();
 
             // Other properties

@@ -12,7 +12,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.ToTable("ThemeFilters");
 
             builder.HasKey(tf => tf.ThemeFilterID);
-            builder.Property(tf => tf.ThemeFilterID).HasColumnName("ThemeFilter ID")
+            builder.Property(tf => tf.ThemeFilterID).HasColumnName("ThemeFilterID")
             .ValueGeneratedOnAdd();
 
             builder.Property(tf => tf.ThemeFilterName)

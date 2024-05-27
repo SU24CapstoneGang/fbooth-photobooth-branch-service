@@ -13,7 +13,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             // Primary key
             builder.HasKey(ms => ms.MapStickerID);
-            builder.Property(ms => ms.MapStickerID)
+            builder.Property(ms => ms.MapStickerID).HasColumnName("MapStickerID")
                 .ValueGeneratedOnAdd();
 
             // Relationships

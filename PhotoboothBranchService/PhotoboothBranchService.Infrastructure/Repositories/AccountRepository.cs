@@ -50,14 +50,14 @@ public class AccountRepository : IAccountRepository
     }
 
     //Read
-    public async Task<IQueryable<Account>> GetAllAsync()
+    public async Task<IQueryable<Account>> GetAllAsync() 
     {
-        return await Task.FromResult(_dbContext.Accounts.AsQueryable());
+        return await Task.FromResult(_dbContext.Accounts.Include(a => a.Role).AsQueryable());
     }
 
     public async Task<IQueryable<Account>> GetAsync(Expression<Func<Account, bool>> predicate)
     {
-        return await Task.FromResult(_dbContext.Accounts.Where(predicate).AsQueryable());
+        return await Task.FromResult(_dbContext.Accounts.Include(a => a.Role).Where(predicate).AsQueryable());
     }
 
 

@@ -20,7 +20,7 @@ public class StickerRepository : IStickerRepository
     {
         await _dbContext.AddAsync(sticker);
         await _dbContext.SaveChangesAsync();
-        return sticker.StickerId;
+        return sticker.StickerID;
     }
 
     //Read

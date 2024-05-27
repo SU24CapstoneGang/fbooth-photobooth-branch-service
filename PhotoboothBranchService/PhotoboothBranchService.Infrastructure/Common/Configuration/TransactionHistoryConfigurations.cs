@@ -13,7 +13,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             // Primary key
             builder.HasKey(th => th.TransactionID);
-            builder.Property(th => th.TransactionID).HasColumnName("Transaction ID")
+            builder.Property(th => th.TransactionID).HasColumnName("TransactionID")
                 .ValueGeneratedOnAdd();
 
             

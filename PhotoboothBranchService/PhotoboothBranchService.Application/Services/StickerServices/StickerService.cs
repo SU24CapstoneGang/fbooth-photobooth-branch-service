@@ -32,7 +32,7 @@ public class StickerService : IStickerService
     {
         try
         {
-            Sticker? sticker = (await _stickerRepository.GetAsync(s => s.StickerId == id)).FirstOrDefault();
+            Sticker? sticker = (await _stickerRepository.GetAsync(s => s.StickerID == id)).FirstOrDefault();
             if (sticker != null)
             {
                 await _stickerRepository.RemoveAsync(sticker);
@@ -61,7 +61,7 @@ public class StickerService : IStickerService
 
     public async Task<StickerResponse> GetByIdAsync(Guid id)
     {
-        var sticker = (await _stickerRepository.GetAsync(s => s.StickerId == id)).FirstOrDefault();
+        var sticker = (await _stickerRepository.GetAsync(s => s.StickerID == id)).FirstOrDefault();
         return _mapper.Map<StickerResponse>(sticker);
     }
 
@@ -74,7 +74,7 @@ public class StickerService : IStickerService
     // Update
     public async Task UpdateAsync(Guid id, UpdateStickerRequest updateModel)
     {
-        var sticker = (await _stickerRepository.GetAsync(s => s.StickerId == id)).FirstOrDefault();
+        var sticker = (await _stickerRepository.GetAsync(s => s.StickerID == id)).FirstOrDefault();
         if (sticker == null)
         {
             throw new KeyNotFoundException("Sticker not found.");

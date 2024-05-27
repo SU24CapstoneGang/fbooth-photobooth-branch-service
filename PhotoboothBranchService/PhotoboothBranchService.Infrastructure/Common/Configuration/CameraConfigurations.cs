@@ -13,7 +13,7 @@ public class CameraConfigurations : IEntityTypeConfiguration<Camera>
 
         // Primary key
         builder.HasKey(c => c.CameraID);
-        builder.Property(c => c.CameraID).HasColumnName("Camera ID")
+        builder.Property(c => c.CameraID).HasColumnName("CameraID")
             .ValueGeneratedOnAdd();
 
         // Properties
@@ -34,10 +34,10 @@ public class CameraConfigurations : IEntityTypeConfiguration<Camera>
                 v => v.ToString(),
                 v => (ManufactureStatus)Enum.Parse(typeof(ManufactureStatus), v));
 
-        // Relationship with PhotoBoothBranch
-        builder.HasOne(c => c.PhotoBoothBranch)
-            .WithOne(pb => pb.Camera)
-            .HasForeignKey<Camera>(c => c.PhotoBoothBranchId)
-            .IsRequired(false);
+        //// Relationship with PhotoBoothBranch
+        //builder.HasOne(c => c.PhotoBoothBranch)
+        //       .WithOne(b => b.Camera)
+        //       .HasForeignKey<Camera>(c => c.CameraID)
+        //       .IsRequired(false);
     }
 }

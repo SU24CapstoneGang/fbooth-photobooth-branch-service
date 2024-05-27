@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
@@ -13,7 +14,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             // Primary key
             builder.HasKey(p => p.PrinterID);
-            builder.Property(p => p.PrinterID).HasColumnName("Printer ID")
+            builder.Property(p => p.PrinterID).HasColumnName("PrinterID")
                 .ValueGeneratedOnAdd();
 
             // Other properties
@@ -24,16 +25,19 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(p => p.Price)
                 .IsRequired();
 
-            // Status property
-            builder.Property(p => p.Status)
+            // Status enum mapping
+            builder.Property(c => c.Status)
                 .IsRequired()
-                .HasColumnType("int");
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (ManufactureStatus)Enum.Parse(typeof(ManufactureStatus), v));
 
             // Relationship with PhotoBoothBranch
-            builder.HasOne(p => p.PhotoBoothBranch)
-                .WithOne(pb => pb.Printer)
-                .HasForeignKey<Printer>(p => p.PhotoBoothBranchId)
-                .IsRequired(false);
+            builder
+               .HasOne(p => p.PhotoBoothBranch)
+               .WithOne(pb => pb.Printer)
+               .HasForeignKey<PhotoBoothBranch>(pb => pb.PrinterID)
+               .IsRequired(false);
         }
     }
 }

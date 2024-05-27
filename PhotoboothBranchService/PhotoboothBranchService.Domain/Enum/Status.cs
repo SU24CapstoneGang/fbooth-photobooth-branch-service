@@ -2,9 +2,9 @@
 
 public enum ManufactureStatus
 {
-    Good = 1,
-    Maintenance = 2,
-    Discarded = 3,
+    Active = 1,
+    Inactive = 2,
+    Maintenance = 3
 }
 
 public enum AccountStatus

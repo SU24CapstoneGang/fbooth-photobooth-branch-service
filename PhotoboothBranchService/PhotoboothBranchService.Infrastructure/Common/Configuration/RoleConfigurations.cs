@@ -13,7 +13,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             // Primary key
             builder.HasKey(r => r.RoleID);
-            builder.Property(r => r.RoleID).HasColumnName("Role ID")
+            builder.Property(r => r.RoleID).HasColumnName("RoleID")
                 .ValueGeneratedOnAdd();
 
             // Other properties

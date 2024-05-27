@@ -12,7 +12,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.ToTable("ThemeFrames");
 
             builder.HasKey(tf => tf.ThemeFrameID);
-            builder.Property(tf => tf.ThemeFrameID).HasColumnName("ThemeFrame ID")
+            builder.Property(tf => tf.ThemeFrameID).HasColumnName("ThemeFrameID")
            .ValueGeneratedOnAdd();
 
             builder.Property(tf => tf.ThemeFrameName)

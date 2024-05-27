@@ -30,5 +30,43 @@ namespace PhotoboothBranchService.Application.Services.FirebaseServices
             var link = await FirebaseAuth.DefaultInstance.GeneratePasswordResetLinkAsync(email);
             return link;
         }
+
+        public async Task DeleteUserAsync(string email)
+        {
+            {
+                var userRecord = await FirebaseAuth.DefaultInstance.GetUserByEmailAsync(email);
+
+                if (userRecord != null)
+                {
+                    await FirebaseAuth.DefaultInstance.DeleteUserAsync(userRecord.Uid);
+                }
+            }
+        }
+
+        public async Task UpdatePasswordOnFirebase(string email, string newPassword)
+        {
+            try
+            {
+                // Lấy thông tin người dùng từ Firebase bằng email
+                var userRecord = await FirebaseAuth.DefaultInstance.GetUserByEmailAsync(email);
+
+                // Cập nhật mật khẩu mới cho người dùng trên Firebase
+                await FirebaseAuth.DefaultInstance.UpdateUserAsync(new UserRecordArgs
+                {
+                    Uid = userRecord.Uid,
+                    Password = newPassword
+                });
+            }
+            catch (FirebaseAuthException ex)
+            {
+                // Xử lý lỗi từ Firebase
+                throw new Exception($"Error updating password on Firebase: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Xử lý các lỗi khác
+                throw new Exception($"An error occurred while updating password on Firebase: {ex.Message}");
+            }
+        }
     }
 }

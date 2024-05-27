@@ -6,6 +6,7 @@ namespace PhotoboothBranchService.Domain.Entities;
 public class Account
 {
     public Guid AccountID { get; set; }
+    public string AccountFBID { get; set; }
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
     public byte[] PasswordHash { get; set; } = default!;
