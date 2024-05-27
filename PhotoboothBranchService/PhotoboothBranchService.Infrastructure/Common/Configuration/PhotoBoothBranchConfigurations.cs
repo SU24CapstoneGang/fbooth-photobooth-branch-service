@@ -43,10 +43,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired(false);
 
             // Relationship with Camera
-            builder.HasOne(pb => pb.Camera)
-                .WithOne(c => c.PhotoBoothBranch)
-                .HasForeignKey<Camera>(c => c.CameraID)
-                .IsRequired(false);
+            builder.HasOne(b => b.Camera)
+                           .WithOne(c => c.PhotoBoothBranch)
+                           .HasForeignKey<PhotoBoothBranch>(b => b.CameraID);
 
             // Relationship with Printer
             builder.HasOne(pb => pb.Printer)

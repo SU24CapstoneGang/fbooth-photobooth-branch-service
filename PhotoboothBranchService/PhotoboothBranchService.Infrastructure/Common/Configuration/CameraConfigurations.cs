@@ -34,10 +34,9 @@ public class CameraConfigurations : IEntityTypeConfiguration<Camera>
                 v => v.ToString(),
                 v => (ManufactureStatus)Enum.Parse(typeof(ManufactureStatus), v));
 
-        //// Relationship with PhotoBoothBranch
-        //builder.HasOne(c => c.PhotoBoothBranch)
-        //       .WithOne(b => b.Camera)
-        //       .HasForeignKey<Camera>(c => c.CameraID)
-        //       .IsRequired(false);
+        // Relationship with PhotoBoothBranch
+        builder.HasOne(c => c.PhotoBoothBranch)
+               .WithOne(b => b.Camera)
+               .HasForeignKey<PhotoBoothBranch>(b => b.CameraID);
     }
 }

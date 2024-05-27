@@ -75,5 +75,7 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ThemeFrameConfigurations());
         modelBuilder.ApplyConfiguration(new ThemeStickerConfigurations());
         modelBuilder.ApplyConfiguration(new MapStickerConfigurations());
+
+        base.OnModelCreating(modelBuilder);
     }
 }
