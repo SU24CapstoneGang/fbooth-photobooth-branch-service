@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Discount;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.DiscountServices;
@@ -21,75 +23,134 @@ public class DiscountService : IDiscountService
     //Create
     public async Task<Guid> CreateAsync(CreateDiscountRequest createModel)
     {
-        var discount = _mapper.Map<Discount>(createModel);
-        return await _discountRepository.AddAsync(discount);
+        try
+        {
+            var isDiscountExisted = await _discountRepository.GetAsync(d => d.DiscountCode == createModel.DiscountCode);
+            if (isDiscountExisted != null) throw new BadRequestException("Discount code is already existed");
+
+            var discount = _mapper.Map<Discount>(createModel);
+            discount.Status = DiscountStatus.Active;
+            return await _discountRepository.AddAsync(discount);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while create discount: " + ex.Message);
+        }
     }
 
     // Get all Discounts
     public async Task<IEnumerable<Discountresponse>> GetAllAsync()
     {
-        var discounts = await _discountRepository.GetAllAsync();
-        return _mapper.Map<IEnumerable<Discountresponse>>(discounts.ToList());
+        try
+        {
+            var discounts = await _discountRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<Discountresponse>>(discounts.ToList());
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while getting the discount: " + ex.Message);
+        }
     }
 
     public async Task<IEnumerable<Discountresponse>> GetAllPagingAsync(DiscountFilter filter, PagingModel paging)
     {
-        var discounts = (await _discountRepository.GetAllAsync()).ToList().AutoFilter(filter);
-        var listDiscountresponse = _mapper.Map<IEnumerable<Discountresponse>>(discounts);
-        listDiscountresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-        return listDiscountresponse;
+        try
+        {
+            var discounts = (await _discountRepository.GetAllAsync()).ToList().AutoFilter(filter);
+            var listDiscountresponse = _mapper.Map<IEnumerable<Discountresponse>>(discounts);
+            listDiscountresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+            return listDiscountresponse;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while getting the discount: " + ex.Message);
+        }
     }
 
     public async Task<Discountresponse> GetByCode(string code)
     {
-        var discount = await _discountRepository.GetAsync(d => d.DiscountCode == code);
-        return _mapper.Map<Discountresponse>(discount);
+        try
+        {
+            var discount = await _discountRepository.GetAsync(d => d.DiscountCode == code);
+            if (discount == null)
+                throw new NotFoundException("discount", code, "discount code not found");
+
+            return _mapper.Map<Discountresponse>(discount);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while getting the discount: " + ex.Message);
+        }
     }
 
     public async Task<Discountresponse> GetByIdAsync(Guid id)
     {
-        var discount = (await _discountRepository.GetAsync(d => d.DiscountID == id)).FirstOrDefault();
-        if (discount == null)
+        try
         {
-            throw new KeyNotFoundException("Discount not found.");
+            var discount = (await _discountRepository.GetAsync(d => d.DiscountID == id)).FirstOrDefault();
+            if (discount == null)
+            {
+                throw new NotFoundException("discount", id, "discount id not found");
+            }
+            return _mapper.Map<Discountresponse>(discount);
         }
-        return _mapper.Map<Discountresponse>(discount);
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while getting the discount: " + ex.Message);
+        }
     }
 
     // Get Discounts by Code
     public async Task<IEnumerable<Discountresponse>> SearchByCode(string code)
     {
-        var discounts = await _discountRepository.GetAsync(d => d.DiscountCode.Contains(code));
-        return _mapper.Map<IEnumerable<Discountresponse>>(discounts.ToList());
+        try
+        {
+            var discounts = await _discountRepository.GetAsync(d => d.DiscountCode.Contains(code));
+            return _mapper.Map<IEnumerable<Discountresponse>>(discounts.ToList());
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while getting the discount: " + ex.Message);
+        }
     }
 
     //Update
     public async Task UpdateAsync(Guid id, UpdateDiscountRequest updateModel)
     {
-        var discounts = await _discountRepository.GetAsync(d => d.DiscountID == id);
-        var discount = discounts.FirstOrDefault();
-        if (discount == null)
+        try
         {
-            throw new KeyNotFoundException("Discount not found.");
-        }
+            var discount = (await _discountRepository.GetAsync(d => d.DiscountID == id)).FirstOrDefault();
+            if (discount == null)
+            {
+                throw new NotFoundException("discount", id, "discount id not found");
+            }
 
-        var updatedDiscount = _mapper.Map(updateModel, discount);
-        updatedDiscount.LastModified = DateTime.UtcNow;
-        await _discountRepository.UpdateAsync(updatedDiscount);
+            var updatedDiscount = _mapper.Map(updateModel, discount);
+            updatedDiscount.LastModified = DateTime.UtcNow;
+            await _discountRepository.UpdateAsync(updatedDiscount);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while update discount: " + ex.Message);
+        }
     }
 
     // Delete a Discount by ID
     public async Task DeleteAsync(Guid id)
     {
-        var discounts = await _discountRepository.GetAsync(d => d.DiscountID == id);
-        var discount = discounts.FirstOrDefault();
-        if (discount != null)
+        try
         {
+            var discounts = await _discountRepository.GetAsync(d => d.DiscountID == id);
+            var discount = discounts.FirstOrDefault();
+            if (discount == null)
+            {
+                throw new NotFoundException("discount", id, "discount id not found");
+            }
             await _discountRepository.RemoveAsync(discount);
         }
-        else
+        catch (Exception ex)
         {
-            throw new KeyNotFoundException("Discount not found.");
+            throw new Exception("An error occurred while deleting discount: " + ex.Message);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(pp => pp.LastModified);
 
-            // Relationship with FinalPicture
+            // Relationship with Sessions
             builder.HasMany(pp => pp.Sessions)
             .WithOne(s => s.PrintPricing)
             .HasForeignKey(s => s.PrintPricingID)
