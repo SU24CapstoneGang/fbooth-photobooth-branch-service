@@ -36,6 +36,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             _firebaseService = firebaseService;
         }
 
+        //khong co sai
         public async Task<Guid> CreateAsync(CreateAccountRequestModel createModel)
         {
             Account account = _mapper.Map<Account>(createModel);
@@ -57,6 +58,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                     await _firebaseService.DeleteUserAsync(accounts.Email);
                     await _accountRepository.RemoveAsync(accounts);
                 }
+                throw new NotFoundException("Account", id, "Account ID not found");
             }
             catch (Exception ex)
             {
@@ -66,14 +68,32 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<IEnumerable<AccountResponse>> GetAllAsync()
         {
-            var accounts = await _accountRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<AccountResponse>>(accounts.ToList());
+            try
+            {
+                var accounts = await _accountRepository.GetAllAsync();
+                return _mapper.Map<IEnumerable<AccountResponse>>(accounts.ToList());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while getting the account: " + ex.Message);
+            }
         }
 
         public async Task<AccountResponse> GetByIdAsync(Guid id)
         {
-            var account = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
-            return _mapper.Map<AccountResponse>(account);
+            try
+            {
+                var account = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
+                if (account == null)
+                {
+                    throw new NotFoundException("Account", id, "Account ID not found");
+                }
+                return _mapper.Map<AccountResponse>(account);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while getting the account: " + ex.Message);
+            }
         }
 
         public async Task UpdateAsync(Guid id, UpdateAccountRequestModel updateModel)
@@ -83,7 +103,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                 var account = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
                 if (account == null)
                 {
-                    throw new KeyNotFoundException("Account not found.");
+                    throw new NotFoundException("Account", id, "Account ID not found");
                 }
 
                 var updateAccount = _mapper.Map(updateModel, account);
@@ -100,10 +120,17 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<IEnumerable<AccountResponse>> GetAllPagingAsync(AccountFilter filter, PagingModel paging)
         {
-            var cameras = (await _accountRepository.GetAllAsync()).ToList().AutoFilter(filter);
-            var listAccountresponse = _mapper.Map<IEnumerable<AccountResponse>>(cameras);
-            listAccountresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-            return listAccountresponse;
+            try
+            {
+                var cameras = (await _accountRepository.GetAllAsync()).ToList().AutoFilter(filter);
+                var listAccountresponse = _mapper.Map<IEnumerable<AccountResponse>>(cameras);
+                listAccountresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+                return listAccountresponse;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while getting the account: " + ex.Message);
+            }
         }
 
         public async Task<LoginResponeModel> Login(LoginRequestModel request)
@@ -125,12 +152,19 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<LoginResponeModel> RefreshToken(RefreshTokenRequestModel request)
         {
-            var loginViewModel = await _jwtService.RefreshToken(request.RefreshToken);
-            if (loginViewModel != null)
+            try
             {
-                return loginViewModel;
+                var loginViewModel = await _jwtService.RefreshToken(request.RefreshToken);
+                if (loginViewModel != null)
+                {
+                    return loginViewModel;
+                }
+                throw new BadRequestException("Refresh token fail!!!");
             }
-            throw new BadRequestException("Refresh token fail!!!");
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while refeshing the account: " + ex.Message);
+            }
         }
 
         public async Task<AccountRegisterResponse> Register(CreateAccountRequestModel request, UserRole role)
@@ -165,7 +199,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                     }
                     throw new BadRequestException("Register fail!!!");
                 }
-                throw new Exception("User role does not exist in the system.");
+                throw new NotFoundException("Account", role, "User role does not exist in the system.");
             }
             catch (Exception ex)
             {
@@ -175,8 +209,19 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<AccountResponse> GetByEmail(string email)
         {
-            var account = (await _accountRepository.GetAsync(a => a.Email.Equals(email))).FirstOrDefault();
-            return _mapper.Map<AccountResponse>(account);
+            try
+            {
+                var account = (await _accountRepository.GetAsync(a => a.Email.Equals(email))).FirstOrDefault();
+                if (account == null)
+                {
+
+                }
+                return _mapper.Map<AccountResponse>(account);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while getting the account: " + ex.Message);
+            }
         }
     }
 }

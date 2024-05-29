@@ -5,10 +5,8 @@ namespace PhotoboothBranchService.Application.DTOs.Printer
     public class PrinterResponse
     {
         public Guid PrinterID { get; set; }
-        public string ModelName { get; set; } = default!;
+        public string ModelName { get; set; }
         public float Price { get; set; }
         public ManufactureStatus Status { get; set; }
-        public Guid PhotoBoothBranchId { get; set; }
-        public string PhotoBoothBranchName { get; set; } = default!;
     }
 }

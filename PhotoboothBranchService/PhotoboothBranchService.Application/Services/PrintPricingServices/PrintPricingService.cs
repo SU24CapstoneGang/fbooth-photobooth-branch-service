@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.PrintPricing;
 using PhotoboothBranchService.Domain.Common.Helper;
@@ -24,56 +25,99 @@ namespace PhotoboothBranchService.Application.Services.PrintPricingServices
 
         public async Task<Guid> CreateAsync(CreatePrintPricingRequest createModel)
         {
-            PrintPricing printPricing = _mapper.Map<PrintPricing>(createModel);
-            return await _printPricingRepository.AddAsync(printPricing);
+            try
+            {
+                PrintPricing printPricing = _mapper.Map<PrintPricing>(createModel);
+                return await _printPricingRepository.AddAsync(printPricing);
+            } catch (Exception ex)
+            {
+                throw new Exception("An error occurred while create price: " + ex.Message);
+            }
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            var printPricing = await _printPricingRepository.GetAsync(p => p.PrintPricingID == id);
-            var printPricingToDelete = printPricing.FirstOrDefault();
-            if (printPricingToDelete != null)
+            try
             {
-                await _printPricingRepository.RemoveAsync(printPricingToDelete);
+                var printPricing = (await _printPricingRepository.GetAsync(p => p.PrintPricingID == id)).FirstOrDefault();
+                if (printPricing == null)
+                {
+                    throw new NotFoundException("PrintPricing", id, "Print pricing not found");
+                }
+                await _printPricingRepository.RemoveAsync(printPricing);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while deleted price: " + ex.Message);
             }
         }
 
         public async Task<IEnumerable<PrintPricingResponse>> GetAllAsync()
         {
-            var printPricings = await _printPricingRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<PrintPricingResponse>>(printPricings.ToList());
+            try
+            {
+                var printPricings = await _printPricingRepository.GetAllAsync();
+                return _mapper.Map<IEnumerable<PrintPricingResponse>>(printPricings.ToList());
+            } catch (Exception ex)
+            {
+                throw new Exception("An error occurred while getting print price: " + ex.Message);
+            }
         }
 
         public async Task<IEnumerable<PrintPricingResponse>> GetAllPagingAsync(PrintPricingFilter filter, PagingModel paging)
         {
-            var printPricings = (await _printPricingRepository.GetAllAsync()).ToList().AutoFilter(filter);
-            var printPricingsResponse = _mapper.Map<IEnumerable<PrintPricingResponse>>(printPricings);
-            printPricingsResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-            return printPricingsResponse;
+            try
+            {
+                var printPricings = (await _printPricingRepository.GetAllAsync()).ToList().AutoFilter(filter);
+                var printPricingsResponse = _mapper.Map<IEnumerable<PrintPricingResponse>>(printPricings);
+                printPricingsResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+                return printPricingsResponse;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while getting print price: " + ex.Message);
+            }
         }
 
         public async Task<PrintPricingResponse> GetByIdAsync(Guid id)
         {
-            var printPricings = await _printPricingRepository.GetAsync(p => p.PrintPricingID == id);
-            return _mapper.Map<PrintPricingResponse>(printPricings);
+            try
+            {
+                var printPricings = (await _printPricingRepository.GetAsync(p => p.PrintPricingID == id)).FirstOrDefault();
+                if (printPricings == null)
+                    throw new NotFoundException("PrintPricing", id, "Print pricing not found");
+
+                return _mapper.Map<PrintPricingResponse>(printPricings);
+            } catch (Exception ex)
+            {
+                throw new Exception("An error occurred while get print price: " + ex.Message);
+            }
+            
         }
 
-        public async Task<IEnumerable<PrintPricingResponse>> GetByName(string name)
-        {
-            var printPricings = await _printPricingRepository.GetAsync(p => p.PrintName.Contains(name));
-            return _mapper.Map<IEnumerable<PrintPricingResponse>>(printPricings.ToList());
-        }
+        //public async Task<IEnumerable<PrintPricingResponse>> GetByName(string name)
+        //{
+        //    var printPricings = await _printPricingRepository.GetAsync(p => p.UnitPrice.Contains(name));
+        //    return _mapper.Map<IEnumerable<PrintPricingResponse>>(printPricings.ToList());
+        //}
 
         public async Task UpdateAsync(Guid id, UpdatePrintPricingRequest updateModel)
         {
-            var printPricing = (await _printPricingRepository.GetAsync(p => p.PrintPricingID == id)).FirstOrDefault();
-            if (printPricing == null)
+            try
             {
-                throw new KeyNotFoundException("Print pricing not found.");
+                var printPricing = (await _printPricingRepository.GetAsync(p => p.PrintPricingID == id)).FirstOrDefault();
+                if (printPricing == null)
+                {
+                    throw new NotFoundException("PrintPricing", id, "Print pricing not found");
+                }
+
+                var updatedPrintPricing = _mapper.Map(updateModel, printPricing);
+                await _printPricingRepository.UpdateAsync(updatedPrintPricing);
+            } catch (Exception ex)
+            {
+                throw new Exception("An error occurred while update print price: " + ex.Message);
             }
 
-            var updatedPrintPricing = _mapper.Map(updateModel, printPricing);
-            await _printPricingRepository.UpdateAsync(updatedPrintPricing);
         }
     }
 }

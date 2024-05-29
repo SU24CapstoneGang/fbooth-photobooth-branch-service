@@ -62,20 +62,20 @@ namespace PhotoboothBranchService.Api.Controllers
             }
         }
 
-        // Read by name
-        [HttpGet("name/{name}")]
-        public async Task<ActionResult<IEnumerable<PrintPricingResponse>>> GetPrintPricingsByName(string name)
-        {
-            try
-            {
-                var printPricings = await _printPricingService.GetByName(name);
-                return Ok(printPricings);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving printPricings by name: {ex.Message}");
-            }
-        }
+        //// Read by name
+        //[HttpGet("name/{name}")]
+        //public async Task<ActionResult<IEnumerable<PrintPricingResponse>>> GetPrintPricingsByName(string name)
+        //{
+        //    try
+        //    {
+        //        var printPricings = await _printPricingService.GetByName(name);
+        //        return Ok(printPricings);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"An error occurred while retrieving printPricings by name: {ex.Message}");
+        //    }
+        //}
 
         // Read by ID
         [HttpGet("{id}")]

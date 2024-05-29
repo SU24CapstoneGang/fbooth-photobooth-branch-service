@@ -12,6 +12,6 @@ namespace PhotoboothBranchService.Application.Services.PrintPricingServices
 {
     public interface IPrintPricingService : IService<PrintPricingResponse, CreatePrintPricingRequest, UpdatePrintPricingRequest, PrintPricingFilter, PagingModel>
     {
-        Task<IEnumerable<PrintPricingResponse>> GetByName(string name);
+       
     }
 }

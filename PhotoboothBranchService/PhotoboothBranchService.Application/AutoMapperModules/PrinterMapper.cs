@@ -11,9 +11,7 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
         {
             CreateMap<CreatePrinterRequest, Printer>().ReverseMap().HandleNullProperty();
             CreateMap<UpdatePrinterRequest, Printer>().ReverseMap().HandleNullProperty();
-            CreateMap<PrinterResponse, Printer>()
-                .ForPath(des => des.PhotoBoothBranch.BranchName, opt => opt.MapFrom(src => src.PhotoBoothBranchName))
-                .ReverseMap().HandleNullProperty();
+            CreateMap<PrinterResponse, Printer>().ReverseMap().HandleNullProperty();
         }
     }
 }

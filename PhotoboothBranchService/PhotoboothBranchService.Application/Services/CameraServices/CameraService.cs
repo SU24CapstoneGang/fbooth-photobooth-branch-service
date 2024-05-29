@@ -32,7 +32,7 @@ public class CameraService : ICameraService
         catch (Exception ex)
         {
             throw new Exception("An error occurred while create the account: " + ex.Message);
-        } 
+        }
     }
     //Delete
     public async Task DeleteAsync(Guid id)
@@ -41,54 +41,91 @@ public class CameraService : ICameraService
         {
             var cameras = await _cameraRepository.GetAsync(c => c.CameraID == id);
             var camera = cameras.FirstOrDefault();
-            if (camera != null)
+            if (camera == null)
             {
-                await _cameraRepository.RemoveAsync(camera);
+                throw new NotFoundException("Camera", id, "Camera id not found");
             }
+            await _cameraRepository.RemoveAsync(camera);
         }
-        catch
+        catch (Exception ex)
         {
-            throw;
+            throw new Exception("An error occurred while deleting the camera: " + ex.Message);
         }
     }
     //Read
     public async Task<IEnumerable<Cameraresponse>> GetAllAsync()
     {
-        var cameras = await _cameraRepository.GetAllAsync();
-        return _mapper.Map<IEnumerable<Cameraresponse>>(cameras.ToList());
+        try
+        {
+            var cameras = await _cameraRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<Cameraresponse>>(cameras.ToList());
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while getting the camera: " + ex.Message);
+        }
     }
 
     public async Task<IEnumerable<Cameraresponse>> GetAllPagingAsync(CameraFilter filter, PagingModel paging)
     {
-        var cameras = (await _cameraRepository.GetAllAsync()).ToList().AutoFilter(filter); 
-        var listCameraresponse = _mapper.Map<IEnumerable<Cameraresponse>>(cameras);
-        listCameraresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-        return listCameraresponse;
+        try
+        {
+            var cameras = (await _cameraRepository.GetAllAsync()).ToList().AutoFilter(filter);
+            var listCameraresponse = _mapper.Map<IEnumerable<Cameraresponse>>(cameras);
+            listCameraresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+            return listCameraresponse;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while getting the camera: " + ex.Message);
+        }
     }
 
     public async Task<Cameraresponse> GetByIdAsync(Guid id)
     {
-        var cameras = await _cameraRepository.GetAsync(c => c.CameraID == id);
-        return _mapper.Map<Cameraresponse>(cameras);
+        try
+        {
+            var cameras = (await _cameraRepository.GetAsync(c => c.CameraID == id)).FirstOrDefault();
+            return _mapper.Map<Cameraresponse>(cameras);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while getting the camera: " + ex.Message);
+        }
     }
 
     public async Task<IEnumerable<Cameraresponse>> GetByName(string name)
     {
-        var cameras = await _cameraRepository.GetAsync(c => c.ModelName.Contains(name));
-        return _mapper.Map<IEnumerable<Cameraresponse>>(cameras.ToList());
+        try
+        {
+            var cameras = await _cameraRepository.GetAsync(c => c.ModelName.Contains(name));
+            return _mapper.Map<IEnumerable<Cameraresponse>>(cameras.ToList());
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while getting the camera: " + ex.Message);
+        }
     }
 
     //Update
     public async Task UpdateAsync(Guid id, UpdateCameraRequest updateModel)
     {
-        var camera = (await _cameraRepository.GetAsync(c => c.CameraID == id)).FirstOrDefault();
-        if (camera == null)
+        try
         {
-            throw new KeyNotFoundException("Camera not found.");
+            var camera = (await _cameraRepository.GetAsync(c => c.CameraID == id)).FirstOrDefault();
+            if (camera == null)
+            {
+                throw new NotFoundException("Camera", id, "Camera id not found");
+            }
+
+            var updateCamera = _mapper.Map(updateModel, camera);
+            await _cameraRepository.UpdateAsync(updateCamera);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while update the camera: " + ex.Message);
         }
 
-        var updateCamera = _mapper.Map(updateModel, camera);
-        await _cameraRepository.UpdateAsync(updateCamera);
     }
 
 }

@@ -9,5 +9,4 @@ public class CreateDiscountRequest
     public int RemaniningUsage { get; set; }
     [Range(0, 90)]
     public decimal DiscountRate { get; set; }
-    public DiscountStatus Status { get; set; }
 }
