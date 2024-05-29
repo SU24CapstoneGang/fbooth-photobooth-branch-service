@@ -1,54 +1,49 @@
 ﻿using FirebaseAdmin.Auth;
+using Microsoft.Identity.Client;
 using PhotoboothBranchService.Application.Common.Helpers;
+using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Api.Common.MiddleWares
 {
-    public class FirebaseAuthenticationMiddleware
+    public class JwtAuthenticationMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public FirebaseAuthenticationMiddleware(RequestDelegate next)
+        public JwtAuthenticationMiddleware(RequestDelegate next)
         {
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, IAccountRepository accountRepository)
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
             if (token != null)
             {
+                var role = "ANONYMOUS";
+                var accountId = "";
+
                 var decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(token);
                 if (decodedToken != null)
                 {
                     var user = await FirebaseAuth.DefaultInstance.GetUserAsync(decodedToken.Uid);
                     var email = user.Email;
-                    var role = "ANONYMOUS";
-                    var customerId = "";
                     if (email == JsonHelper.GetFromAppSettings("Admin:Email"))
                     {
                         role = "ADMIN";
                     }
                     else
                     {
-                        //var customer = customerRepository.Get(c => c.Email == email).FirstOrDefault();
-                        //if (customer != null)
-                        //{
-                        //    role = "CUSTOMER";
-                        //    customerId = customer.CustomerId.ToString();
-                        //}
-                        //else
-                        //{
-                        //    var staff = staffRepository.Get(c => c.Email == email).FirstOrDefault();
-                        //    if (staff != null)
-                        //    {
-                        //        role = "STAFF";
-                        //    }
-                        //}
+                        var account = (await accountRepository.GetAsync(c => c.Email == email)).FirstOrDefault();
+                        if (account != null)
+                        {
+                            role = account.Role.RoleName;
+                            accountId = account.AccountID.ToString();
+                        }
                     }
                     context.Items["Role"] = role;
                     context.Items["Email"] = email;
                     context.Items["Token"] = token;
-                    context.Items["CustomerId"] = customerId;
+                    context.Items["CustomerId"] = accountId;
                 }
             };
             await _next(context);
@@ -58,7 +53,7 @@ namespace PhotoboothBranchService.Api.Common.MiddleWares
     {
         public static IApplicationBuilder UseJwtMiddleware(this IApplicationBuilder builder)
         {
-            return builder.UseMiddleware<FirebaseAuthenticationMiddleware>();
+            return builder.UseMiddleware<JwtAuthenticationMiddleware>();
         }
     }
 }
