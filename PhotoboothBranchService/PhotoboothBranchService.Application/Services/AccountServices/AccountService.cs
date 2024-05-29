@@ -72,8 +72,18 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<AccountResponse> GetByIdAsync(Guid id)
         {
-            var account = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
-            return _mapper.Map<AccountResponse>(account);
+            try
+            {
+                var account = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
+                if (account == null)
+                {
+                    throw new NotFoundException("not found");
+                }
+                return _mapper.Map<AccountResponse>(account);
+            } catch (Exception ex) {
+                throw;
+            }
+         
         }
 
         public async Task UpdateAsync(Guid id, UpdateAccountRequestModel updateModel)
@@ -115,7 +125,11 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                 {
                     return loginViewModel;
                 }
-                throw new BadRequestException("Login fail!!!");
+                throw new BadRequestException("Incorrect username or password");
+            }
+            catch (BadRequestException)
+            {
+                throw;
             }
             catch (Exception ex)
             {

@@ -17,6 +17,7 @@ using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Application.Services.LayoutServices;
 using PhotoboothBranchService.Application.Services.MapStickerServices;
 using PhotoboothBranchService.Application.Services.PaymentMethodServices;
+using PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices;
 using PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
 using PhotoboothBranchService.Application.Services.PrinterServices;
 using PhotoboothBranchService.Application.Services.PrintPricingServices;
@@ -57,6 +58,10 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IThemeFrameService, ThemeFrameService>();
             services.AddScoped<IThemeStickerService, ThemeStickerService>();
             services.AddScoped<ITransactionHistoryService, TransactionHistoryService>();
+
+
+            //payment 
+            services.AddScoped<IVNPayService, VNPayService>();
 
             //Firebase
             services.AddScoped<IFirebaseService, FirebaseService>();
