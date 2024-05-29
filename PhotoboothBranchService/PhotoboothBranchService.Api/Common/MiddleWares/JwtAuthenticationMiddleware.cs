@@ -1,5 +1,7 @@
 ﻿using FirebaseAdmin.Auth;
+using Microsoft.Identity.Client;
 using PhotoboothBranchService.Application.Common.Helpers;
+using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Api.Common.MiddleWares
 {
@@ -12,7 +14,7 @@ namespace PhotoboothBranchService.Api.Common.MiddleWares
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, IAccountRepository accountRepository)
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
             if (token != null)
@@ -23,32 +25,24 @@ namespace PhotoboothBranchService.Api.Common.MiddleWares
                     var user = await FirebaseAuth.DefaultInstance.GetUserAsync(decodedToken.Uid);
                     var email = user.Email;
                     var role = "ANONYMOUS";
-                    var customerId = "";
+                    var accountId = "";
                     if (email == JsonHelper.GetFromAppSettings("Admin:Email"))
                     {
                         role = "ADMIN";
                     }
                     else
                     {
-                        //var customer = customerRepository.Get(c => c.Email == email).FirstOrDefault();
-                        //if (customer != null)
-                        //{
-                        //    role = "CUSTOMER";
-                        //    customerId = customer.CustomerId.ToString();
-                        //}
-                        //else
-                        //{
-                        //    var staff = staffRepository.Get(c => c.Email == email).FirstOrDefault();
-                        //    if (staff != null)
-                        //    {
-                        //        role = "STAFF";
-                        //    }
-                        //}
+                        var account = (await accountRepository.GetAsync(c => c.Email == email)).FirstOrDefault();
+                        if (account != null)
+                        {
+                            role = account.Role.RoleName;
+                            accountId = account.AccountID.ToString();
+                        }
                     }
                     context.Items["Role"] = role;
                     context.Items["Email"] = email;
                     context.Items["Token"] = token;
-                    context.Items["CustomerId"] = customerId;
+                    context.Items["CustomerId"] = accountId;
                 }
             };
             await _next(context);
