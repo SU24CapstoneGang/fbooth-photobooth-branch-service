@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Application.Services.CameraServices;
+using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Application.Services.DiscountServices;
 using PhotoboothBranchService.Application.Services.EffectsPackLogServices;
 using PhotoboothBranchService.Application.Services.FilterServices;
@@ -58,13 +59,16 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IThemeStickerService, ThemeStickerService>();
             services.AddScoped<ITransactionHistoryService, TransactionHistoryService>();
 
+            // cloudinary
+            services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
+            services.AddScoped<ICloudinaryService, CloudinaryService>();
             //Firebase
             services.AddScoped<IFirebaseService, FirebaseService>();
 
             //Password hasher
             services.AddScoped<IPasswordHasher, PasswordHasher>();
-            //JWT service
-            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+            ////JWT service
+            //services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
             // Add http client
             services.AddHttpClient<IJwtService, JwtService>();
 

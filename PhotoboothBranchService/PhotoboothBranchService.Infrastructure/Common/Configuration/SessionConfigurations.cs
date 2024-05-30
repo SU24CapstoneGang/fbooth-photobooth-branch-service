@@ -24,10 +24,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired(); // Tổng giá
 
 
-            builder.Property(s => s.StartTime)
-                .IsRequired();
-
-            builder.Property(s => s.EndTime)
+            builder.Property(s => s.CreateDate)
                 .IsRequired();
 
             // Relationship with PhotoBoothBranch

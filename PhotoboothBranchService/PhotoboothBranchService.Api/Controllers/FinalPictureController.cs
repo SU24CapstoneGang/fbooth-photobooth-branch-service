@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.FinalPicture;
+using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Application.Services.FinalPictureServices;
 
 namespace PhotoboothBranchService.Api.Controllers
@@ -10,10 +11,12 @@ namespace PhotoboothBranchService.Api.Controllers
     public class FinalPictureController : ControllerBase
     {
         private readonly IFinalPictureService _finalPictureService;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public FinalPictureController(IFinalPictureService finalPictureService)
+        public FinalPictureController(IFinalPictureService finalPictureService, ICloudinaryService cloudinaryService)
         {
             _finalPictureService = finalPictureService;
+            _cloudinaryService = cloudinaryService;
         }
 
         // Create
@@ -108,6 +111,31 @@ namespace PhotoboothBranchService.Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred while deleting the finalPicture: {ex.Message}");
+            }
+        }
+
+
+        [HttpPost("add-photo-cloud")]
+        public async Task<ActionResult<FinalPictureResponse>> AddPhoto(IFormFile file)
+        {
+            try
+            {
+                var result = await _cloudinaryService.AddPhotoAsync(file);
+                if (result.Error != null) return BadRequest(result.Error.Message);
+
+                var photoRequest = new CreateFinalPictureRequest
+                {
+                    PictureURl = result.SecureUrl.AbsoluteUri,
+                    //PublicId = result.PublicId
+                };
+
+                var id = await _finalPictureService.CreateAsync(photoRequest);
+
+                return CreatedAtAction(nameof(GetFinalPictureById), new { id }, photoRequest);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while adding the photo: {ex.Message}");
             }
         }
     }

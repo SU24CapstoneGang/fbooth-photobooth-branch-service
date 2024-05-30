@@ -6,6 +6,7 @@ namespace PhotoboothBranchService.Domain.Entities
     {
         public Guid PictureID { get; set; }
         public string PictureURl { get; set; } = default!;
+        public string PublicId { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime? LastModified { get; set; }
         public PhotoPrivacy PicturePrivacy { get; set; }

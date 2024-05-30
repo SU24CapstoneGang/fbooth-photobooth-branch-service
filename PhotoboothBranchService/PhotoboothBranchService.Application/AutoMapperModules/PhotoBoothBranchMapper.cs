@@ -12,9 +12,9 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
             CreateMap<CreatePhotoBoothBranchRequest, PhotoBoothBranch>().ReverseMap().HandleNullProperty();
             CreateMap<UpdatePhotoBoothBranchRequest, PhotoBoothBranch>().ReverseMap().HandleNullProperty();
             CreateMap<PhotoBoothBranch, PhotoBoothBranchresponse>()
-                .ForPath(des => des.CameraModelName, opt => opt.MapFrom(src => src.Camera.ModelName))
-                .ForPath(des => des.PrinterModelName, opt => opt.MapFrom(src => src.Printer.ModelName))
-                .ForMember(des => des.AccountName, opt => opt.MapFrom<FullNameResolver>())
+                //.ForPath(des => des.CameraModelName, opt => opt.MapFrom(src => src.Camera.ModelName))
+                //.ForPath(des => des.PrinterModelName, opt => opt.MapFrom(src => src.Printer.ModelName))
+                //.ForMember(des => des.AccountName, opt => opt.MapFrom<FullNameResolver>())
                 .ReverseMap()
                 .HandleNullProperty();
         }

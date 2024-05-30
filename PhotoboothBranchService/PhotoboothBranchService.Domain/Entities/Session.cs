@@ -5,8 +5,7 @@
         public Guid SessionID { get; set; } = default!;
         public int PhotosTaken { get; set; } = default!;
         public double TotalPrice { get; set; } = default!;
-        public DateTime StartTime { get; set; } = default!;
-        public DateTime EndTime { get; set; } = default!;
+        public DateTime CreateDate { get; set; } = default!;
         public Guid BranchesID { get; set; }
         public virtual PhotoBoothBranch PhotoBoothBranch { get; set; }
         public Guid? DiscountID { get; set; }

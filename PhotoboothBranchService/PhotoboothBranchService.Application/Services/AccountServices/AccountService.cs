@@ -16,19 +16,17 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository _accountRepository;
-        private readonly IJwtTokenGenerator _jwtTokenGenerator;
         private readonly IRoleRepository _roleRepository;
         private readonly IMapper _mapper;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IJwtService _jwtService;
         private readonly IFirebaseService _firebaseService;
 
-        public AccountService(IAccountRepository accountRepository, IJwtTokenGenerator jwtTokenGenerator,
+        public AccountService(IAccountRepository accountRepository,
             IRoleRepository roleRepository, IMapper mapper, IPasswordHasher passwordHasher,
             IJwtService jwtService, IFirebaseService firebaseService)
         {
             _accountRepository = accountRepository;
-            _jwtTokenGenerator = jwtTokenGenerator;
             _roleRepository = roleRepository;
             _mapper = mapper;
             _passwordHasher = passwordHasher;
