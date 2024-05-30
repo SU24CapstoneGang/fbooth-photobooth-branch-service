@@ -33,7 +33,20 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
 
         public async Task<IQueryable<EffectsPackLog>> GetAsync(Expression<Func<EffectsPackLog, bool>> predicate)
         {
-            return await Task.FromResult(_dbContext.EffectsPacks.Where(predicate).AsQueryable());
+            try
+            {
+                var result = _dbContext.EffectsPacks.Where(predicate).AsQueryable();
+                if (!result.Any())
+                {
+                    return await Task.FromResult(new List<EffectsPackLog>().AsQueryable());
+                }
+                return await Task.FromResult(result);
+            }
+            catch (Exception e)
+            {
+
+                throw new Exception(e.Message);
+            }
         }
 
         // Update

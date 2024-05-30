@@ -9,7 +9,7 @@ namespace PhotoboothBranchService.Application.DTOs.PaymentMethod
 {
     public class UpdatePaymentMethodRequest
     {
-        public string PaymentName { get; set; }
+        public string PaymentMethodName { get; set; }
         public PaymentStatus Status { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
@@ -30,7 +31,20 @@ public class PhotoBoothBranchRepository : IPhotoBoothBranchRepository
 
     public async Task<IQueryable<PhotoBoothBranch>> GetAsync(Expression<Func<PhotoBoothBranch, bool>> predicate)
     {
-        return await Task.FromResult(_dbContext.PhotoBoothBranches.Where(predicate));
+        try
+        {
+            var result = _dbContext.PhotoBoothBranches.Where(predicate);
+            if (!result.Any())
+            {
+                return await Task.FromResult(new List<PhotoBoothBranch>().AsQueryable());
+            }
+            return await Task.FromResult(result);
+        }
+        catch (Exception e)
+        {
+
+            throw new Exception(e.Message);
+        }
     }
 
     //Update

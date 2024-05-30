@@ -21,9 +21,18 @@ public class PhotoBoothBranchService : IPhotoBoothBranchService
     //Create
     public async Task<Guid> CreateAsync(CreatePhotoBoothBranchRequest createModel)
     {
-        PhotoBoothBranch photoBoothBranch = _mapper.Map<PhotoBoothBranch>(createModel);
-        await _photoBoothBranchRepository.AddAsync(photoBoothBranch);
-        return photoBoothBranch.PhotoBoothBranchID;
+        try
+        {
+           // await _photoBoothBranchRepository.GetAsync(createModel.)
+            PhotoBoothBranch photoBoothBranch = _mapper.Map<PhotoBoothBranch>(createModel);
+            await _photoBoothBranchRepository.AddAsync(photoBoothBranch);
+            return photoBoothBranch.PhotoBoothBranchID;
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
     }
     //Delete
     public async Task DeleteAsync(Guid id)

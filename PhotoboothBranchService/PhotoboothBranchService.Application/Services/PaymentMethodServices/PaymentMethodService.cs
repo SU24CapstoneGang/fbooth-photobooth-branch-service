@@ -28,7 +28,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
         {
             try
             {
-                var isPaymentExist = _paymentMethodRepository.GetAsync(p => p.PaymentMethodName.Equals(createModel.PaymentName));
+                var isPaymentExist = (await _paymentMethodRepository.GetAsync(p => p.PaymentMethodName.Equals(createModel.PaymentMethodName))).FirstOrDefault();
                 if (isPaymentExist != null) throw new BadRequestException("Payment method is already existed");
 
                 PaymentMethod paymentMethod = _mapper.Map<PaymentMethod>(createModel);

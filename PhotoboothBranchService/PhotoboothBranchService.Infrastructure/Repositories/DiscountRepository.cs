@@ -2,6 +2,7 @@
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
@@ -31,7 +32,20 @@ public class DiscountRepository : IDiscountRepository
 
     public async Task<IQueryable<Discount>> GetAsync(Expression<Func<Discount, bool>> predicate)
     {
-        return await Task.FromResult(_dbContext.Discounts.Where(predicate));
+        try
+        {
+            var result = _dbContext.Discounts.Where(predicate);
+            if (!result.Any())
+            {
+                return await Task.FromResult(new List<Discount>().AsQueryable());
+            }
+            return await Task.FromResult(result);
+        }
+        catch (Exception e)
+        {
+
+            throw new Exception(e.Message);
+        }
     }
 
     public async Task<IEnumerable<Discount>> GetByCode(string code)
