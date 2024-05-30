@@ -33,7 +33,20 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
 
         public async Task<IQueryable<ThemeFrame>> GetAsync(Expression<Func<ThemeFrame, bool>> predicate)
         {
-            return await Task.FromResult(_dbContext.ThemeFrames.Where(predicate).AsQueryable());
+            try
+            {
+                var result = _dbContext.ThemeFrames.Where(predicate);
+                if (!result.Any())
+                {
+                    return await Task.FromResult(new List<ThemeFrame>().AsQueryable());
+                }
+                return await Task.FromResult(result);
+            }
+            catch (Exception e)
+            {
+
+                throw new Exception(e.Message);
+            }
         }
 
         // Update

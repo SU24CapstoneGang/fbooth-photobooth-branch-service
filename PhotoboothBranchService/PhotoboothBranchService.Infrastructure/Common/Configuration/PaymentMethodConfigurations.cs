@@ -44,6 +44,23 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
               .ValueGeneratedOnAdd()
               .HasDefaultValue(DateTime.UtcNow)
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
+            //Add primordial data 
+            //builder.HasData(
+            //    new PaymentMethod
+            //    {
+            //        PaymentMethodID = new Guid("3ff27515-80e9-4ea9-8a60-5e2b02bc338a"),
+            //        PaymentMethodName = "VNPay",
+            //        CreateDate = DateTime.UtcNow,
+            //        Status = PaymentStatus.Active,
+            //    },
+            //    new PaymentMethod
+            //    {
+            //        PaymentMethodID = new Guid("e7292894-9c01-40f0-8354-e974d93098b7"),
+            //        PaymentMethodName = "MoMo",
+            //        CreateDate = DateTime.UtcNow,
+            //        Status = PaymentStatus.Active,
+            //    });
         }
     }
 }

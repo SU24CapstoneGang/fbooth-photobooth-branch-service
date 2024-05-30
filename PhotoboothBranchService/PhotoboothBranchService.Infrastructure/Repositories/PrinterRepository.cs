@@ -1,6 +1,7 @@
 ﻿using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
@@ -30,7 +31,20 @@ public class PrinterRepository : IPrinterRepository
 
     public async Task<IQueryable<Printer>> GetAsync(Expression<Func<Printer, bool>> predicate)
     {
-        return await Task.FromResult(_dbContext.Printers.Where(predicate));
+        try
+        {
+            var result = _dbContext.Printers.Where(predicate);
+            if (!result.Any())
+            {
+                return await Task.FromResult(new List<Printer>().AsQueryable());
+            }
+            return await Task.FromResult(result);
+        }
+        catch (Exception e)
+        {
+
+            throw new Exception(e.Message);
+        }
     }
 
     public async Task<Printer?> GetByIdAsync(Guid printerId)

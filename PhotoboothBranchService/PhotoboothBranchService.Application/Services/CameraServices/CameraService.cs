@@ -115,7 +115,7 @@ public class CameraService : ICameraService
             var camera = (await _cameraRepository.GetAsync(c => c.CameraID == id)).FirstOrDefault();
             if (camera == null)
             {
-                throw new NotFoundException("Camera", id, "Camera id not found");
+                throw new NotFoundException("Camera", id, "not found");
             }
 
             var updateCamera = _mapper.Map(updateModel, camera);

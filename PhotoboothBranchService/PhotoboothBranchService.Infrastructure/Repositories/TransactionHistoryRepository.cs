@@ -33,7 +33,20 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
 
         public async Task<IQueryable<TransactionHistory>> GetAsync(Expression<Func<TransactionHistory, bool>> predicate)
         {
-            return await Task.FromResult(_dbContext.TransactionHistories.Where(predicate).AsQueryable());
+            try
+            {
+                var result = _dbContext.TransactionHistories.Where(predicate);
+                if (!result.Any())
+                {
+                    return await Task.FromResult(new List<TransactionHistory>().AsQueryable());
+                }
+                return await Task.FromResult(result);
+            }
+            catch (Exception e)
+            {
+
+                throw new Exception(e.Message);
+            }
         }
 
         // Update

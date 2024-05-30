@@ -1,6 +1,7 @@
 ﻿using Microsoft.OpenApi.Models;
 using PhotoboothBranchService.Api.Common.MiddleWares;
 using PhotoboothBranchService.Application;
+using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Infrastructure;
 using System.Text.Json.Serialization;
 
@@ -46,6 +47,10 @@ builder.Services.AddRouting(options =>
     options.LowercaseUrls = true;
 });
 
+//http context accessor
+builder.Services.AddHttpContextAccessor();
+
+//add service from application layer and infrastructure layer
 builder.Services
     .AddApplicaiton(builder.Configuration)
     .AddInfrastructure(builder.Configuration);

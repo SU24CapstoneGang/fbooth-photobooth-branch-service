@@ -1,6 +1,7 @@
 ﻿using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
@@ -28,7 +29,20 @@ public class FrameRepository : IFrameRepository
 
     public async Task<IQueryable<Frame>> GetAsync(Expression<Func<Frame, bool>> predicate)
     {
-        return await Task.FromResult(_dbContext.Frames.Where(predicate));
+        try
+        {
+            var result = _dbContext.Frames.Where(predicate);
+            if (!result.Any())
+            {
+                return await Task.FromResult(new List<Frame>().AsQueryable());
+            }
+            return await Task.FromResult(result);
+        }
+        catch (Exception e)
+        {
+
+            throw new Exception(e.Message);
+        }
     }
 
     //Delete

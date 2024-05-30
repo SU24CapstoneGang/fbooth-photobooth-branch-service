@@ -33,7 +33,20 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
 
         public async Task<IQueryable<FinalPicture>> GetAsync(Expression<Func<FinalPicture, bool>> predicate)
         {
-            return await Task.FromResult(_dbContext.FinalPictures.Where(predicate).AsQueryable());
+            try
+            {
+                var result = _dbContext.FinalPictures.Where(predicate);
+                if (!result.Any())
+                {
+                    return await Task.FromResult(new List<FinalPicture>().AsQueryable());
+                }
+                return await Task.FromResult(result);
+            }
+            catch (Exception e)
+            {
+
+                throw new Exception(e.Message);
+            }
         }
 
         // Update

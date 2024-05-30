@@ -33,7 +33,20 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
 
         public async Task<IQueryable<MapSticker>> GetAsync(Expression<Func<MapSticker, bool>> predicate)
         {
-            return await Task.FromResult(_dbContext.MapStickers.Where(predicate).AsQueryable());
+            try
+            {
+                var result = _dbContext.MapStickers.Where(predicate);
+                if (!result.Any())
+                {
+                    return await Task.FromResult(new List<MapSticker>().AsQueryable());
+                }
+                return await Task.FromResult(result);
+            }
+            catch (Exception e)
+            {
+
+                throw new Exception(e.Message);
+            }
         }
 
         // Update
