@@ -24,22 +24,13 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired(); // Tổng giá
 
 
-            builder.Property(s => s.StartTime)
-                .IsRequired();
-
-            builder.Property(s => s.EndTime)
+            builder.Property(s => s.CreateDate)
                 .IsRequired();
 
             // Relationship with PhotoBoothBranch
             builder.HasOne(s => s.PhotoBoothBranch)
                 .WithMany(pb => pb.Sessions)
                 .HasForeignKey(s => s.BranchesID)
-                .IsRequired();
-
-            // Relationship with Layout
-            builder.HasOne(s => s.Layout)
-                .WithMany(l => l.Sessions)
-                .HasForeignKey(s => s.LayoutID)
                 .IsRequired();
 
             // Mối quan hệ một-nhieu giữa Session và Discount

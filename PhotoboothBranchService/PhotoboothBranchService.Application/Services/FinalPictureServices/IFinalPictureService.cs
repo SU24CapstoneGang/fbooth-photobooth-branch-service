@@ -1,6 +1,8 @@
-﻿using PhotoboothBranchService.Application.DTOs;
+﻿using Microsoft.AspNetCore.Http;
+using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.FinalPicture;
 using PhotoboothBranchService.Domain.Common.Interfaces;
+using PhotoboothBranchService.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +13,6 @@ namespace PhotoboothBranchService.Application.Services.FinalPictureServices
 {
     public interface IFinalPictureService : IService<FinalPictureResponse, CreateFinalPictureRequest, UpdateFinalPictureRequest, FinalPictureFilter, PagingModel>
     {
+        public Task<FinalPictureResponse> CreateFinalPictureAsync(IFormFile file, Guid SessionID);
     }
 }

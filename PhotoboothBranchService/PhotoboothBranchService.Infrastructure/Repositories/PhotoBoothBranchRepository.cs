@@ -1,4 +1,5 @@
-﻿using PhotoboothBranchService.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using System.Linq;
@@ -26,7 +27,9 @@ public class PhotoBoothBranchRepository : IPhotoBoothBranchRepository
     //Read
     public async Task<IQueryable<PhotoBoothBranch>> GetAllAsync()
     {
-        return await Task.FromResult(_dbContext.PhotoBoothBranches);
+        return await Task.FromResult(_dbContext.PhotoBoothBranches.Include(b => b.Camera)
+        .Include(b => b.Printer)
+        .Include(b => b.Sessions));
     }
 
     public async Task<IQueryable<PhotoBoothBranch>> GetAsync(Expression<Func<PhotoBoothBranch, bool>> predicate)

@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.FinalPicture;
+using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Application.Services.FinalPictureServices;
 
 namespace PhotoboothBranchService.Api.Controllers
@@ -10,10 +11,12 @@ namespace PhotoboothBranchService.Api.Controllers
     public class FinalPictureController : ControllerBase
     {
         private readonly IFinalPictureService _finalPictureService;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public FinalPictureController(IFinalPictureService finalPictureService)
+        public FinalPictureController(IFinalPictureService finalPictureService, ICloudinaryService cloudinaryService)
         {
             _finalPictureService = finalPictureService;
+            _cloudinaryService = cloudinaryService;
         }
 
         // Create
@@ -108,6 +111,23 @@ namespace PhotoboothBranchService.Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred while deleting the finalPicture: {ex.Message}");
+            }
+        }
+
+
+        [HttpPost("add-photo-cloud")]
+        public async Task<ActionResult<FinalPictureResponse>> AddPhoto(IFormFile file, Guid sessionID)
+        {
+            try
+            {
+                //var accountId = (Guid)HttpContext.Items["CustomerId"];
+                var result = await _finalPictureService.CreateFinalPictureAsync(file, sessionID);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while adding the photo: {ex.Message}");
             }
         }
     }

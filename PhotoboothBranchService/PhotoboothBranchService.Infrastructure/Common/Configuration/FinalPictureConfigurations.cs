@@ -26,8 +26,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(fp => fp.CreateDate)
                 .IsRequired();
 
-            builder.Property(fp => fp.LastModified)
-                .IsRequired();
+            //builder.Property(fp => fp.LastModified)
+            //    .IsRequired(false);
 
             // Privacy enum mapping
             builder.Property(fp => fp.PicturePrivacy)

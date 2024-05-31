@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
+using System.ComponentModel.DataAnnotations;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
@@ -23,8 +24,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(d => d.RemaniningUsage)
                 .IsRequired();
 
-            builder.Property(d => d.DiscountRate)
-                .IsRequired();
+            builder.Property(d => d.DiscountRate).HasPrecision(18, 2).IsRequired();
 
             builder.Property(d => d.CreateDate)
                 .IsRequired();

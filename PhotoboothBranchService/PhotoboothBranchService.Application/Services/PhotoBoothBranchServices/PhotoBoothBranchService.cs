@@ -30,7 +30,6 @@ public class PhotoBoothBranchService : IPhotoBoothBranchService
         }
         catch (Exception)
         {
-
             throw;
         }
     }

@@ -5,6 +5,7 @@ namespace PhotoboothBranchService.Domain.Entities
     public class TransactionHistory
     {
         public Guid TransactionID { get; set; }
+        public string ThirdpartyID { get; set; }
         public string Description { get; set; } = default!;
         public DateTime CreatedDate { get; set; }
         public DateTime? LastModified { get; set; }

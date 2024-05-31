@@ -2,8 +2,11 @@
 {
     public class CreateSessionRequest
     {
-        public DateTime StartTime { get; set; } = default!;
-        public DateTime EndTime { get; set; } = default!;
+        public int PhotosTaken { get; set; }
+        public double TotalPrice { get; set; }
         public Guid BranchesID { get; set; }
+        public Guid? DiscountID { get; set; }
+        public Guid PrintPricingID { get; set; }
+        public Guid? AccountID { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Authentication;
@@ -32,6 +33,7 @@ public class AccountsController : ControllerBaseApi
     //}
 
     // Read all
+    [Authorization("ADMIN", "CUSTOMER")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAllAccount()
     {

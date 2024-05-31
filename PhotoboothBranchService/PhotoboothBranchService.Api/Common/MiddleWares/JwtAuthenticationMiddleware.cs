@@ -5,11 +5,11 @@ using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Api.Common.MiddleWares
 {
-    public class FirebaseAuthenticationMiddleware
+    public class JwtAuthenticationMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public FirebaseAuthenticationMiddleware(RequestDelegate next)
+        public JwtAuthenticationMiddleware(RequestDelegate next)
         {
             _next = next;
         }
@@ -19,13 +19,14 @@ namespace PhotoboothBranchService.Api.Common.MiddleWares
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
             if (token != null)
             {
+                var role = "ANONYMOUS";
+                var accountId = Guid.Empty;
+
                 var decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(token);
                 if (decodedToken != null)
                 {
                     var user = await FirebaseAuth.DefaultInstance.GetUserAsync(decodedToken.Uid);
                     var email = user.Email;
-                    var role = "ANONYMOUS";
-                    var accountId = "";
                     if (email == JsonHelper.GetFromAppSettings("Admin:Email"))
                     {
                         role = "ADMIN";
@@ -36,7 +37,7 @@ namespace PhotoboothBranchService.Api.Common.MiddleWares
                         if (account != null)
                         {
                             role = account.Role.RoleName;
-                            accountId = account.AccountID.ToString();
+                            accountId = account.AccountID;
                         }
                     }
                     context.Items["Role"] = role;
@@ -52,7 +53,7 @@ namespace PhotoboothBranchService.Api.Common.MiddleWares
     {
         public static IApplicationBuilder UseJwtMiddleware(this IApplicationBuilder builder)
         {
-            return builder.UseMiddleware<FirebaseAuthenticationMiddleware>();
+            return builder.UseMiddleware<JwtAuthenticationMiddleware>();
         }
     }
 }
