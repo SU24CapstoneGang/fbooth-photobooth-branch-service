@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 
@@ -11,9 +12,11 @@ using PhotoboothBranchService.Infrastructure.Common.Persistence;
 namespace PhotoboothBranchService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240531055810_migration-Vd1")]
+    partial class migrationVd1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -125,7 +128,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 646, DateTimeKind.Utc).AddTicks(1115));
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 5, 58, 10, 34, DateTimeKind.Utc).AddTicks(8694));
 
                     b.Property<string>("DiscountCode")
                         .IsRequired()
@@ -199,7 +202,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 648, DateTimeKind.Utc).AddTicks(271));
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 5, 58, 10, 37, DateTimeKind.Utc).AddTicks(1368));
 
                     b.Property<string>("FilterName")
                         .IsRequired()
@@ -238,7 +241,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 648, DateTimeKind.Utc).AddTicks(4602));
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 5, 58, 10, 37, DateTimeKind.Utc).AddTicks(6200));
 
                     b.Property<string>("PicturePrivacy")
                         .IsRequired()
@@ -274,7 +277,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 648, DateTimeKind.Utc).AddTicks(6741));
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 5, 58, 10, 37, DateTimeKind.Utc).AddTicks(8558));
 
                     b.Property<string>("FrameName")
                         .IsRequired()
@@ -313,7 +316,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 648, DateTimeKind.Utc).AddTicks(8866));
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 5, 58, 10, 38, DateTimeKind.Utc).AddTicks(767));
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
@@ -363,7 +366,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 649, DateTimeKind.Utc).AddTicks(1386));
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 5, 58, 10, 38, DateTimeKind.Utc).AddTicks(3412));
 
                     b.Property<string>("PaymentMethodName")
                         .IsRequired()
@@ -382,14 +385,14 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         new
                         {
                             PaymentMethodID = new Guid("1b4f2a3e-7d94-4119-8b6d-5c15b02848f6"),
-                            CreateDate = new DateTime(2024, 5, 31, 13, 18, 27, 649, DateTimeKind.Utc).AddTicks(1616),
+                            CreateDate = new DateTime(2024, 5, 31, 5, 58, 10, 38, DateTimeKind.Utc).AddTicks(3654),
                             PaymentMethodName = "VNPay",
                             Status = "Active"
                         },
                         new
                         {
                             PaymentMethodID = new Guid("f3b6e6b2-f90e-4f6b-8cd2-68b467afae0f"),
-                            CreateDate = new DateTime(2024, 5, 31, 13, 18, 27, 649, DateTimeKind.Utc).AddTicks(1620),
+                            CreateDate = new DateTime(2024, 5, 31, 5, 58, 10, 38, DateTimeKind.Utc).AddTicks(3657),
                             PaymentMethodName = "MoMo",
                             Status = "Active"
                         });
@@ -453,17 +456,16 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 651, DateTimeKind.Utc).AddTicks(4134));
-
-                    b.Property<decimal>("DiscountPerPrintNumber")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 5, 58, 10, 40, DateTimeKind.Utc).AddTicks(7406));
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("MinQuantity")
                         .HasColumnType("int");
+
+                    b.Property<float>("UnitPrice")
+                        .HasColumnType("real");
 
                     b.HasKey("PrintPricingID");
 
@@ -584,7 +586,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 652, DateTimeKind.Utc).AddTicks(1796));
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 5, 58, 10, 41, DateTimeKind.Utc).AddTicks(5301));
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");

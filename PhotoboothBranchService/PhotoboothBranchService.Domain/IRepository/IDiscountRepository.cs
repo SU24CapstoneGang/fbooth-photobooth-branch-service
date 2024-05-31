@@ -5,4 +5,5 @@ namespace PhotoboothBranchService.Domain.IRepository;
 
 public interface IDiscountRepository : IRepositoryBase<Discount>
 {
+    public Task<IEnumerable<Discount>> GetByCode(string code);
 }

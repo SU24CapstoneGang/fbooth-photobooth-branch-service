@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Actions;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Account;
@@ -212,7 +213,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                 var account = (await _accountRepository.GetAsync(a => a.Email.Equals(email))).FirstOrDefault();
                 if (account == null)
                 {
-
+                    throw new NotFoundException("Account", email, "Email does not exist in the system.");
                 }
                 return _mapper.Map<AccountResponse>(account);
             }

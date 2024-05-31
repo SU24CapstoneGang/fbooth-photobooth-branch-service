@@ -12,8 +12,8 @@ using PhotoboothBranchService.Infrastructure.Common.Persistence;
 namespace PhotoboothBranchService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240530163453_PhotoBracnhServiceV6")]
-    partial class PhotoBracnhServiceV6
+    [Migration("20240531131827_migration-Vd2")]
+    partial class migrationVd2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -128,7 +128,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 30, 16, 34, 53, 435, DateTimeKind.Utc).AddTicks(1171));
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 646, DateTimeKind.Utc).AddTicks(1115));
 
                     b.Property<string>("DiscountCode")
                         .IsRequired()
@@ -202,7 +202,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 30, 16, 34, 53, 437, DateTimeKind.Utc).AddTicks(5893));
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 648, DateTimeKind.Utc).AddTicks(271));
 
                     b.Property<string>("FilterName")
                         .IsRequired()
@@ -241,11 +241,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 30, 16, 34, 53, 438, DateTimeKind.Utc).AddTicks(2173));
-
-                    b.Property<DateTime?>("LastModified")
-                        .IsRequired()
-                        .HasColumnType("datetime2");
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 648, DateTimeKind.Utc).AddTicks(4602));
 
                     b.Property<string>("PicturePrivacy")
                         .IsRequired()
@@ -281,7 +277,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 30, 16, 34, 53, 438, DateTimeKind.Utc).AddTicks(5075));
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 648, DateTimeKind.Utc).AddTicks(6741));
 
                     b.Property<string>("FrameName")
                         .IsRequired()
@@ -320,7 +316,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 30, 16, 34, 53, 438, DateTimeKind.Utc).AddTicks(8053));
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 648, DateTimeKind.Utc).AddTicks(8866));
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
@@ -370,7 +366,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 30, 16, 34, 53, 439, DateTimeKind.Utc).AddTicks(1894));
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 649, DateTimeKind.Utc).AddTicks(1386));
 
                     b.Property<string>("PaymentMethodName")
                         .IsRequired()
@@ -388,15 +384,15 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            PaymentMethodID = new Guid("3ff27515-80e9-4ea9-8a60-5e2b02bc338a"),
-                            CreateDate = new DateTime(2024, 5, 30, 16, 34, 53, 439, DateTimeKind.Utc).AddTicks(2225),
+                            PaymentMethodID = new Guid("1b4f2a3e-7d94-4119-8b6d-5c15b02848f6"),
+                            CreateDate = new DateTime(2024, 5, 31, 13, 18, 27, 649, DateTimeKind.Utc).AddTicks(1616),
                             PaymentMethodName = "VNPay",
                             Status = "Active"
                         },
                         new
                         {
-                            PaymentMethodID = new Guid("e7292894-9c01-40f0-8354-e974d93098b7"),
-                            CreateDate = new DateTime(2024, 5, 30, 16, 34, 53, 439, DateTimeKind.Utc).AddTicks(2228),
+                            PaymentMethodID = new Guid("f3b6e6b2-f90e-4f6b-8cd2-68b467afae0f"),
+                            CreateDate = new DateTime(2024, 5, 31, 13, 18, 27, 649, DateTimeKind.Utc).AddTicks(1620),
                             PaymentMethodName = "MoMo",
                             Status = "Active"
                         });
@@ -423,7 +419,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<Guid?>("CameraID")
-                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -441,7 +436,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.HasIndex("AccountID");
 
                     b.HasIndex("CameraID")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[CameraID] IS NOT NULL");
 
                     b.HasIndex("PrinterID")
                         .IsUnique()
@@ -460,16 +456,17 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 30, 16, 34, 53, 442, DateTimeKind.Utc).AddTicks(2741));
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 651, DateTimeKind.Utc).AddTicks(4134));
+
+                    b.Property<decimal>("DiscountPerPrintNumber")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("MinQuantity")
                         .HasColumnType("int");
-
-                    b.Property<float>("UnitPrice")
-                        .HasColumnType("real");
 
                     b.HasKey("PrintPricingID");
 
@@ -519,22 +516,22 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            RoleID = new Guid("ba132a6b-5963-4869-94d5-f8736273fe7b"),
+                            RoleID = new Guid("4a1f17f8-c66f-4c6e-a0c2-8b95b8d4e5bb"),
                             RoleName = "Admin"
                         },
                         new
                         {
-                            RoleID = new Guid("f74311a5-b646-4db8-9814-e2154b3f402e"),
+                            RoleID = new Guid("9d7c0f8b-cb6f-4894-8e91-b5b594c1c37c"),
                             RoleName = "Customer"
                         },
                         new
                         {
-                            RoleID = new Guid("9bd86f81-ce71-4a5c-98f0-702ac0409470"),
+                            RoleID = new Guid("e82f0f61-4488-4b18-bf68-540704917e6a"),
                             RoleName = "BranchManager"
                         },
                         new
                         {
-                            RoleID = new Guid("80624419-a203-40b7-9dc0-51205b34e1c6"),
+                            RoleID = new Guid("2f3d2f4b-8370-4b12-8e5c-1e38c3f9bace"),
                             RoleName = "Manager"
                         });
                 });
@@ -590,7 +587,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 30, 16, 34, 53, 443, DateTimeKind.Utc).AddTicks(3796));
+                        .HasDefaultValue(new DateTime(2024, 5, 31, 13, 18, 27, 652, DateTimeKind.Utc).AddTicks(1796));
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
@@ -842,9 +839,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
                     b.HasOne("PhotoboothBranchService.Domain.Entities.Camera", "Camera")
                         .WithOne("PhotoBoothBranch")
-                        .HasForeignKey("PhotoboothBranchService.Domain.Entities.PhotoBoothBranch", "CameraID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PhotoboothBranchService.Domain.Entities.PhotoBoothBranch", "CameraID");
 
                     b.HasOne("PhotoboothBranchService.Domain.Entities.Printer", "Printer")
                         .WithOne("PhotoBoothBranch")

@@ -18,8 +18,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .ValueGeneratedOnAdd();
 
             // Other properties
-            builder.Property(pp => pp.UnitPrice)
-                .IsRequired();
+            builder.Property(pp => pp.DiscountPerPrintNumber).HasPrecision(18, 2).IsRequired();
 
             builder.Property(pp => pp.MinQuantity)
             .IsRequired(); // Số lượng tối thiểu

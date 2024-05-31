@@ -13,6 +13,6 @@ namespace PhotoboothBranchService.Application.Services.FinalPictureServices
 {
     public interface IFinalPictureService : IService<FinalPictureResponse, CreateFinalPictureRequest, UpdateFinalPictureRequest, FinalPictureFilter, PagingModel>
     {
-        public Task<FinalPictureResponse> CreateFinalPictureAsync(IFormFile file, Guid SessionID);
+        public Task<FinalPictureResponse> CreateFinalPictureAsync(IFormFile file, Guid branchID, int photoTaken, Guid layoutID, string? discountCode, Guid? accountID);
     }
 }

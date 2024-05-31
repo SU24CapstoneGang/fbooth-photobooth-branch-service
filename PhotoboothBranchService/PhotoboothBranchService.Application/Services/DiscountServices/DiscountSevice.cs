@@ -26,7 +26,7 @@ public class DiscountService : IDiscountService
         try
         {
             var isDiscountExisted = await _discountRepository.GetAsync(d => d.DiscountCode == createModel.DiscountCode);
-            if (isDiscountExisted != null) throw new BadRequestException("Discount code is already existed");
+            if (isDiscountExisted == null) throw new BadRequestException("Discount code is already existed");
 
             var discount = _mapper.Map<Discount>(createModel);
             discount.Status = DiscountStatus.Active;

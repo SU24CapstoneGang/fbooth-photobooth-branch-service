@@ -24,6 +24,8 @@ public class DiscountRepository : IDiscountRepository
         return discount.DiscountID;
     }
 
+
+
     // Get all Discounts from the database
     public async Task<IQueryable<Discount>> GetAllAsync()
     {

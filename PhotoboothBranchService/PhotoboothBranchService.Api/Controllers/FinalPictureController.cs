@@ -116,12 +116,12 @@ namespace PhotoboothBranchService.Api.Controllers
 
 
         [HttpPost("add-photo-cloud")]
-        public async Task<ActionResult<FinalPictureResponse>> AddPhoto(IFormFile file, Guid sessionID)
+        public async Task<ActionResult<FinalPictureResponse>> AddPhoto(IFormFile file, Guid branchID, int photoTaken, Guid layoutID, string? discountCode, Guid? accountID)
         {
             try
             {
-                //var accountId = (Guid)HttpContext.Items["CustomerId"];
-                var result = await _finalPictureService.CreateFinalPictureAsync(file, sessionID);
+
+                var result = await _finalPictureService.CreateFinalPictureAsync(file, branchID, photoTaken, layoutID, discountCode, accountID);
 
                 return Ok(result);
             }

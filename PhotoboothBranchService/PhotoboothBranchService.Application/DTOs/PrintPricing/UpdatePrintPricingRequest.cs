@@ -8,7 +8,7 @@ namespace PhotoboothBranchService.Application.DTOs.PrintPricing
 {
     public class UpdatePrintPricingRequest
     {
-        public float UnitPrice { get; set; }
+        public decimal DiscountPerPrintNumber { get; set; }
         public int MinQuantity { get; set; }
     }
 }

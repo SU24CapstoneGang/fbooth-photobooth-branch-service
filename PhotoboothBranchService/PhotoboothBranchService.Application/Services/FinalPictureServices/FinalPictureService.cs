@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.FinalPicture;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
+using PhotoboothBranchService.Application.Services.LayoutServices;
+using PhotoboothBranchService.Application.Services.PrintPricingServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -21,14 +23,22 @@ namespace PhotoboothBranchService.Application.Services.FinalPictureServices
         private readonly IMapper _mapper;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly ISessionRepository _sessionRepository;
+        private readonly IPrintPricingService _printPricingService;
+        private readonly IPrintPricingRepository _printPricingRepository;
+        private readonly IDiscountRepository _discountRepository;
+        private readonly ILayoutRepository _layoutRepository;
 
-        public FinalPictureService(IFinalPictureRepository finalPictureRepository, IMapper mapper, 
-            ICloudinaryService cloudinaryService, ISessionRepository sessionRepository)
+        public FinalPictureService(IFinalPictureRepository finalPictureRepository, IMapper mapper,
+            ICloudinaryService cloudinaryService, ISessionRepository sessionRepository, IPrintPricingService printPricingService,
+            IDiscountRepository discountRepository, ILayoutRepository layoutRepository)
         {
             _finalPictureRepository = finalPictureRepository;
             _mapper = mapper;
             _cloudinaryService = cloudinaryService;
             _sessionRepository = sessionRepository;
+            _printPricingService = printPricingService;
+            _discountRepository = discountRepository;
+            _layoutRepository = layoutRepository;
         }
 
         public async Task<Guid> CreateAsync(CreateFinalPictureRequest createModel)
@@ -37,8 +47,62 @@ namespace PhotoboothBranchService.Application.Services.FinalPictureServices
             return await _finalPictureRepository.AddAsync(finalPicture);
         }
 
-        public async Task<FinalPictureResponse> CreateFinalPictureAsync(IFormFile file, Guid SessionID)
+        public async Task<FinalPictureResponse> CreateFinalPictureAsync(IFormFile file, Guid branchID, int photoTaken, Guid layoutID, string? discountCode, Guid? accountID)
         {
+            //var session = (await _sessionRepository.GetAsync(s => s.BranchesID.Equals(branchID) && s.FinalPicture == null)).FirstOrDefault();
+
+            // Retrieve pricing information
+            var layout = (await _layoutRepository.GetAsync(l => l.LayoutID.Equals(layoutID))).FirstOrDefault();
+            if (layout == null)
+            {
+                throw new Exception("Layout not found.");
+            }
+
+            var printPricing = (await _printPricingRepository.GetAsync(p => p.MinQuantity < photoTaken || p.MinQuantity == photoTaken)).FirstOrDefault();
+            if (printPricing == null)
+            {
+                throw new Exception("Print pricing not found.");
+            }
+
+            Discount discount = null;
+            if (discountCode != null)
+            {
+                discount = (await _discountRepository.GetByCode(discountCode)).FirstOrDefault();
+                if (discount == null)
+                {
+                    throw new Exception("Invalid discount code.");
+                }
+            }
+            // Calculate total price per final picture
+            decimal totalPrice = (decimal)layout.LayoutPrice  * photoTaken;
+
+            // Apply discount if available
+            if (discount != null)
+            {
+                totalPrice -= (totalPrice * (discount.DiscountRate / 100) * (printPricing.DiscountPerPrintNumber / 100));
+            }
+
+            // Calculate total price
+            //decimal totalPrice = (decimal)layout.LayoutPrice + ((decimal)printPricing.UnitPrice * photoTaken);
+            //if (discount != null)
+            //{
+            //    totalPrice -= (totalPrice * discount.DiscountRate / 100);
+            //}
+
+            // If no session exists for the branch, create a new session
+            //if (session == null)
+            //{
+            var session = new Session
+            {
+                PhotosTaken = photoTaken,
+                TotalPrice = (double)totalPrice,
+                CreateDate = DateTime.UtcNow,
+                BranchesID = branchID,
+                PrintPricingID = printPricing.PrintPricingID,
+                DiscountID = discount?.DiscountID
+            };
+            await _sessionRepository.AddAsync(session);
+            //}
 
             var uploadResult = await _cloudinaryService.AddPhotoAsync(file);
             if (uploadResult.Error != null)
@@ -52,10 +116,11 @@ namespace PhotoboothBranchService.Application.Services.FinalPictureServices
                 PublicId = uploadResult.PublicId,
                 CreateDate = DateTime.UtcNow,
                 PicturePrivacy = PhotoPrivacy.Public,
-                SessionID = SessionID
+                SessionID = session.SessionID
             };
 
             await _finalPictureRepository.AddAsync(finalPicture);
+
             return new FinalPictureResponse
             {
                 PictureID = finalPicture.PictureID,
@@ -65,50 +130,6 @@ namespace PhotoboothBranchService.Application.Services.FinalPictureServices
             };
         }
 
-        //public async Task<FinalPictureResponse> CreateFinalPictureAsync(IFormFile file)
-        //{
-        //    // Upload the photo to Cloudinary
-        //    var uploadResult = await _cloudinaryService.AddPhotoAsync(file);
-        //    if (uploadResult.Error != null)
-        //    {
-        //        throw new Exception(uploadResult.Error.Message);
-        //    }
-        //    var us = _photoBoothBranchRepository.GetAsync(p => p.AccountID == );
-
-        //    // Create a new session
-        //    var session = new Session
-        //    {
-        //        CreateDate = DateTime.UtcNow,
-        //        PhotosTaken = request.PrintQuantity,
-        //        TotalPrice = 0.0, // Set your logic for the total price
-        //        BranchesID = ,
-        //        DiscountID = request.DiscountID,
-        //        PrintPricingID = request.PrintPricingID,
-        //        AccountID = request.AccountID
-        //    };
-
-        //    // Create a new final picture
-        //    var finalPicture = new FinalPicture
-        //    {
-        //        PictureURl = uploadResult.SecureUrl.AbsoluteUri,
-        //        PublicId = uploadResult.PublicId,
-        //        CreateDate = DateTime.UtcNow,
-        //        PicturePrivacy = PhotoPrivacy.Public,
-        //        SessionID = session.SessionID,
-        //        Session = session
-        //    };
-
-        //    _sessionRepository.AddAsync(session);
-        //    _finalPictureRepository.AddAsync(finalPicture);
-
-        //    return new FinalPictureResponse
-        //    {
-        //        PictureID = finalPicture.PictureID,
-        //        PictureURl = finalPicture.PictureURl,
-        //        CreateDate = finalPicture.CreateDate,
-        //        PicturePrivacy = finalPicture.PicturePrivacy
-        //    };
-        //}
 
         public async Task DeleteAsync(Guid id)
         {
