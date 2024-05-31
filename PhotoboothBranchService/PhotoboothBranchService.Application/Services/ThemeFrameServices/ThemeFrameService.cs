@@ -4,10 +4,6 @@ using PhotoboothBranchService.Application.DTOs.ThemeFrame;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.ThemeFrameServices
 {
@@ -60,7 +56,7 @@ namespace PhotoboothBranchService.Application.Services.ThemeFrameServices
 
         public async Task<IEnumerable<ThemeFrameResponse>> GetByName(string name)
         {
-            var themeFrames = await _themeFrameRepository.GetAsync(i=>i.ThemeFrameName.Contains(name));
+            var themeFrames = await _themeFrameRepository.GetAsync(i => i.ThemeFrameName.Contains(name));
             return _mapper.Map<IEnumerable<ThemeFrameResponse>>(themeFrames.ToList());
         }
 

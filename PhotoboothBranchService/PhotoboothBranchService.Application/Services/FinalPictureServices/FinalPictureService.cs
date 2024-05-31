@@ -3,17 +3,10 @@ using Microsoft.AspNetCore.Http;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.FinalPicture;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
-using PhotoboothBranchService.Application.Services.LayoutServices;
-using PhotoboothBranchService.Application.Services.PrintPricingServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
 
 namespace PhotoboothBranchService.Application.Services.FinalPictureServices
 {
@@ -23,22 +16,22 @@ namespace PhotoboothBranchService.Application.Services.FinalPictureServices
         private readonly IMapper _mapper;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly ISessionRepository _sessionRepository;
-        private readonly IPrintPricingService _printPricingService;
         private readonly IPrintPricingRepository _printPricingRepository;
         private readonly IDiscountRepository _discountRepository;
         private readonly ILayoutRepository _layoutRepository;
 
         public FinalPictureService(IFinalPictureRepository finalPictureRepository, IMapper mapper,
-            ICloudinaryService cloudinaryService, ISessionRepository sessionRepository, IPrintPricingService printPricingService,
+            IPrintPricingRepository printPricingRepository,
+            ICloudinaryService cloudinaryService, ISessionRepository sessionRepository,
             IDiscountRepository discountRepository, ILayoutRepository layoutRepository)
         {
             _finalPictureRepository = finalPictureRepository;
             _mapper = mapper;
             _cloudinaryService = cloudinaryService;
             _sessionRepository = sessionRepository;
-            _printPricingService = printPricingService;
             _discountRepository = discountRepository;
             _layoutRepository = layoutRepository;
+            _printPricingRepository = printPricingRepository;
         }
 
         public async Task<Guid> CreateAsync(CreateFinalPictureRequest createModel)
@@ -58,7 +51,13 @@ namespace PhotoboothBranchService.Application.Services.FinalPictureServices
                 throw new Exception("Layout not found.");
             }
 
-            var printPricing = (await _printPricingRepository.GetAsync(p => p.MinQuantity < photoTaken || p.MinQuantity == photoTaken)).FirstOrDefault();
+            var printPricing = (await _printPricingRepository.GetAsync(p => p.MinQuantity <= photoTaken)).OrderByDescending(p => p.MinQuantity).FirstOrDefault();
+            //var printPricing = (await _printPricingRepository.GetAsync(p => p.MinQuantity.Equals(photoTaken))).FirstOrDefault();
+            //if (printPricing == null)
+            //{
+            //    printPricing = (await _printPricingRepository.GetAsync(p => p.MinQuantity < photoTaken)).OrderByDescending(p => p.MinQuantity).FirstOrDefault();
+            //}
+
             if (printPricing == null)
             {
                 throw new Exception("Print pricing not found.");
@@ -74,7 +73,7 @@ namespace PhotoboothBranchService.Application.Services.FinalPictureServices
                 }
             }
             // Calculate total price per final picture
-            decimal totalPrice = (decimal)layout.LayoutPrice  * photoTaken;
+            decimal totalPrice = (decimal)layout.LayoutPrice * photoTaken;
 
             // Apply discount if available
             if (discount != null)

@@ -34,7 +34,8 @@ public class RoleService : IRoleService
             await _roleRepository.AddAsync(role);
             return role.RoleID;
 
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             throw new Exception("An error occurred while create role: " + ex.Message);
         }
@@ -47,7 +48,7 @@ public class RoleService : IRoleService
             var role = (await _roleRepository.GetAsync(r => r.RoleID == id)).FirstOrDefault();
             if (role == null)
                 throw new NotFoundException("Role", id, "Role not found");
-            
+
             await _roleRepository.RemoveAsync(role);
         }
         catch (Exception ex)

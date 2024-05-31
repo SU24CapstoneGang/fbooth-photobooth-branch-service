@@ -4,10 +4,6 @@ using PhotoboothBranchService.Application.DTOs.ThemeSticker;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.ThemeStickerServices
 {
@@ -60,7 +56,7 @@ namespace PhotoboothBranchService.Application.Services.ThemeStickerServices
 
         public async Task<IEnumerable<ThemeStickerResponse>> GetByName(string name)
         {
-            var themeStickers = await _themeStickerRepository.GetAsync(i=>i.ThemeStickerName.Contains(name));
+            var themeStickers = await _themeStickerRepository.GetAsync(i => i.ThemeStickerName.Contains(name));
             return _mapper.Map<IEnumerable<ThemeStickerResponse>>(themeStickers.ToList());
         }
 

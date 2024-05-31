@@ -54,7 +54,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<ISessionService, SessionService>();
             services.AddScoped<IStickerService, StickerService>();
-            services.AddScoped<IThemeFilterService,ThemeFilterService>();
+            services.AddScoped<IThemeFilterService, ThemeFilterService>();
             services.AddScoped<IThemeFrameService, ThemeFrameService>();
             services.AddScoped<IThemeStickerService, ThemeStickerService>();
             services.AddScoped<ITransactionHistoryService, TransactionHistoryService>();

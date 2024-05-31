@@ -2,11 +2,6 @@
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.PrintPricing;
 using PhotoboothBranchService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.AutoMapperModules
 {
@@ -16,7 +11,7 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
         {
             CreateMap<CreatePrintPricingRequest, PrintPricing>().ReverseMap().HandleNullProperty();
             CreateMap<UpdatePrintPricingRequest, PrintPricing>().ReverseMap().HandleNullProperty();
-            CreateMap<PrintPricing,PrintPricingResponse>().ReverseMap().HandleNullProperty();
+            CreateMap<PrintPricing, PrintPricingResponse>().ReverseMap().HandleNullProperty();
         }
     }
 }

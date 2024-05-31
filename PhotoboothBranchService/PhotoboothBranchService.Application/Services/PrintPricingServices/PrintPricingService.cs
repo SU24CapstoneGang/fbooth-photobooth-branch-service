@@ -5,10 +5,6 @@ using PhotoboothBranchService.Application.DTOs.PrintPricing;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.PrintPricingServices
 {
@@ -29,7 +25,8 @@ namespace PhotoboothBranchService.Application.Services.PrintPricingServices
             {
                 PrintPricing printPricing = _mapper.Map<PrintPricing>(createModel);
                 return await _printPricingRepository.AddAsync(printPricing);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception("An error occurred while create price: " + ex.Message);
             }
@@ -58,7 +55,8 @@ namespace PhotoboothBranchService.Application.Services.PrintPricingServices
             {
                 var printPricings = await _printPricingRepository.GetAllAsync();
                 return _mapper.Map<IEnumerable<PrintPricingResponse>>(printPricings.ToList());
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception("An error occurred while getting print price: " + ex.Message);
             }
@@ -88,11 +86,12 @@ namespace PhotoboothBranchService.Application.Services.PrintPricingServices
                     throw new NotFoundException("PrintPricing", id, "Print pricing not found");
 
                 return _mapper.Map<PrintPricingResponse>(printPricings);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception("An error occurred while get print price: " + ex.Message);
             }
-            
+
         }
 
         //public async Task<IEnumerable<PrintPricingResponse>> GetByName(string name)
@@ -113,7 +112,8 @@ namespace PhotoboothBranchService.Application.Services.PrintPricingServices
 
                 var updatedPrintPricing = _mapper.Map(updateModel, printPricing);
                 await _printPricingRepository.UpdateAsync(updatedPrintPricing);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception("An error occurred while update print price: " + ex.Message);
             }

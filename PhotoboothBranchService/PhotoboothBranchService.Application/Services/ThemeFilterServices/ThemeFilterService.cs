@@ -4,10 +4,6 @@ using PhotoboothBranchService.Application.DTOs.ThemeFilter;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.ThemeFilterServices
 {
@@ -60,7 +56,7 @@ namespace PhotoboothBranchService.Application.Services.ThemeFilterServices
 
         public async Task<IEnumerable<ThemeFilterResponse>> GetByName(string name)
         {
-            var themeFilters = await _themeFilterRepository.GetAsync(i=>i.ThemeFilterName.Contains(name));
+            var themeFilters = await _themeFilterRepository.GetAsync(i => i.ThemeFilterName.Contains(name));
             return _mapper.Map<IEnumerable<ThemeFilterResponse>>(themeFilters.ToList());
         }
 

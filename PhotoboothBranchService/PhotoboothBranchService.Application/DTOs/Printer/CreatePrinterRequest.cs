@@ -1,6 +1,4 @@
-﻿using PhotoboothBranchService.Domain.Enum;
-
-namespace PhotoboothBranchService.Application.DTOs.Printer
+﻿namespace PhotoboothBranchService.Application.DTOs.Printer
 {
     public class CreatePrinterRequest
     {

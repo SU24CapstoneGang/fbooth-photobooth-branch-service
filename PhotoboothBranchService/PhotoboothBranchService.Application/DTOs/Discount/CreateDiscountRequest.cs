@@ -1,5 +1,4 @@
-﻿using PhotoboothBranchService.Domain.Enum;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace PhotoboothBranchService.Application.DTOs.Discount;
 

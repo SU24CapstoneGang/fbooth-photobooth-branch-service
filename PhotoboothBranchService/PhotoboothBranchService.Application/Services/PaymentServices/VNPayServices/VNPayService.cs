@@ -1,13 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Protocols;
-using PhotoboothBranchService.Application.Common;
+﻿using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices
 {
@@ -18,7 +11,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
         string vnp_TmnCode = JsonHelper.GetFromAppSettings("VNPay:vnp_TmnCode"); //Ma định danh merchant kết nối (Terminal Id)
         string vnp_HashSecret = JsonHelper.GetFromAppSettings("VNPay:vnp_HashSecret"); //Secret Key
         public async Task<string> Pay(PaymentRequest paymentRequest)
-        {          
+        {
             //create library
             VnPayLibrary vnpay = new VnPayLibrary();
 
@@ -38,15 +31,16 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
             else if (paymentRequest.BankCode == "INTCARD")
             {
                 vnpay.AddRequestData("vnp_BankCode", "INTCARD");
-            } else
+            }
+            else
             {
                 vnpay.AddRequestData("vnp_BankCode", "");
             };
             vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", "VND");
-            if (paymentRequest.ClientIpAddress!= null)
+            if (paymentRequest.ClientIpAddress != null)
             {
-                vnpay.AddRequestData("vnp_IpAddr", paymentRequest.ClientIpAddress); 
+                vnpay.AddRequestData("vnp_IpAddr", paymentRequest.ClientIpAddress);
             }
             vnpay.AddRequestData("vnp_Locale", "vn");
             vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:");

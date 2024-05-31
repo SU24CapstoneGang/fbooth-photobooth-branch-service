@@ -28,7 +28,8 @@ public class PrinterService : IPrinterService
             printer.Status = ManufactureStatus.Active;
             await _printerRepository.AddAsync(printer);
             return printer.PrinterID;
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             throw new Exception("An error occurred while create Printer: " + ex.Message);
         }

@@ -23,8 +23,8 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
             .ForMember(dest => dest.PasswordSalt, opt => opt.Ignore())
             .ForMember(dest => dest.AccountID, opt => opt.Ignore())
             .ForMember(dest => dest.Status, opt => opt.Ignore())
-            .ForMember(dest => dest.Email, opt => opt.Ignore()) 
-            .ForMember(dest => dest.RoleID, opt => opt.Ignore()) 
+            .ForMember(dest => dest.Email, opt => opt.Ignore())
+            .ForMember(dest => dest.RoleID, opt => opt.Ignore())
             .ForMember(dest => dest.RoleID, opt => opt.Ignore()).ReverseMap().HandleNullProperty();
         }
     }

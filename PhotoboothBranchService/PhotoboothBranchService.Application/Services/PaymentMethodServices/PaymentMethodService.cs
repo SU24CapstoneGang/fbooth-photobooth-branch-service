@@ -5,11 +5,6 @@ using PhotoboothBranchService.Application.DTOs.PaymentMethod;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
 {
@@ -33,7 +28,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
 
                 PaymentMethod paymentMethod = _mapper.Map<PaymentMethod>(createModel);
                 return await _paymentMethodRepository.AddAsync(paymentMethod);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception("An error occurred while create Payment Method: " + ex.Message);
             }

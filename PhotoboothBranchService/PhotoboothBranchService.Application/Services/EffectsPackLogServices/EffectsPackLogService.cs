@@ -4,10 +4,6 @@ using PhotoboothBranchService.Application.DTOs.EffectsPackLog;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.EffectsPackLogServices
 {

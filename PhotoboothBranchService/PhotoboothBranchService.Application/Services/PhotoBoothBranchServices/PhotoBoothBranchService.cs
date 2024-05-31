@@ -23,7 +23,7 @@ public class PhotoBoothBranchService : IPhotoBoothBranchService
     {
         try
         {
-           // await _photoBoothBranchRepository.GetAsync(createModel.)
+            // await _photoBoothBranchRepository.GetAsync(createModel.)
             PhotoBoothBranch photoBoothBranch = _mapper.Map<PhotoBoothBranch>(createModel);
             await _photoBoothBranchRepository.AddAsync(photoBoothBranch);
             return photoBoothBranch.PhotoBoothBranchID;
