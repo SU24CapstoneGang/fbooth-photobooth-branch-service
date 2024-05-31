@@ -55,6 +55,7 @@ public class AppDbContext : DbContext
     public AppDbContext() { }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new AccountConfigurations());
         modelBuilder.ApplyConfiguration(new CameraConfigurations());
         modelBuilder.ApplyConfiguration(new DiscountConfigurations());
@@ -74,8 +75,6 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ThemeFilterConfigurations());
         modelBuilder.ApplyConfiguration(new ThemeFrameConfigurations());
         modelBuilder.ApplyConfiguration(new ThemeStickerConfigurations());
-        modelBuilder.ApplyConfiguration(new MapStickerConfigurations());
-
-        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfiguration(new MapStickerConfigurations());        
     }
 }

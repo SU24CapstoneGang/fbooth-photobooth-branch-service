@@ -46,21 +46,21 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
             //Add primordial data 
-            //builder.HasData(
-            //    new PaymentMethod
-            //    {
-            //        PaymentMethodID = new Guid("3ff27515-80e9-4ea9-8a60-5e2b02bc338a"),
-            //        PaymentMethodName = "VNPay",
-            //        CreateDate = DateTime.UtcNow,
-            //        Status = PaymentStatus.Active,
-            //    },
-            //    new PaymentMethod
-            //    {
-            //        PaymentMethodID = new Guid("e7292894-9c01-40f0-8354-e974d93098b7"),
-            //        PaymentMethodName = "MoMo",
-            //        CreateDate = DateTime.UtcNow,
-            //        Status = PaymentStatus.Active,
-            //    });
+            builder.HasData(
+                new PaymentMethod
+                {
+                    PaymentMethodID = new Guid("1b4f2a3e-7d94-4119-8b6d-5c15b02848f6"),
+                    PaymentMethodName = "VNPay",
+                    CreateDate = DateTime.UtcNow,
+                    Status = PaymentStatus.Active,
+                },
+                new PaymentMethod
+                {
+                    PaymentMethodID = new Guid("f3b6e6b2-f90e-4f6b-8cd2-68b467afae0f"),
+                    PaymentMethodName = "MoMo",
+                    CreateDate = DateTime.UtcNow,
+                    Status = PaymentStatus.Active,
+                });
         }
     }
 }

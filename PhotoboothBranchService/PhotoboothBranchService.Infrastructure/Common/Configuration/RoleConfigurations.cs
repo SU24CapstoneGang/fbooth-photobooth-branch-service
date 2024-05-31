@@ -28,27 +28,27 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired();
 
             //Add primordial data
-            //builder.HasData(
-            //    new Role
-            //    {
-            //        RoleID = new Guid("ba132a6b - 5963 - 4869 - 94d5 - f8736273fe7b"),
-            //        RoleName = "Admin"
-            //    },
-            //    new Role
-            //    { 
-            //        RoleID = new Guid("f74311a5 - b646 - 4db8 - 9814 - e2154b3f402e"),
-            //        RoleName = "Customer"
-            //    },
-            //    new Role
-            //    { 
-            //        RoleID = new Guid("9bd86f81-ce71-4a5c-98f0-702ac0409470"),
-            //        RoleName = "BranchManager"
-            //    },
-            //    new Role
-            //    {
-            //        RoleID = new Guid("80624419-a203-40b7-9dc0-51205b34e1c6"),
-            //        RoleName = "Manager"
-            //    });
+            builder.HasData(
+                new Role
+                {
+                    RoleID = new Guid("4a1f17f8-c66f-4c6e-a0c2-8b95b8d4e5bb"),
+                    RoleName = "Admin"
+                },
+                new Role
+                {
+                    RoleID = new Guid("9d7c0f8b-cb6f-4894-8e91-b5b594c1c37c"),
+                    RoleName = "Customer"
+                },
+                new Role
+                {
+                    RoleID = new Guid("e82f0f61-4488-4b18-bf68-540704917e6a"),
+                    RoleName = "BranchManager"
+                },
+                new Role
+                {
+                    RoleID = new Guid("2f3d2f4b-8370-4b12-8e5c-1e38c3f9bace"),
+                    RoleName = "Manager"
+                });
         }
     }
 }
