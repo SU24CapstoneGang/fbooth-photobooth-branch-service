@@ -14,8 +14,6 @@
         public virtual PrintPricing PrintPricing { get; set; }
         public Guid? AccountID { get; set; }
         public virtual Account Account { get; set; }
-        public Guid LayoutID { get; set; }
-        public virtual Layout Layout { get; set; }
         public virtual FinalPicture FinalPicture { get; set; }
         public virtual TransactionHistory TransactionHistory { get; set; }
     }

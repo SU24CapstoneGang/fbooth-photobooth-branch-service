@@ -27,7 +27,8 @@ public class SessionRepository : ISessionRepository
     //Read
     public async Task<IQueryable<Session>> GetAllAsync()
     {
-        return await Task.FromResult(_dbContext.Sessions);
+        return await Task.FromResult(_dbContext.Sessions.Include(p => p.PrintPricing)
+            .Include(d => d.Discount));
     }
 
     public async Task<IQueryable<Session>> GetAsync(Expression<Func<Session, bool>> predicate)

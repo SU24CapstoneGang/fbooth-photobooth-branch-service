@@ -33,12 +33,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasForeignKey(s => s.BranchesID)
                 .IsRequired();
 
-            // Relationship with Layout
-            builder.HasOne(s => s.Layout)
-                .WithMany(l => l.Sessions)
-                .HasForeignKey(s => s.LayoutID)
-                .IsRequired();
-
             // Mối quan hệ một-nhieu giữa Session và Discount
             builder.HasOne(s => s.Discount)
                 .WithMany(d => d.Sessions)

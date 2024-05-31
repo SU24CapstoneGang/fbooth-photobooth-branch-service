@@ -45,7 +45,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
               .HasDefaultValue(DateTime.UtcNow)
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
-            //Add primordial data 
+            ////Add primordial data
             //builder.HasData(
             //    new PaymentMethod
             //    {

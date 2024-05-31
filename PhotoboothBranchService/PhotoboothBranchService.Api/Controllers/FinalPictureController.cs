@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.FinalPicture;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
@@ -116,22 +116,14 @@ namespace PhotoboothBranchService.Api.Controllers
 
 
         [HttpPost("add-photo-cloud")]
-        public async Task<ActionResult<FinalPictureResponse>> AddPhoto(IFormFile file)
+        public async Task<ActionResult<FinalPictureResponse>> AddPhoto(IFormFile file, Guid sessionID)
         {
             try
             {
-                var result = await _cloudinaryService.AddPhotoAsync(file);
-                if (result.Error != null) return BadRequest(result.Error.Message);
+                //var accountId = (Guid)HttpContext.Items["CustomerId"];
+                var result = await _finalPictureService.CreateFinalPictureAsync(file, sessionID);
 
-                var photoRequest = new CreateFinalPictureRequest
-                {
-                    PictureURl = result.SecureUrl.AbsoluteUri,
-                    //PublicId = result.PublicId
-                };
-
-                var id = await _finalPictureService.CreateAsync(photoRequest);
-
-                return CreatedAtAction(nameof(GetFinalPictureById), new { id }, photoRequest);
+                return Ok(result);
             }
             catch (Exception ex)
             {

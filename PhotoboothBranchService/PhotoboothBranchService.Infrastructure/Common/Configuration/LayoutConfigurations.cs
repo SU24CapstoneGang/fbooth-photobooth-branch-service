@@ -30,11 +30,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(l => l.LastModified);
 
-            // Relationship with Session
-            builder.HasMany(l => l.Sessions)
-               .WithOne(s => s.Layout)
-               .HasForeignKey(s => s.LayoutID)
-               .IsRequired();
 
             // Mối quan hệ một-nhiều giữa Layout và EffectsPackLog
             builder.HasMany(l => l.EffectsPackLogs)

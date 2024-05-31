@@ -20,7 +20,7 @@ namespace PhotoboothBranchService.Api.Common.MiddleWares
             if (token != null)
             {
                 var role = "ANONYMOUS";
-                var accountId = "";
+                var accountId = Guid.Empty;
 
                 var decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(token);
                 if (decodedToken != null)
@@ -37,7 +37,7 @@ namespace PhotoboothBranchService.Api.Common.MiddleWares
                         if (account != null)
                         {
                             role = account.Role.RoleName;
-                            accountId = account.AccountID.ToString();
+                            accountId = account.AccountID;
                         }
                     }
                     context.Items["Role"] = role;

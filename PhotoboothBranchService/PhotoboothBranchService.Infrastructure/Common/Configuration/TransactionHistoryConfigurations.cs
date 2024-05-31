@@ -25,6 +25,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(th => th.CreatedDate)
                 .IsRequired();
+            builder.Property(th => th.ThirdpartyID)
+                .IsRequired();
 
             builder.Property(th => th.LastModified).IsRequired(false);
 
