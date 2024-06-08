@@ -193,12 +193,12 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
             {
                 if (vnp_ResponseCode == "00" && vnp_TransactionStatus == "00")
                 {
-                    _transactionHistoryRepository.AddAsync(new TransactionHistory()
-                    {
-                        ThirdpartyID = vnpayTranId.ToString(),
-                        SessionID = new Guid(orderId),
+                    //_transactionHistoryRepository.AddAsync(new TransactionHistory()
+                    //{
+                    //    ThirdpartyID = vnpayTranId.ToString(),
+                    //    SessionID = new Guid(orderId),
 
-                    });
+                    //});
                     return new VnpayResponse
                     {
                         Message = "Giao dịch được thực hiện thành công. Cảm ơn quý khách đã sử dụng dịch vụ",
