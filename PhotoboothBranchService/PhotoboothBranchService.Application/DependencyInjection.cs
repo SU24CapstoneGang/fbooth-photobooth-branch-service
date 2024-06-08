@@ -18,6 +18,8 @@ using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Application.Services.LayoutServices;
 using PhotoboothBranchService.Application.Services.MapStickerServices;
 using PhotoboothBranchService.Application.Services.PaymentMethodServices;
+using PhotoboothBranchService.Application.Services.PaymentServices.QR;
+using PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices;
 using PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
 using PhotoboothBranchService.Application.Services.PrinterServices;
 using PhotoboothBranchService.Application.Services.PrintPricingServices;
@@ -88,6 +90,10 @@ namespace PhotoboothBranchService.Application
                 options.TokenValidationParameters.ValidIssuer = configuration["FirebaseJwt:Issuer"];
             });
 
+            //qrcode
+            services.AddScoped<IQrCodeService, QrCodeService>(); 
+            //Vnpay Service
+            services.AddScoped<IVNPayService, VNPayService>();
             return services;
         }
     }
