@@ -72,6 +72,4 @@ public class AccountRepository : IAccountRepository
             throw new Exception(e.Message);
         }
     }
-
-
 }

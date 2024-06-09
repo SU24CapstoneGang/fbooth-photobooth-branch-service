@@ -35,7 +35,7 @@ namespace PhotoboothBranchService.Api.Common.MiddleWares
                         var account = (await accountRepository.GetAsync(c => c.Email == email)).FirstOrDefault();
                         if (account != null)
                         {
-                            role = account.Role.RoleName;
+                            role = account.Role.ToString();
                             accountId = account.AccountID;
                         }
                     }

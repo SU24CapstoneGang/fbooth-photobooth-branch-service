@@ -10,13 +10,13 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
         public AccountAutoMapper()
         {
             CreateMap<Account, AccountRegisterResponse>().ReverseMap().HandleNullProperty();
-            CreateMap<Account, AccountResponse>().ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role.RoleName)).ReverseMap();
+            CreateMap<Account, AccountResponse>().ReverseMap();
             CreateMap<CreateAccountRequestModel, Account>()
             .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
             .ForMember(dest => dest.PasswordSalt, opt => opt.Ignore())
             .ForMember(dest => dest.AccountID, opt => opt.Ignore())
             .ForMember(dest => dest.Status, opt => opt.Ignore())
-            .ForMember(dest => dest.RoleID, opt => opt.Ignore()).ReverseMap().HandleNullProperty();
+            .ReverseMap().HandleNullProperty();
 
             CreateMap<UpdateAccountRequestModel, Account>()
             .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
@@ -24,8 +24,7 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
             .ForMember(dest => dest.AccountID, opt => opt.Ignore())
             .ForMember(dest => dest.Status, opt => opt.Ignore())
             .ForMember(dest => dest.Email, opt => opt.Ignore())
-            .ForMember(dest => dest.RoleID, opt => opt.Ignore())
-            .ForMember(dest => dest.RoleID, opt => opt.Ignore()).ReverseMap().HandleNullProperty();
+            .ReverseMap().HandleNullProperty();
         }
     }
 }

@@ -16,10 +16,9 @@ public class AppDbContext : DbContext
     public DbSet<Payment> Payments {get; set; }
     public DbSet<PaymentMethod> PaymentMethods {get; set; }
     public DbSet<Photo> Photos {get; set; }
-    public DbSet<PhotoBoothBranch> PhotoBoothBranches { get; set; }
+    public DbSet<BoothBranch> BoothBranches { get; set; }
     public DbSet<PhotoSession> PhotoSessions {get; set; }
     public DbSet<PhotoSticker> PhotoStickers {get; set; }
-    public DbSet<Role> Roles { get; set; }
     public DbSet<Service> Services {get; set; }
     public DbSet<ServiceItem> ServiceItems {get; set; }
     public DbSet<ServiceType> ServiceTypes {get; set; }
@@ -61,10 +60,9 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new LayoutConfigurations());
         modelBuilder.ApplyConfiguration(new PaymentConfiguration());
         modelBuilder.ApplyConfiguration(new PaymentMethodConfigurations());
-        modelBuilder.ApplyConfiguration(new PhotoBoothBranchConfigurations());
-        modelBuilder.ApplyConfiguration(new PhotoSessionConfiduration());
+        modelBuilder.ApplyConfiguration(new BoothBranchConfigurations());
+        modelBuilder.ApplyConfiguration(new PhotoSessionConfiguration());
         modelBuilder.ApplyConfiguration(new PhotoStickerConfigurations());
-        modelBuilder.ApplyConfiguration(new RoleConfigurations());
         modelBuilder.ApplyConfiguration(new ServiceConfiguration());
         modelBuilder.ApplyConfiguration(new ServiceItemConfiguration());
         modelBuilder.ApplyConfiguration(new ServiceTypeConfiguration());

@@ -35,26 +35,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
               .HasDefaultValue(DateTime.UtcNow)
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
-            builder.HasOne(l => l.Layout)
-                .WithMany(a => a.Photos)
-                .HasForeignKey(l => l.LayoutID)
-                .IsRequired();
-
-            builder.HasOne(l => l.Frame)
-              .WithMany(a => a.Photos)
-              .HasForeignKey(l => l.FrameID)
-              .IsRequired();
-
-            builder.HasOne(l => l.Filter)
-              .WithMany(a => a.Photos)
-              .HasForeignKey(l => l.FilterID)
-              .IsRequired();
-
-            builder.HasOne(l => l.PhotoSession)
-              .WithMany(a => a.Photos)
-              .HasForeignKey(l => l.PhotoSessionID)
-              .IsRequired();
-
             builder.HasMany(a => a.PhotoStickers)
                 .WithOne(b => b.Photo)
                 .HasForeignKey(b => b.PhotoID);

@@ -13,7 +13,8 @@ namespace PhotoboothBranchService.Domain.Entities
         public string BoothName { get; set; }
         public ManufactureStatus Status { get; set; }
         public Guid PhotoBoothBranchID { get; set; }
-        public virtual PhotoBoothBranch PhotoBoothBranch { get; set; }
+        public virtual BoothBranch PhotoBoothBranch { get; set; }
         public virtual ICollection<PhotoSession> PhotoSessions { get; set; }
+        public virtual ICollection<SessionOrder> SessionOrders { get; set; }
     }
 }

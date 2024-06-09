@@ -9,7 +9,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
     public interface IAccountService : IService<AccountResponse, CreateAccountRequestModel, UpdateAccountRequestModel, AccountFilter, PagingModel>
     {
         Task<AccountResponse> GetByEmail(string Email);
-        Task<AccountRegisterResponse> Register(CreateAccountRequestModel request, UserRole userRole);
+        Task<AccountRegisterResponse> Register(CreateAccountRequestModel request, AccountRole userRole);
         Task<LoginResponeModel> Login(LoginRequestModel request);
         Task<LoginResponeModel> RefreshToken(RefreshTokenRequestModel request);
     }

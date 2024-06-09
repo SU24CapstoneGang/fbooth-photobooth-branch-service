@@ -22,7 +22,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(s => s.TotalPrice)
                 .IsRequired(); // Tổng giá
 
-
+            builder.Property(s => s.EndTime).IsRequired(false);
             builder.Property(a => a.StartTime)
               .ValueGeneratedOnAdd()
               .HasDefaultValue(DateTime.UtcNow)
@@ -36,16 +36,19 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     v => v.ToString(),
                     v => (SessionOrderStatus)Enum.Parse(typeof(SessionOrderStatus), v));
 
-            // Relationship with PhotoBoothBranch
-            builder.HasOne(s => s.PhotoBoothBranch)
-                .WithMany(pb => pb.SessionOrders)
-                .HasForeignKey(s => s.PhotoBoothBranchID)
-                .IsRequired();
-
             // Mối quan hệ một-nhieu giữa Session và Account
             builder.HasOne(s => s.Account)
                 .WithMany(a => a.SessionOrder)
                 .HasForeignKey(s => s.AccountID)
+                .IsRequired();
+
+            builder.HasMany(s => s.Payments)
+                .WithOne(p => p.SessionOrder)
+                .HasForeignKey(p => p.SessionOrderID)
+                .IsRequired();
+            builder.HasMany(s => s.ServiceItems)
+                .WithOne(a => a.SessionOrder)
+                .HasForeignKey(c => c.SessionOrderID)
                 .IsRequired(false);
         }
     }

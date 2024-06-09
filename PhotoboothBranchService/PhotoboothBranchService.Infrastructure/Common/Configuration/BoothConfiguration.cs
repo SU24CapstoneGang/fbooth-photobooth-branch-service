@@ -27,13 +27,13 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     v => v.ToString(),
                     v => (ManufactureStatus)Enum.Parse(typeof(ManufactureStatus), v));
 
-            builder.HasOne(s => s.PhotoBoothBranch)
-                .WithMany(pb => pb.Booths)
-                .HasForeignKey(s => s.PhotoBoothBranchID)
-                .IsRequired();
             builder.HasMany(s => s.PhotoSessions)
                 .WithOne(b => b.Booth)
                 .HasForeignKey(b => b.BoothID)
+                .IsRequired();
+            builder.HasMany(s => s.SessionOrders)
+                .WithOne(a => a.Booth)
+                .HasForeignKey(c => c.BoothID)
                 .IsRequired();
         }
     }

@@ -139,7 +139,7 @@ public class AccountsController : ControllerBaseApi
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] CreateAccountRequestModel request, UserRole userRole)
+    public async Task<IActionResult> Register([FromBody] CreateAccountRequestModel request, AccountRole userRole)
     {
 
         try

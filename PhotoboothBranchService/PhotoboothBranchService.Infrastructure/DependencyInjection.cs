@@ -21,10 +21,9 @@ namespace PhotoboothBranchService.Infrastructure
             services.AddScoped<IFilterRepository, FilterRepository>();
             services.AddScoped<IFrameRepository, FrameRepository>();
             services.AddScoped<ILayoutRepository, LayoutRepository>();
-            services.AddScoped<IMapStickerRepository, MapStickerRepository>();
-            services.AddScoped<IPhotoBoothBranchRepository, PhotoBoothBranchRepository>();
-            services.AddScoped<IRoleRepository, RoleRepository>();
-            services.AddScoped<ISessionRepository, SessionRepository>();
+            services.AddScoped<IPhotoStickerRepository, PhotoStickerRepository>();
+            services.AddScoped<IBoothBranchRepository, BoothBranchRepository>();
+            services.AddScoped<ISessionOrderRepository, SessionOrderRepository>();
             services.AddScoped<IStickerRepository, StickerRepository>();
             services.AddScoped<IThemeFrameRepository, ThemeFrameRepository>();
 

@@ -16,18 +16,16 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository _accountRepository;
-        private readonly IRoleRepository _roleRepository;
         private readonly IMapper _mapper;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IJwtService _jwtService;
         private readonly IFirebaseService _firebaseService;
 
         public AccountService(IAccountRepository accountRepository,
-            IRoleRepository roleRepository, IMapper mapper, IPasswordHasher passwordHasher,
+            IMapper mapper, IPasswordHasher passwordHasher,
             IJwtService jwtService, IFirebaseService firebaseService)
         {
             _accountRepository = accountRepository;
-            _roleRepository = roleRepository;
             _mapper = mapper;
             _passwordHasher = passwordHasher;
             _jwtService = jwtService;
@@ -48,8 +46,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                 var accounts = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
                 if (accounts != null)
                 {
-                    var userRole = (await _roleRepository.GetAsync(r => r.RoleName == UserRole.Admin.ToString())).FirstOrDefault();
-                    if (accounts.RoleID == userRole.RoleID)
+                    if (accounts.Role == AccountRole.Admin)
                     {
                         throw new Exception("Admin account cannot be delete!");
                     }
@@ -165,14 +162,13 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             }
         }
 
-        public async Task<AccountRegisterResponse> Register(CreateAccountRequestModel request, UserRole role)
+        public async Task<AccountRegisterResponse> Register(CreateAccountRequestModel request, AccountRole role)
         {
             try
             {
-                var userRole = (await _roleRepository.GetAsync(r => r.RoleName.Trim() == role.ToString().Trim())).FirstOrDefault();
 
                 //validation in db
-                if (userRole != null)
+                if (Enum.IsDefined(typeof(AccountRole), role))
                 {
                     var uid = await _firebaseService.RegisterAsync(request.Email, request.Password);
                     if (uid != null)
@@ -185,13 +181,13 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                         var newAccount = _mapper.Map<Account>(request);
                         newAccount.AccountFBID = uid;
                         newAccount.SetPassword(request.Password, _passwordHasher);
-                        newAccount.RoleID = userRole.RoleID;
+                        newAccount.Role = role;
                         newAccount.Status = AccountStatus.Active;
 
                         var result = await _accountRepository.CreateAccount(newAccount);
 
                         var accountRespone = _mapper.Map<AccountRegisterResponse>(result);
-                        accountRespone.RoleName = userRole.RoleName;
+                        accountRespone.RoleName = role.ToString();
 
                         return accountRespone;
                     }

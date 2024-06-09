@@ -15,5 +15,7 @@ namespace PhotoboothBranchService.Domain.Entities
         public virtual PhotoSession PhotoSession { get; set; }
         public Guid ServiceID { get; set; }
         public virtual Service Service { get; set; }
+        public Guid? SessionOrderID { get; set; }
+        public virtual SessionOrder SessionOrder { get; set; }
     }
 }

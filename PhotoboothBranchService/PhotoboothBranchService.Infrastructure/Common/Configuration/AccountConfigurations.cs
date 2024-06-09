@@ -25,17 +25,12 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
         builder.Property(a => a.DateOfBirth).IsRequired();
         builder.Property(a => a.Address).IsRequired().HasMaxLength(100);
 
-        // Relationship with Role
-        builder.HasOne(a => a.Role)
-                .WithMany(r => r.Accounts)
-                .HasForeignKey(a => a.RoleID)
-                .IsRequired();
-
-        // Relationship with PhotoBoothBranch
-        builder.HasMany(a => a.PhotoBoothBranches)
-            .WithOne(pb => pb.Account)
-            .HasForeignKey(a => a.AccountID)
-            .IsRequired(false);
+        // Account role  enum mapping
+        builder.Property(a => a.Role)
+            .IsRequired()
+            .HasConversion(
+                v => v.ToString(),
+                v => (AccountRole)Enum.Parse(typeof(AccountRole), v));
 
         // Relationship with Sessions
         builder.HasMany(a => a.SessionOrder)

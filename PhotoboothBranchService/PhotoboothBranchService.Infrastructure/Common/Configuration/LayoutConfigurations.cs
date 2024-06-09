@@ -40,6 +40,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasMany(t => t.Photos)
                 .WithOne(p => p.Layout)
                 .HasForeignKey(p => p.LayoutID)
+                .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired();
         }
     }

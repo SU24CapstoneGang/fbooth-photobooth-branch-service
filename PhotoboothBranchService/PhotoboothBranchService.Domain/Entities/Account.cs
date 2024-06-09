@@ -16,11 +16,11 @@ public class Account
     public string Email { get; set; } = default!;
     public string PhoneNumber { get; set; } = default!;
     public AccountStatus Status { get; set; }
-    public Guid RoleID { get; set; }
-    public virtual Role Role { get; set; }
-    public virtual ICollection<PhotoBoothBranch> PhotoBoothBranches { get; set; }
+    public AccountRole Role { get; set; }
     public virtual ICollection<SessionOrder> SessionOrder { get; set; }
-
+    public Guid? PhotoBoothBranchID { get; set; }
+    public virtual BoothBranch BoothBranchManage { get; set; }
+    public virtual BoothBranch BoothBranchBelong { get; set; }
     public void SetPassword(string plainTextPassword, IPasswordHasher passwordHasher)
     {
         PasswordSalt = passwordHasher.GenerateSalt();

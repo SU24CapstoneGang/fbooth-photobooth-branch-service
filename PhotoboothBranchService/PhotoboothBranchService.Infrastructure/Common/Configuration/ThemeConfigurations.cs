@@ -13,12 +13,10 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.HasKey(tf => tf.ThemeID);
             builder.Property(tf => tf.ThemeID).HasColumnName("ThemeID")
-           .ValueGeneratedOnAdd();
-
+                .ValueGeneratedOnAdd();
             builder.Property(tf => tf.ThemeName)
                 .IsRequired()
                 .HasMaxLength(100);
-
             builder.Property(tf => tf.ThemeFrameDescription)
                 .HasMaxLength(500);
 

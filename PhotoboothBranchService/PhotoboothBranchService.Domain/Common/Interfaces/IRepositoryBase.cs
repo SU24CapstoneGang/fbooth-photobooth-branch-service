@@ -9,4 +9,6 @@ public interface IRepositoryBase<TEntity>
     Task<Guid> AddAsync(TEntity entity);
     Task RemoveAsync(TEntity entity);
     Task UpdateAsync(TEntity entity);
+    //Task<TEntity> LoadRelateEntity(TEntity entity);
+    //Task<List<TEntity>> LoadRelateListEntity(List<TEntity> entities);
 }
