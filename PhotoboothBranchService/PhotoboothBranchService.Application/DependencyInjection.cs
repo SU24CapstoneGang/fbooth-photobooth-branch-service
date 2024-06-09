@@ -33,7 +33,6 @@ namespace PhotoboothBranchService.Application
             //Service
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IFilterService, FilterService>();
-            services.AddScoped<IFinalPictureService, FinalPictureService>();
             services.AddScoped<IFrameService, FrameService>();
             services.AddScoped<ILayoutService, LayoutService>();
             services.AddScoped<IMapStickerService, MapStickerService>();

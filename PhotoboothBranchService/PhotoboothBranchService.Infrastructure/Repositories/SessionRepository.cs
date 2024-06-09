@@ -18,7 +18,7 @@ public class SessionRepository : ISessionRepository
     // Add a new session
     public async Task<Guid> AddAsync(SessionOrder session)
     {
-        _dbContext.Sessions.Add(session);
+        _dbContext.SessionOrders.Add(session);
         await _dbContext.SaveChangesAsync();
         return session.SessionOrderID;
     }
@@ -26,14 +26,14 @@ public class SessionRepository : ISessionRepository
     //Read
     public async Task<IQueryable<SessionOrder>> GetAllAsync()
     {
-        return await Task.FromResult(_dbContext.Sessions);
+        return await Task.FromResult(_dbContext.SessionOrders);
     }
 
     public async Task<IQueryable<SessionOrder>> GetAsync(Expression<Func<SessionOrder, bool>> predicate)
     {
         try
         {
-            var result = _dbContext.Sessions.Where(predicate);
+            var result = _dbContext.SessionOrders.Where(predicate);
             if (!result.Any())
             {
                 return await Task.FromResult(new List<SessionOrder>().AsQueryable());
@@ -50,7 +50,7 @@ public class SessionRepository : ISessionRepository
     // Remove a session
     public async Task RemoveAsync(SessionOrder session)
     {
-        _dbContext.Sessions.Remove(session);
+        _dbContext.SessionOrders.Remove(session);
         await _dbContext.SaveChangesAsync();
     }
 

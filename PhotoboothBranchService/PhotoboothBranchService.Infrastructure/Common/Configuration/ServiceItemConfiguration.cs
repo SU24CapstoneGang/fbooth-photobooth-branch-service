@@ -26,7 +26,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasForeignKey(s => s.ServiceID)
                 .IsRequired();
             builder.HasOne(s => s.PhotoSession)
-                .WithMany
+                .WithMany(b => b.ServiceItems)
+                .HasForeignKey(s => s.PhotoSessionID)
+                .IsRequired();
         }
     }
 }

@@ -25,14 +25,14 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         // Read
         public async Task<IQueryable<Theme>> GetAllAsync()
         {
-            return await Task.FromResult(_dbContext.ThemeFrames.AsQueryable());
+            return await Task.FromResult(_dbContext.Themes.AsQueryable());
         }
 
         public async Task<IQueryable<Theme>> GetAsync(Expression<Func<Theme, bool>> predicate)
         {
             try
             {
-                var result = _dbContext.ThemeFrames.Where(predicate);
+                var result = _dbContext.Themes.Where(predicate);
                 if (!result.Any())
                 {
                     return await Task.FromResult(new List<Theme>().AsQueryable());
