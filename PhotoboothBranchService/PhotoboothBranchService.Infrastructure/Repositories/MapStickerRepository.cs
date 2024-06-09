@@ -1,10 +1,7 @@
 ﻿using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories
 {
@@ -18,27 +15,27 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Create
-        public async Task<Guid> AddAsync(MapSticker entity)
+        public async Task<Guid> AddAsync(PhotoSticker entity)
         {
             await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
-            return entity.MapStickerID;
+            return entity.PhotoStickerID;
         }
 
         // Read
-        public async Task<IQueryable<MapSticker>> GetAllAsync()
+        public async Task<IQueryable<PhotoSticker>> GetAllAsync()
         {
             return await Task.FromResult(_dbContext.MapStickers.AsQueryable());
         }
 
-        public async Task<IQueryable<MapSticker>> GetAsync(Expression<Func<MapSticker, bool>> predicate)
+        public async Task<IQueryable<PhotoSticker>> GetAsync(Expression<Func<PhotoSticker, bool>> predicate)
         {
             try
             {
                 var result = _dbContext.MapStickers.Where(predicate);
                 if (!result.Any())
                 {
-                    return await Task.FromResult(new List<MapSticker>().AsQueryable());
+                    return await Task.FromResult(new List<PhotoSticker>().AsQueryable());
                 }
                 return await Task.FromResult(result);
             }
@@ -50,14 +47,14 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Update
-        public async Task UpdateAsync(MapSticker entity)
+        public async Task UpdateAsync(PhotoSticker entity)
         {
             _dbContext.Update(entity);
             await _dbContext.SaveChangesAsync();
         }
 
         // Delete
-        public async Task RemoveAsync(MapSticker entity)
+        public async Task RemoveAsync(PhotoSticker entity)
         {
             _dbContext.Remove(entity);
             await _dbContext.SaveChangesAsync();

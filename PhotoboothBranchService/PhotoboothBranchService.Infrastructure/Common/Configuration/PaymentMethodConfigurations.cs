@@ -31,19 +31,18 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired()
                 .HasConversion(
                     v => v.ToString(),
-                    v => (PaymentStatus)Enum.Parse(typeof(PaymentStatus), v));
-
-            // Mối quan hệ một-nhiều giữa PaymentMethod và TransactionHistory
-            builder.HasMany(pm => pm.TransactionHistories)
-            .WithOne(th => th.PaymentMethod)
-            .HasForeignKey(th => th.PaymentMethodID)
-            .IsRequired();
+                    v => (PaymentMethodStatus)Enum.Parse(typeof(PaymentMethodStatus), v));
 
             //auto add CreateDate and ignore change after update
             builder.Property(a => a.CreateDate)
               .ValueGeneratedOnAdd()
               .HasDefaultValue(DateTime.UtcNow)
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
+            builder.HasMany(i => i.Payments)
+                .WithOne(w => w.PaymentMethod)
+                .HasForeignKey(i => i.PaymentMethodID)
+                .IsRequired();
 
             //Add primordial data 
             builder.HasData(
@@ -52,15 +51,15 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     PaymentMethodID = new Guid("1b4f2a3e-7d94-4119-8b6d-5c15b02848f6"),
                     PaymentMethodName = "VNPay",
                     CreateDate = DateTime.UtcNow,
-                    Status = PaymentStatus.Active,
+                    Status = PaymentMethodStatus.Active,
                 },
                 new PaymentMethod
                 {
                     PaymentMethodID = new Guid("f3b6e6b2-f90e-4f6b-8cd2-68b467afae0f"),
                     PaymentMethodName = "MoMo",
                     CreateDate = DateTime.UtcNow,
-                    Status = PaymentStatus.Active,
+                    Status = PaymentMethodStatus.Active,
                 });
-        }
+        } 
     }
 }

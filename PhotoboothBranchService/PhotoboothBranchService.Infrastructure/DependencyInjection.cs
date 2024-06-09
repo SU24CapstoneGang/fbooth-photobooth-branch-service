@@ -18,25 +18,16 @@ namespace PhotoboothBranchService.Infrastructure
 
             //Repositories
             services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<ICameraRepository, CameraRepository>();
-            services.AddScoped<IDiscountRepository, DiscountRepository>();
-            services.AddScoped<IEffectsPackLogRepository, EffectsPackLogRepository>();
             services.AddScoped<IFilterRepository, FilterRepository>();
             services.AddScoped<IFinalPictureRepository, FinalPictureRepository>();
             services.AddScoped<IFrameRepository, FrameRepository>();
             services.AddScoped<ILayoutRepository, LayoutRepository>();
             services.AddScoped<IMapStickerRepository, MapStickerRepository>();
-            services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
             services.AddScoped<IPhotoBoothBranchRepository, PhotoBoothBranchRepository>();
-            services.AddScoped<IPrinterRepository, PrinterRepository>();
-            services.AddScoped<IPrintPricingRepository, PrintPricingRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<ISessionRepository, SessionRepository>();
             services.AddScoped<IStickerRepository, StickerRepository>();
-            services.AddScoped<IThemeFilterRepository, ThemeFilterRepository>();
             services.AddScoped<IThemeFrameRepository, ThemeFrameRepository>();
-            services.AddScoped<IThemeStickerRepository, ThemeStickerRepository>();
-            services.AddScoped<ITransactionHistoryRepository, TransactionHistoryRepository>();
 
             services.AddScoped<IMapper, Mapper>();
 

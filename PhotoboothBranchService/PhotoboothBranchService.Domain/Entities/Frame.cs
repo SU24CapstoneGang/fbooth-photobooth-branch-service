@@ -10,8 +10,9 @@ namespace PhotoboothBranchService.Domain.Entities
         public StatusUse Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? LastModified { get; set; }
-        public virtual List<EffectsPackLog> EffectsPackLogs { get; set; }
-        public Guid ThemeFrameID { get; set; }
-        public virtual ThemeFrame ThemeFrame { get; set; }
+        public Guid ThemeID { get; set; }
+        public virtual Theme Theme { get; set; }
+        public virtual ICollection<Photo> Photos { get; set; }
+        public virtual ICollection<Layout> Layouts { get; set; }
     }
 }

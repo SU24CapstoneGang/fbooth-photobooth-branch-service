@@ -18,8 +18,8 @@ public class Account
     public AccountStatus Status { get; set; }
     public Guid RoleID { get; set; }
     public virtual Role Role { get; set; }
-    public virtual List<PhotoBoothBranch> PhotoBoothBranches { get; set; }
-    public virtual List<Session> Sessions { get; set; }
+    public virtual ICollection<PhotoBoothBranch> PhotoBoothBranches { get; set; }
+    public virtual ICollection<SessionOrder> SessionOrder { get; set; }
 
     public void SetPassword(string plainTextPassword, IPasswordHasher passwordHasher)
     {

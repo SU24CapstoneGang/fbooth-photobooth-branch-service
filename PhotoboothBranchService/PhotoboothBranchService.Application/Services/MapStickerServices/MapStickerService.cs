@@ -21,7 +21,7 @@ namespace PhotoboothBranchService.Application.Services.MapStickerServices
         // Create
         public async Task<Guid> CreateAsync(CreateMapStickerRequest createModel)
         {
-            var mapSticker = _mapper.Map<MapSticker>(createModel);
+            var mapSticker = _mapper.Map<PhotoSticker>(createModel);
             return await _mapStickerRepository.AddAsync(mapSticker);
         }
 
@@ -30,7 +30,7 @@ namespace PhotoboothBranchService.Application.Services.MapStickerServices
         {
             try
             {
-                var mapStickers = await _mapStickerRepository.GetAsync(m => m.MapStickerID == id);
+                var mapStickers = await _mapStickerRepository.GetAsync(m => m.PhotoStickerID == id);
                 var mapSticker = mapStickers.FirstOrDefault();
                 if (mapSticker != null)
                 {
@@ -62,14 +62,14 @@ namespace PhotoboothBranchService.Application.Services.MapStickerServices
         // Read by ID
         public async Task<MapStickerResponse> GetByIdAsync(Guid id)
         {
-            var mapStickers = await _mapStickerRepository.GetAsync(m => m.MapStickerID == id);
+            var mapStickers = await _mapStickerRepository.GetAsync(m => m.PhotoStickerID == id);
             return _mapper.Map<MapStickerResponse>(mapStickers);
         }
 
         // Update
         public async Task UpdateAsync(Guid id, UpdateMapStickerRequest updateModel)
         {
-            var mapSticker = (await _mapStickerRepository.GetAsync(m => m.MapStickerID == id)).FirstOrDefault();
+            var mapSticker = (await _mapStickerRepository.GetAsync(m => m.PhotoStickerID == id)).FirstOrDefault();
             if (mapSticker == null)
             {
                 throw new KeyNotFoundException("Map Sticker not found.");

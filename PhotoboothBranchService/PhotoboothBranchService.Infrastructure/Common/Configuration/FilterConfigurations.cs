@@ -30,12 +30,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(f => f.LastModified);
 
-            // Relationship with EffectsPack
-            builder.HasMany(f => f.EffectsPackLogs)
-                .WithOne(ep => ep.Filter)
-                .HasForeignKey(ep => ep.FilterID)
-                .IsRequired();
-
             //auto add CreateDate and ignore change after update
             builder.Property(a => a.CreatedDate)
               .ValueGeneratedOnAdd()
@@ -48,6 +42,11 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasConversion(
                     v => v.ToString(),
                     v => (StatusUse)Enum.Parse(typeof(StatusUse), v));
+
+            builder.HasMany(p => p.Photos)
+                .WithOne(a => a.Filter)
+                .HasForeignKey(a => a.FilterID)
+                .IsRequired();
         }
     }
 }

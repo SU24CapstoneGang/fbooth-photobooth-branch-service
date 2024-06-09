@@ -1,10 +1,7 @@
 ﻿using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories
 {
@@ -18,27 +15,27 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Create
-        public async Task<Guid> AddAsync(ThemeFrame entity)
+        public async Task<Guid> AddAsync(Theme entity)
         {
             await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
-            return entity.ThemeFrameID;
+            return entity.ThemeID;
         }
 
         // Read
-        public async Task<IQueryable<ThemeFrame>> GetAllAsync()
+        public async Task<IQueryable<Theme>> GetAllAsync()
         {
             return await Task.FromResult(_dbContext.ThemeFrames.AsQueryable());
         }
 
-        public async Task<IQueryable<ThemeFrame>> GetAsync(Expression<Func<ThemeFrame, bool>> predicate)
+        public async Task<IQueryable<Theme>> GetAsync(Expression<Func<Theme, bool>> predicate)
         {
             try
             {
                 var result = _dbContext.ThemeFrames.Where(predicate);
                 if (!result.Any())
                 {
-                    return await Task.FromResult(new List<ThemeFrame>().AsQueryable());
+                    return await Task.FromResult(new List<Theme>().AsQueryable());
                 }
                 return await Task.FromResult(result);
             }
@@ -50,14 +47,14 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Update
-        public async Task UpdateAsync(ThemeFrame entity)
+        public async Task UpdateAsync(Theme entity)
         {
             _dbContext.Update(entity);
             await _dbContext.SaveChangesAsync();
         }
 
         // Delete
-        public async Task RemoveAsync(ThemeFrame entity)
+        public async Task RemoveAsync(Theme entity)
         {
             _dbContext.Remove(entity);
             await _dbContext.SaveChangesAsync();

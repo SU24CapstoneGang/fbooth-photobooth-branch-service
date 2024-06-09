@@ -32,12 +32,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(f => f.LastModified);
 
-            // Relationship with EffectsPack
-            builder.HasMany(f => f.EffectsPackLogs)
-                .WithOne(ep => ep.Frame)
-                .HasForeignKey(ep => ep.FrameID)
-                .IsRequired();
-
             //auto add CreateDate and ignore change after update
             builder.Property(a => a.CreatedDate)
               .ValueGeneratedOnAdd()
@@ -50,6 +44,19 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasConversion(
                     v => v.ToString(),
                     v => (StatusUse)Enum.Parse(typeof(StatusUse), v));
+
+            builder.HasOne(f => f.Theme)
+                .WithMany(t => t.Frames)
+                .HasForeignKey(f => f.ThemeID)
+                .IsRequired();
+            builder.HasMany(p => p.Photos)
+                .WithOne(f => f.Frame)
+                .HasForeignKey(f => f.FrameID)
+                .IsRequired();
+            builder.HasMany(l => l.Layouts)
+                .WithOne(f => f.Frame)
+                .HasForeignKey(f => f.FrameID)
+                .IsRequired();
         }
     }
 }

@@ -22,26 +22,25 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired()
                 .HasMaxLength(255);
 
-            builder.Property(l => l.LayoutPrice)
-                .IsRequired();
-
             builder.Property(l => l.CreatedDate)
                 .IsRequired();
 
             builder.Property(l => l.LastModified);
-
-
-            // Mối quan hệ một-nhiều giữa Layout và EffectsPackLog
-            builder.HasMany(l => l.EffectsPackLogs)
-                .WithOne(e => e.Layout)
-                .HasForeignKey(e => e.LayoutID)
-                .IsRequired();
 
             //auto add CreateDate and ignore change after update
             builder.Property(a => a.CreatedDate)
               .ValueGeneratedOnAdd()
               .HasDefaultValue(DateTime.UtcNow)
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
+            builder.HasOne(l => l.Frame)
+                .WithMany(f => f.Layouts)
+                .HasForeignKey(l => l.FrameID)
+                .IsRequired();
+            builder.HasMany(t => t.Photos)
+                .WithOne(p => p.Layout)
+                .HasForeignKey(p => p.LayoutID)
+                .IsRequired();
         }
     }
 }

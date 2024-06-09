@@ -47,7 +47,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 new Role
                 {
                     RoleID = new Guid("2f3d2f4b-8370-4b12-8e5c-1e38c3f9bace"),
-                    RoleName = "Manager"
+                    RoleName = "Staff"
                 });
         }
     }

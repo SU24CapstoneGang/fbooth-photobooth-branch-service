@@ -1,5 +1,4 @@
 ﻿using FirebaseAdmin.Auth;
-using Microsoft.Identity.Client;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Domain.IRepository;
 

@@ -9,9 +9,9 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
     {
         public ThemeFrameMapper()
         {
-            CreateMap<CreateThemeFrameRequest, ThemeFrame>().ReverseMap().HandleNullProperty();
-            CreateMap<UpdateThemeFrameRequest, ThemeFrame>().ReverseMap().HandleNullProperty();
-            CreateMap<ThemeFrame, ThemeFrameResponse>().ReverseMap().HandleNullProperty();
+            CreateMap<CreateThemeFrameRequest, Theme>().ReverseMap().HandleNullProperty();
+            CreateMap<UpdateThemeFrameRequest, Theme>().ReverseMap().HandleNullProperty();
+            CreateMap<Theme, ThemeFrameResponse>().ReverseMap().HandleNullProperty();
         }
     }
 }

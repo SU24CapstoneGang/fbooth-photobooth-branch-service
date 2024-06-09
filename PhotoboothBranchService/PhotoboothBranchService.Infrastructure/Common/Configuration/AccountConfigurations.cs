@@ -38,7 +38,7 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
             .IsRequired(false);
 
         // Relationship with Sessions
-        builder.HasMany(a => a.Sessions)
+        builder.HasMany(a => a.SessionOrder)
             .WithOne(s => s.Account)
             .HasForeignKey(s => s.AccountID)
             .IsRequired();

@@ -36,7 +36,7 @@ namespace PhotoboothBranchService.Application.Services.FinalPictureServices
 
         public async Task<Guid> CreateAsync(CreateFinalPictureRequest createModel)
         {
-            FinalPicture finalPicture = _mapper.Map<FinalPicture>(createModel);
+            Photo finalPicture = _mapper.Map<Photo>(createModel);
             return await _finalPictureRepository.AddAsync(finalPicture);
         }
 
@@ -91,12 +91,12 @@ namespace PhotoboothBranchService.Application.Services.FinalPictureServices
             // If no session exists for the branch, create a new session
             //if (session == null)
             //{
-            var session = new Session
+            var session = new SessionOrder
             {
                 PhotosTaken = photoTaken,
                 TotalPrice = (double)totalPrice,
-                CreateDate = DateTime.UtcNow,
-                BranchesID = branchID,
+                StartTime = DateTime.UtcNow,
+                PhotoBoothBranchID = branchID,
                 PrintPricingID = printPricing.PrintPricingID,
                 DiscountID = discount?.DiscountID
             };
@@ -109,21 +109,21 @@ namespace PhotoboothBranchService.Application.Services.FinalPictureServices
                 throw new Exception(uploadResult.Error.Message);
             }
 
-            var finalPicture = new FinalPicture
+            var finalPicture = new Photo
             {
-                PictureURl = uploadResult.SecureUrl.AbsoluteUri,
+                PhotoURL = uploadResult.SecureUrl.AbsoluteUri,
                 PublicId = uploadResult.PublicId,
                 CreateDate = DateTime.UtcNow,
                 PicturePrivacy = PhotoPrivacy.Public,
-                SessionID = session.SessionID
+                SessionID = session.SessionOrderID
             };
 
             await _finalPictureRepository.AddAsync(finalPicture);
 
             return new FinalPictureResponse
             {
-                PictureID = finalPicture.PictureID,
-                PictureURl = finalPicture.PictureURl,
+                PictureID = finalPicture.PhotoID,
+                PictureURl = finalPicture.PhotoURL,
                 CreateDate = finalPicture.CreateDate,
                 PicturePrivacy = finalPicture.PicturePrivacy
             };
@@ -132,7 +132,7 @@ namespace PhotoboothBranchService.Application.Services.FinalPictureServices
 
         public async Task DeleteAsync(Guid id)
         {
-            var finalPicture = await _finalPictureRepository.GetAsync(f => f.PictureID == id);
+            var finalPicture = await _finalPictureRepository.GetAsync(f => f.PhotoID == id);
             var finalPictureToDelete = finalPicture.FirstOrDefault();
             if (finalPictureToDelete != null)
             {
@@ -156,13 +156,13 @@ namespace PhotoboothBranchService.Application.Services.FinalPictureServices
 
         public async Task<FinalPictureResponse> GetByIdAsync(Guid id)
         {
-            var finalPictures = await _finalPictureRepository.GetAsync(f => f.PictureID == id);
+            var finalPictures = await _finalPictureRepository.GetAsync(f => f.PhotoID == id);
             return _mapper.Map<FinalPictureResponse>(finalPictures);
         }
 
         public async Task UpdateAsync(Guid id, UpdateFinalPictureRequest updateModel)
         {
-            var finalPicture = (await _finalPictureRepository.GetAsync(f => f.PictureID == id)).FirstOrDefault();
+            var finalPicture = (await _finalPictureRepository.GetAsync(f => f.PhotoID == id)).FirstOrDefault();
             if (finalPicture == null)
             {
                 throw new KeyNotFoundException("Final picture not found.");

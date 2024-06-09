@@ -2,7 +2,6 @@
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
@@ -51,7 +50,7 @@ public class AccountRepository : IAccountRepository
     }
 
     //Read
-    public async Task<IQueryable<Account>> GetAllAsync() 
+    public async Task<IQueryable<Account>> GetAllAsync()
     {
         return await Task.FromResult(_dbContext.Accounts.Include(a => a.Role).AsQueryable());
     }

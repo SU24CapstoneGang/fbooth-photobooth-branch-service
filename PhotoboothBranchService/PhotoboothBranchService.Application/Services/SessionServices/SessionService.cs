@@ -21,14 +21,14 @@ public class SessionService : ISessionService
     // Create a new session
     public async Task<Guid> CreateAsync(CreateSessionRequest createModel)
     {
-        var session = _mapper.Map<Session>(createModel);
+        var session = _mapper.Map<SessionOrder>(createModel);
         return await _sessionRepository.AddAsync(session);
     }
 
     // Delete a session by ID
     public async Task DeleteAsync(Guid id)
     {
-        var session = (await _sessionRepository.GetAsync(s => s.SessionID == id)).FirstOrDefault();
+        var session = (await _sessionRepository.GetAsync(s => s.SessionOrderID == id)).FirstOrDefault();
         if (session != null)
         {
             await _sessionRepository.RemoveAsync(session);
@@ -57,7 +57,7 @@ public class SessionService : ISessionService
     // Get a session by ID
     public async Task<SessionResponse> GetByIdAsync(Guid id)
     {
-        var session = (await _sessionRepository.GetAsync(s => s.SessionID == id)).FirstOrDefault();
+        var session = (await _sessionRepository.GetAsync(s => s.SessionOrderID == id)).FirstOrDefault();
         if (session == null)
         {
             throw new KeyNotFoundException("Session not found.");
@@ -68,7 +68,7 @@ public class SessionService : ISessionService
     // Update a session
     public async Task UpdateAsync(Guid id, UpdateSessionRequest updateModel)
     {
-        var session = (await _sessionRepository.GetAsync(s => s.SessionID == id)).FirstOrDefault();
+        var session = (await _sessionRepository.GetAsync(s => s.SessionOrderID == id)).FirstOrDefault();
         if (session == null)
         {
             throw new KeyNotFoundException("Session not found.");

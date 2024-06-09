@@ -1,11 +1,8 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment;
 using PhotoboothBranchService.Application.Services.PaymentServices.QR;
 using PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices;
-using PhotoboothBranchService.Domain.Entities;
-using System.Net;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
@@ -29,11 +26,12 @@ namespace PhotoboothBranchService.Api.Controllers
             {
                 var clientIpAddress = IpAddressHelper.GetClientIpAddress(HttpContext);
                 paymentRequest.ClientIpAddress = clientIpAddress;
-                string paymentUrl =  await _vnpayService.Pay(paymentRequest);
+                string paymentUrl = await _vnpayService.Pay(paymentRequest);
                 return paymentUrl;
                 //string qrcode = await _qrCodeService.GetQrCodeDataAsync(paymentUrl);
                 //return qrcode;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 //return StatusCode(500, $"An error occurred while creating the request: {ex.Message}");
                 return ex.Message;

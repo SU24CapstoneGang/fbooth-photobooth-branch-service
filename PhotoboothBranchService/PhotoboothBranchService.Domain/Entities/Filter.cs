@@ -1,4 +1,5 @@
 ﻿using PhotoboothBranchService.Domain.Enum;
+using System.Collections;
 
 namespace PhotoboothBranchService.Domain.Entities
 {
@@ -10,8 +11,6 @@ namespace PhotoboothBranchService.Domain.Entities
         public StatusUse Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? LastModified { get; set; }
-        public virtual List<EffectsPackLog> EffectsPackLogs { get; set; }
-        public Guid ThemeFilterID { get; set; }
-        public virtual ThemeFilter ThemeFilter { get; set; }
+        public virtual ICollection<Photo> Photos { get; set; }
     }
 }

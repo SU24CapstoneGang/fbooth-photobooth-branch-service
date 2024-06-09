@@ -6,10 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Services.AccountServices;
-using PhotoboothBranchService.Application.Services.CameraServices;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
-using PhotoboothBranchService.Application.Services.DiscountServices;
-using PhotoboothBranchService.Application.Services.EffectsPackLogServices;
 using PhotoboothBranchService.Application.Services.FilterServices;
 using PhotoboothBranchService.Application.Services.FinalPictureServices;
 using PhotoboothBranchService.Application.Services.FirebaseServices;
@@ -17,19 +14,13 @@ using PhotoboothBranchService.Application.Services.FrameServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Application.Services.LayoutServices;
 using PhotoboothBranchService.Application.Services.MapStickerServices;
-using PhotoboothBranchService.Application.Services.PaymentMethodServices;
 using PhotoboothBranchService.Application.Services.PaymentServices.QR;
 using PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices;
 using PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
-using PhotoboothBranchService.Application.Services.PrinterServices;
-using PhotoboothBranchService.Application.Services.PrintPricingServices;
 using PhotoboothBranchService.Application.Services.RoleServices;
 using PhotoboothBranchService.Application.Services.SessionServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
-using PhotoboothBranchService.Application.Services.ThemeFilterServices;
 using PhotoboothBranchService.Application.Services.ThemeFrameServices;
-using PhotoboothBranchService.Application.Services.ThemeStickerServices;
-using PhotoboothBranchService.Application.Services.TransactionHistoryServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using System.Reflection;
 
@@ -41,25 +32,16 @@ namespace PhotoboothBranchService.Application
         {
             //Service
             services.AddScoped<IAccountService, AccountService>();
-            services.AddScoped<ICameraService, CameraService>();
-            services.AddScoped<IDiscountService, DiscountService>();
-            services.AddScoped<IEffectsPackLogService, EffectsPackLogService>();
             services.AddScoped<IFilterService, FilterService>();
             services.AddScoped<IFinalPictureService, FinalPictureService>();
             services.AddScoped<IFrameService, FrameService>();
             services.AddScoped<ILayoutService, LayoutService>();
             services.AddScoped<IMapStickerService, MapStickerService>();
-            services.AddScoped<IPaymentMethodService, PaymentMethodService>();
             services.AddScoped<IPhotoBoothBranchService, PhotoBoothBranchService>();
-            services.AddScoped<IPrinterService, PrinterService>();
-            services.AddScoped<IPrintPricingService, PrintPricingService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<ISessionService, SessionService>();
             services.AddScoped<IStickerService, StickerService>();
-            services.AddScoped<IThemeFilterService, ThemeFilterService>();
             services.AddScoped<IThemeFrameService, ThemeFrameService>();
-            services.AddScoped<IThemeStickerService, ThemeStickerService>();
-            services.AddScoped<ITransactionHistoryService, TransactionHistoryService>();
 
             // cloudinary
             services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
@@ -91,7 +73,7 @@ namespace PhotoboothBranchService.Application
             });
 
             //qrcode
-            services.AddScoped<IQrCodeService, QrCodeService>(); 
+            services.AddScoped<IQrCodeService, QrCodeService>();
             //Vnpay Service
             services.AddScoped<IVNPayService, VNPayService>();
             return services;

@@ -1,10 +1,7 @@
 ﻿using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories
 {
@@ -18,27 +15,27 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Create
-        public async Task<Guid> AddAsync(FinalPicture entity)
+        public async Task<Guid> AddAsync(Photo entity)
         {
             await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
-            return entity.PictureID;
+            return entity.PhotoID;
         }
 
         // Read
-        public async Task<IQueryable<FinalPicture>> GetAllAsync()
+        public async Task<IQueryable<Photo>> GetAllAsync()
         {
             return await Task.FromResult(_dbContext.FinalPictures.AsQueryable());
         }
 
-        public async Task<IQueryable<FinalPicture>> GetAsync(Expression<Func<FinalPicture, bool>> predicate)
+        public async Task<IQueryable<Photo>> GetAsync(Expression<Func<Photo, bool>> predicate)
         {
             try
             {
                 var result = _dbContext.FinalPictures.Where(predicate);
                 if (!result.Any())
                 {
-                    return await Task.FromResult(new List<FinalPicture>().AsQueryable());
+                    return await Task.FromResult(new List<Photo>().AsQueryable());
                 }
                 return await Task.FromResult(result);
             }
@@ -50,14 +47,14 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Update
-        public async Task UpdateAsync(FinalPicture entity)
+        public async Task UpdateAsync(Photo entity)
         {
             _dbContext.Update(entity);
             await _dbContext.SaveChangesAsync();
         }
 
         // Delete
-        public async Task RemoveAsync(FinalPicture entity)
+        public async Task RemoveAsync(Photo entity)
         {
             _dbContext.Remove(entity);
             await _dbContext.SaveChangesAsync();

@@ -1,17 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Protocols;
 using Newtonsoft.Json;
 using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment;
-using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices
 {
@@ -19,18 +12,16 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
     {
         private readonly string vnp_Returnurl;
         private readonly string vnp_Url;
-        private readonly string vnp_TmnCode; 
+        private readonly string vnp_TmnCode;
         private readonly string vnp_HashSecret;
         private readonly string vnp_Api;
-        private readonly ITransactionHistoryRepository _transactionHistoryRepository;
-        public VNPayService(ITransactionHistoryRepository transactionHistoryRepository)
+        public VNPayService()
         {
             vnp_Returnurl = JsonHelper.GetFromAppSettings("VNPay:vnp_Returnurl");//URL nhan ket qua tra ve 
             vnp_Url = JsonHelper.GetFromAppSettings("VNPay:vnp_Url"); //URL thanh toan cua VNPAY 
             vnp_TmnCode = JsonHelper.GetFromAppSettings("VNPay:vnp_TmnCode"); //Ma định danh merchant kết nối (Terminal Id)
             vnp_HashSecret = JsonHelper.GetFromAppSettings("VNPay:vnp_HashSecret"); //Secret Key
             vnp_Api = JsonHelper.GetFromAppSettings("VNPay:vnp_Api");
-            _transactionHistoryRepository = transactionHistoryRepository;
         }
 
         public async Task<string> Pay(VnpayRequest paymentRequest)
@@ -193,12 +184,6 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
             {
                 if (vnp_ResponseCode == "00" && vnp_TransactionStatus == "00")
                 {
-                    //_transactionHistoryRepository.AddAsync(new TransactionHistory()
-                    //{
-                    //    ThirdpartyID = vnpayTranId.ToString(),
-                    //    SessionID = new Guid(orderId),
-
-                    //});
                     return new VnpayResponse
                     {
                         Message = "Giao dịch được thực hiện thành công. Cảm ơn quý khách đã sử dụng dịch vụ",

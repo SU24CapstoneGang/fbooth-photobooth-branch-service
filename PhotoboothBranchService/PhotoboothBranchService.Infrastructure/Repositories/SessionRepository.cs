@@ -2,7 +2,6 @@
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
@@ -17,28 +16,27 @@ public class SessionRepository : ISessionRepository
     }
 
     // Add a new session
-    public async Task<Guid> AddAsync(Session session)
+    public async Task<Guid> AddAsync(SessionOrder session)
     {
         _dbContext.Sessions.Add(session);
         await _dbContext.SaveChangesAsync();
-        return session.SessionID;
+        return session.SessionOrderID;
     }
 
     //Read
-    public async Task<IQueryable<Session>> GetAllAsync()
+    public async Task<IQueryable<SessionOrder>> GetAllAsync()
     {
-        return await Task.FromResult(_dbContext.Sessions.Include(p => p.PrintPricing)
-            .Include(d => d.Discount));
+        return await Task.FromResult(_dbContext.Sessions);
     }
 
-    public async Task<IQueryable<Session>> GetAsync(Expression<Func<Session, bool>> predicate)
+    public async Task<IQueryable<SessionOrder>> GetAsync(Expression<Func<SessionOrder, bool>> predicate)
     {
         try
         {
             var result = _dbContext.Sessions.Where(predicate);
             if (!result.Any())
             {
-                return await Task.FromResult(new List<Session>().AsQueryable());
+                return await Task.FromResult(new List<SessionOrder>().AsQueryable());
             }
             return await Task.FromResult(result);
         }
@@ -50,14 +48,14 @@ public class SessionRepository : ISessionRepository
     }
 
     // Remove a session
-    public async Task RemoveAsync(Session session)
+    public async Task RemoveAsync(SessionOrder session)
     {
         _dbContext.Sessions.Remove(session);
         await _dbContext.SaveChangesAsync();
     }
 
     // Update a session
-    public async Task UpdateAsync(Session session)
+    public async Task UpdateAsync(SessionOrder session)
     {
         _dbContext.Entry(session).State = EntityState.Modified;
         await _dbContext.SaveChangesAsync();

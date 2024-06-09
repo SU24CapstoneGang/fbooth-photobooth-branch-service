@@ -9,9 +9,9 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
     {
         public MapStickerMapper()
         {
-            CreateMap<CreateMapStickerRequest, MapSticker>().ReverseMap().HandleNullProperty();
-            CreateMap<UpdateMapStickerRequest, MapSticker>().ReverseMap().HandleNullProperty();
-            CreateMap<MapSticker, MapStickerResponse>().ReverseMap().HandleNullProperty();
+            CreateMap<CreateMapStickerRequest, PhotoSticker>().ReverseMap().HandleNullProperty();
+            CreateMap<UpdateMapStickerRequest, PhotoSticker>().ReverseMap().HandleNullProperty();
+            CreateMap<PhotoSticker, MapStickerResponse>().ReverseMap().HandleNullProperty();
         }
     }
 }

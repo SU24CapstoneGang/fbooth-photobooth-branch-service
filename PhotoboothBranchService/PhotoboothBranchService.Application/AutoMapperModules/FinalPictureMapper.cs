@@ -9,9 +9,9 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
     {
         public FinalPictureMapper()
         {
-            CreateMap<CreateFinalPictureRequest, FinalPicture>().ReverseMap().HandleNullProperty();
-            CreateMap<UpdateFinalPictureRequest, FinalPicture>().ReverseMap().HandleNullProperty();
-            CreateMap<FinalPicture, FinalPictureResponse>().ReverseMap().HandleNullProperty();
+            CreateMap<CreateFinalPictureRequest, Photo>().ReverseMap().HandleNullProperty();
+            CreateMap<UpdateFinalPictureRequest, Photo>().ReverseMap().HandleNullProperty();
+            CreateMap<Photo, FinalPictureResponse>().ReverseMap().HandleNullProperty();
         }
     }
 }

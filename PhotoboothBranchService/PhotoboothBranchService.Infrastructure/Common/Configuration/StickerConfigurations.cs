@@ -33,9 +33,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(s => s.LastModified);
 
             // Relationship with MapSticker
-            builder.HasMany(s => s.MapStickers)
+            builder.HasMany(s => s.PhotoSticker)
                .WithOne(ms => ms.Sticker)
-               .HasForeignKey(ms => ms.StickerId)
+               .HasForeignKey(ms => ms.StickerID)
                .IsRequired();
 
             //auto add CreateDate and ignore change after update

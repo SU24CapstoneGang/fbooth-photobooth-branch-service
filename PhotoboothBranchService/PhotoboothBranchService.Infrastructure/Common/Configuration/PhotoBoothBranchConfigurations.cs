@@ -40,24 +40,17 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasOne(pb => pb.Account)
                 .WithMany(a => a.PhotoBoothBranches)
                 .HasForeignKey(pb => pb.AccountID)
-                .IsRequired(false);
-
-            // Relationship with Camera
-            builder.HasOne(b => b.Camera)
-                  .WithOne(c => c.PhotoBoothBranch)
-                  .HasForeignKey<PhotoBoothBranch>(b => b.CameraID)
-                  .IsRequired(false);
-
-            // Relationship with Printer
-            builder.HasOne(pb => pb.Printer)
-                .WithOne(p => p.PhotoBoothBranch)
-                .HasForeignKey<Printer>(p => p.PrinterID)
-                .IsRequired(false);
+                .IsRequired();
 
             // Relationship with Session
-            builder.HasMany(pb => pb.Sessions)
+            builder.HasMany(pb => pb.SessionOrders)
                 .WithOne(s => s.PhotoBoothBranch)
-                .HasForeignKey(s => s.BranchesID)
+                .HasForeignKey(s => s.PhotoBoothBranchID)
+                .IsRequired();
+
+            builder.HasMany(b => b.Booths)
+                .WithOne(a => a.PhotoBoothBranch)
+                .HasForeignKey(a => a.PhotoBoothBranchID)
                 .IsRequired();
         }
     }

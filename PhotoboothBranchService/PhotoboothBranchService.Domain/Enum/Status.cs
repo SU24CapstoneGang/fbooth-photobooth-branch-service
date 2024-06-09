@@ -10,35 +10,30 @@ public enum ManufactureStatus
 public enum AccountStatus
 {
     Active = 1,
-    Blocked = 2,
+    Blocked = 0,
 }
 
 public enum StatusUse
 {
     Available = 1,
-    Unusable = 2,
+    Unusable = 0,
 }
-public enum PhotoPrivacy
+
+public enum PaymentMethodStatus
 {
-    Public = 1,
-    Private = 2
+    Active = 1,
+    Inactive = 0,
 }
+
 
 public enum PaymentStatus
 {
-    Active = 1,
-    Inactive = 2,
-}
-
-public enum DiscountStatus
-{
-    Active = 1,
-    Expired = 2,
-}
-
-public enum TransactionStatus
-{
     Success = 1,
-    Fail = 2,
+    Fail = 0,
 }
 
+public enum PhotoVersion
+{
+    Original = 0,
+    Edited = 1,
+}
