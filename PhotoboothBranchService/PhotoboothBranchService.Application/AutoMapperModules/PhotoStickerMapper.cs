@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.Common.Helpers;
-using PhotoboothBranchService.Application.DTOs.MapSticker;
+using PhotoboothBranchService.Application.DTOs.PhotoSticker;
 using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Application.AutoMapperModules
@@ -9,9 +9,9 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
     {
         public PhotoStickerMapper()
         {
-            CreateMap<CreateMapStickerRequest, PhotoSticker>().ReverseMap().HandleNullProperty();
-            CreateMap<UpdateMapStickerRequest, PhotoSticker>().ReverseMap().HandleNullProperty();
-            CreateMap<PhotoSticker, MapStickerResponse>().ReverseMap().HandleNullProperty();
+            CreateMap<CreatePhotoStickerRequest, PhotoSticker>().ReverseMap().HandleNullProperty();
+            CreateMap<UpdatePhotoStickerRequest, PhotoSticker>().ReverseMap().HandleNullProperty();
+            CreateMap<PhotoSticker, PhotoStickerResponse>().ReverseMap().HandleNullProperty();
         }
     }
 }

@@ -1,10 +1,10 @@
 ﻿using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.MapSticker;
+using PhotoboothBranchService.Application.DTOs.PhotoSticker;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 
-namespace PhotoboothBranchService.Application.Services.MapStickerServices
+namespace PhotoboothBranchService.Application.Services.PhotoStickerServices
 {
-    public interface IPhotoStickerService : IService<MapStickerResponse, CreateMapStickerRequest, UpdateMapStickerRequest, MapStickerFilter, PagingModel>
+    public interface IPhotoStickerService : IService<PhotoStickerResponse, CreatePhotoStickerRequest, UpdatePhotoStickerRequest, PhotoStickerFilter, PagingModel>
     {
     }
 }

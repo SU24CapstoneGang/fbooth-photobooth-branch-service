@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.Session;
-using PhotoboothBranchService.Application.Services.SessionServices;
+using PhotoboothBranchService.Application.DTOs.SessionOrder;
+using PhotoboothBranchService.Application.Services.SessionOrderServices;
 
 namespace PhotoboothBranchService.Api.Controllers;
 

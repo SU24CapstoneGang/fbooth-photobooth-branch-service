@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment;
-using PhotoboothBranchService.Domain.IRepository;
 using System.Text;
 
 namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices

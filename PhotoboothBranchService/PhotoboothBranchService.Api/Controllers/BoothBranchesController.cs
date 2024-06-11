@@ -1,8 +1,8 @@
 ﻿// PhotoBoothBranchesController.cs
 using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.PhotoBoothBranch;
-using PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
+using PhotoboothBranchService.Application.DTOs.BoothBranch;
+using PhotoboothBranchService.Application.Services.BoothBranchServices;
 using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Api.Controllers;

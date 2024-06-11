@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.PhotoBoothBranch;
+using PhotoboothBranchService.Application.DTOs.BoothBranch;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
-namespace PhotoboothBranchService.Application.Services.PhotoBoothBranchServices;
+namespace PhotoboothBranchService.Application.Services.BoothBranchServices;
 
 public class BoothBranchService : IBoothBranchService
 {

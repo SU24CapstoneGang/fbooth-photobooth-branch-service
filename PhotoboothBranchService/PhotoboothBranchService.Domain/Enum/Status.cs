@@ -30,6 +30,7 @@ public enum PaymentStatus
 {
     Success = 1,
     Fail = 0,
+    Processing = 2
 }
 
 public enum PhotoVersion

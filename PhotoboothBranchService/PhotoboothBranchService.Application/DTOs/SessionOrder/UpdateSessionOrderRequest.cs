@@ -1,9 +1,11 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.Session
+﻿using PhotoboothBranchService.Domain.Enum;
+
+namespace PhotoboothBranchService.Application.DTOs.SessionOrder
 {
     public class UpdateSessionOrderRequest
     {
-        public DateTime StartTime { get; set; } = default!;
+        public double TotalPrice { get; set; } = default!;
         public DateTime EndTime { get; set; } = default!;
-        public Guid BranchesID { get; set; }
+        public SessionOrderStatus Status { get; set; }
     }
 }

@@ -48,8 +48,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired(false);
             // Relationship with Session
             builder.HasMany(pb => pb.SessionOrders)
-                .WithOne(s => s.PhotoBoothBranch)
-                .HasForeignKey(s => s.PhotoBoothBranchID)
+                .WithOne(s => s.BoothBranch)
+                .HasForeignKey(s => s.BoothBranchID)
                 .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired();
 

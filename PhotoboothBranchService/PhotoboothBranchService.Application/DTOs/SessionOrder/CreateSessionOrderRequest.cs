@@ -1,10 +1,10 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.Session
+﻿namespace PhotoboothBranchService.Application.DTOs.SessionOrder
 {
     public class CreateSessionOrderRequest
     {
-        public int PhotosTaken { get; set; }
-        public double TotalPrice { get; set; }
-        public Guid BranchesID { get; set; }
-        public Guid? AccountID { get; set; }
+        public double? TotalPrice { get; set; }
+        public Guid PhotoBoothBranchID { get; set; }
+        public Guid BoothID { get; set; }
+        public Guid AccountID { get; set; }
     }
 }

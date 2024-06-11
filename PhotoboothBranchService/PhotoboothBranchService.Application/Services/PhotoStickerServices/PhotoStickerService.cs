@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.MapSticker;
+using PhotoboothBranchService.Application.DTOs.PhotoSticker;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 
-namespace PhotoboothBranchService.Application.Services.MapStickerServices
+namespace PhotoboothBranchService.Application.Services.PhotoStickerServices
 {
     public class PhotoStickerService : IPhotoStickerService
     {
@@ -19,7 +19,7 @@ namespace PhotoboothBranchService.Application.Services.MapStickerServices
         }
 
         // Create
-        public async Task<Guid> CreateAsync(CreateMapStickerRequest createModel)
+        public async Task<Guid> CreateAsync(CreatePhotoStickerRequest createModel)
         {
             var mapSticker = _mapper.Map<PhotoSticker>(createModel);
             return await _mapStickerRepository.AddAsync(mapSticker);
@@ -44,30 +44,30 @@ namespace PhotoboothBranchService.Application.Services.MapStickerServices
         }
 
         // Read all
-        public async Task<IEnumerable<MapStickerResponse>> GetAllAsync()
+        public async Task<IEnumerable<PhotoStickerResponse>> GetAllAsync()
         {
             var mapStickers = await _mapStickerRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<MapStickerResponse>>(mapStickers.ToList());
+            return _mapper.Map<IEnumerable<PhotoStickerResponse>>(mapStickers.ToList());
         }
 
         // Read all with paging and filter
-        public async Task<IEnumerable<MapStickerResponse>> GetAllPagingAsync(MapStickerFilter filter, PagingModel paging)
+        public async Task<IEnumerable<PhotoStickerResponse>> GetAllPagingAsync(PhotoStickerFilter filter, PagingModel paging)
         {
             var mapStickers = (await _mapStickerRepository.GetAllAsync()).ToList().AutoFilter(filter);
-            var listMapStickerResponse = _mapper.Map<IEnumerable<MapStickerResponse>>(mapStickers);
+            var listMapStickerResponse = _mapper.Map<IEnumerable<PhotoStickerResponse>>(mapStickers);
             listMapStickerResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
             return listMapStickerResponse;
         }
 
         // Read by ID
-        public async Task<MapStickerResponse> GetByIdAsync(Guid id)
+        public async Task<PhotoStickerResponse> GetByIdAsync(Guid id)
         {
             var mapStickers = await _mapStickerRepository.GetAsync(m => m.PhotoStickerID == id);
-            return _mapper.Map<MapStickerResponse>(mapStickers);
+            return _mapper.Map<PhotoStickerResponse>(mapStickers);
         }
 
         // Update
-        public async Task UpdateAsync(Guid id, UpdateMapStickerRequest updateModel)
+        public async Task UpdateAsync(Guid id, UpdatePhotoStickerRequest updateModel)
         {
             var mapSticker = (await _mapStickerRepository.GetAsync(m => m.PhotoStickerID == id)).FirstOrDefault();
             if (mapSticker == null)

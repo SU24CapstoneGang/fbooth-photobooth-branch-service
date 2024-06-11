@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.Session;
+using PhotoboothBranchService.Application.DTOs.SessionOrder;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 
-namespace PhotoboothBranchService.Application.Services.SessionServices;
+namespace PhotoboothBranchService.Application.Services.SessionOrderServices;
 
 public class SessionOrderService : ISessionOrderService
 {

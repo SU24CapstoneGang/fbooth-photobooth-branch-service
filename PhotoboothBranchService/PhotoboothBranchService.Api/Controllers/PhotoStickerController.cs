@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.MapSticker;
-using PhotoboothBranchService.Application.Services.MapStickerServices;
+using PhotoboothBranchService.Application.DTOs.PhotoSticker;
+using PhotoboothBranchService.Application.Services.PhotoStickerServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
@@ -18,7 +18,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<Guid>> CreateMapSticker(CreateMapStickerRequest createMapStickerRequest)
+        public async Task<ActionResult<Guid>> CreateMapSticker(CreatePhotoStickerRequest createMapStickerRequest)
         {
             try
             {
@@ -33,7 +33,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Read all
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MapStickerResponse>>> GetAllMapStickers()
+        public async Task<ActionResult<IEnumerable<PhotoStickerResponse>>> GetAllMapStickers()
         {
             try
             {
@@ -48,8 +48,8 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Read all with paging and filter
         [HttpGet("paging")]
-        public async Task<ActionResult<IEnumerable<MapStickerResponse>>> GetPagingMapStickers(
-            [FromQuery] MapStickerFilter mapStickerFilter, [FromQuery] PagingModel pagingModel)
+        public async Task<ActionResult<IEnumerable<PhotoStickerResponse>>> GetPagingMapStickers(
+            [FromQuery] PhotoStickerFilter mapStickerFilter, [FromQuery] PagingModel pagingModel)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Read by ID
         [HttpGet("{id}")]
-        public async Task<ActionResult<MapStickerResponse>> GetMapStickerById(Guid id)
+        public async Task<ActionResult<PhotoStickerResponse>> GetMapStickerById(Guid id)
         {
             try
             {
@@ -83,7 +83,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateMapSticker(Guid id, UpdateMapStickerRequest updateMapStickerRequest)
+        public async Task<ActionResult> UpdateMapSticker(Guid id, UpdatePhotoStickerRequest updateMapStickerRequest)
         {
             try
             {
