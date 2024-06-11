@@ -7,6 +7,7 @@ namespace PhotoboothBranchService.Domain.Entities
         public Guid PhotoID { get; set; }
         public string PhotoURL { get; set; } = default!;
         public PhotoVersion Version { get; set; }
+        public string PublicId { get; set; } //id from cloudinary service
         public DateTime CreateDate { get; set; }
         public Guid PhotoSessionID { get; set; }
         public virtual PhotoSession PhotoSession { get; set; }

@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
-public class SessionOrderRepository : ISessionOrderRepository
+public class SessionOrderRepository : IPhotoSessionRepository
 {
     private readonly AppDbContext _dbContext;
 

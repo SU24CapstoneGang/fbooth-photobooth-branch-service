@@ -3,6 +3,6 @@ using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Domain.IRepository;
 
-public interface ISessionOrderRepository : IRepositoryBase<SessionOrder>
+public interface IPhotoSessionRepository : IRepositoryBase<SessionOrder>
 {
 }
