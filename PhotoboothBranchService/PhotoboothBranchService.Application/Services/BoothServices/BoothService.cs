@@ -65,6 +65,12 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
             return _mapper.Map<BoothResponse>(booth);
         }
 
+        public async Task<IEnumerable<BoothResponse>> GetByName(string name)
+        {
+            var booths = await _boothRepository.GetAsync(b => b.BoothName.Contains(name));
+            return _mapper.Map<IEnumerable<BoothResponse>>(booths.ToList());
+        }
+
         // Update
         public async Task UpdateAsync(Guid id, UpdateBoothRequest updateModel)
         {

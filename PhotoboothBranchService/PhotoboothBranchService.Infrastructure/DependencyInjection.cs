@@ -18,11 +18,18 @@ namespace PhotoboothBranchService.Infrastructure
 
             //Repositories
             services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<IFilterRepository, FilterRepository>();
+            services.AddScoped<IBoothRepository, BoothRepository>();
+            services.AddScoped<IBoothBranchRepository, BoothBranchRepository>();
             services.AddScoped<IFrameRepository, FrameRepository>();
             services.AddScoped<ILayoutRepository, LayoutRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
+            services.AddScoped<IPhotoRepository, PhotoRepository>();
+            services.AddScoped<IPhotoSessionRepository, PhotoSessionRepository>();
             services.AddScoped<IPhotoStickerRepository, PhotoStickerRepository>();
-            services.AddScoped<IBoothBranchRepository, BoothBranchRepository>();
+            services.AddScoped<IServiceItemRepository, ServiceItemRepository>();
+            services.AddScoped<IServiceRepository, ServiceRepository>();
+            services.AddScoped<IServiceTypeRepository, ServiceTypeRepository>();
             services.AddScoped<ISessionOrderRepository, SessionOrderRepository>();
             services.AddScoped<IStickerRepository, StickerRepository>();
             services.AddScoped<IThemeFrameRepository, ThemeFrameRepository>();

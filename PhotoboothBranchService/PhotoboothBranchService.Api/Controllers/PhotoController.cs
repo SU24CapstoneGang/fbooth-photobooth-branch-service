@@ -1,8 +1,7 @@
-﻿﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Photo;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
-using PhotoboothBranchService.Application.Services.PhotoServices;
 using PhotoboothBranchService.Application.Services.PhotoServices;
 
 namespace PhotoboothBranchService.Api.Controllers

@@ -4,6 +4,7 @@ namespace PhotoboothBranchService.Application.DTOs.Photo
 {
     public class CreatePhotoRequest
     {
+        public string? PhotoURL { get; set; }
         public PhotoVersion Version { get; set; }
         public Guid PhotoSessionID { get; set; }
         public Guid FrameID { get; set; }
