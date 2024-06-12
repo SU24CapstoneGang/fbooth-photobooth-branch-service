@@ -9,10 +9,10 @@ namespace PhotoboothBranchService.Application.Services.SessionOrderServices;
 
 public class SessionOrderService : ISessionOrderService
 {
-    private readonly IPhotoSessionRepository _sessionRepository;
+    private readonly ISessionOrderRepository _sessionRepository;
     private readonly IMapper _mapper;
 
-    public SessionOrderService(IPhotoSessionRepository sessionRepository, IMapper mapper)
+    public SessionOrderService(ISessionOrderRepository sessionRepository, IMapper mapper)
     {
         _sessionRepository = sessionRepository;
         _mapper = mapper;

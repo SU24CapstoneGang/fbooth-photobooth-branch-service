@@ -23,7 +23,7 @@ namespace PhotoboothBranchService.Infrastructure
             services.AddScoped<ILayoutRepository, LayoutRepository>();
             services.AddScoped<IPhotoStickerRepository, PhotoStickerRepository>();
             services.AddScoped<IBoothBranchRepository, BoothBranchRepository>();
-            services.AddScoped<IPhotoSessionRepository, SessionOrderRepository>();
+            services.AddScoped<ISessionOrderRepository, SessionOrderRepository>();
             services.AddScoped<IStickerRepository, StickerRepository>();
             services.AddScoped<IThemeFrameRepository, ThemeFrameRepository>();
 
