@@ -17,18 +17,16 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IPhotoSessionRepository _photoSessionRepository;
         private readonly ILayoutRepository _layoutRepository;
-        private readonly IFilterRepository _filterRepository;
         private readonly IFrameRepository _frameRepository;
         public PhotoService(IPhotoRepository photoRepository, IMapper mapper,
             ICloudinaryService cloudinaryService, IPhotoSessionRepository photoSessionRepository,
-            ILayoutRepository layoutRepository, IFilterRepository filterRepository, IFrameRepository frameRepository)
+            ILayoutRepository layoutRepository, IFrameRepository frameRepository)
         {
             _photoRepository = photoRepository;
             _mapper = mapper;
             _cloudinaryService = cloudinaryService;
             _photoSessionRepository = photoSessionRepository;
             _layoutRepository = layoutRepository;
-            _filterRepository = filterRepository;
             _frameRepository = frameRepository;
         }
 
@@ -46,11 +44,6 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
             if (layout == null)
             {
                 throw new Exception("Layout not found.");
-            }
-            var filter = (await _filterRepository.GetAsync(f => f.FilterID.Equals(createPhotoRequest.FilterID))).FirstOrDefault();
-            if (filter == null)
-            {
-                throw new Exception("Filter not found.");
             }
             var frame = (await _frameRepository.GetAsync(f => f.FrameID.Equals(createPhotoRequest.FrameID))).FirstOrDefault();
             if (frame == null)
@@ -78,7 +71,6 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
                 PhotoSessionID = createPhotoRequest.PhotoSessionID,
                 FrameID = createPhotoRequest.FrameID,
                 LayoutID = createPhotoRequest.LayoutID,
-                FilterID = createPhotoRequest.FilterID,
             };
 
             await _photoRepository.AddAsync(photo);

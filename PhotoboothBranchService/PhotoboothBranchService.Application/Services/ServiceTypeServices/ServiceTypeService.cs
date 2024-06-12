@@ -71,6 +71,12 @@ namespace PhotoboothBranchService.Application.Services.ServiceTypeServices
             return _mapper.Map<ServiceTypeResponse>(serviceType);
         }
 
+        public async Task<IEnumerable<ServiceTypeResponse>> GetByName(string name)
+        {
+            var serviceTypes = await _serviceTypeRepository.GetAsync(s => s.ServiceTypeName.Contains(name));
+            return _mapper.Map<IEnumerable<ServiceTypeResponse>>(serviceTypes.ToList());
+        }
+
         // Update
         public async Task UpdateAsync(Guid id, UpdateServiceTypeRequest updateModel)
         {

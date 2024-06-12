@@ -24,7 +24,7 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         {
             await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
-            return entity.ServiceTypeId;
+            return entity.ServiceTypeID;
         }
 
         // Read

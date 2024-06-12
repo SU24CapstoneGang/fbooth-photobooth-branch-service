@@ -1,4 +1,4 @@
-﻿namespace PhotoboothBranchService.Application.Common.Helpers
+﻿namespace PhotoboothBranchService.Api.Common.Helper
 {
     public static class IpAddressHelper
     {

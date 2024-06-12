@@ -10,7 +10,6 @@ public class AppDbContext : DbContext
 {
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Booth> Booths {get; set; }
-    public DbSet<Filter> Filters { get; set; }
     public DbSet<Frame> Frames { get; set; }
     public DbSet<Layout> Layouts { get; set; }
     public DbSet<Payment> Payments {get; set; }
@@ -55,7 +54,6 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new AccountConfigurations());
         modelBuilder.ApplyConfiguration(new BoothConfiguration());
-        modelBuilder.ApplyConfiguration(new FilterConfigurations());
         modelBuilder.ApplyConfiguration(new FrameConfigurations());
         modelBuilder.ApplyConfiguration(new LayoutConfigurations());
         modelBuilder.ApplyConfiguration(new PaymentConfiguration());
