@@ -12,6 +12,6 @@ namespace PhotoboothBranchService.Application.DTOs.Account
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public AccountStatus Status { get; set; }
-        public string RoleName { get; set; }
+        public AccountRole Role { get; set; }
     }
 }

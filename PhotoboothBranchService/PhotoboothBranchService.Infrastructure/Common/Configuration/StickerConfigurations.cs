@@ -27,10 +27,19 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired()
                 .HasMaxLength(255);
 
+            builder.Property(s => s.CouldID)
+                .IsRequired();
+
             builder.Property(s => s.CreatedDate)
                 .IsRequired();
 
             builder.Property(s => s.LastModified);
+            // Status enum mapping
+            builder.Property(s => s.Status)
+                .IsRequired()
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (StatusUse)Enum.Parse(typeof(StatusUse), v));
 
             // Relationship with MapSticker
             builder.HasMany(s => s.PhotoSticker)

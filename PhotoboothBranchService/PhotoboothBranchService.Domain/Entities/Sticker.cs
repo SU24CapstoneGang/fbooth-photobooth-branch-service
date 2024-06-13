@@ -7,9 +7,10 @@ namespace PhotoboothBranchService.Domain.Entities
         public Guid StickerID { get; set; } = default!;
         public string StickerName { get; set; } = default!;
         public string StrickerURL { get; set; } = default!;
+        public string CouldID { get; set; } = default!;
         public StatusUse Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? LastModified { get; set; }
-        public virtual ICollection<PhotoSticker> PhotoSticker { get; set; }
+        public virtual ICollection<PhotoSticker> PhotoSticker { get; set; } = default!;
     }
 }

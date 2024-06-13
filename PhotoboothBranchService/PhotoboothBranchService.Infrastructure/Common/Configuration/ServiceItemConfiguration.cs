@@ -19,20 +19,24 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasColumnName("ServiceItemID")
                 .ValueGeneratedOnAdd();
             builder.Property(s => s.Quantity);
-            builder.Property(s => s.UnitPrice);
+            builder.Property(s => s.UnitPrice).HasColumnType("decimal(18, 2)"); ;
+            builder.Property(s => s.SubTotal).HasColumnType("decimal(18, 2)"); ;
+
 
             builder.HasOne(s => s.Service)
                 .WithMany(a => a.ServiceItems)
                 .HasForeignKey(s => s.ServiceID)
                 .IsRequired();
+
             builder.HasOne(s => s.PhotoSession)
                 .WithMany(b => b.ServiceItems)
                 .HasForeignKey(s => s.PhotoSessionID)
                 .IsRequired(false);
+
             builder.HasOne(s => s.SessionOrder)
                 .WithMany(b => b.ServiceItems)
                 .HasForeignKey(c => c.SessionOrderID)
-                .IsRequired(false);
+                .IsRequired();
         }
     }
 }

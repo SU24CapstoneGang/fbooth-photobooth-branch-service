@@ -117,8 +117,8 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
         {
             try
             {
-                var cameras = (await _accountRepository.GetAllAsync()).ToList().AutoFilter(filter);
-                var listAccountresponse = _mapper.Map<IEnumerable<AccountResponse>>(cameras);
+                var account = (await _accountRepository.GetAllAsync()).ToList().AutoFilter(filter);
+                var listAccountresponse = _mapper.Map<IEnumerable<AccountResponse>>(account);
                 listAccountresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
                 return listAccountresponse;
             }
@@ -187,7 +187,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                         var result = await _accountRepository.CreateAccount(newAccount);
 
                         var accountRespone = _mapper.Map<AccountRegisterResponse>(result);
-                        accountRespone.RoleName = role.ToString();
+                        //accountRespone.Role = role;
 
                         return accountRespone;
                     }

@@ -67,7 +67,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
             var photo = new Photo
             {
                 PhotoURL = uploadResult.SecureUrl.AbsoluteUri,
-                PublicId = uploadResult.PublicId,
+                CouldID = uploadResult.PublicId,
                 PhotoSessionID = createPhotoRequest.PhotoSessionID,
                 FrameID = createPhotoRequest.FrameID,
                 LayoutID = createPhotoRequest.LayoutID,

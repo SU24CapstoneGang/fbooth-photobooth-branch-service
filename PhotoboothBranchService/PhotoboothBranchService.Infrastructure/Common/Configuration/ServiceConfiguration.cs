@@ -18,9 +18,12 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasKey(r => r.ServiceID);
             builder.Property(r => r.ServiceID).HasColumnName("ServiceID")
                 .ValueGeneratedOnAdd();
+
             builder.Property(s => s.ServiceName).IsRequired();
             builder.Property(s => s.ServiceDescription).IsRequired(false);
-            builder.Property(a => a.UnitPrice).IsRequired();
+            builder.Property(a => a.Price).IsRequired().HasColumnType("decimal(18, 2)");
+            builder.Property(a => a.Unit).IsRequired(); ;
+
 
             builder.HasOne(s => s.ServiceType)
                 .WithMany(t => t.Services)

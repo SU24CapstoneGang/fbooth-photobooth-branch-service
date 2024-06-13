@@ -11,12 +11,10 @@ namespace PhotoboothBranchService.Api.Controllers
     public class PhotoController : ControllerBase
     {
         private readonly IPhotoService _photoService;
-        private readonly ICloudinaryService _cloudinaryService;
 
-        public PhotoController(IPhotoService photoService, ICloudinaryService cloudinaryService)
+        public PhotoController(IPhotoService photoService)
         {
             _photoService = photoService;
-            _cloudinaryService = cloudinaryService;
         }
 
         // Create
@@ -116,7 +114,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
 
         [HttpPost("add-photo-cloud")]
-        public async Task<ActionResult<PhotoResponse>> AddPhoto(IFormFile file, CreatePhotoRequest createPhotoRequest)
+        public async Task<ActionResult<PhotoResponse>> AddPhoto(IFormFile file, [FromQuery] CreatePhotoRequest createPhotoRequest)
         {
             try
             {

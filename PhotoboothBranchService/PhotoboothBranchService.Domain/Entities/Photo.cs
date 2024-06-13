@@ -7,14 +7,14 @@ namespace PhotoboothBranchService.Domain.Entities
         public Guid PhotoID { get; set; }
         public string PhotoURL { get; set; } = default!;
         public PhotoVersion Version { get; set; }
-        public string PublicId { get; set; } //id from cloudinary service
+        public string CouldID { get; set; } = default!; //id from cloudinary service
         public DateTime CreateDate { get; set; }
         public Guid PhotoSessionID { get; set; }
-        public virtual PhotoSession PhotoSession { get; set; }
+        public virtual PhotoSession PhotoSession { get; set; } = default!;
         public Guid FrameID { get; set; }
-        public virtual Frame Frame { get; set; }
+        public virtual Frame Frame { get; set; } = default!;
         public Guid LayoutID {  get; set; }
-        public virtual Layout Layout { get; set; }
-        public virtual ICollection<PhotoSticker> PhotoStickers { get; set; }
+        public virtual Layout Layout { get; set; } = default!;
+        public virtual ICollection<PhotoSticker> PhotoStickers { get; set; } = default!;
     }
 }

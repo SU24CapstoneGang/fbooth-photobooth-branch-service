@@ -20,7 +20,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             
             builder.Property(s => s.TotalPrice)
-                .IsRequired(); // Tổng giá
+                .IsRequired().HasColumnType("decimal(18, 2)"); ; // Tổng giá
 
             builder.Property(s => s.EndTime).IsRequired(false);
             builder.Property(a => a.StartTime)

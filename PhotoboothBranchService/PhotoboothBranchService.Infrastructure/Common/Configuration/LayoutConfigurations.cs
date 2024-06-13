@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
@@ -18,12 +19,18 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .ValueGeneratedOnAdd();
 
             // Other properties
-            builder.Property(l => l.LayoutURL)
-                .IsRequired()
-                .HasMaxLength(255);
+            builder.Property(l => l.LayoutURL).IsRequired();
+            builder.Property(l => l.CouldID).IsRequired();
+            builder.Property(l => l.Lenght).IsRequired();
+            builder.Property(l => l.Width).IsRequired();
+            builder.Property(l => l.PhotoSlot).IsRequired();
 
-            builder.Property(l => l.CreatedDate)
-                .IsRequired();
+            // ManufactureStatus enum mapping
+            builder.Property(l => l.Status)
+                .IsRequired()
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (StatusUse)Enum.Parse(typeof(StatusUse), v));
 
             builder.Property(l => l.LastModified);
 

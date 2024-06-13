@@ -21,7 +21,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(p => p.PhotoID).HasColumnName("PhotoID").ValueGeneratedOnAdd();
 
             builder.Property(p => p.PhotoURL).IsRequired();
-
+            builder.Property(p => p.CouldID).IsRequired();
             // ManufactureStatus enum mapping
             builder.Property(pb => pb.Version)
                 .IsRequired()

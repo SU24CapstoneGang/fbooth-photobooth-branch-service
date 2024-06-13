@@ -24,10 +24,15 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasMaxLength(100);
 
             builder.Property(f => f.FrameURL)
-                .IsRequired()
-                .HasMaxLength(255);
+                .IsRequired();
 
             builder.Property(f => f.CreatedDate)
+                .IsRequired();
+
+            builder.Property(f => f.Lenght)
+                .IsRequired();
+
+            builder.Property(f => f.Width)
                 .IsRequired();
 
             builder.Property(f => f.LastModified);

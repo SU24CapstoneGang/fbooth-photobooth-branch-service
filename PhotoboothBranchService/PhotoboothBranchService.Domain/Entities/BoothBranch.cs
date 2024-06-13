@@ -10,8 +10,8 @@ public class BoothBranch
     public DateTime CreateDate { get; set; }
     public ManufactureStatus Status { get; set; } = default!;
     public Guid ManagerID { get; set; }
-    public virtual Account Manager { get; set; }
-    public virtual ICollection<SessionOrder> SessionOrders { get; set; }
-    public virtual ICollection<Booth> Booths { get; set; }
-    public virtual ICollection<Account> Staffs { get; set; }
+    public virtual Account Manager { get; set; } = default!;
+    public virtual ICollection<SessionOrder> SessionOrders { get; set; } = default!;
+    public virtual ICollection<Booth> Booths { get; set; } = default!;
+    public virtual ICollection<Account> Staffs { get; set; } = default!;
 }
