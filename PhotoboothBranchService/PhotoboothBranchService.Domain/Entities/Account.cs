@@ -7,21 +7,21 @@ public class Account
 {
     public Guid AccountID { get; set; }
     public string AccountFBID { get; set; } = default!;
-    public string? PasswordResetToken { get; set; } = default!;
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
     public byte[] PasswordHash { get; set; } = default!;
     public byte[] PasswordSalt { get; set; } = default!;
+    public string? ResetPasswordToken { get; set; } = default!;
     public DateOnly DateOfBirth { get; set; }
     public string Address { get; set; } = default!;
     public string Email { get; set; } = default!;
     public string PhoneNumber { get; set; } = default!;
     public AccountStatus Status { get; set; }
     public AccountRole Role { get; set; }
-    public virtual ICollection<SessionOrder> SessionOrder { get; set; } 
+    public virtual ICollection<SessionOrder> SessionOrder { get; set; } = default!;
     public Guid? PhotoBoothBranchID { get; set; }
-    public virtual BoothBranch BoothBranchManage { get; set; }
-    public virtual BoothBranch BoothBranchBelong { get; set; }
+    public virtual BoothBranch BoothBranchManage { get; set; } = default!;
+    public virtual BoothBranch BoothBranchBelong { get; set; } = default!;
     public void SetPassword(string plainTextPassword, IPasswordHasher passwordHasher)
     {
         PasswordSalt = passwordHasher.GenerateSalt();

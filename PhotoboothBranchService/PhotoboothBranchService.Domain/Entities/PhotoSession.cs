@@ -13,8 +13,10 @@ namespace PhotoboothBranchService.Domain.Entities
         public int TotalPhotoTaken { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
-        public Guid BoothID { get; set; }
-        public virtual Booth Booth { get; set; } = default!;
+        public Guid LayoutID { get; set; }
+        public virtual Layout Layout { get; set; } = default!;
+        public Guid SessionOrderID { get; set; }
+        public virtual SessionOrder SessionOrder { get; set; } = default!;
         public virtual ICollection<Photo> Photos { get; set; } = default!;
         public virtual ICollection<ServiceItem> ServiceItems { get; set; } = default!;
     }

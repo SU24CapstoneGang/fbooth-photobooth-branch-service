@@ -46,12 +46,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .WithOne(a => a.BoothBranchBelong)
                 .HasForeignKey(a => a.PhotoBoothBranchID)
                 .IsRequired(false);
-            // Relationship with Session
-            builder.HasMany(pb => pb.SessionOrders)
-                .WithOne(s => s.BoothBranch)
-                .HasForeignKey(s => s.BoothBranchID)
-                .OnDelete(DeleteBehavior.Restrict)
-                .IsRequired();
 
             builder.HasMany(b => b.Booths)
                 .WithOne(a => a.PhotoBoothBranch)

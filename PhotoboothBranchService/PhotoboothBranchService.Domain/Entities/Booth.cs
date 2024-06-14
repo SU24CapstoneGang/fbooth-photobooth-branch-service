@@ -14,7 +14,6 @@ namespace PhotoboothBranchService.Domain.Entities
         public ManufactureStatus Status { get; set; }
         public Guid PhotoBoothBranchID { get; set; }
         public virtual BoothBranch PhotoBoothBranch { get; set; } = default!;
-        public virtual ICollection<PhotoSession> PhotoSessions { get; set; } = default!;
         public virtual ICollection<SessionOrder> SessionOrders { get; set; } = default!;
     }
 }

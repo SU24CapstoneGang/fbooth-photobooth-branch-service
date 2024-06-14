@@ -10,12 +10,13 @@ public class AppDbContext : DbContext
 {
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Booth> Booths {get; set; }
+    public DbSet<BoothBranch> BoothBranches { get; set; }
     public DbSet<Frame> Frames { get; set; }
     public DbSet<Layout> Layouts { get; set; }
     public DbSet<Payment> Payments {get; set; }
     public DbSet<PaymentMethod> PaymentMethods {get; set; }
     public DbSet<Photo> Photos {get; set; }
-    public DbSet<BoothBranch> BoothBranches { get; set; }
+    public DbSet<PhotoBox> PhotoBoxes { get; set; }
     public DbSet<PhotoSession> PhotoSessions {get; set; }
     public DbSet<PhotoSticker> PhotoStickers {get; set; }
     public DbSet<Service> Services {get; set; }
@@ -59,6 +60,8 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new PaymentConfiguration());
         modelBuilder.ApplyConfiguration(new PaymentMethodConfigurations());
         modelBuilder.ApplyConfiguration(new BoothBranchConfigurations());
+        modelBuilder.ApplyConfiguration(new PhotoBoxConfiguration());
+        modelBuilder.ApplyConfiguration(new PhotoConfiguration());
         modelBuilder.ApplyConfiguration(new PhotoSessionConfiguration());
         modelBuilder.ApplyConfiguration(new PhotoStickerConfigurations());
         modelBuilder.ApplyConfiguration(new ServiceConfiguration());

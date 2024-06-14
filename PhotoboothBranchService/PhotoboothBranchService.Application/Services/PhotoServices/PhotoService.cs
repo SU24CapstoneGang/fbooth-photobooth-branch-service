@@ -40,11 +40,6 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
         {
 
             // validate
-            var layout = (await _layoutRepository.GetAsync(l => l.LayoutID.Equals(createPhotoRequest.LayoutID))).FirstOrDefault();
-            if (layout == null)
-            {
-                throw new Exception("Layout not found.");
-            }
             var frame = (await _frameRepository.GetAsync(f => f.FrameID.Equals(createPhotoRequest.FrameID))).FirstOrDefault();
             if (frame == null)
             {
@@ -70,7 +65,6 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
                 CouldID = uploadResult.PublicId,
                 PhotoSessionID = createPhotoRequest.PhotoSessionID,
                 FrameID = createPhotoRequest.FrameID,
-                LayoutID = createPhotoRequest.LayoutID,
             };
 
             await _photoRepository.AddAsync(photo);
