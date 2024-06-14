@@ -1,14 +1,21 @@
 ﻿using FirebaseAdmin.Auth;
+using PhotoboothBranchService.Application.Common.Exceptions;
+using PhotoboothBranchService.Application.Services.AccountServices;
+using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.FirebaseServices
 {
     public class FirebaseService : IFirebaseService
     {
-        public FirebaseService()
+        private readonly IAccountRepository _accountRepository;
+
+        public FirebaseService(IAccountRepository accountRepository)
         {
             var path = AppDomain.CurrentDomain.BaseDirectory;
             string credential_path = path + "firebase.json";
             System.Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", credential_path);
+
+            _accountRepository = accountRepository;
         }
 
         public async Task<string> RegisterAsync(string email, string password)
@@ -27,8 +34,22 @@ namespace PhotoboothBranchService.Application.Services.FirebaseServices
 
         public async Task<string> GetResetPasswordLink(string email)
         {
+            var userRecord = await FirebaseAuth.DefaultInstance.GetUserByEmailAsync(email);
+            var account = (await _accountRepository.GetAsync(a => a.Email.Equals(email))).FirstOrDefault();
+            if (userRecord == null || account == null)
+            {
+                throw new NotFoundException("Account", email, "Email not found");
+            }
+
+            var resetToken = Guid.NewGuid().ToString();
+            account.PasswordResetToken = resetToken;
+            await _accountRepository.UpdateAsync(account);
+
             var link = await FirebaseAuth.DefaultInstance.GeneratePasswordResetLinkAsync(email);
-            return link;
+            // Append the token to the reset link
+            var resetLinkWithToken = $"{link}&resetToken={resetToken}";
+
+            return resetLinkWithToken;
         }
 
         public async Task DeleteUserAsync(string email)

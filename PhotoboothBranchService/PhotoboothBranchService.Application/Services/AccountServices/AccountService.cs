@@ -39,6 +39,12 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             return await _accountRepository.AddAsync(account);
         }
 
+        public async Task<string> ResetPassword(string email)
+        {
+            var link = await _firebaseService.GetResetPasswordLink(email);
+            return link;
+        }
+
         public async Task DeleteAsync(Guid id)
         {
             try
@@ -132,9 +138,18 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
         {
             try
             {
+                var account = (await _accountRepository.GetAsync(a => a.Email == request.Email)).FirstOrDefault();
+
                 var loginViewModel = await _jwtService.GetForCredentialsAsync(request.Email, request.Password);
-                if (loginViewModel != null)
+                if (loginViewModel != null && account != null)
                 {
+                    if (!string.IsNullOrEmpty(account.PasswordResetToken))
+                    {
+                        // Clear the password reset token and update the password in the database
+                        account.PasswordResetToken = null;
+                        account.SetPassword(request.Password, _passwordHasher);
+                        await _accountRepository.UpdateAsync(account);
+                    }
                     return loginViewModel;
                 }
                 throw new BadRequestException("Login fail!!!");

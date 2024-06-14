@@ -167,5 +167,15 @@ public class AccountsController : ControllerBaseApi
             return Ok(token);
         return BadRequest("Login fail!!!");
     }
+
+    [HttpGet("profile/reset-password-link")]
+    public async Task<IActionResult> ResetPassword()
+    {
+        var email = Request.HttpContext.Items["Email"]?.ToString();
+        var result = await _accountService.ResetPassword(email);
+        if (result != null)
+            return Ok(result);
+        return BadRequest();
+    }
 }
 
