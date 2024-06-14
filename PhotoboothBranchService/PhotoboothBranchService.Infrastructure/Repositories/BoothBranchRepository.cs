@@ -26,7 +26,7 @@ public class BoothBranchRepository : IBoothBranchRepository
     //Read
     public async Task<IQueryable<BoothBranch>> GetAllAsync()
     {
-        return await Task.FromResult(_dbContext.BoothBranches.Include(b => b.SessionOrders));
+        return await Task.FromResult(_dbContext.BoothBranches);
     }
 
     public async Task<IQueryable<BoothBranch>> GetAsync(Expression<Func<BoothBranch, bool>> predicate)

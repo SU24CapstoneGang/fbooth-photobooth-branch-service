@@ -22,6 +22,7 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
         builder.Property(u => u.PhoneNumber).HasMaxLength(11);
         builder.Property(u => u.PasswordHash).IsRequired();
         builder.Property(u => u.PasswordSalt).IsRequired();
+        builder.Property(u=>u.ResetPasswordToken).IsRequired();
         builder.Property(a => a.DateOfBirth).IsRequired();
         builder.Property(a => a.Address).IsRequired().HasMaxLength(100);
 

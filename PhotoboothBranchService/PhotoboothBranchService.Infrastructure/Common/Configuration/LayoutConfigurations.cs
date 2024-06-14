@@ -40,14 +40,15 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
               .HasDefaultValue(DateTime.UtcNow)
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
-            builder.HasOne(l => l.Frame)
-                .WithMany(f => f.Layouts)
-                .HasForeignKey(l => l.FrameID)
-                .IsRequired();
-            builder.HasMany(t => t.Photos)
+            builder.HasMany(t => t.PhotoSessions)
                 .WithOne(p => p.Layout)
                 .HasForeignKey(p => p.LayoutID)
-                .OnDelete(DeleteBehavior.Restrict)
+                //.OnDelete(DeleteBehavior.Restrict)
+                .IsRequired();
+
+            builder.HasMany(t => t.PhotoBoxes)
+                .WithOne(p => p.Layout)
+                .HasForeignKey(v => v.LayoutID)
                 .IsRequired();
         }
     }

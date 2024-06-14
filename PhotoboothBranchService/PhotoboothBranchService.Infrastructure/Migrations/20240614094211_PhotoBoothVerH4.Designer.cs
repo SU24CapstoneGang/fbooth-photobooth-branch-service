@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 
@@ -11,9 +12,11 @@ using PhotoboothBranchService.Infrastructure.Common.Persistence;
 namespace PhotoboothBranchService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240614094211_PhotoBoothVerH4")]
+    partial class PhotoBoothVerH4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -165,7 +168,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 14, 10, 4, 36, 247, DateTimeKind.Utc).AddTicks(2753));
+                        .HasDefaultValue(new DateTime(2024, 6, 14, 9, 42, 11, 509, DateTimeKind.Utc).AddTicks(1463));
 
                     b.Property<string>("FrameName")
                         .IsRequired()
@@ -213,7 +216,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 14, 10, 4, 36, 247, DateTimeKind.Utc).AddTicks(5925));
+                        .HasDefaultValue(new DateTime(2024, 6, 14, 9, 42, 11, 509, DateTimeKind.Utc).AddTicks(4776));
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
@@ -290,7 +293,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 14, 10, 4, 36, 248, DateTimeKind.Utc).AddTicks(2183));
+                        .HasDefaultValue(new DateTime(2024, 6, 14, 9, 42, 11, 510, DateTimeKind.Utc).AddTicks(2134));
 
                     b.Property<string>("PaymentMethodName")
                         .IsRequired()
@@ -309,14 +312,14 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         new
                         {
                             PaymentMethodID = new Guid("1b4f2a3e-7d94-4119-8b6d-5c15b02848f6"),
-                            CreateDate = new DateTime(2024, 6, 14, 10, 4, 36, 248, DateTimeKind.Utc).AddTicks(2734),
+                            CreateDate = new DateTime(2024, 6, 14, 9, 42, 11, 510, DateTimeKind.Utc).AddTicks(2756),
                             PaymentMethodName = "VNPay",
                             Status = "Active"
                         },
                         new
                         {
                             PaymentMethodID = new Guid("f3b6e6b2-f90e-4f6b-8cd2-68b467afae0f"),
-                            CreateDate = new DateTime(2024, 6, 14, 10, 4, 36, 248, DateTimeKind.Utc).AddTicks(2736),
+                            CreateDate = new DateTime(2024, 6, 14, 9, 42, 11, 510, DateTimeKind.Utc).AddTicks(2759),
                             PaymentMethodName = "MoMo",
                             Status = "Active"
                         });
@@ -336,9 +339,12 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 14, 10, 4, 36, 251, DateTimeKind.Utc).AddTicks(343));
+                        .HasDefaultValue(new DateTime(2024, 6, 14, 9, 42, 11, 513, DateTimeKind.Utc).AddTicks(2767));
 
                     b.Property<Guid>("FrameID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("LayoutID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PhotoSessionID")
@@ -355,6 +361,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.HasKey("PhotoID");
 
                     b.HasIndex("FrameID");
+
+                    b.HasIndex("LayoutID");
 
                     b.HasIndex("PhotoSessionID");
 
@@ -400,9 +408,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("LayoutID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("SessionIndex")
                         .HasColumnType("int");
 
@@ -412,14 +417,12 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("StartTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 14, 10, 4, 36, 251, DateTimeKind.Utc).AddTicks(2372));
+                        .HasDefaultValue(new DateTime(2024, 6, 14, 9, 42, 11, 513, DateTimeKind.Utc).AddTicks(4960));
 
                     b.Property<int>("TotalPhotoTaken")
                         .HasColumnType("int");
 
                     b.HasKey("PhotoSessionID");
-
-                    b.HasIndex("LayoutID");
 
                     b.HasIndex("SessionOrderID");
 
@@ -544,6 +547,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("BoothBranchID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("BoothID")
                         .HasColumnType("uniqueidentifier");
 
@@ -553,7 +559,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("StartTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 14, 10, 4, 36, 255, DateTimeKind.Utc).AddTicks(3774));
+                        .HasDefaultValue(new DateTime(2024, 6, 14, 9, 42, 11, 514, DateTimeKind.Utc).AddTicks(8316));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -565,6 +571,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.HasKey("SessionOrderID");
 
                     b.HasIndex("AccountID");
+
+                    b.HasIndex("BoothBranchID");
 
                     b.HasIndex("BoothID");
 
@@ -585,7 +593,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 14, 10, 4, 36, 255, DateTimeKind.Utc).AddTicks(8024));
+                        .HasDefaultValue(new DateTime(2024, 6, 14, 9, 42, 11, 515, DateTimeKind.Utc).AddTicks(2417));
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
@@ -698,6 +706,12 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PhotoboothBranchService.Domain.Entities.Layout", "Layout")
+                        .WithMany("Photos")
+                        .HasForeignKey("LayoutID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("PhotoboothBranchService.Domain.Entities.PhotoSession", "PhotoSession")
                         .WithMany("Photos")
                         .HasForeignKey("PhotoSessionID")
@@ -705,6 +719,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Frame");
+
+                    b.Navigation("Layout");
 
                     b.Navigation("PhotoSession");
                 });
@@ -722,19 +738,11 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.PhotoSession", b =>
                 {
-                    b.HasOne("PhotoboothBranchService.Domain.Entities.Layout", "Layout")
-                        .WithMany("PhotoSessions")
-                        .HasForeignKey("LayoutID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("PhotoboothBranchService.Domain.Entities.SessionOrder", "SessionOrder")
                         .WithMany("PhotoSessions")
                         .HasForeignKey("SessionOrderID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Layout");
 
                     b.Navigation("SessionOrder");
                 });
@@ -800,6 +808,12 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PhotoboothBranchService.Domain.Entities.BoothBranch", "BoothBranch")
+                        .WithMany("SessionOrders")
+                        .HasForeignKey("BoothBranchID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("PhotoboothBranchService.Domain.Entities.Booth", "Booth")
                         .WithMany("SessionOrders")
                         .HasForeignKey("BoothID")
@@ -809,6 +823,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Navigation("Account");
 
                     b.Navigation("Booth");
+
+                    b.Navigation("BoothBranch");
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Account", b =>
@@ -828,6 +844,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Navigation("Booths");
 
+                    b.Navigation("SessionOrders");
+
                     b.Navigation("Staffs");
                 });
 
@@ -840,7 +858,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 {
                     b.Navigation("PhotoBoxes");
 
-                    b.Navigation("PhotoSessions");
+                    b.Navigation("Photos");
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.PaymentMethod", b =>

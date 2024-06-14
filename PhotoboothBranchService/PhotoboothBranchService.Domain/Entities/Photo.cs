@@ -13,8 +13,6 @@ namespace PhotoboothBranchService.Domain.Entities
         public virtual PhotoSession PhotoSession { get; set; } = default!;
         public Guid FrameID { get; set; }
         public virtual Frame Frame { get; set; } = default!;
-        public Guid LayoutID {  get; set; }
-        public virtual Layout Layout { get; set; } = default!;
         public virtual ICollection<PhotoSticker> PhotoStickers { get; set; } = default!;
     }
 }

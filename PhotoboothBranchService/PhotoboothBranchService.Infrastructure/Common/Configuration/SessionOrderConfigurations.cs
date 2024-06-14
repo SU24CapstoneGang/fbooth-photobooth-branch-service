@@ -50,6 +50,10 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .WithOne(a => a.SessionOrder)
                 .HasForeignKey(c => c.SessionOrderID)
                 .IsRequired(false);
+            builder.HasMany(s => s.PhotoSessions)
+                .WithOne(ps => ps.SessionOrder)
+                .HasForeignKey(ps => ps.SessionOrderID)
+                .IsRequired();
         }
     }
 }

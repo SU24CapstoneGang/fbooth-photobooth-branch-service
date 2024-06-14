@@ -50,18 +50,10 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     v => v.ToString(),
                     v => (StatusUse)Enum.Parse(typeof(StatusUse), v));
 
-            builder.HasOne(f => f.Theme)
-                .WithMany(t => t.Frames)
-                .HasForeignKey(f => f.ThemeID)
-                .IsRequired();
             builder.HasMany(p => p.Photos)
                 .WithOne(f => f.Frame)
                 .HasForeignKey(f => f.FrameID)
-                .IsRequired();
-            builder.HasMany(l => l.Layouts)
-                .WithOne(f => f.Frame)
-                .HasForeignKey(f => f.FrameID)
-                .IsRequired();
+                .IsRequired();;
         }
     }
 }
