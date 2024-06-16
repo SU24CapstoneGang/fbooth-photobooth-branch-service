@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FirebaseAdmin.Auth;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Account;
@@ -143,10 +144,10 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                 var loginViewModel = await _jwtService.GetForCredentialsAsync(request.Email, request.Password);
                 if (loginViewModel != null && account != null)
                 {
-                    if (!string.IsNullOrEmpty(account.PasswordResetToken))
+                    if (!string.IsNullOrEmpty(account.ResetPasswordToken))
                     {
                         // Clear the password reset token and update the password in the database
-                        account.PasswordResetToken = null;
+                        account.ResetPasswordToken = null;
                         account.SetPassword(request.Password, _passwordHasher);
                         await _accountRepository.UpdateAsync(account);
                     }
@@ -181,7 +182,6 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
         {
             try
             {
-
                 //validation in db
                 if (Enum.IsDefined(typeof(AccountRole), role))
                 {
@@ -198,12 +198,11 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                         newAccount.SetPassword(request.Password, _passwordHasher);
                         newAccount.Role = role;
                         newAccount.Status = AccountStatus.Active;
+                        newAccount.ResetPasswordToken = null;
 
                         var result = await _accountRepository.CreateAccount(newAccount);
 
                         var accountRespone = _mapper.Map<AccountRegisterResponse>(result);
-                        //accountRespone.Role = role;
-
                         return accountRespone;
                     }
                     throw new BadRequestException("Register fail!!!");
@@ -212,6 +211,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             }
             catch (Exception ex)
             {
+                await _firebaseService.DeleteUserAsync(request.Email);
                 throw new Exception("An error occurred while register the account: " + ex.Message);
             }
         }

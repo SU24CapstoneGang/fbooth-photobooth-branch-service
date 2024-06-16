@@ -42,7 +42,7 @@ namespace PhotoboothBranchService.Application.Services.FirebaseServices
             }
 
             var resetToken = Guid.NewGuid().ToString();
-            account.PasswordResetToken = resetToken;
+            account.ResetPasswordToken = resetToken;
             await _accountRepository.UpdateAsync(account);
 
             var link = await FirebaseAuth.DefaultInstance.GeneratePasswordResetLinkAsync(email);
