@@ -9,9 +9,9 @@ namespace PhotoboothBranchService.Application.DTOs.ServiceItem
     public class CreateServiceItemRequest
     {
         public short Quantity { get; set; }
-        public double UnitPrice { get; set; }
+        public Guid? LayoutID { get; set; }
         public Guid? PhotoSessionID { get; set; }
         public Guid ServiceID { get; set; }
-        public Guid? SessionOrderID { get; set; }
+        public Guid SessionOrderID { get; set; }
     }
 }

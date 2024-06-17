@@ -37,7 +37,7 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         {
             try
             {
-                var result = _dbContext.Services.Where(predicate);
+                var result = _dbContext.Services.Where(predicate).Include(i=>i.ServiceType);
                 if (!result.Any())
                 {
                     return await Task.FromResult(new List<Service>().AsQueryable());

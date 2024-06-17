@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.ServiceItem;
 using PhotoboothBranchService.Domain.Common.Helper;
@@ -15,18 +16,102 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
     {
         private readonly IServiceItemRepository _serviceItemRepository;
         private readonly IMapper _mapper;
-
-        public ServiceItemService(IServiceItemRepository serviceItemRepository, IMapper mapper)
+        private readonly IPhotoSessionRepository _photoSessionRepository;
+        private readonly ILayoutRepository _layoutRepository;
+        private readonly ISessionOrderRepository _sessionOrderRepository;
+        private readonly IServiceRepository _serviceRepository;
+        private readonly IServiceTypeRepository _serviceTypeRepository;
+        public ServiceItemService(IServiceItemRepository serviceItemRepository, IMapper mapper, IPhotoSessionRepository photoSessionRepository
+            , ILayoutRepository layoutRepository, ISessionOrderRepository sessionOrderRepository
+            , IServiceRepository serviceRepository, IServiceTypeRepository serviceTypeRepository)
         {
             _serviceItemRepository = serviceItemRepository;
             _mapper = mapper;
+            _photoSessionRepository = photoSessionRepository;
+            _layoutRepository = layoutRepository;
+            _sessionOrderRepository = sessionOrderRepository;
+            _serviceRepository = serviceRepository;
+            _serviceTypeRepository = serviceTypeRepository;
         }
 
-        // Create
         public async Task<Guid> CreateAsync(CreateServiceItemRequest createModel)
         {
-            var serviceItem = _mapper.Map<ServiceItem>(createModel);
-            return await _serviceItemRepository.AddAsync(serviceItem);
+            // Fetch session order, service, and service type asynchronously
+            var sessionOrderTask = _sessionOrderRepository.GetAsync(i => i.SessionOrderID == createModel.SessionOrderID);
+            var serviceTask = _serviceRepository.GetAsync(i => i.ServiceID == createModel.ServiceID);
+
+            await Task.WhenAll(sessionOrderTask, serviceTask);
+
+            var sessionOrder = sessionOrderTask.Result.FirstOrDefault();
+            var service = serviceTask.Result.FirstOrDefault();
+
+            var serviceType = service != null ? (await _serviceTypeRepository.GetAsync(i => i.ServiceTypeID == service.ServiceTypeID)).FirstOrDefault() : null;
+            var layout = createModel.LayoutID != null ? (await _layoutRepository.GetAsync(i => i.LayoutID == createModel.LayoutID)).FirstOrDefault() : null;
+
+            if (sessionOrder != null && service != null && serviceType != null)
+            {
+                if (createModel.LayoutID != null && serviceType.ServiceTypeName.Equals("Take photo"))
+                {
+                    if (layout != null)
+                    {
+                        // Create photo session
+                        var photoSession = new PhotoSession
+                        {
+                            LayoutID = layout.LayoutID,
+                            SessionOrderID = sessionOrder.SessionOrderID,
+                            SessionIndex = sessionOrder.ServiceItems.Count + 1,
+                            TotalPhotoTaken = layout.PhotoSlot,
+                        };
+                        photoSession.PhotoSessionID = await _photoSessionRepository.AddAsync(photoSession);
+
+                        var serviceItem = new ServiceItem
+                        {
+                            PhotoSessionID = photoSession.PhotoSessionID,
+                            Quantity = createModel.Quantity,
+                            UnitPrice = service.Price,
+                            SubTotal = createModel.Quantity * service.Price,
+                            SessionOrderID = sessionOrder.SessionOrderID,
+                            ServiceID = service.ServiceID
+                        };
+
+                        return await _serviceItemRepository.AddAsync(serviceItem);
+                    }
+                    else
+                    {
+                        throw new NotFoundException("Layout not found");
+                    }
+                }
+                else
+                {
+                    var serviceItem = (await _serviceItemRepository.GetAsync(s => s.ServiceID == createModel.ServiceID)).FirstOrDefault();
+                    if (serviceItem == null)
+                    {
+                        serviceItem = _mapper.Map<ServiceItem>(createModel);
+                        serviceItem.UnitPrice = service.Price;
+                        serviceItem.SubTotal = createModel.Quantity * serviceItem.UnitPrice;
+                        sessionOrder.TotalPrice += serviceItem.SubTotal;
+                        await _sessionOrderRepository.UpdateAsync(sessionOrder);
+                        return await _serviceItemRepository.AddAsync(serviceItem);
+                    }
+                    else
+                    {
+                        serviceItem.Quantity += createModel.Quantity;
+                        serviceItem.SubTotal += createModel.Quantity * serviceItem.UnitPrice;
+                        sessionOrder.TotalPrice += serviceItem.SubTotal;
+                        await _sessionOrderRepository.UpdateAsync(sessionOrder);
+                        await _serviceItemRepository.UpdateAsync(serviceItem);
+                        return serviceItem.ServiceItemID;
+                    }
+                }
+            }
+            else
+            {
+                if (sessionOrder == null) throw new NotFoundException("Session Order not found");
+                if (service == null) throw new NotFoundException("Service not found");
+                if (serviceType == null) throw new NotFoundException("Service type not found");
+            }
+
+            return Guid.Empty;
         }
 
         // Delete
