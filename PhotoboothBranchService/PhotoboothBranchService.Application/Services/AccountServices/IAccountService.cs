@@ -12,5 +12,6 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
         Task<AccountRegisterResponse> Register(CreateAccountRequestModel request, AccountRole userRole);
         Task<LoginResponeModel> Login(LoginRequestModel request);
         Task<LoginResponeModel> RefreshToken(RefreshTokenRequestModel request);
+        Task<string> ResetPassword(string email);
     }
 }
