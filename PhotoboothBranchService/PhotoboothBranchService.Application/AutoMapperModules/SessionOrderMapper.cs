@@ -9,9 +9,7 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
     {
         public SessionOrderMapper()
         {
-            CreateMap<CreateSessionOrderRequest, SessionOrder>()
-                .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.TotalPrice ?? 0)) // Set TotalPrice to src.TotalPrice if it's not null, otherwise set it to 0
-                .HandleNullProperty();
+            CreateMap<CreateSessionOrderRequest, SessionOrder>().HandleNullProperty();
             CreateMap<UpdateSessionOrderRequest, SessionOrder>().ReverseMap().HandleNullProperty();
             CreateMap<SessionOrderResponse, SessionOrder>().ReverseMap().HandleNullProperty();
         }

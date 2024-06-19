@@ -130,20 +130,27 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                 else // for other type of service
                 {
                     var serviceItem = (await _serviceItemRepository.GetAsync(s => s.ServiceID == createModel.ServiceID)).FirstOrDefault();
-                    if (serviceItem == null)
+                    if (createModel.Quantity.HasValue)
                     {
-                        serviceItem = _mapper.Map<ServiceItem>(createModel);
-                        serviceItem.UnitPrice = service.Price;
-                        serviceItem.SubTotal = createModel.Quantity * serviceItem.UnitPrice;
-                        returnGuid = await _serviceItemRepository.AddAsync(serviceItem);
-                    }
-                    else
+                        if (serviceItem == null)
+                        {
+                            serviceItem = _mapper.Map<ServiceItem>(createModel);
+                            serviceItem.UnitPrice = service.Price;
+                            serviceItem.SubTotal = createModel.Quantity.Value * serviceItem.UnitPrice;
+                            returnGuid = await _serviceItemRepository.AddAsync(serviceItem);
+                        }
+                        else
+                        {
+                            serviceItem.Quantity += createModel.Quantity.Value;
+                            serviceItem.SubTotal += createModel.Quantity.Value * serviceItem.UnitPrice;
+                            await _serviceItemRepository.UpdateAsync(serviceItem);
+                            returnGuid = serviceItem.ServiceItemID;
+                        }
+                    } else
                     {
-                        serviceItem.Quantity += createModel.Quantity;
-                        serviceItem.SubTotal += createModel.Quantity * serviceItem.UnitPrice;
-                        await _serviceItemRepository.UpdateAsync(serviceItem);
-                        returnGuid = serviceItem.ServiceItemID;
+                       throw new Exception("No quantity input");
                     }
+                   
                 }
             }
             else
