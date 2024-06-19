@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Layout;
+using PhotoboothBranchService.Application.DTOs.Photo;
 using PhotoboothBranchService.Application.Services.LayoutServices;
 
 namespace PhotoboothBranchService.Api.Controllers;
@@ -31,7 +32,7 @@ public class LayoutController : ControllerBaseApi
 
     // Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Layoutresponse>>> GetAllLayouts()
+    public async Task<ActionResult<IEnumerable<LayoutResponse>>> GetAllLayouts()
     {
         try
         {
@@ -46,7 +47,7 @@ public class LayoutController : ControllerBaseApi
 
     // gat all with filter and paging
     [HttpGet("paging")]
-    public async Task<ActionResult<IEnumerable<Layoutresponse>>> GetAllLayouts(
+    public async Task<ActionResult<IEnumerable<LayoutResponse>>> GetAllLayouts(
         [FromQuery] LayoutFilter layoutFilter, [FromQuery] PagingModel pagingModel)
     {
         try
@@ -61,7 +62,7 @@ public class LayoutController : ControllerBaseApi
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Layoutresponse>> GetLayoutById(Guid id)
+    public async Task<ActionResult<LayoutResponse>> GetLayoutById(Guid id)
     {
         try
         {
@@ -105,6 +106,22 @@ public class LayoutController : ControllerBaseApi
         catch (Exception ex)
         {
             return StatusCode(500, $"An error occurred while deleting the layout: {ex.Message}");
+        }
+    }
+
+    [HttpPost("add-layout-cloud")]
+    public async Task<ActionResult<LayoutResponse>> AddPhoto(IFormFile file, [FromQuery] CreateLayoutRequest createLayoutRequest)
+    {
+        try
+        {
+
+            var result = await _layoutService.CreateLayoutAsync(file, createLayoutRequest);
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while adding the photo: {ex.Message}");
         }
     }
 }

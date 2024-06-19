@@ -32,7 +32,7 @@ namespace PhotoboothBranchService.Infrastructure
             services.AddScoped<IServiceTypeRepository, ServiceTypeRepository>();
             services.AddScoped<ISessionOrderRepository, SessionOrderRepository>();
             services.AddScoped<IStickerRepository, StickerRepository>();
-            services.AddScoped<IThemeFrameRepository, ThemeFrameRepository>();
+            services.AddScoped<IThemeRepository, ThemeRepository>();
 
             services.AddScoped<IMapper, Mapper>();
 

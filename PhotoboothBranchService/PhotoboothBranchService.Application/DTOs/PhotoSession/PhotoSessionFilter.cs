@@ -3,8 +3,11 @@
     public class PhotoSessionFilter
     {
         public Guid? PhotoSessionID { get; set; }
-        public DateTime? StartTime { get; set; }
+        public int SessionIndex { get; set; }
+        public int TotalPhotoTaken { get; set; }
+        public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
-        public Guid? BoothID { get; set; }
+        public Guid LayoutID { get; set; }
+        public Guid SessionOrderID { get; set; }
     }
 }

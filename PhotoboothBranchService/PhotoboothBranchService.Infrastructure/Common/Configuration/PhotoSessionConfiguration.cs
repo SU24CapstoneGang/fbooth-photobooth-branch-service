@@ -24,7 +24,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(a => a.StartTime)
               .ValueGeneratedOnAdd()
-              .HasDefaultValue(DateTime.UtcNow)
+              .HasDefaultValueSql("GETDATE()")
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
             builder.Property(u => u.EndTime).IsRequired(false);
 

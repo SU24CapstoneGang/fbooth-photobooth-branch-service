@@ -1,4 +1,5 @@
-﻿using PhotoboothBranchService.Domain.Enum;
+﻿using PhotoboothBranchService.Application.DTOs.ServiceItem;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Application.DTOs.SessionOrder
 {
@@ -9,8 +10,7 @@ namespace PhotoboothBranchService.Application.DTOs.SessionOrder
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public SessionOrderStatus Status { get; set; }
-        public Guid BranchesID { get; set; }
-        public Guid BoothBranchId { get; set; }
         public Guid AccountID { get; set; }
+        public IList<ServiceItemResponse> ServiceItems { get; set; } = new List<ServiceItemResponse>();
     }
 }

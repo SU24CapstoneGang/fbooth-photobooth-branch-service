@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
+using PhotoboothBranchService.Infrastructure.Common.Helper;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using System.Linq.Expressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -55,14 +57,27 @@ public class AccountRepository : IAccountRepository
         return await Task.FromResult(_dbContext.Accounts.AsQueryable());
     }
 
-    public async Task<IQueryable<Account>> GetAsync(Expression<Func<Account, bool>> predicate)
+    public async Task<IQueryable<Account>> GetAsync(Expression<Func<Account, bool>> predicate = null,
+        params Expression<Func<Account, object>>[] includeProperties)
     {
         try
         {
-            var result = _dbContext.Accounts.Where(predicate).AsQueryable();
+            var result = predicate == null ? _dbContext.Accounts : _dbContext.Accounts.Where(predicate);
             if (!result.Any())
             {
                 return await Task.FromResult(new List<Account>().AsQueryable());
+            } else
+            {
+                if (includeProperties != null)
+                {
+                    foreach (var includeProperty in includeProperties)
+                    {
+                        if (IncludeHelper.IsValidInclude(includeProperty))
+                        {
+                            result = result.Include(includeProperty);
+                        }
+                    }
+                }
             }
             return await Task.FromResult(result);
         }

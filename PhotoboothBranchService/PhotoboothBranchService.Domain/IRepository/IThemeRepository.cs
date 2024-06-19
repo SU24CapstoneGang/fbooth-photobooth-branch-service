@@ -3,7 +3,7 @@ using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Domain.IRepository
 {
-    public interface IThemeFrameRepository : IRepositoryBase<Theme>
+    public interface IThemeRepository : IRepositoryBase<Theme>
     {
     }
 }

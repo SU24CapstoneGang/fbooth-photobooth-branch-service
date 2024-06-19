@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Frame;
+using PhotoboothBranchService.Application.DTOs.Layout;
+using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -12,11 +15,12 @@ public class FrameService : IFrameService
 {
     private readonly IFrameRepository _frameRepository;
     private readonly IMapper _mapper;
-
-    public FrameService(IFrameRepository frameRepository, IMapper mapper)
+    private readonly ICloudinaryService _cloudinaryService;
+    public FrameService(IFrameRepository frameRepository, IMapper mapper, ICloudinaryService cloudinaryService)
     {
         _frameRepository = frameRepository;
         _mapper = mapper;
+        _cloudinaryService = cloudinaryService;
     }
 
     // Create
@@ -26,7 +30,27 @@ public class FrameService : IFrameService
         frame.Status = StatusUse.Available;
         return await _frameRepository.AddAsync(frame);
     }
+    public async Task<FrameResponse> CreateFrameAsync(IFormFile file, CreateFrameRequest createModel)
+    {
 
+        //upload to cloudinary
+        var uploadResult = await _cloudinaryService.AddPhotoAsync(file);
+        if (uploadResult.Error != null)
+        {
+            throw new Exception(uploadResult.Error.Message);
+        }
+
+        //create object from cloudinary's return 
+        var frame = _mapper.Map<Frame>(createModel);
+
+        frame.FrameURL = uploadResult.SecureUrl.AbsoluteUri;
+        frame.CouldID = uploadResult.PublicId;
+        frame.Status = StatusUse.Available;
+
+        await _frameRepository.AddAsync(frame);
+
+        return _mapper.Map<FrameResponse>(frame);
+    }
     // Delete
     public async Task DeleteAsync(Guid id)
     {
@@ -77,7 +101,7 @@ public class FrameService : IFrameService
         var frame = (await _frameRepository.GetAsync(f => f.FrameID == id)).FirstOrDefault();
         if (frame == null)
         {
-            throw new KeyNotFoundException("Printer not found.");
+            throw new KeyNotFoundException("Frame not found.");
         }
 
         var updateFrame = _mapper.Map(updateModel, frame);

@@ -6,7 +6,7 @@ namespace PhotoboothBranchService.Domain.Entities
     {
         public Guid ThemeID { get; set; }
         public string ThemeName { get; set; } = default!;
-        public string ThemeFrameDescription { get; set; } = default!;
+        public string ThemeDescription { get; set; } = default!;
         public virtual ICollection<Frame> Frames { get; set; } = default!;
     }
 }

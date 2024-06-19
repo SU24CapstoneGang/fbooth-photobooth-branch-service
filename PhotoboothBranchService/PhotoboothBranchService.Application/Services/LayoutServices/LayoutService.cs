@@ -1,8 +1,14 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Core;
+using Microsoft.AspNetCore.Http;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Layout;
+using PhotoboothBranchService.Application.DTOs.Photo;
+using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.LayoutServices;
@@ -11,11 +17,13 @@ public class LayoutService : ILayoutService
 {
     private readonly ILayoutRepository _layoutRepository;
     private readonly IMapper _mapper;
+    private readonly ICloudinaryService _cloudinaryService;
 
-    public LayoutService(ILayoutRepository layoutRepository, IMapper mapper)
+    public LayoutService(ILayoutRepository layoutRepository, IMapper mapper, ICloudinaryService cloudinaryService)
     {
         _layoutRepository = layoutRepository;
         _mapper = mapper;
+        _cloudinaryService = cloudinaryService;
     }
 
     // Create
@@ -23,6 +31,27 @@ public class LayoutService : ILayoutService
     {
         Layout layout = _mapper.Map<Layout>(createModel);
         return await _layoutRepository.AddAsync(layout);
+    }
+    public async Task<LayoutResponse> CreateLayoutAsync(IFormFile file, CreateLayoutRequest createModel)
+    {
+
+        //upload to cloudinary
+        var uploadResult = await _cloudinaryService.AddPhotoAsync(file);
+        if (uploadResult.Error != null)
+        {
+            throw new Exception(uploadResult.Error.Message);
+        }
+
+        //create object from cloudinary's return 
+        var layout = _mapper.Map<Layout>(createModel);
+
+        layout.LayoutURL = uploadResult.SecureUrl.AbsoluteUri;
+        layout.CouldID = uploadResult.PublicId;
+        layout.Status = StatusUse.Available;
+
+        await _layoutRepository.AddAsync(layout);
+
+        return _mapper.Map<LayoutResponse>(layout);
     }
 
     // Delete
@@ -34,6 +63,9 @@ public class LayoutService : ILayoutService
             if (layout != null)
             {
                 await _layoutRepository.RemoveAsync(layout);
+            } else
+            {
+                throw new NotFoundException($"Not found kayout id {id}");
             }
         }
         catch
@@ -43,24 +75,24 @@ public class LayoutService : ILayoutService
     }
 
     // Read
-    public async Task<IEnumerable<Layoutresponse>> GetAllAsync()
+    public async Task<IEnumerable<LayoutResponse>> GetAllAsync()
     {
         var layouts = await _layoutRepository.GetAllAsync();
-        return _mapper.Map<IEnumerable<Layoutresponse>>(layouts.ToList());
+        return _mapper.Map<IEnumerable<LayoutResponse>>(layouts.ToList());
     }
 
-    public async Task<IEnumerable<Layoutresponse>> GetAllPagingAsync(LayoutFilter filter, PagingModel paging)
+    public async Task<IEnumerable<LayoutResponse>> GetAllPagingAsync(LayoutFilter filter, PagingModel paging)
     {
         var layouts = (await _layoutRepository.GetAllAsync()).ToList().AutoFilter(filter);
-        var listLayoutresponse = _mapper.Map<IEnumerable<Layoutresponse>>(layouts);
+        var listLayoutresponse = _mapper.Map<IEnumerable<LayoutResponse>>(layouts);
         listLayoutresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         return listLayoutresponse;
     }
 
-    public async Task<Layoutresponse> GetByIdAsync(Guid id)
+    public async Task<LayoutResponse> GetByIdAsync(Guid id)
     {
         var layout = (await _layoutRepository.GetAsync(l => l.LayoutID == id)).FirstOrDefault();
-        return _mapper.Map<Layoutresponse>(layout);
+        return _mapper.Map<LayoutResponse>(layout);
     }
 
     // Update

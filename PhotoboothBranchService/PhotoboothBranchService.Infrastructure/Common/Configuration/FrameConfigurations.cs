@@ -23,24 +23,17 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired()
                 .HasMaxLength(100);
 
-            builder.Property(f => f.FrameURL)
-                .IsRequired();
-
-            builder.Property(f => f.CreatedDate)
-                .IsRequired();
-
-            builder.Property(f => f.Lenght)
-                .IsRequired();
-
-            builder.Property(f => f.Width)
-                .IsRequired();
-
-            builder.Property(f => f.LastModified);
+            builder.Property(f => f.FrameURL).IsRequired();
+            builder.Property(f => f.CouldID).IsRequired();
+            builder.Property(f => f.CreatedDate).IsRequired();
+            builder.Property(f => f.Lenght).IsRequired();
+            builder.Property(f => f.Width).IsRequired();
+            builder.Property(f => f.LastModified).IsRequired(false);
 
             //auto add CreateDate and ignore change after update
             builder.Property(a => a.CreatedDate)
               .ValueGeneratedOnAdd()
-              .HasDefaultValue(DateTime.UtcNow)
+              .HasDefaultValueSql("GETDATE()")
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
             // Status enum mapping

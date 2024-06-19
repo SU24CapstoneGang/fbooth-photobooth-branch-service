@@ -5,4 +5,5 @@ namespace PhotoboothBranchService.Domain.IRepository;
 
 public interface ISessionOrderRepository : IRepositoryBase<SessionOrder>
 {
+    Task updateTotalPrice(Guid SessionOrderID);
 }

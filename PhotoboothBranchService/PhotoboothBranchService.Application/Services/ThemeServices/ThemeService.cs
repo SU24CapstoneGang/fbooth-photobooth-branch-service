@@ -1,24 +1,24 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.ThemeFrame;
+using PhotoboothBranchService.Application.DTOs.Theme;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 
-namespace PhotoboothBranchService.Application.Services.ThemeFrameServices
+namespace PhotoboothBranchService.Application.Services.ThemeServices
 {
-    public class ThemeFrameService : IThemeFrameService
+    public class ThemeService : IThemeService
     {
-        private readonly IThemeFrameRepository _themeFrameRepository;
+        private readonly IThemeRepository _themeFrameRepository;
         private readonly IMapper _mapper;
 
-        public ThemeFrameService(IThemeFrameRepository themeFrameRepository, IMapper mapper)
+        public ThemeService(IThemeRepository themeFrameRepository, IMapper mapper)
         {
             _themeFrameRepository = themeFrameRepository;
             _mapper = mapper;
         }
 
-        public async Task<Guid> CreateAsync(CreateThemeFrameRequest createModel)
+        public async Task<Guid> CreateAsync(CreateThemeRequest createModel)
         {
             Theme themeFrame = _mapper.Map<Theme>(createModel);
             return await _themeFrameRepository.AddAsync(themeFrame);
@@ -34,33 +34,33 @@ namespace PhotoboothBranchService.Application.Services.ThemeFrameServices
             }
         }
 
-        public async Task<IEnumerable<ThemeFrameResponse>> GetAllAsync()
+        public async Task<IEnumerable<ThemeResponse>> GetAllAsync()
         {
             var themeFrames = await _themeFrameRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<ThemeFrameResponse>>(themeFrames.ToList());
+            return _mapper.Map<IEnumerable<ThemeResponse>>(themeFrames.ToList());
         }
 
-        public async Task<IEnumerable<ThemeFrameResponse>> GetAllPagingAsync(ThemeFrameFilter filter, PagingModel paging)
+        public async Task<IEnumerable<ThemeResponse>> GetAllPagingAsync(ThemeFilter filter, PagingModel paging)
         {
             var themeFrames = (await _themeFrameRepository.GetAllAsync()).ToList().AutoFilter(filter);
-            var themeFramesResponse = _mapper.Map<IEnumerable<ThemeFrameResponse>>(themeFrames);
+            var themeFramesResponse = _mapper.Map<IEnumerable<ThemeResponse>>(themeFrames);
             themeFramesResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
             return themeFramesResponse;
         }
 
-        public async Task<ThemeFrameResponse> GetByIdAsync(Guid id)
+        public async Task<ThemeResponse> GetByIdAsync(Guid id)
         {
             var themeFrames = await _themeFrameRepository.GetAsync(t => t.ThemeID == id);
-            return _mapper.Map<ThemeFrameResponse>(themeFrames);
+            return _mapper.Map<ThemeResponse>(themeFrames);
         }
 
-        public async Task<IEnumerable<ThemeFrameResponse>> GetByName(string name)
+        public async Task<IEnumerable<ThemeResponse>> GetByName(string name)
         {
             var themeFrames = await _themeFrameRepository.GetAsync(i => i.ThemeName.Contains(name));
-            return _mapper.Map<IEnumerable<ThemeFrameResponse>>(themeFrames.ToList());
+            return _mapper.Map<IEnumerable<ThemeResponse>>(themeFrames.ToList());
         }
 
-        public async Task UpdateAsync(Guid id, UpdateThemeFrameRequest updateModel)
+        public async Task UpdateAsync(Guid id, UpdateThemeRequest updateModel)
         {
             var themeFrame = (await _themeFrameRepository.GetAsync(t => t.ThemeID == id)).FirstOrDefault();
             if (themeFrame == null)

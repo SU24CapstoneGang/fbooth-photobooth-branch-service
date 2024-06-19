@@ -25,9 +25,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(s => s.EndTime).IsRequired(false);
             builder.Property(a => a.StartTime)
               .ValueGeneratedOnAdd()
-              .HasDefaultValue(DateTime.UtcNow)
+              .HasDefaultValueSql("GETDATE()")
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
-            builder.Property(s => s.EndTime).IsRequired(false);
 
             // enum mapping
             builder.Property(pb => pb.Status)

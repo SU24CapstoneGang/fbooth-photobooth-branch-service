@@ -1,5 +1,7 @@
-﻿using PhotoboothBranchService.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
+using PhotoboothBranchService.Infrastructure.Common.Helper;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using System;
 using System.Linq;
@@ -31,20 +33,34 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
             return await Task.FromResult(_dbContext.PaymentMethods.AsQueryable());
         }
 
-        public async Task<IQueryable<PaymentMethod>> GetAsync(Expression<Func<PaymentMethod, bool>> predicate)
+        public async Task<IQueryable<PaymentMethod>> GetAsync(
+        Expression<Func<PaymentMethod, bool>> predicate = null,
+        params Expression<Func<PaymentMethod, object>>[] includeProperties)
         {
             try
             {
-                var result = _dbContext.PaymentMethods.Where(predicate).AsQueryable();
+                var result = predicate == null ? _dbContext.PaymentMethods : _dbContext.PaymentMethods.Where(predicate);
                 if (!result.Any())
                 {
-                    return await Task.FromResult(new List<PaymentMethod>().AsQueryable());
+                    return await Task.FromResult(Enumerable.Empty<PaymentMethod>().AsQueryable());
+                }
+                else
+                {
+                    if (includeProperties != null)
+                    {
+                        foreach (var includeProperty in includeProperties)
+                        {
+                            if (IncludeHelper.IsValidInclude(includeProperty))
+                            {
+                                result = result.Include(includeProperty);
+                            }
+                        }
+                    }
                 }
                 return await Task.FromResult(result);
             }
             catch (Exception e)
             {
-
                 throw new Exception(e.Message);
             }
         }

@@ -1,24 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.ThemeFrame;
-using PhotoboothBranchService.Application.Services.ThemeFrameServices;
+using PhotoboothBranchService.Application.DTOs.Theme;
+using PhotoboothBranchService.Application.Services.ThemeServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ThemeFrameController : ControllerBase
+    public class ThemeController : ControllerBase
     {
-        private readonly IThemeFrameService _themeFrameService;
+        private readonly IThemeService _themeFrameService;
 
-        public ThemeFrameController(IThemeFrameService themeFrameService)
+        public ThemeController(IThemeService themeFrameService)
         {
             _themeFrameService = themeFrameService;
         }
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<Guid>> CreateThemeFrame(CreateThemeFrameRequest createThemeFrameRequest)
+        public async Task<ActionResult<Guid>> CreateThemeFrame(CreateThemeRequest createThemeFrameRequest)
         {
             try
             {
@@ -33,7 +33,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Read all
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ThemeFrameResponse>>> GetAllThemeFrames()
+        public async Task<ActionResult<IEnumerable<ThemeResponse>>> GetAllThemeFrames()
         {
             try
             {
@@ -48,8 +48,8 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Read all with paging and filter
         [HttpGet("paging")]
-        public async Task<ActionResult<IEnumerable<ThemeFrameResponse>>> GetPagingThemeFrames(
-            [FromQuery] ThemeFrameFilter themeFrameFilter, [FromQuery] PagingModel pagingModel)
+        public async Task<ActionResult<IEnumerable<ThemeResponse>>> GetPagingThemeFrames(
+            [FromQuery] ThemeFilter themeFrameFilter, [FromQuery] PagingModel pagingModel)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Read by name
         [HttpGet("name/{name}")]
-        public async Task<ActionResult<IEnumerable<ThemeFrameResponse>>> GetThemeFramesByName(string name)
+        public async Task<ActionResult<IEnumerable<ThemeResponse>>> GetThemeFramesByName(string name)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Read by ID
         [HttpGet("{id}")]
-        public async Task<ActionResult<ThemeFrameResponse>> GetThemeFrameById(Guid id)
+        public async Task<ActionResult<ThemeResponse>> GetThemeFrameById(Guid id)
         {
             try
             {
@@ -98,7 +98,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateThemeFrame(Guid id, UpdateThemeFrameRequest updateThemeFrameRequest)
+        public async Task<ActionResult> UpdateThemeFrame(Guid id, UpdateThemeRequest updateThemeFrameRequest)
         {
             try
             {

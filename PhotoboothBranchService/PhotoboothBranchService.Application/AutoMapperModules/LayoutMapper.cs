@@ -11,7 +11,7 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
         {
             CreateMap<CreateLayoutRequest, Layout>().ReverseMap().HandleNullProperty();
             CreateMap<UpdateLayoutRequest, Layout>().ReverseMap().HandleNullProperty();
-            CreateMap<Layoutresponse, Layout>().ReverseMap().HandleNullProperty();
+            CreateMap<LayoutResponse, Layout>().ReverseMap().HandleNullProperty();
         }
     }
 }

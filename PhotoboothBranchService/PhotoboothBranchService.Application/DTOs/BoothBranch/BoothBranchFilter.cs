@@ -6,7 +6,8 @@ namespace PhotoboothBranchService.Application.DTOs.BoothBranch
     {
         public string? BranchName { get; set; } = default!;
         public string? BranchAddress { get; set; } = default!;
+        public DateTime? CreateDate { get; set; }
         public ManufactureStatus? Status { get; set; } = default!;
-        public Guid? AccountID { get; set; }
+        public Guid? ManagerID { get; set; }
     }
 }

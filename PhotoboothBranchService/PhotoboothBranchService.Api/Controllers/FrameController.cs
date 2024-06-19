@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Frame;
+using PhotoboothBranchService.Application.DTOs.Photo;
 using PhotoboothBranchService.Application.Services.FrameServices;
 
 namespace PhotoboothBranchService.Api.Controllers;
@@ -119,6 +120,21 @@ public class FrameController : ControllerBaseApi
         catch (Exception ex)
         {
             return StatusCode(500, $"An error occurred while deleting the frame: {ex.Message}");
+        }
+    }
+    [HttpPost("add-frame-cloud")]
+    public async Task<ActionResult<PhotoResponse>> AddPhoto(IFormFile file, [FromQuery] CreateFrameRequest createFrameRequest)
+    {
+        try
+        {
+
+            var result = await _frameService.CreateFrameAsync(file, createFrameRequest);
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while adding the photo: {ex.Message}");
         }
     }
 }

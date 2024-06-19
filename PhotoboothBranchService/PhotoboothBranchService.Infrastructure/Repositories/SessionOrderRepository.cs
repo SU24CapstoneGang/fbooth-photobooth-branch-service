@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
+using PhotoboothBranchService.Infrastructure.Common.Helper;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using System.Linq.Expressions;
 
@@ -29,20 +30,34 @@ public class SessionOrderRepository : ISessionOrderRepository
         return await Task.FromResult(_dbContext.SessionOrders);
     }
 
-    public async Task<IQueryable<SessionOrder>> GetAsync(Expression<Func<SessionOrder, bool>> predicate)
+    public async Task<IQueryable<SessionOrder>> GetAsync(
+        Expression<Func<SessionOrder, bool>> predicate = null,
+        params Expression<Func<SessionOrder, object>>[] includeProperties)
     {
         try
         {
-            var result = _dbContext.SessionOrders.Where(predicate);
+            var result = predicate == null ? _dbContext.SessionOrders : _dbContext.SessionOrders.Where(predicate);
             if (!result.Any())
             {
-                return await Task.FromResult(new List<SessionOrder>().AsQueryable());
+                return await Task.FromResult(Enumerable.Empty<SessionOrder>().AsQueryable());
+            }
+            else
+            {
+                if (includeProperties != null)
+                {
+                    foreach (var includeProperty in includeProperties)
+                    {
+                        if (IncludeHelper.IsValidInclude(includeProperty))
+                        {
+                            result = result.Include(includeProperty);
+                        }
+                    }
+                }
             }
             return await Task.FromResult(result);
         }
         catch (Exception e)
         {
-
             throw new Exception(e.Message);
         }
     }
@@ -59,6 +74,19 @@ public class SessionOrderRepository : ISessionOrderRepository
     {
         _dbContext.Entry(session).State = EntityState.Modified;
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task updateTotalPrice(Guid SessionOrderID)
+    {
+        var order = _dbContext.SessionOrders.Where(i => i.SessionOrderID == SessionOrderID).Include(u=>u.ServiceItems).FirstOrDefault();
+        if (order != null) {
+            decimal totalPrice = 0;
+            foreach (var item in order.ServiceItems) {
+                totalPrice += item.UnitPrice * item.Quantity;
+            }
+            order.TotalPrice = totalPrice;
+            await UpdateAsync(order);
+        }
     }
 }
 

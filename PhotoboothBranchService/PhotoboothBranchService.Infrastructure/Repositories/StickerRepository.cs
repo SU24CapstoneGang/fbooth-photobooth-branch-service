@@ -1,5 +1,7 @@
-﻿using PhotoboothBranchService.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
+using PhotoboothBranchService.Infrastructure.Common.Helper;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using System.Linq.Expressions;
 
@@ -29,20 +31,34 @@ public class StickerRepository : IStickerRepository
         return await Task.FromResult(_dbContext.Stickers);
     }
 
-    public async Task<IQueryable<Sticker>> GetAsync(Expression<Func<Sticker, bool>> predicate)
+    public async Task<IQueryable<Sticker>> GetAsync(
+        Expression<Func<Sticker, bool>> predicate = null,
+        params Expression<Func<Sticker, object>>[] includeProperties)
     {
         try
         {
-            var result = _dbContext.Stickers.Where(predicate);
+            var result = predicate == null ? _dbContext.Stickers : _dbContext.Stickers.Where(predicate);
             if (!result.Any())
             {
-                return await Task.FromResult(new List<Sticker>().AsQueryable());
+                return await Task.FromResult(Enumerable.Empty<Sticker>().AsQueryable());
+            }
+            else
+            {
+                if (includeProperties != null)
+                {
+                    foreach (var includeProperty in includeProperties)
+                    {
+                        if (IncludeHelper.IsValidInclude(includeProperty))
+                        {
+                            result = result.Include(includeProperty);
+                        }
+                    }
+                }
             }
             return await Task.FromResult(result);
         }
         catch (Exception e)
         {
-
             throw new Exception(e.Message);
         }
     }
@@ -57,6 +73,7 @@ public class StickerRepository : IStickerRepository
     //Update
     public async Task UpdateAsync(Sticker sticker)
     {
+        sticker.LastModified = DateTime.UtcNow; 
         _dbContext.Update(sticker);
         await _dbContext.SaveChangesAsync();
     }

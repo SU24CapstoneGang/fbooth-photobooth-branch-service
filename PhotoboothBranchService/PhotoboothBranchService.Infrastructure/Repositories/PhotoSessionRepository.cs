@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
+using PhotoboothBranchService.Infrastructure.Common.Helper;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using System;
 using System.Collections.Generic;
@@ -33,14 +34,29 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
             return await Task.FromResult(_dbContext.PhotoSessions.AsQueryable());
         }
 
-        public async Task<IQueryable<PhotoSession>> GetAsync(Expression<Func<PhotoSession, bool>> predicate)
+        public async Task<IQueryable<PhotoSession>> GetAsync(
+        Expression<Func<PhotoSession, bool>> predicate = null,
+        params Expression<Func<PhotoSession, object>>[] includeProperties)
         {
             try
             {
-                var result = _dbContext.PhotoSessions.Where(predicate);
+                var result = predicate == null ? _dbContext.PhotoSessions : _dbContext.PhotoSessions.Where(predicate);
                 if (!result.Any())
                 {
-                    return await Task.FromResult(new List<PhotoSession>().AsQueryable());
+                    return await Task.FromResult(Enumerable.Empty<PhotoSession>().AsQueryable());
+                }
+                else
+                {
+                    if (includeProperties != null)
+                    {
+                        foreach (var includeProperty in includeProperties)
+                        {
+                            if (IncludeHelper.IsValidInclude(includeProperty))
+                            {
+                                result = result.Include(includeProperty);
+                            }
+                        }
+                    }
                 }
                 return await Task.FromResult(result);
             }

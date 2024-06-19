@@ -37,7 +37,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             //auto add CreateDate and ignore change after update
             builder.Property(a => a.CreatedDate)
               .ValueGeneratedOnAdd()
-              .HasDefaultValue(DateTime.UtcNow)
+              .HasDefaultValueSql("GETDATE()")
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
             builder.HasMany(t => t.PhotoSessions)

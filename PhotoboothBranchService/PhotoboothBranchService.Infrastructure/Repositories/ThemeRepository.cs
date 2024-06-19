@@ -1,15 +1,17 @@
-﻿using PhotoboothBranchService.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
+using PhotoboothBranchService.Infrastructure.Common.Helper;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories
 {
-    public class ThemeFrameRepository : IThemeFrameRepository
+    public class ThemeRepository : IThemeRepository
     {
         private readonly AppDbContext _dbContext;
 
-        public ThemeFrameRepository(AppDbContext dbContext)
+        public ThemeRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -28,20 +30,34 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
             return await Task.FromResult(_dbContext.Themes.AsQueryable());
         }
 
-        public async Task<IQueryable<Theme>> GetAsync(Expression<Func<Theme, bool>> predicate)
+        public async Task<IQueryable<Theme>> GetAsync(
+        Expression<Func<Theme, bool>> predicate = null,
+        params Expression<Func<Theme, object>>[] includeProperties)
         {
             try
             {
-                var result = _dbContext.Themes.Where(predicate);
+                var result = predicate == null ? _dbContext.Themes : _dbContext.Themes.Where(predicate);
                 if (!result.Any())
                 {
-                    return await Task.FromResult(new List<Theme>().AsQueryable());
+                    return await Task.FromResult(Enumerable.Empty<Theme>().AsQueryable());
+                }
+                else
+                {
+                    if (includeProperties != null)
+                    {
+                        foreach (var includeProperty in includeProperties)
+                        {
+                            if (IncludeHelper.IsValidInclude(includeProperty))
+                            {
+                                result = result.Include(includeProperty);
+                            }
+                        }
+                    }
                 }
                 return await Task.FromResult(result);
             }
             catch (Exception e)
             {
-
                 throw new Exception(e.Message);
             }
         }

@@ -2,7 +2,7 @@
 {
     public class CreatePhotoSessionRequest
     {
-        public DateTime StartTime { get; set; }
-        public Guid BoothID { get; set; }
+        public Guid LayoutID { get; set; }
+        public Guid SessionOrderID { get; set; }
     }
 }

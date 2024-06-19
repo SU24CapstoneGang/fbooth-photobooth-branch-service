@@ -4,7 +4,8 @@ public enum ManufactureStatus
 {
     Active = 1,
     Inactive = 2,
-    Maintenance = 3
+    Maintenance = 3,
+    InUse = 4,
 }
 
 public enum AccountStatus

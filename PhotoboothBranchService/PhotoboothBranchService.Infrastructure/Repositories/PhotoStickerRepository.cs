@@ -1,5 +1,7 @@
-﻿using PhotoboothBranchService.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
+using PhotoboothBranchService.Infrastructure.Common.Helper;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using System.Linq.Expressions;
 
@@ -28,20 +30,34 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
             return await Task.FromResult(_dbContext.PhotoStickers.AsQueryable());
         }
 
-        public async Task<IQueryable<PhotoSticker>> GetAsync(Expression<Func<PhotoSticker, bool>> predicate)
+        public async Task<IQueryable<PhotoSticker>> GetAsync(
+        Expression<Func<PhotoSticker, bool>> predicate = null,
+        params Expression<Func<PhotoSticker, object>>[] includeProperties)
         {
             try
             {
-                var result = _dbContext.PhotoStickers.Where(predicate);
+                var result = predicate == null ? _dbContext.PhotoStickers : _dbContext.PhotoStickers.Where(predicate);
                 if (!result.Any())
                 {
-                    return await Task.FromResult(new List<PhotoSticker>().AsQueryable());
+                    return await Task.FromResult(Enumerable.Empty<PhotoSticker>().AsQueryable());
+                }
+                else
+                {
+                    if (includeProperties != null)
+                    {
+                        foreach (var includeProperty in includeProperties)
+                        {
+                            if (IncludeHelper.IsValidInclude(includeProperty))
+                            {
+                                result = result.Include(includeProperty);
+                            }
+                        }
+                    }
                 }
                 return await Task.FromResult(result);
             }
             catch (Exception e)
             {
-
                 throw new Exception(e.Message);
             }
         }

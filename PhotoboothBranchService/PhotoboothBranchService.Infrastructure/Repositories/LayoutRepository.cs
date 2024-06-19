@@ -1,5 +1,7 @@
-﻿using PhotoboothBranchService.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
+using PhotoboothBranchService.Infrastructure.Common.Helper;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using System.Linq.Expressions;
 
@@ -26,20 +28,34 @@ public class LayoutRepository : ILayoutRepository
         return await Task.FromResult(_dbContext.Layouts);
     }
 
-    public async Task<IQueryable<Layout>> GetAsync(Expression<Func<Layout, bool>> predicate)
+    public async Task<IQueryable<Layout>> GetAsync(
+        Expression<Func<Layout, bool>> predicate = null,
+        params Expression<Func<Layout, object>>[] includeProperties)
     {
         try
         {
-            var result = _dbContext.Layouts.Where(predicate);
+            var result = predicate == null ? _dbContext.Layouts : _dbContext.Layouts.Where(predicate);
             if (!result.Any())
             {
-                return await Task.FromResult(new List<Layout>().AsQueryable());
+                return await Task.FromResult(Enumerable.Empty<Layout>().AsQueryable());
+            }
+            else
+            {
+                if (includeProperties != null)
+                {
+                    foreach (var includeProperty in includeProperties)
+                    {
+                        if (IncludeHelper.IsValidInclude(includeProperty))
+                        {
+                            result = result.Include(includeProperty);
+                        }
+                    }
+                }
             }
             return await Task.FromResult(result);
         }
         catch (Exception e)
         {
-
             throw new Exception(e.Message);
         }
     }
@@ -53,6 +69,7 @@ public class LayoutRepository : ILayoutRepository
     //Update
     public async Task UpdateAsync(Layout layout)
     {
+        layout.LastModified = DateTime.UtcNow;
         _dbContext.Update(layout);
         await _dbContext.SaveChangesAsync();
     }

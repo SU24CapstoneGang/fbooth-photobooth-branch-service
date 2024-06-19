@@ -25,7 +25,7 @@ using PhotoboothBranchService.Application.Services.ServiceServices;
 using PhotoboothBranchService.Application.Services.ServiceTypeServices;
 using PhotoboothBranchService.Application.Services.SessionOrderServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
-using PhotoboothBranchService.Application.Services.ThemeFrameServices;
+using PhotoboothBranchService.Application.Services.ThemeServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using System.Reflection;
 
@@ -51,7 +51,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IServiceTypeService, ServiceTypeService>();
             services.AddScoped<ISessionOrderService, SessionOrderService>();
             services.AddScoped<IStickerService, StickerService>();
-            services.AddScoped<IThemeFrameService, ThemeFrameService>();
+            services.AddScoped<IThemeService, ThemeService>();
 
             // cloudinary
             services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));

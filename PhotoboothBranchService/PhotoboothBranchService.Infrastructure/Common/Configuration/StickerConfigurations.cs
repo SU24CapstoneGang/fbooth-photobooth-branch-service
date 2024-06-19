@@ -50,7 +50,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             //auto add CreateDate and ignore change after update
             builder.Property(s => s.CreatedDate)
               .ValueGeneratedOnAdd()
-              .HasDefaultValue(DateTime.UtcNow)
+              .HasDefaultValueSql("GETDATE()")
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
             // Status enum mapping

@@ -7,8 +7,6 @@ namespace PhotoboothBranchService.Application.DTOs.BoothBranch
         public string BranchName { get; set; } = default!;
         public string BranchAddress { get; set; } = default!;
         public ManufactureStatus Status { get; set; } = default!;
-        public Guid? AccountID { get; set; }
-        public Guid? CameraID { get; set; }
-        public Guid? PrinterID { get; set; }
+        public Guid ManagerID { get; set; }
     }
 }

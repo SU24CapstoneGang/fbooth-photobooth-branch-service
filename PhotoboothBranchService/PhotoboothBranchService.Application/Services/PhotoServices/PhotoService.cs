@@ -16,17 +16,15 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
         private readonly IMapper _mapper;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IPhotoSessionRepository _photoSessionRepository;
-        private readonly ILayoutRepository _layoutRepository;
         private readonly IFrameRepository _frameRepository;
         public PhotoService(IPhotoRepository photoRepository, IMapper mapper,
             ICloudinaryService cloudinaryService, IPhotoSessionRepository photoSessionRepository,
-            ILayoutRepository layoutRepository, IFrameRepository frameRepository)
+            IFrameRepository frameRepository)
         {
             _photoRepository = photoRepository;
             _mapper = mapper;
             _cloudinaryService = cloudinaryService;
             _photoSessionRepository = photoSessionRepository;
-            _layoutRepository = layoutRepository;
             _frameRepository = frameRepository;
         }
 
@@ -65,6 +63,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
                 CouldID = uploadResult.PublicId,
                 PhotoSessionID = createPhotoRequest.PhotoSessionID,
                 FrameID = createPhotoRequest.FrameID,
+                Version = createPhotoRequest.Version
             };
 
             await _photoRepository.AddAsync(photo);

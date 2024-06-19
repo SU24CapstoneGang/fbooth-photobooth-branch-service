@@ -83,7 +83,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
         {
             try
             {
-                var paymentMethods = await _paymentMethodRepository.GetAsync(p => p.PaymentMethodID == id);
+                var paymentMethods = (await _paymentMethodRepository.GetAsync(p => p.PaymentMethodID == id)).FirstOrDefault();
                 if (paymentMethods == null) throw new NotFoundException("Payment method", id, "Payment method ID not found");
                 return _mapper.Map<PaymentMethodResponse>(paymentMethods);
             }

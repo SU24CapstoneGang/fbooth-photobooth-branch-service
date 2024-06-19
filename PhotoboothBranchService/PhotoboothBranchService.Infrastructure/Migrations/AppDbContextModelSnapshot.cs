@@ -73,7 +73,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ResetPasswordToken")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
@@ -162,10 +161,14 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("FrameID");
 
+                    b.Property<string>("CouldID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 14, 10, 4, 36, 247, DateTimeKind.Utc).AddTicks(2753));
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("FrameName")
                         .IsRequired()
@@ -213,7 +216,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 14, 10, 4, 36, 247, DateTimeKind.Utc).AddTicks(5925));
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
@@ -290,7 +293,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 14, 10, 4, 36, 248, DateTimeKind.Utc).AddTicks(2183));
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("PaymentMethodName")
                         .IsRequired()
@@ -309,14 +312,14 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         new
                         {
                             PaymentMethodID = new Guid("1b4f2a3e-7d94-4119-8b6d-5c15b02848f6"),
-                            CreateDate = new DateTime(2024, 6, 14, 10, 4, 36, 248, DateTimeKind.Utc).AddTicks(2734),
+                            CreateDate = new DateTime(2024, 6, 19, 3, 33, 29, 771, DateTimeKind.Utc).AddTicks(2419),
                             PaymentMethodName = "VNPay",
                             Status = "Active"
                         },
                         new
                         {
                             PaymentMethodID = new Guid("f3b6e6b2-f90e-4f6b-8cd2-68b467afae0f"),
-                            CreateDate = new DateTime(2024, 6, 14, 10, 4, 36, 248, DateTimeKind.Utc).AddTicks(2736),
+                            CreateDate = new DateTime(2024, 6, 19, 3, 33, 29, 771, DateTimeKind.Utc).AddTicks(2421),
                             PaymentMethodName = "MoMo",
                             Status = "Active"
                         });
@@ -336,7 +339,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 14, 10, 4, 36, 251, DateTimeKind.Utc).AddTicks(343));
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<Guid>("FrameID")
                         .HasColumnType("uniqueidentifier");
@@ -412,7 +415,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("StartTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 14, 10, 4, 36, 251, DateTimeKind.Utc).AddTicks(2372));
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<int>("TotalPhotoTaken")
                         .HasColumnType("int");
@@ -457,6 +460,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("ServiceID");
 
+                    b.Property<int>("Measure")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18, 2)");
 
@@ -479,6 +485,68 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.HasIndex("ServiceTypeID");
 
                     b.ToTable("Services", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ServiceID = new Guid("c51a05bb-28af-4315-b888-606376ba061b"),
+                            Measure = 30,
+                            Price = 90000m,
+                            ServiceDescription = "Take Photo in 30 minutes",
+                            ServiceName = "Take Photo in 30 minutes",
+                            ServiceTypeID = new Guid("79497fe3-789f-4555-ac6b-977dfbf0f671"),
+                            Unit = "minutes"
+                        },
+                        new
+                        {
+                            ServiceID = new Guid("30c2a7fb-9164-4164-9f1b-7c334744e559"),
+                            Measure = 15,
+                            Price = 50000m,
+                            ServiceDescription = "Take Photo in 15 minutes",
+                            ServiceName = "Take Photo in 15 minutes",
+                            ServiceTypeID = new Guid("79497fe3-789f-4555-ac6b-977dfbf0f671"),
+                            Unit = "minutes"
+                        },
+                        new
+                        {
+                            ServiceID = new Guid("9b0dc075-557c-4b29-b3ba-c8b5841c4c68"),
+                            Measure = 60,
+                            Price = 180000m,
+                            ServiceDescription = "Take Photo in 60 minutes",
+                            ServiceName = "Take Photo in 60 minutes",
+                            ServiceTypeID = new Guid("79497fe3-789f-4555-ac6b-977dfbf0f671"),
+                            Unit = "minutes"
+                        },
+                        new
+                        {
+                            ServiceID = new Guid("6288e0ab-adec-4363-b80f-95abf3053d56"),
+                            Measure = 1,
+                            Price = 100000m,
+                            ServiceDescription = "Make up with Korean stype for 1 people",
+                            ServiceName = "Make up with Korean stype for 1 people",
+                            ServiceTypeID = new Guid("06167451-8b59-4dd2-bb9e-88df025eead6"),
+                            Unit = "people"
+                        },
+                        new
+                        {
+                            ServiceID = new Guid("13e75fc2-f38b-401e-9cd2-c545b80fd1f0"),
+                            Measure = 2,
+                            Price = 190000m,
+                            ServiceDescription = "Make up with Korean stype for 2 people",
+                            ServiceName = "Combo make up with Korean stype for 2 people",
+                            ServiceTypeID = new Guid("06167451-8b59-4dd2-bb9e-88df025eead6"),
+                            Unit = "people"
+                        },
+                        new
+                        {
+                            ServiceID = new Guid("5d568e18-8883-409b-bc48-6456aeefb4f9"),
+                            Measure = 120,
+                            Price = 190000m,
+                            ServiceDescription = "Hire this booth for 120 minutes",
+                            ServiceName = "Hire this booth for 120 minutes",
+                            ServiceTypeID = new Guid("96eae221-6528-4f26-a97b-3ad5e55256ee"),
+                            Unit = "minutes"
+                        });
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.ServiceItem", b =>
@@ -531,6 +599,23 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.HasKey("ServiceTypeID");
 
                     b.ToTable("ServiceTypes", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ServiceTypeID = new Guid("79497fe3-789f-4555-ac6b-977dfbf0f671"),
+                            ServiceTypeName = "Take photo"
+                        },
+                        new
+                        {
+                            ServiceTypeID = new Guid("06167451-8b59-4dd2-bb9e-88df025eead6"),
+                            ServiceTypeName = "Make up"
+                        },
+                        new
+                        {
+                            ServiceTypeID = new Guid("96eae221-6528-4f26-a97b-3ad5e55256ee"),
+                            ServiceTypeName = "Hire booth"
+                        });
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.SessionOrder", b =>
@@ -553,7 +638,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("StartTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 14, 10, 4, 36, 255, DateTimeKind.Utc).AddTicks(3774));
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -585,7 +670,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 14, 10, 4, 36, 255, DateTimeKind.Utc).AddTicks(8024));
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
@@ -616,7 +701,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("ThemeID");
 
-                    b.Property<string>("ThemeFrameDescription")
+                    b.Property<string>("ThemeDescription")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");

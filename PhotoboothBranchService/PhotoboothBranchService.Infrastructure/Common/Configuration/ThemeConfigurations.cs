@@ -17,7 +17,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(tf => tf.ThemeName)
                 .IsRequired()
                 .HasMaxLength(100);
-            builder.Property(tf => tf.ThemeFrameDescription)
+            builder.Property(tf => tf.ThemeDescription)
                 .HasMaxLength(500);
 
             builder.HasMany(tf => tf.Frames)
