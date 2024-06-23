@@ -4,10 +4,6 @@ using PhotoboothBranchService.Application.DTOs.Service;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.ServiceServices
 {
@@ -23,10 +19,11 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
         }
 
         // Create
-        public async Task<Guid> CreateAsync(CreateServiceRequest createModel)
+        public async Task<CreateServiceResponse> CreateAsync(CreateServiceRequest createModel)
         {
             var service = _mapper.Map<Service>(createModel);
-            return await _serviceRepository.AddAsync(service);
+            await _serviceRepository.AddAsync(service);
+            return _mapper.Map<CreateServiceResponse>(service);
         }
 
         // Delete

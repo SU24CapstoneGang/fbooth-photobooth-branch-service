@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.Payment;
 using PhotoboothBranchService.Application.DTOs.SessionOrder;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
@@ -25,7 +24,7 @@ public class SessionOrderService : ISessionOrderService
     }
 
     // Create a new session
-    public async Task<Guid> CreateAsync(CreateSessionOrderRequest createModel)
+    public async Task<CreateSessionOrderResponse> CreateAsync(CreateSessionOrderRequest createModel)
     {
         var boothTask = _boothRepository.GetAsync(i => i.BoothID == createModel.BoothID);
         var sessionOrderCheckTask = _sessionOrderRepository.GetAsync(i => i.AccountID == createModel.AccountID && (i.EndTime > DateTime.Now || !i.EndTime.HasValue));
@@ -35,7 +34,8 @@ public class SessionOrderService : ISessionOrderService
         if (booth == null)
         {
             throw new NotFoundException("Booth not found on server, try again later");
-        } else if (booth.Status == ManufactureStatus.InUse || booth.Status == ManufactureStatus.Maintenance || booth.Status == ManufactureStatus.Inactive)
+        }
+        else if (booth.Status == ManufactureStatus.InUse || booth.Status == ManufactureStatus.Maintenance || booth.Status == ManufactureStatus.Inactive)
         {
             throw new Exception("Booth is used by another or is inactive, in maintenance");
         }
@@ -46,16 +46,16 @@ public class SessionOrderService : ISessionOrderService
             throw new Exception("This Account is using another booth");
         }
         var session = _mapper.Map<SessionOrder>(createModel);
-        var addTask = await _sessionOrderRepository.AddAsync(session);
+        await _sessionOrderRepository.AddAsync(session);
         booth.Status = ManufactureStatus.InUse;
         await _boothRepository.UpdateAsync(booth);
-        return addTask;
+        return _mapper.Map<CreateSessionOrderResponse>(session);
     }
 
     //checkout
     public async void CheckOut(Guid SessionOrderID)
     {
-        var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == SessionOrderID, i=>i.ServiceItems)).FirstOrDefault();
+        var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == SessionOrderID, i => i.ServiceItems)).FirstOrDefault();
 
         //if (sessionOrder != null)
         //{
@@ -63,7 +63,7 @@ public class SessionOrderService : ISessionOrderService
         //        PaymentMethodID = createPaymentRequest.PaymentMethodID,
         //        Description = "Checkout for Session " + sessionOrder.SessionOrderID.ToString(),
         //        SessionOrderID = sessionOrder.SessionOrderID,
-                
+
         //    };
 
         //}

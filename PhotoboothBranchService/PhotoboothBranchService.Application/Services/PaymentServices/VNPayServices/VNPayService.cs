@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using PhotoboothBranchService.Application.Common;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment;
+using PhotoboothBranchService.Domain.IRepository;
 using System.Text;
 
 namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices
@@ -14,16 +17,21 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
         private readonly string vnp_TmnCode;
         private readonly string vnp_HashSecret;
         private readonly string vnp_Api;
-        public VNPayService()
+
+        private readonly IMapper _mapper;
+        private readonly IPaymentRepository _paymentRepository;
+        public VNPayService(IPaymentRepository paymentRepository, IMapper mapper)
         {
             vnp_Returnurl = JsonHelper.GetFromAppSettings("VNPay:vnp_Returnurl");//URL nhan ket qua tra ve 
             vnp_Url = JsonHelper.GetFromAppSettings("VNPay:vnp_Url"); //URL thanh toan cua VNPAY 
             vnp_TmnCode = JsonHelper.GetFromAppSettings("VNPay:vnp_TmnCode"); //Ma định danh merchant kết nối (Terminal Id)
             vnp_HashSecret = JsonHelper.GetFromAppSettings("VNPay:vnp_HashSecret"); //Secret Key
             vnp_Api = JsonHelper.GetFromAppSettings("VNPay:vnp_Api");
+            _paymentRepository = paymentRepository;
+            _mapper = mapper;
         }
 
-        public async Task<string> Pay(VnpayRequest paymentRequest)
+        public string Pay(VnpayRequest paymentRequest)
         {
             //create library
             VnPayLibrary vnpay = new VnPayLibrary();
@@ -49,30 +57,30 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
             {
                 vnpay.AddRequestData("vnp_BankCode", "");
             };
-            vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_CreateDate", paymentRequest.PaymentDateTime.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", "VND");
             if (paymentRequest.ClientIpAddress != null)
             {
                 vnpay.AddRequestData("vnp_IpAddr", paymentRequest.ClientIpAddress);
             }
             vnpay.AddRequestData("vnp_Locale", "vn");
-            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:");
+            vnpay.AddRequestData("vnp_OrderInfo", paymentRequest.OrderInformation ?? "Thanh toan don hang");
             vnpay.AddRequestData("vnp_OrderType", "other"); //default value: other
             vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
-            vnpay.AddRequestData("vnp_TxnRef", paymentRequest.SessionID.ToString());
+            vnpay.AddRequestData("vnp_TxnRef", GuidAlphanumericConverter.GuidToAlphanumeric(paymentRequest.PaymentID));
 
             //build request url
             string paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
             return paymentUrl;
         }
 
-        public async Task<VnpayQueryResponse> Query(string orderId, string payDate, string clientIp)
+        public async Task<VnpayQueryResponse> Query(Guid paymentID, string payDate, string clientIp)
         {
             var vnp_RequestId = DateTime.Now.Ticks.ToString();
             var vnp_Version = VnPayLibrary.VERSION;
             var vnp_Command = "querydr";
-            var vnp_TxnRef = orderId;
-            var vnp_OrderInfo = "Truy van giao dich:" + orderId;
+            var vnp_TxnRef = GuidAlphanumericConverter.GuidToAlphanumeric(paymentID);
+            var vnp_OrderInfo = "Truy van giao dich:" + paymentID;
             var vnp_TransactionDate = payDate;
             var vnp_CreateDate = DateTime.Now.ToString("yyyyMMddHHmmss");
             var vnp_IpAddr = clientIp;
@@ -156,7 +164,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
             }
         }
 
-        public VnpayResponse Return(IQueryCollection queryString)
+        public async Task<(VnpayResponse response, string returnContent)> Return(IQueryCollection queryString)
         {
             VnPayLibrary vnpay = new VnPayLibrary();
 
@@ -169,7 +177,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                 }
             }
 
-            string orderId = vnpay.GetResponseData("vnp_TxnRef");
+            string paymentID = vnpay.GetResponseData("vnp_TxnRef");
             long vnpayTranId = Convert.ToInt64(vnpay.GetResponseData("vnp_TransactionNo"));
             string vnp_ResponseCode = vnpay.GetResponseData("vnp_ResponseCode");
             string vnp_TransactionStatus = vnpay.GetResponseData("vnp_TransactionStatus");
@@ -179,44 +187,96 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
             string bankCode = queryString["vnp_BankCode"];
 
             bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, vnp_HashSecret);
-            if (checkSignature)
+
+            //init VnpayResponse
+            VnpayResponse vnpayResponse;
+
+            //get paymentID and find in db
+            Guid paymentIDGUID = GuidAlphanumericConverter.AlphanumericToGuid(paymentID);
+            var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == paymentIDGUID)).FirstOrDefault();
+
+            string returnContent = string.Empty;
+            if (payment != null)
             {
-                if (vnp_ResponseCode == "00" && vnp_TransactionStatus == "00")
+                payment.Signature = vnp_SecureHash;
+                payment.TransactionID = vnpayTranId.ToString();
+
+                if (checkSignature)
                 {
-                    return new VnpayResponse
+                    if (payment.Amount==vnp_Amount)
                     {
-                        Message = "Giao dịch được thực hiện thành công. Cảm ơn quý khách đã sử dụng dịch vụ",
-                        TerminalID = terminalID,
-                        SessionId = new Guid(orderId),
-                        VnpayTranId = vnpayTranId,
-                        Amount = vnp_Amount,
-                        BankCode = bankCode,
-                        Success = true
-                    };
+                        if (payment.PaymentStatus == Domain.Enum.PaymentStatus.Processing)
+                        {
+                            if (vnp_ResponseCode == "00" && vnp_TransactionStatus == "00")
+                            {
+                                payment.PaymentStatus = Domain.Enum.PaymentStatus.Success;
+                                vnpayResponse = new VnpayResponse
+                                {
+                                    Message = "Giao dịch được thực hiện thành công. Cảm ơn quý khách đã sử dụng dịch vụ",
+                                    TerminalID = terminalID,
+                                    PaymentID = paymentIDGUID,
+                                    VnpayTranId = vnpayTranId,
+                                    Amount = vnp_Amount,
+                                    BankCode = bankCode,
+                                    Success = true
+                                };
+                            }
+                            else
+                            {
+                                payment.PaymentStatus = Domain.Enum.PaymentStatus.Fail;
+                                vnpayResponse = new VnpayResponse
+                                {
+                                    Message = "Có lỗi xảy ra trong quá trình xử lý.",
+                                    ErrorCode = vnp_ResponseCode,
+                                    TerminalID = terminalID,
+                                    PaymentID = paymentIDGUID,
+                                    VnpayTranId = vnpayTranId,
+                                    Amount = vnp_Amount,
+                                    BankCode = bankCode,
+                                    Success = false
+                                };
+                            }
+                            returnContent = "{\"RspCode\":\"00\",\"Message\":\"Confirm Success\"}";
+                        }
+                        else
+                        {
+                            vnpayResponse = new VnpayResponse
+                            {
+                                Message = "Order already confirmed",
+                                Success = false
+                            };
+                            payment.PaymentStatus = Domain.Enum.PaymentStatus.Fail;
+                            returnContent = "{\"RspCode\":\"02\",\"Message\":\"Order already confirmed\"}";
+                        } 
+                    }
+                    else
+                    {
+                        vnpayResponse = new VnpayResponse
+                        {
+                            Message = "Có lỗi xảy ra trong quá trình xử lý",
+                            Success = false
+                        };
+                        payment.PaymentStatus = Domain.Enum.PaymentStatus.Fail;
+                        returnContent = "{\"RspCode\":\"04\",\"Message\":\"invalid amount\"}";
+                    }
                 }
                 else
                 {
-                    return new VnpayResponse
+                    payment.PaymentStatus = Domain.Enum.PaymentStatus.Fail;
+                    vnpayResponse = new VnpayResponse
                     {
-                        Message = "Có lỗi xảy ra trong quá trình xử lý.",
-                        ErrorCode = vnp_ResponseCode,
-                        TerminalID = terminalID,
-                        SessionId = new Guid(orderId),
-                        VnpayTranId = vnpayTranId,
-                        Amount = vnp_Amount,
-                        BankCode = bankCode,
+                        Message = "Có lỗi xảy ra trong quá trình xử lý",
                         Success = false
                     };
+                    returnContent = "{\"RspCode\":\"97\",\"Message\":\"Invalid signature\"}";
                 }
+                await _paymentRepository.UpdateAsync(payment);
             }
             else
             {
-                return new VnpayResponse
-                {
-                    Message = "Có lỗi xảy ra trong quá trình xử lý",
-                    Success = false
-                };
+                throw new NotFoundException("No Payment with id saved in server");
             }
+            return (vnpayResponse, returnContent);
         }
     }
 }

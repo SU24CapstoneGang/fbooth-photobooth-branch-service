@@ -18,12 +18,12 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<Guid>> CreatePaymentMethod(CreatePaymentMethodRequest createPaymentMethodRequest)
+        public async Task<ActionResult<CreatePaymentMethodResponse>> CreatePaymentMethod(CreatePaymentMethodRequest createPaymentMethodRequest)
         {
             try
             {
-                var id = await _paymentMethodService.CreateAsync(createPaymentMethodRequest);
-                return Ok(id);
+                var createPaymentMethodResponse = await _paymentMethodService.CreateAsync(createPaymentMethodRequest);
+                return Ok(createPaymentMethodResponse);
             }
             catch (Exception ex)
             {

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Layout;
-using PhotoboothBranchService.Application.DTOs.Photo;
 using PhotoboothBranchService.Application.Services.LayoutServices;
 
 namespace PhotoboothBranchService.Api.Controllers;
@@ -17,12 +16,12 @@ public class LayoutController : ControllerBaseApi
 
     // Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreateLayout(CreateLayoutRequest createLayoutRequest)
+    public async Task<ActionResult<CreateLayoutResponse>> CreateLayout(CreateLayoutRequest createLayoutRequest)
     {
         try
         {
-            var id = await _layoutService.CreateAsync(createLayoutRequest);
-            return Ok(id);
+            var createLayoutResponse = await _layoutService.CreateAsync(createLayoutRequest);
+            return Ok(createLayoutResponse);
         }
         catch (Exception ex)
         {

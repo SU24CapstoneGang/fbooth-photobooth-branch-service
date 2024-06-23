@@ -17,11 +17,11 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Create
-        public async Task<Guid> AddAsync(PhotoSticker entity)
+        public async Task<PhotoSticker> AddAsync(PhotoSticker entity)
         {
-            await _dbContext.AddAsync(entity);
+            var result = await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
-            return entity.PhotoStickerID;
+            return result.Entity;
         }
 
         // Read

@@ -6,15 +6,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Services.AccountServices;
+using PhotoboothBranchService.Application.Services.BackgroundServices;
 using PhotoboothBranchService.Application.Services.BoothBranchServices;
 using PhotoboothBranchService.Application.Services.BoothServices;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Application.Services.FirebaseServices;
-using PhotoboothBranchService.Application.Services.FrameServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Application.Services.LayoutServices;
 using PhotoboothBranchService.Application.Services.PaymentMethodServices;
 using PhotoboothBranchService.Application.Services.PaymentServices;
+using PhotoboothBranchService.Application.Services.PaymentServices.MoMoServices;
 using PhotoboothBranchService.Application.Services.PaymentServices.QR;
 using PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices;
 using PhotoboothBranchService.Application.Services.PhotoServices;
@@ -25,7 +26,6 @@ using PhotoboothBranchService.Application.Services.ServiceServices;
 using PhotoboothBranchService.Application.Services.ServiceTypeServices;
 using PhotoboothBranchService.Application.Services.SessionOrderServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
-using PhotoboothBranchService.Application.Services.ThemeServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using System.Reflection;
 
@@ -39,7 +39,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IBoothService, BoothService>();
             services.AddScoped<IBoothBranchService, BoothBranchService>();
-            services.AddScoped<IFrameService, FrameService>();
+            services.AddScoped<IBackgroundService, BackgroundService>();
             services.AddScoped<ILayoutService, LayoutService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IPaymentMethodService, PaymentMethodService>();
@@ -51,7 +51,6 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IServiceTypeService, ServiceTypeService>();
             services.AddScoped<ISessionOrderService, SessionOrderService>();
             services.AddScoped<IStickerService, StickerService>();
-            services.AddScoped<IThemeService, ThemeService>();
 
             // cloudinary
             services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
@@ -86,6 +85,8 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IQrCodeService, QrCodeService>();
             //Vnpay Service
             services.AddScoped<IVNPayService, VNPayService>();
+            //momo service
+            services.AddScoped<IMoMoService, MoMoService>();
             return services;
         }
     }

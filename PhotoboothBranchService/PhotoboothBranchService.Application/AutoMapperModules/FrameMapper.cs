@@ -1,17 +1,18 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.Common.Helpers;
-using PhotoboothBranchService.Application.DTOs.Frame;
+using PhotoboothBranchService.Application.DTOs.Background;
 using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Application.AutoMapperModules
 {
-    public class FrameMapper : Profile
+    public class BackgroundMapper : Profile
     {
-        public FrameMapper()
+        public BackgroundMapper()
         {
-            CreateMap<CreateFrameRequest, Frame>().ReverseMap().HandleNullProperty();
-            CreateMap<UpdateFrameRequest, Frame>().ReverseMap().HandleNullProperty();
-            CreateMap<FrameResponse, Frame>().ReverseMap().HandleNullProperty();
+            CreateMap<CreateBackgroundRequest, Background>().ReverseMap().HandleNullProperty();
+            CreateMap<UpdateBackgroundRequest, Background>().ReverseMap().HandleNullProperty();
+            CreateMap<BackgroundResponse, Background>().ReverseMap().HandleNullProperty();
+            CreateMap<Background, CreateBackgroundResponse>().HandleNullProperty();
         }
     }
 }

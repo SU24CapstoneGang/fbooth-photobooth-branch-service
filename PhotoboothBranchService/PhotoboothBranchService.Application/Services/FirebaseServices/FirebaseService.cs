@@ -1,6 +1,5 @@
 ﻿using FirebaseAdmin.Auth;
 using PhotoboothBranchService.Application.Common.Exceptions;
-using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.FirebaseServices

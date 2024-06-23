@@ -5,9 +5,9 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
 {
     public interface IVNPayService
     {
-        Task<string> Pay(VnpayRequest paymentRequest);
-        Task<VnpayQueryResponse> Query(string orderId, string payDate, string clientIp);
+        string Pay(VnpayRequest paymentRequest);
+        Task<VnpayQueryResponse> Query(Guid paymentID, string payDate, string clientIp);
         Task<VnpayRefundResponse> RefundTransaction(VnpayRefundRequest request, string clientIp);
-        VnpayResponse Return(IQueryCollection queryString);
+        Task<(VnpayResponse response, string returnContent)> Return(IQueryCollection queryString);
     }
 }

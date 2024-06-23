@@ -17,11 +17,11 @@ public class SessionOrderRepository : ISessionOrderRepository
     }
 
     // Add a new session
-    public async Task<Guid> AddAsync(SessionOrder session)
+    public async Task<SessionOrder> AddAsync(SessionOrder session)
     {
-        _dbContext.SessionOrders.Add(session);
+        var result = await _dbContext.AddAsync(session);
         await _dbContext.SaveChangesAsync();
-        return session.SessionOrderID;
+        return result.Entity;
     }
 
     //Read
@@ -78,10 +78,12 @@ public class SessionOrderRepository : ISessionOrderRepository
 
     public async Task updateTotalPrice(Guid SessionOrderID)
     {
-        var order = _dbContext.SessionOrders.Where(i => i.SessionOrderID == SessionOrderID).Include(u=>u.ServiceItems).FirstOrDefault();
-        if (order != null) {
+        var order = _dbContext.SessionOrders.Where(i => i.SessionOrderID == SessionOrderID).Include(u => u.ServiceItems).FirstOrDefault();
+        if (order != null)
+        {
             decimal totalPrice = 0;
-            foreach (var item in order.ServiceItems) {
+            foreach (var item in order.ServiceItems)
+            {
                 totalPrice += item.UnitPrice * item.Quantity;
             }
             order.TotalPrice = totalPrice;

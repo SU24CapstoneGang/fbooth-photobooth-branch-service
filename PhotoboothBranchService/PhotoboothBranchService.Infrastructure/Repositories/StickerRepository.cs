@@ -18,11 +18,11 @@ public class StickerRepository : IStickerRepository
 
 
     //Create
-    public async Task<Guid> AddAsync(Sticker sticker)
+    public async Task<Sticker> AddAsync(Sticker sticker)
     {
-        await _dbContext.AddAsync(sticker);
+        var result = await _dbContext.AddAsync(sticker);
         await _dbContext.SaveChangesAsync();
-        return sticker.StickerID;
+        return result.Entity;
     }
 
     //Read
@@ -73,7 +73,7 @@ public class StickerRepository : IStickerRepository
     //Update
     public async Task UpdateAsync(Sticker sticker)
     {
-        sticker.LastModified = DateTime.UtcNow; 
+        sticker.LastModified = DateTime.UtcNow;
         _dbContext.Update(sticker);
         await _dbContext.SaveChangesAsync();
     }

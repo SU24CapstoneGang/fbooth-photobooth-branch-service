@@ -12,6 +12,7 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
             CreateMap<CreatePhotoStickerRequest, PhotoSticker>().ReverseMap().HandleNullProperty();
             CreateMap<UpdatePhotoStickerRequest, PhotoSticker>().ReverseMap().HandleNullProperty();
             CreateMap<PhotoSticker, PhotoStickerResponse>().ReverseMap().HandleNullProperty();
+            CreateMap<PhotoSticker, CreatePhotoStickerResponse>().ReverseMap().HandleNullProperty();
         }
     }
 }

@@ -11,7 +11,8 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
         {
             CreateMap<CreatePaymentMethodRequest, PaymentMethod>().ReverseMap().HandleNullProperty();
             CreateMap<UpdatePaymentMethodRequest, PaymentMethod>().ReverseMap().HandleNullProperty();
-            CreateMap<PaymentMethod, PaymentMethodResponse>().ReverseMap().HandleNullProperty();
+            CreateMap<PaymentMethod, PaymentMethodResponse>().HandleNullProperty();
+            CreateMap<PaymentMethod, CreatePaymentMethodResponse>().HandleNullProperty();
         }
     }
 }

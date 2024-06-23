@@ -20,7 +20,7 @@ namespace PhotoboothBranchService.Infrastructure
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IBoothRepository, BoothRepository>();
             services.AddScoped<IBoothBranchRepository, BoothBranchRepository>();
-            services.AddScoped<IFrameRepository, FrameRepository>();
+            services.AddScoped<IBackgroundRepository, BackgroundRepository>();
             services.AddScoped<ILayoutRepository, LayoutRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
@@ -32,7 +32,6 @@ namespace PhotoboothBranchService.Infrastructure
             services.AddScoped<IServiceTypeRepository, ServiceTypeRepository>();
             services.AddScoped<ISessionOrderRepository, SessionOrderRepository>();
             services.AddScoped<IStickerRepository, StickerRepository>();
-            services.AddScoped<IThemeRepository, ThemeRepository>();
 
             services.AddScoped<IMapper, Mapper>();
 

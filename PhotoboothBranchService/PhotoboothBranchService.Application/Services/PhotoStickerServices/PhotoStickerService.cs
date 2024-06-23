@@ -19,10 +19,11 @@ namespace PhotoboothBranchService.Application.Services.PhotoStickerServices
         }
 
         // Create
-        public async Task<Guid> CreateAsync(CreatePhotoStickerRequest createModel)
+        public async Task<CreatePhotoStickerResponse> CreateAsync(CreatePhotoStickerRequest createModel)
         {
             var mapSticker = _mapper.Map<PhotoSticker>(createModel);
-            return await _mapStickerRepository.AddAsync(mapSticker);
+            await _mapStickerRepository.AddAsync(mapSticker);
+            return _mapper.Map<CreatePhotoStickerResponse>(mapSticker);
         }
 
         // Delete

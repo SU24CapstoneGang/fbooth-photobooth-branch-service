@@ -2,15 +2,9 @@
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.PhotoBox;
-using PhotoboothBranchService.Application.DTOs.PhotoSticker;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.PhotoBoxServices
 {
@@ -25,10 +19,11 @@ namespace PhotoboothBranchService.Application.Services.PhotoBoxServices
             _mapper = mapper;
         }
 
-        public Task<Guid> CreateAsync(CreatePhotoBoxRequest createModel)
+        public async Task<CreatePhotoBoxResponse> CreateAsync(CreatePhotoBoxRequest createModel)
         {
             PhotoBox photoBox = _mapper.Map<PhotoBox>(createModel);
-            return _photoBoxRepository.AddAsync(photoBox);
+            await _photoBoxRepository.AddAsync(photoBox);
+            return _mapper.Map<CreatePhotoBoxResponse>(photoBox);
         }
 
         public async Task DeleteAsync(Guid id)
@@ -39,7 +34,8 @@ namespace PhotoboothBranchService.Application.Services.PhotoBoxServices
                 if (photoBox != null)
                 {
                     await _photoBoxRepository.RemoveAsync(photoBox);
-                } else
+                }
+                else
                 {
                     throw new NotFoundException($"Not found {id} photo box");
                 }

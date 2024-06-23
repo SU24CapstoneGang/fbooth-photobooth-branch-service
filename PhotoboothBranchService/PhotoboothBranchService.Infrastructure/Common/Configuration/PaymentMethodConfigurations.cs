@@ -59,6 +59,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     CreateDate = DateTime.UtcNow,
                     Status = PaymentMethodStatus.Active,
                 });
-        } 
+        }
     }
 }

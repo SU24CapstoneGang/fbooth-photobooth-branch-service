@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
@@ -15,7 +10,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
         {
             builder.ToTable("PhotoBox");
             builder.HasKey(u => u.PhotoBoxID);
-            builder.Property(u=>u.PhotoBoxID)
+            builder.Property(u => u.PhotoBoxID)
                 .HasColumnName("PhotoBoxID")
                 .ValueGeneratedOnAdd();
             builder.Property(u => u.boxWidth).IsRequired();

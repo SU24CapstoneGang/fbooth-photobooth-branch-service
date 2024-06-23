@@ -17,5 +17,4 @@
         public string Vnp_TransactionStatus { get; set; }
         public string Vnp_SecureHash { get; set; }
     }
-
 }

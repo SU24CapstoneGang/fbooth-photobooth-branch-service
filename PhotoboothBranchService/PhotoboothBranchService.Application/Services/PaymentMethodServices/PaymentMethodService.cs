@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Actions;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.PaymentMethod;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
@@ -19,7 +21,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
             _mapper = mapper;
         }
 
-        public async Task<Guid> CreateAsync(CreatePaymentMethodRequest createModel)
+        public async Task<CreatePaymentMethodResponse> CreateAsync(CreatePaymentMethodRequest createModel)
         {
             try
             {
@@ -27,7 +29,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
                 if (isPaymentExist != null) throw new BadRequestException("Payment method is already existed");
 
                 PaymentMethod paymentMethod = _mapper.Map<PaymentMethod>(createModel);
-                return await _paymentMethodRepository.AddAsync(paymentMethod);
+                await _paymentMethodRepository.AddAsync(paymentMethod);
+                return _mapper.Map<CreatePaymentMethodResponse>(createModel);
             }
             catch (Exception ex)
             {

@@ -2,7 +2,7 @@
 {
     public class VnpayQueryRequest
     {
-        public string SessionId { get; set; }
+        public Guid PaymentID { get; set; }
         public string PayDate { get; set; }
     }
 }

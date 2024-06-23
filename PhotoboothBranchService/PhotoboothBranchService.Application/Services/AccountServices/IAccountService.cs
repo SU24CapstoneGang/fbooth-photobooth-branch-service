@@ -6,7 +6,7 @@ using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Application.Services.AccountServices
 {
-    public interface IAccountService : IService<AccountResponse, CreateAccountRequestModel, UpdateAccountRequestModel, AccountFilter, PagingModel>
+    public interface IAccountService : IService<AccountResponse, CreateAccountRequestModel, AccountRegisterResponse, UpdateAccountRequestModel, AccountFilter, PagingModel>
     {
         Task<AccountResponse> GetByEmail(string Email);
         Task<AccountRegisterResponse> Register(CreateAccountRequestModel request, AccountRole userRole);

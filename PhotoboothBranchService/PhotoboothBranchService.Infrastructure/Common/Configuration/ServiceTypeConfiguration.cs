@@ -1,17 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
     public class ServiceTypeConfiguration : IEntityTypeConfiguration<ServiceType>
     {
 
-        public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<ServiceType> builder)
+        public void Configure(EntityTypeBuilder<ServiceType> builder)
         {
             builder.ToTable("ServiceTypes");
             builder.HasKey(s => s.ServiceTypeID);

@@ -4,7 +4,7 @@ using PhotoboothBranchService.Domain.Common.Interfaces;
 
 namespace PhotoboothBranchService.Application.Services.PaymentServices
 {
-    public interface IPaymentService : IService<PaymentResponse, CreatePaymentRequest, UpdatePaymentRequest, PaymentFilter, PagingModel>
+    public interface IPaymentService : IService<PaymentResponse, CreatePaymentRequest, CreatePaymentResponse, UpdatePaymentRequest, PaymentFilter, PagingModel>
     {
     }
 }

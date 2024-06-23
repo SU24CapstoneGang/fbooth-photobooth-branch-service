@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using FirebaseAdmin.Auth;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Account;
@@ -34,10 +33,11 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
         }
 
         //khong co sai
-        public async Task<Guid> CreateAsync(CreateAccountRequestModel createModel)
+        public async Task<AccountRegisterResponse> CreateAsync(CreateAccountRequestModel createModel)
         {
             Account account = _mapper.Map<Account>(createModel);
-            return await _accountRepository.AddAsync(account);
+            await _accountRepository.AddAsync(account);
+            return _mapper.Map<AccountRegisterResponse>(account);
         }
 
         public async Task<string> ResetPassword(string email)
@@ -200,7 +200,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                         newAccount.Status = AccountStatus.Active;
                         newAccount.ResetPasswordToken = null;
 
-                        var result = await _accountRepository.CreateAccount(newAccount);
+                        var result = await _accountRepository.AddAsync(newAccount);
 
                         var accountRespone = _mapper.Map<AccountRegisterResponse>(result);
                         return accountRespone;

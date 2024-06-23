@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -28,6 +29,11 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(pb => pb.CreateDate)
             .IsRequired();
+
+            builder.Property(s => s.CreateDate)
+              .ValueGeneratedOnAdd()
+              .HasDefaultValueSql("GETDATE()")
+              .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
             // ManufactureStatus enum mapping
             builder.Property(pb => pb.Status)

@@ -3,10 +3,7 @@ using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Helper;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories
 {
@@ -20,11 +17,11 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Create
-        public async Task<Guid> AddAsync(PaymentMethod entity)
+        public async Task<PaymentMethod> AddAsync(PaymentMethod entity)
         {
-            await _dbContext.AddAsync(entity);
+            var result = await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
-            return entity.PaymentMethodID;
+            return result.Entity;
         }
 
         // Read

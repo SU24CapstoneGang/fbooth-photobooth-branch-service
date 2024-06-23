@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using PhotoboothBranchService.Domain.Enum;
+﻿using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Application.DTOs.Photo
 {

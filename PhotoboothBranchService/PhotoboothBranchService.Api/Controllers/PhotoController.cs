@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Photo;
-using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Application.Services.PhotoServices;
 
 namespace PhotoboothBranchService.Api.Controllers
@@ -19,12 +18,12 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<Guid>> CreatePhoto(CreatePhotoRequest createPhotoRequest)
+        public async Task<ActionResult<CreatePhotoResponse>> CreatePhoto(CreatePhotoRequest createPhotoRequest)
         {
             try
             {
-                var id = await _photoService.CreateAsync(createPhotoRequest);
-                return Ok(id);
+                var createPhotoResponse = await _photoService.CreateAsync(createPhotoRequest);
+                return Ok(createPhotoResponse);
             }
             catch (Exception ex)
             {

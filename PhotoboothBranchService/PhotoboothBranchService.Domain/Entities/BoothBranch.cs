@@ -4,7 +4,7 @@ namespace PhotoboothBranchService.Domain.Entities;
 
 public class BoothBranch
 {
-    public Guid BoothBranchID { get; set; } 
+    public Guid BoothBranchID { get; set; }
     public string BranchName { get; set; } = default!;
     public string BranchAddress { get; set; } = default!;
     public DateTime CreateDate { get; set; }

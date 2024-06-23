@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PhotoboothBranchService.Api.Common.Helper;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Payment;
 using PhotoboothBranchService.Application.Services.PaymentServices;
@@ -16,12 +17,18 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<Guid>> CreatePayment(CreatePaymentRequest createPaymentRequest)
+        public async Task<ActionResult<CreatePaymentResponse>> CreatePayment(CreatePaymentRequest createPaymentRequest)
         {
             try
             {
-                var id = await _paymentService.CreateAsync(createPaymentRequest);
-                return Ok(id);
+                //get ip from request
+                var clientIpAddress = IpAddressHelper.GetClientIpAddress(HttpContext);
+                createPaymentRequest.ClientIpAddress = clientIpAddress;
+
+                //sent to service layer
+                var createPaymentResponse = await _paymentService.CreateAsync(createPaymentRequest);
+
+                return Ok(createPaymentResponse);
             }
             catch (Exception ex)
             {

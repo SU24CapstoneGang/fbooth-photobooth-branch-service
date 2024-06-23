@@ -20,8 +20,8 @@ namespace PhotoboothBranchService.Api.Controllers
         {
             try
             {
-                var id = await _photoSessionService.CreateAsync(createPhotoSessionRequest);
-                return Ok(id);
+                var createPhotoSessionResponse = await _photoSessionService.CreateAsync(createPhotoSessionRequest);
+                return Ok(createPhotoSessionResponse);
             }
             catch (Exception ex)
             {

@@ -19,14 +19,13 @@ public class BoothBranchService : IBoothBranchService
         _mapper = mapper;
     }
     //Create
-    public async Task<Guid> CreateAsync(CreateBoothBranchRequest createModel)
+    public async Task<CreateBoothBranchResponse> CreateAsync(CreateBoothBranchRequest createModel)
     {
         try
         {
-            // await _photoBoothBranchRepository.GetAsync(createModel.)
             BoothBranch photoBoothBranch = _mapper.Map<BoothBranch>(createModel);
             await _photoBoothBranchRepository.AddAsync(photoBoothBranch);
-            return photoBoothBranch.BoothBranchID;
+            return _mapper.Map<CreateBoothBranchResponse>(photoBoothBranch);
         }
         catch (Exception)
         {

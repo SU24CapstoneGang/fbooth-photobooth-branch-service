@@ -12,6 +12,7 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
             CreateMap<CreatePhotoRequest, Photo>().ReverseMap().HandleNullProperty();
             CreateMap<UpdatePhotoRequest, Photo>().ReverseMap().HandleNullProperty();
             CreateMap<Photo, PhotoResponse>().HandleNullProperty();
+            CreateMap<Photo, CreatePhotoResponse>().HandleNullProperty();
         }
     }
 }

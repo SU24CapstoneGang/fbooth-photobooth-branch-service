@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
-using CloudinaryDotNet.Core;
 using Microsoft.AspNetCore.Http;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Layout;
-using PhotoboothBranchService.Application.DTOs.Photo;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
@@ -27,10 +25,11 @@ public class LayoutService : ILayoutService
     }
 
     // Create
-    public async Task<Guid> CreateAsync(CreateLayoutRequest createModel)
+    public async Task<CreateLayoutResponse> CreateAsync(CreateLayoutRequest createModel)
     {
         Layout layout = _mapper.Map<Layout>(createModel);
-        return await _layoutRepository.AddAsync(layout);
+        await _layoutRepository.AddAsync(layout);
+        return _mapper.Map<CreateLayoutResponse>(layout);
     }
     public async Task<LayoutResponse> CreateLayoutAsync(IFormFile file, CreateLayoutRequest createModel)
     {
@@ -63,7 +62,8 @@ public class LayoutService : ILayoutService
             if (layout != null)
             {
                 await _layoutRepository.RemoveAsync(layout);
-            } else
+            }
+            else
             {
                 throw new NotFoundException($"Not found kayout id {id}");
             }

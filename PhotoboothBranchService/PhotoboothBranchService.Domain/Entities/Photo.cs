@@ -11,8 +11,8 @@ namespace PhotoboothBranchService.Domain.Entities
         public DateTime CreateDate { get; set; }
         public Guid PhotoSessionID { get; set; }
         public virtual PhotoSession PhotoSession { get; set; } = default!;
-        public Guid FrameID { get; set; }
-        public virtual Frame Frame { get; set; } = default!;
+        public Guid BackgroundID { get; set; }
+        public virtual Background Background { get; set; } = default!;
         public virtual ICollection<PhotoSticker> PhotoStickers { get; set; } = default!;
     }
 }

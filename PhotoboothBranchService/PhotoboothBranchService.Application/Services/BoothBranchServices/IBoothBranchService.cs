@@ -7,6 +7,7 @@ namespace PhotoboothBranchService.Application.Services.BoothBranchServices;
 
 public interface IBoothBranchService : IService<BoothBranchResponse,
     CreateBoothBranchRequest,
+    CreateBoothBranchResponse,
     UpdateBoothBranchRequest,
     BoothBranchFilter,
     PagingModel>

@@ -16,12 +16,12 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<Guid>> CreateServiceType(CreateServiceTypeRequest createServiceTypeRequest)
+        public async Task<ActionResult<CreateServiceTypeResponse>> CreateServiceType(CreateServiceTypeRequest createServiceTypeRequest)
         {
             try
             {
-                var id = await _serviceTypeService.CreateAsync(createServiceTypeRequest);
-                return Ok(id);
+                var createServiceTypeResponse = await _serviceTypeService.CreateAsync(createServiceTypeRequest);
+                return Ok(createServiceTypeResponse);
             }
             catch (Exception ex)
             {

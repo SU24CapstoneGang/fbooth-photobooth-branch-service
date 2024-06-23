@@ -1,43 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using PhotoboothBranchService.Api.Common.Helper;
+using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment;
 using PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices;
+using System.Net;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
     public class PaymentVNPayController : ControllerBaseApi
     {
         private readonly IVNPayService _vnpayService;
-
         public PaymentVNPayController(IVNPayService vnpayService)
         {
             _vnpayService = vnpayService;
-        }
-
-        [HttpPost]
-        public async Task<string> CreatePaymentRequest([FromBody] VnpayRequest paymentRequest)
-        {
-            try
-            {
-                var clientIpAddress = IpAddressHelper.GetClientIpAddress(HttpContext);
-                paymentRequest.ClientIpAddress = clientIpAddress;
-                string paymentUrl = await _vnpayService.Pay(paymentRequest);
-                return paymentUrl;
-                //string qrcode = await _qrCodeService.GetQrCodeDataAsync(paymentUrl);
-                //return qrcode;
-            }
-            catch (Exception ex)
-            {
-                //return StatusCode(500, $"An error occurred while creating the request: {ex.Message}");
-                return ex.Message;
-            }
         }
 
         [HttpPost("query")]
         public async Task<IActionResult> QueryTransaction([FromBody] VnpayQueryRequest request)
         {
             var clientIp = IpAddressHelper.GetClientIpAddress(HttpContext);
-            var result = await _vnpayService.Query(request.SessionId, request.PayDate, clientIp);
+            var result = await _vnpayService.Query(request.PaymentID, request.PayDate, clientIp);
             return Ok(result);
         }
 
@@ -50,21 +34,34 @@ namespace PhotoboothBranchService.Api.Controllers
         }
 
         [HttpGet("return")]
-        public IActionResult VnpayReturn()
+        public async Task<IActionResult> VnpayReturn()
         {
             if (Request.QueryString.HasValue)
             {
-                var response = _vnpayService.Return(Request.Query);
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
-            }
+                var response = await _vnpayService.Return(Request.Query);
+                string returnContent = $@"
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Payment Return</title>
+                        <script>
+                            window.onload = function() {{
+                                setTimeout(function() {{
+                                    window.close();
+                                }}, 3000); // Close after 3 seconds
+                            }}
+                        </script>
+                    </head>
+                    <body>
+                        <h1>Payment Processed</h1>
+                        <p>Your payment has been processed. This tab will close automatically.</p>
+                        <h2>Response Data:</h2>
+                        <pre>{response.returnContent}</pre> <!-- Display JSON response here -->
+                    </body>
+                    </html>";
 
+                return Content(returnContent, "text/html");
+            }
             return BadRequest(new { Message = "No query string found" });
         }
     }

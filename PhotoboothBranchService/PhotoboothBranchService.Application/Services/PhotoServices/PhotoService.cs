@@ -5,7 +5,6 @@ using PhotoboothBranchService.Application.DTOs.Photo;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
-using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.PhotoServices
@@ -16,10 +15,10 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
         private readonly IMapper _mapper;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IPhotoSessionRepository _photoSessionRepository;
-        private readonly IFrameRepository _frameRepository;
+        private readonly IBackgroundRepository _frameRepository;
         public PhotoService(IPhotoRepository photoRepository, IMapper mapper,
             ICloudinaryService cloudinaryService, IPhotoSessionRepository photoSessionRepository,
-            IFrameRepository frameRepository)
+            IBackgroundRepository frameRepository)
         {
             _photoRepository = photoRepository;
             _mapper = mapper;
@@ -28,17 +27,18 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
             _frameRepository = frameRepository;
         }
 
-        public async Task<Guid> CreateAsync(CreatePhotoRequest createModel)
+        public async Task<CreatePhotoResponse> CreateAsync(CreatePhotoRequest createModel)
         {
-            Photo finalPicture = _mapper.Map<Photo>(createModel);
-            return await _photoRepository.AddAsync(finalPicture);
+            Photo photo = _mapper.Map<Photo>(createModel);
+            await _photoRepository.AddAsync(photo);
+            return _mapper.Map<CreatePhotoResponse>(photo);
         }
 
         public async Task<PhotoResponse> CreatePhotoAsync(IFormFile file, CreatePhotoRequest createPhotoRequest)
         {
 
             // validate
-            var frame = (await _frameRepository.GetAsync(f => f.FrameID.Equals(createPhotoRequest.FrameID))).FirstOrDefault();
+            var frame = (await _frameRepository.GetAsync(f => f.BackgroundID.Equals(createPhotoRequest.FrameID))).FirstOrDefault();
             if (frame == null)
             {
                 throw new Exception("Frame not found.");
@@ -62,7 +62,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
                 PhotoURL = uploadResult.SecureUrl.AbsoluteUri,
                 CouldID = uploadResult.PublicId,
                 PhotoSessionID = createPhotoRequest.PhotoSessionID,
-                FrameID = createPhotoRequest.FrameID,
+                BackgroundID = createPhotoRequest.FrameID,
                 Version = createPhotoRequest.Version
             };
 

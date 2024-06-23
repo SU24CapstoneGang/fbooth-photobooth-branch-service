@@ -16,12 +16,12 @@ public class BoothController : ControllerBaseApi
 
     // Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreateBooth(CreateBoothRequest createBoothRequest)
+    public async Task<ActionResult<CreateBoothResponse>> CreateBooth(CreateBoothRequest createBoothRequest)
     {
         try
         {
-            var id = await _boothService.CreateAsync(createBoothRequest);
-            return Ok(id);
+            var createBoothResponse = await _boothService.CreateAsync(createBoothRequest);
+            return Ok(createBoothResponse);
         }
         catch (Exception ex)
         {

@@ -18,12 +18,12 @@ public class BoothBranchesController : ControllerBaseApi
 
     //Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreatePhotoBoothBranch(CreateBoothBranchRequest createPhotoBoothBranchRequest)
+    public async Task<ActionResult<CreateBoothBranchResponse>> CreatePhotoBoothBranch(CreateBoothBranchRequest createPhotoBoothBranchRequest)
     {
         try
         {
-            var id = await _photoBoothBranchService.CreateAsync(createPhotoBoothBranchRequest);
-            return Ok(id);
+            var createBoothBranchResponse = await _photoBoothBranchService.CreateAsync(createPhotoBoothBranchRequest);
+            return Ok(createBoothBranchResponse);
         }
         catch (Exception ex)
         {

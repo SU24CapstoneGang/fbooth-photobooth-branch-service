@@ -20,11 +20,12 @@ public class StickerService : IStickerService
     }
 
     // Create
-    public async Task<Guid> CreateAsync(CreateStickerRequest createModel)
+    public async Task<CreateStickerResponse> CreateAsync(CreateStickerRequest createModel)
     {
         Sticker sticker = _mapper.Map<Sticker>(createModel);
         sticker.Status = StatusUse.Available;
-        return await _stickerRepository.AddAsync(sticker);
+        await _stickerRepository.AddAsync(sticker);
+        return _mapper.Map<CreateStickerResponse>(createModel);
     }
 
     // Delete
@@ -67,7 +68,7 @@ public class StickerService : IStickerService
 
     public async Task<IEnumerable<StickerResponse>> GetByName(string name)
     {
-        var stickers = await _stickerRepository.GetAsync(s => s.StickerName.Contains(name));
+        var stickers = await _stickerRepository.GetAsync(s => s.StickerCode.Contains(name));
         return _mapper.Map<IEnumerable<StickerResponse>>(stickers.ToList());
     }
 

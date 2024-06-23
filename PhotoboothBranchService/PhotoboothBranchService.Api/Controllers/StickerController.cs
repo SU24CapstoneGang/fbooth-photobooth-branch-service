@@ -16,12 +16,12 @@ public class StickerController : ControllerBaseApi
 
     // Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreateSticker(CreateStickerRequest createStickerRequest)
+    public async Task<ActionResult<CreateStickerResponse>> CreateSticker(CreateStickerRequest createStickerRequest)
     {
         try
         {
-            var id = await _stickerService.CreateAsync(createStickerRequest);
-            return Ok(id);
+            var createStickerResponse = await _stickerService.CreateAsync(createStickerRequest);
+            return Ok(createStickerResponse);
         }
         catch (Exception ex)
         {

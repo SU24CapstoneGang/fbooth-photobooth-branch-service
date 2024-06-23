@@ -18,12 +18,12 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<Guid>> CreateMapSticker(CreatePhotoStickerRequest createMapStickerRequest)
+        public async Task<ActionResult<CreatePhotoStickerResponse>> CreateMapSticker(CreatePhotoStickerRequest createMapStickerRequest)
         {
             try
             {
-                var id = await _mapStickerService.CreateAsync(createMapStickerRequest);
-                return Ok(id);
+                var createPhotoStickerResponse = await _mapStickerService.CreateAsync(createMapStickerRequest);
+                return Ok(createPhotoStickerResponse);
             }
             catch (Exception ex)
             {

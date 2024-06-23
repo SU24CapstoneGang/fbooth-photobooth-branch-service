@@ -5,6 +5,7 @@ namespace PhotoboothBranchService.Domain.Entities
     public class Layout
     {
         public Guid LayoutID { get; set; }
+        public string LayoutCode { get; set; }
         public string LayoutURL { get; set; } = default!;
         public string CouldID { get; set; } = default!;
         public StatusUse Status { get; set; }
@@ -14,6 +15,7 @@ namespace PhotoboothBranchService.Domain.Entities
         public DateTime CreatedDate { get; set; }
         public DateTime? LastModified { get; set; }
         public virtual ICollection<PhotoBox> PhotoBoxes { get; set; } = default!;
+        public virtual ICollection<Background> Backgrounds { get; set; }
         public virtual ICollection<PhotoSession> PhotoSessions { get; set; } = default!;
     }
 }

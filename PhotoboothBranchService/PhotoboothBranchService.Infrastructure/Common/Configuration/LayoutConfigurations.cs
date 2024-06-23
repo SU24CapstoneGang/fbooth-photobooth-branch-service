@@ -19,6 +19,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .ValueGeneratedOnAdd();
 
             // Other properties
+            builder.Property(l => l.LayoutCode).IsRequired();
             builder.Property(l => l.LayoutURL).IsRequired();
             builder.Property(l => l.CouldID).IsRequired();
             builder.Property(l => l.Lenght).IsRequired();
@@ -49,6 +50,12 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasMany(t => t.PhotoBoxes)
                 .WithOne(p => p.Layout)
                 .HasForeignKey(v => v.LayoutID)
+                .IsRequired();
+
+            builder.HasMany(i => i.Backgrounds)
+                .WithOne(p => p.Layout)
+                .HasForeignKey(pt => pt.LayoutID)
+                .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired();
         }
     }

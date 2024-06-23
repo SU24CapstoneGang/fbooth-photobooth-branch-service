@@ -3,11 +3,8 @@ using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Helper;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories
 {
@@ -21,11 +18,11 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Create
-        public async Task<Guid> AddAsync(Payment entity)
+        public async Task<Payment> AddAsync(Payment entity)
         {
-            await _dbContext.AddAsync(entity);
+            var result = await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
-            return entity.PaymentID;
+            return result.Entity;
         }
 
         // Read
@@ -78,6 +75,19 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         {
             _dbContext.Remove(entity);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsOrderPaid(Guid SessionOrderID)
+        {
+            var payments = await GetAsync(i => i.SessionOrderID == SessionOrderID);
+            foreach (var payment in payments)
+            {
+                if (payment.PaymentStatus == Domain.Enum.PaymentStatus.Success)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

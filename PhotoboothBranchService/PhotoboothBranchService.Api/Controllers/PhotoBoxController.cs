@@ -2,9 +2,6 @@
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.PhotoBox;
 using PhotoboothBranchService.Application.Services.PhotoBoxServices;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
@@ -19,12 +16,12 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<Guid>> CreatePhotoBox(CreatePhotoBoxRequest createPhotoBoxRequest)
+        public async Task<ActionResult<CreatePhotoBoxResponse>> CreatePhotoBox(CreatePhotoBoxRequest createPhotoBoxRequest)
         {
             try
             {
-                var id = await _photoBoxService.CreateAsync(createPhotoBoxRequest);
-                return Ok(id);
+                var createPhotoBoxResponse = await _photoBoxService.CreateAsync(createPhotoBoxRequest);
+                return Ok(createPhotoBoxResponse);
             }
             catch (Exception ex)
             {

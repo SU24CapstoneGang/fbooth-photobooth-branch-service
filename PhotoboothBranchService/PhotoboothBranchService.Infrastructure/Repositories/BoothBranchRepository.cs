@@ -17,11 +17,11 @@ public class BoothBranchRepository : IBoothBranchRepository
     }
 
     //Create
-    public async Task<Guid> AddAsync(BoothBranch photoBoothBranch)
+    public async Task<BoothBranch> AddAsync(BoothBranch photoBoothBranch)
     {
-        await _dbContext.AddAsync(photoBoothBranch);
+        var result = await _dbContext.AddAsync(photoBoothBranch);
         await _dbContext.SaveChangesAsync();
-        return photoBoothBranch.BoothBranchID;
+        return result.Entity;
     }
 
     //Read

@@ -16,11 +16,11 @@ public class LayoutRepository : ILayoutRepository
         _dbContext = dbContext;
     }
     //Create
-    public async Task<Guid> AddAsync(Layout layout)
+    public async Task<Layout> AddAsync(Layout layout)
     {
-        await _dbContext.AddAsync(layout);
+        var result = await _dbContext.AddAsync(layout);
         await _dbContext.SaveChangesAsync();
-        return layout.LayoutID;
+        return result.Entity;
     }
     //Read
     public async Task<IQueryable<Layout>> GetAllAsync()

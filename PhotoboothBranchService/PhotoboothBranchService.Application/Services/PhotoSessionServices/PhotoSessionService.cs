@@ -4,10 +4,6 @@ using PhotoboothBranchService.Application.DTOs.PhotoSession;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
 {
@@ -23,10 +19,11 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         }
 
         // Create
-        public async Task<Guid> CreateAsync(CreatePhotoSessionRequest createModel)
+        public async Task<CreatePhotoSessionResponse> CreateAsync(CreatePhotoSessionRequest createModel)
         {
             var photoSession = _mapper.Map<PhotoSession>(createModel);
-            return await _photoSessionRepository.AddAsync(photoSession);
+            await _photoSessionRepository.AddAsync(photoSession);
+            return _mapper.Map<CreatePhotoSessionResponse>(photoSession);
         }
 
         // Delete

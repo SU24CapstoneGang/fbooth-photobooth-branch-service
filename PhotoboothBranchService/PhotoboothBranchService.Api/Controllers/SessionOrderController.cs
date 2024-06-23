@@ -16,12 +16,12 @@ public class SessionOrderController : ControllerBaseApi
 
     // Create
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreateSession(CreateSessionOrderRequest createSessionRequest)
+    public async Task<ActionResult<CreateSessionOrderResponse>> CreateSession(CreateSessionOrderRequest createSessionRequest)
     {
         try
         {
-            var id = await _sessionService.CreateAsync(createSessionRequest);
-            return Ok(id);
+            var createSessionOrderResponse = await _sessionService.CreateAsync(createSessionRequest);
+            return Ok(createSessionOrderResponse);
         }
         catch (Exception ex)
         {

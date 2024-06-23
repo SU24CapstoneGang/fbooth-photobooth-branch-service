@@ -18,7 +18,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(s => s.SessionOrderID).HasColumnName("SessionOrderID")
                 .ValueGeneratedOnAdd();
 
-            
+
             builder.Property(s => s.TotalPrice)
                 .IsRequired().HasColumnType("decimal(18, 2)"); ; // Tổng giá
 

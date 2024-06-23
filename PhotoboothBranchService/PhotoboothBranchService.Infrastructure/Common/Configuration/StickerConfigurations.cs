@@ -19,7 +19,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .ValueGeneratedOnAdd();
 
             // Other properties
-            builder.Property(s => s.StickerName)
+            builder.Property(s => s.StickerCode)
                 .IsRequired()
                 .HasMaxLength(100);
 

@@ -4,7 +4,6 @@ using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Helper;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
@@ -17,18 +16,11 @@ public class AccountRepository : IAccountRepository
     }
 
     //Create
-    public async Task<Account> CreateAccount(Account account)
+    public async Task<Account> AddAsync(Account account)
     {
         var result = await _dbContext.AddAsync(account);
         await _dbContext.SaveChangesAsync();
         return result.Entity;
-    }
-
-    public async Task<Guid> AddAsync(Account account)
-    {
-        await _dbContext.AddAsync(account);
-        await _dbContext.SaveChangesAsync();
-        return account.AccountID;
     }
 
     //Update
@@ -66,7 +58,8 @@ public class AccountRepository : IAccountRepository
             if (!result.Any())
             {
                 return await Task.FromResult(new List<Account>().AsQueryable());
-            } else
+            }
+            else
             {
                 if (includeProperties != null)
                 {

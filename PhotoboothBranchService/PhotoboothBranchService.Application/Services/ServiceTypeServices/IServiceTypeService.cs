@@ -1,16 +1,10 @@
 ﻿using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.Frame;
 using PhotoboothBranchService.Application.DTOs.ServiceType;
 using PhotoboothBranchService.Domain.Common.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.ServiceTypeServices
 {
-    public interface IServiceTypeService : IService<ServiceTypeResponse,CreateServiceTypeRequest,UpdateServiceTypeRequest,ServiceTypeFilter,PagingModel>
+    public interface IServiceTypeService : IService<ServiceTypeResponse, CreateServiceTypeRequest, CreateServiceTypeResponse, UpdateServiceTypeRequest, ServiceTypeFilter, PagingModel>
     {
         Task<IEnumerable<ServiceTypeResponse>> GetByName(string name);
     }
