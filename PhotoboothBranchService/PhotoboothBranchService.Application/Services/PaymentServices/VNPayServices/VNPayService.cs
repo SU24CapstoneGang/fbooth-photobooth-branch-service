@@ -5,6 +5,7 @@ using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment;
+using PhotoboothBranchService.Application.Services.SessionOrderServices;
 using PhotoboothBranchService.Domain.IRepository;
 using System.Text;
 
@@ -20,7 +21,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
 
         private readonly IMapper _mapper;
         private readonly IPaymentRepository _paymentRepository;
-        public VNPayService(IPaymentRepository paymentRepository, IMapper mapper)
+        private readonly ISessionOrderRepository _sessionOrderRepository;
+        public VNPayService(IPaymentRepository paymentRepository, IMapper mapper, ISessionOrderRepository sessionOrderRepository)
         {
             vnp_Returnurl = JsonHelper.GetFromAppSettings("VNPay:vnp_Returnurl");//URL nhan ket qua tra ve 
             vnp_Url = JsonHelper.GetFromAppSettings("VNPay:vnp_Url"); //URL thanh toan cua VNPAY 
@@ -29,6 +31,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
             vnp_Api = JsonHelper.GetFromAppSettings("VNPay:vnp_Api");
             _paymentRepository = paymentRepository;
             _mapper = mapper;
+            _sessionOrderRepository = sessionOrderRepository;
         }
 
         public string Pay(VnpayRequest paymentRequest)
@@ -271,6 +274,15 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                     returnContent = "{\"RspCode\":\"97\",\"Message\":\"Invalid signature\"}";
                 }
                 await _paymentRepository.UpdateAsync(payment);
+                if (payment.PaymentStatus == Domain.Enum.PaymentStatus.Success)
+                {
+                    var sessionOrder = (await _sessionOrderRepository.GetAsync(i=> i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
+                    if (sessionOrder != null)
+                    {
+                        sessionOrder.Status = Domain.Enum.SessionOrderStatus.Paid;
+                        await _sessionOrderRepository.UpdateAsync(sessionOrder);
+                    }
+                }
             }
             else
             {

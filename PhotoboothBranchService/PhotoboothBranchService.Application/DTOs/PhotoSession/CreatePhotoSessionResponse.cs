@@ -1,4 +1,6 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.PhotoSession
+﻿using PhotoboothBranchService.Domain.Enum;
+
+namespace PhotoboothBranchService.Application.DTOs.PhotoSession
 {
     public class CreatePhotoSessionResponse
     {
@@ -9,5 +11,6 @@
         public DateTime? EndTime { get; set; }
         public Guid LayoutID { get; set; }
         public Guid SessionOrderID { get; set; }
+        public PhotoSessionStatus Status { get; set; }
     }
 }

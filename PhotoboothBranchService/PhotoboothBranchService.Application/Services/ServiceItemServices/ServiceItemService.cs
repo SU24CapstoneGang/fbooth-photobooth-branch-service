@@ -53,23 +53,20 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                 else if (sessionOrder.EndTime.HasValue && sessionOrder.EndTime.Value < DateTime.Now)
                 {
                     throw new Exception("Session has end. Please choose the hire booth service first to use the other service");
+                } else if (sessionOrder.Status == Domain.Enum.SessionOrderStatus.Paid)
+                {
+                    throw new Exception("This Session has been paid and ended, please create other Session Order to use our service");
                 }
                 if (serviceType.ServiceTypeName.Equals("Take photo")) //case add photosession and item service
                 {
-                    if (!createModel.LayoutID.HasValue)
-                    {
-                        throw new NotFoundException("No layout in input");
-                    }
-
-                    var layout = createModel.LayoutID != null ? (await _layoutRepository.GetAsync(i => i.LayoutID == createModel.LayoutID)).FirstOrDefault() : null;
-                    if (layout != null)
-                    {
-                        //validate time left
-                        if (sessionOrder.EndTime.HasValue && sessionOrder.EndTime.Value < DateTime.Now.AddMinutes(service.Measure))
+                    //validate time left
+                    if (sessionOrder.EndTime.HasValue && sessionOrder.EndTime.Value < DateTime.Now.AddMinutes(service.Measure))
                         {
                             throw new Exception("Your remaining time hire this booth can not enough for use this service ");
                         }
-                        var checkPhotoSession = await _photoSessionRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.EndTime < DateTime.Now) == null;
+                        var checkPhotoSession = (await _photoSessionRepository
+                                                    .GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.EndTime < DateTime.Now))
+                                                    .FirstOrDefault() == null;
                         if (!checkPhotoSession)
                         {
                             throw new BadRequestException("You are in a another Photosession, can not add more");
@@ -77,12 +74,12 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                         // Create photo session
                         var photoSession = new PhotoSession
                         {
-                            LayoutID = layout.LayoutID,
                             SessionOrderID = sessionOrder.SessionOrderID,
-                            SessionIndex = (await _serviceItemRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PhotoSessionID != null)).Count() + 1, //count from service item have photo session of this order
-                            TotalPhotoTaken = layout.PhotoSlot,
+                            SessionIndex = (await _photoSessionRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.Status == Domain.Enum.PhotoSessionStatus.Ended)).Count() + 1, //count from service item have photo session of this order
                             StartTime = DateTime.Now.AddMinutes(1), //+1 min in case service delay
                             EndTime = DateTime.Now.AddMinutes(service.Measure),
+                            Status = Domain.Enum.PhotoSessionStatus.Waiting,
+                            ValidateCode = new Random().Next(100000, 1000000),
                         };
                         await _photoSessionRepository.AddAsync(photoSession);
 
@@ -96,13 +93,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                             SessionOrderID = sessionOrder.SessionOrderID,
                             ServiceID = service.ServiceID
                         };
-
                         createServiceItemResponse = await _serviceItemRepository.AddAsync(serviceItem);
-                    }
-                    else
-                    {
-                        throw new NotFoundException("Layout not found");
-                    }
                 }
                 else if (serviceType.ServiceTypeName.Equals("Hire booth")) //case hire booth or extend time
                 {
@@ -136,17 +127,17 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                 }
                 else // for other type of service
                 {
-                    var serviceItem = (await _serviceItemRepository.GetAsync(s => s.ServiceID == createModel.ServiceID && s.SessionOrderID == sessionOrder.SessionOrderID)).FirstOrDefault();
                     if (createModel.Quantity.HasValue)
                     {
-                        if (serviceItem == null)
+                        var serviceItem = (await _serviceItemRepository.GetAsync(s => s.ServiceID == createModel.ServiceID && s.SessionOrderID == sessionOrder.SessionOrderID)).FirstOrDefault();
+                        if (serviceItem == null || serviceItem.PhotoSessionID != null) // create new item 
                         {
                             serviceItem = _mapper.Map<ServiceItem>(createModel);
                             serviceItem.UnitPrice = service.Price;
                             serviceItem.SubTotal = createModel.Quantity.Value * serviceItem.UnitPrice;
                             createServiceItemResponse = await _serviceItemRepository.AddAsync(serviceItem);
                         }
-                        else
+                        else //update existed item
                         {
                             serviceItem.Quantity += createModel.Quantity.Value;
                             serviceItem.SubTotal += createModel.Quantity.Value * serviceItem.UnitPrice;
@@ -158,7 +149,6 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                     {
                         throw new Exception("No quantity input");
                     }
-
                 }
             }
             else
@@ -177,6 +167,24 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
             }
             return _mapper.Map<CreateServiceItemResponse>(createServiceItemResponse);
         }
+
+        //for case need optimize code later
+        //private async Task<ServiceItem> AddServiceItem(decimal subTotal, decimal unitPrice, CreateServiceItemRequest request)
+        //{
+        //    var service = _mapper.Map<ServiceItem>(request);
+        //    if (request.Quantity.HasValue)
+        //    {
+        //        service.Quantity = request.Quantity.Value;
+        //    }
+        //    else
+        //    {
+        //        service.Quantity = 1;
+        //    }
+        //    service.SubTotal = subTotal;
+        //    service.UnitPrice = unitPrice;
+        //    await _serviceItemRepository.AddAsync(service);
+        //    return service;
+        //}
 
         // Delete
         public async Task DeleteAsync(Guid id)

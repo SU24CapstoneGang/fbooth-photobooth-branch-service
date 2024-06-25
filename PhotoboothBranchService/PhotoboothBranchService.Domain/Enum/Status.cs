@@ -39,3 +39,4 @@ public enum PhotoVersion
     Original = 0,
     Edited = 1,
 }
+

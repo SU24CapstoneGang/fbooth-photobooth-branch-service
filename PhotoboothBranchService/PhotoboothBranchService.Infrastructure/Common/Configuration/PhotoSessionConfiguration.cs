@@ -16,11 +16,11 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(u => u.SessionIndex).IsRequired();
             builder.Property(u => u.TotalPhotoTaken).IsRequired();
-
+            builder.Property(u => u.ValidateCode).IsRequired();
+            builder.Property(u => u.Status).IsRequired();
             builder.Property(a => a.StartTime)
               .ValueGeneratedOnAdd()
-              .HasDefaultValueSql("GETDATE()")
-              .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+              .HasDefaultValueSql("GETDATE()");
             builder.Property(u => u.EndTime).IsRequired(false);
 
             builder.HasMany(a => a.Photos)

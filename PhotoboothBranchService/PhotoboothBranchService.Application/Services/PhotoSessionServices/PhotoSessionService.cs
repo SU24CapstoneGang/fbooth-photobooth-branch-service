@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.PhotoSession;
 using PhotoboothBranchService.Domain.Common.Helper;
@@ -11,11 +12,12 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
     {
         private readonly IPhotoSessionRepository _photoSessionRepository;
         private readonly IMapper _mapper;
-
-        public PhotoSessionService(IPhotoSessionRepository photoSessionRepository, IMapper mapper)
+        private readonly ISessionOrderRepository _sessionOrderRepository;
+        public PhotoSessionService(IPhotoSessionRepository photoSessionRepository, IMapper mapper, ISessionOrderRepository sessionOrderRepository)
         {
             _photoSessionRepository = photoSessionRepository;
             _mapper = mapper;
+            _sessionOrderRepository = sessionOrderRepository;
         }
 
         // Create
@@ -78,7 +80,40 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
             }
 
             var updatedPhotoSession = _mapper.Map(updateModel, photoSession);
-            await _photoSessionRepository.UpdateAsync(updatedPhotoSession);
+            if (updatedPhotoSession.Status == Domain.Enum.PhotoSessionStatus.Canceled)
+            {
+                updatedPhotoSession.EndTime = DateTime.Now;
+                await _photoSessionRepository.UpdateAsync(updatedPhotoSession);
+                await _sessionOrderRepository.updateTotalPrice(updatedPhotoSession.SessionOrderID);
+            } else
+            {
+                await _photoSessionRepository.UpdateAsync(updatedPhotoSession);
+            }
+        }
+
+        public async Task<bool> ValidatePhotoSession(ValidateSessionPhotoRequest validateSessionPhotoRequest)
+        {
+            var photoSession = (await _photoSessionRepository
+                .GetAsync(i => i.PhotoSessionID == validateSessionPhotoRequest.PhotoSessionID))
+                .FirstOrDefault();
+            if (photoSession != null)
+            {
+                if (photoSession.ValidateCode == validateSessionPhotoRequest.ValidateCode)
+                {
+                    TimeSpan difference = DateTime.Now - photoSession.StartTime;
+                    photoSession.StartTime += difference;
+                    photoSession.EndTime += difference;
+                    photoSession.Status = Domain.Enum.PhotoSessionStatus.Ongoing;
+                    await _photoSessionRepository.UpdateAsync(photoSession);
+                    return true;
+                } else
+                {
+                    throw new Exception("Wrong validate code, please try again");
+                }
+            } else
+            {
+                throw new NotFoundException("No photo session found, please resigter session with our staff");
+            }
         }
     }
 }

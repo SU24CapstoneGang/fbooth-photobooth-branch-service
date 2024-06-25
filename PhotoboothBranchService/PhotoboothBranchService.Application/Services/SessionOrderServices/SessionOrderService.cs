@@ -52,23 +52,6 @@ public class SessionOrderService : ISessionOrderService
         return _mapper.Map<CreateSessionOrderResponse>(session);
     }
 
-    //checkout
-    public async void CheckOut(Guid SessionOrderID)
-    {
-        var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == SessionOrderID, i => i.ServiceItems)).FirstOrDefault();
-
-        //if (sessionOrder != null)
-        //{
-        //    CreatePaymentRequest createPaymentRequest = new CreatePaymentRequest {
-        //        PaymentMethodID = createPaymentRequest.PaymentMethodID,
-        //        Description = "Checkout for Session " + sessionOrder.SessionOrderID.ToString(),
-        //        SessionOrderID = sessionOrder.SessionOrderID,
-
-        //    };
-
-        //}
-    }
-
     // Delete a session by ID
     public async Task DeleteAsync(Guid id)
     {

@@ -29,6 +29,12 @@ namespace PhotoboothBranchService.Api.Controllers
             }
         }
 
+        //validate code
+        [HttpPost("validate")]
+        public async Task<bool> ValidateSession(ValidateSessionPhotoRequest validateSessionPhotoRequest)
+        {
+            return await _photoSessionService.ValidatePhotoSession(validateSessionPhotoRequest);
+        }
         // Read
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PhotoSessionResponse>>> GetAllPhotoSessions()
@@ -92,6 +98,7 @@ namespace PhotoboothBranchService.Api.Controllers
                 return StatusCode(500, $"An error occurred while updating the photo session: {ex.Message}");
             }
         }
+
 
         // Delete
         [HttpDelete("{id}")]

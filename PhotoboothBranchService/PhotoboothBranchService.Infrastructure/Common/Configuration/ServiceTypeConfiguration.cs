@@ -35,6 +35,11 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 {
                     ServiceTypeID = new Guid("96eae221-6528-4f26-a97b-3ad5e55256ee"),
                     ServiceTypeName = "Hire booth"
+                },
+                new ServiceType
+                {
+                    ServiceTypeID = new Guid("fc34dccb-10a0-4643-84bf-71ac85ca77bb"),
+                    ServiceTypeName = "Relate to \"Take Photo\""
                 }
             );
         }

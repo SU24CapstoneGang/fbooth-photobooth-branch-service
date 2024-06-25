@@ -44,8 +44,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasMany(t => t.PhotoSessions)
                 .WithOne(p => p.Layout)
                 .HasForeignKey(p => p.LayoutID)
-                //.OnDelete(DeleteBehavior.Restrict)
-                .IsRequired();
+                .IsRequired(false);
 
             builder.HasMany(t => t.PhotoBoxes)
                 .WithOne(p => p.Layout)
