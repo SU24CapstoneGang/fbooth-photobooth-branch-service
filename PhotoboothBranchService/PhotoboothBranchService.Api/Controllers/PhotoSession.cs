@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.PhotoSession;
+using PhotoboothBranchService.Application.DTOs.SessionOrder;
 using PhotoboothBranchService.Application.Services.PhotoSessionServices;
 
 namespace PhotoboothBranchService.Api.Controllers
@@ -29,12 +30,6 @@ namespace PhotoboothBranchService.Api.Controllers
             }
         }
 
-        //validate code
-        [HttpPost("validate")]
-        public async Task<bool> ValidateSession(ValidateSessionPhotoRequest validateSessionPhotoRequest)
-        {
-            return await _photoSessionService.ValidatePhotoSession(validateSessionPhotoRequest);
-        }
         // Read
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PhotoSessionResponse>>> GetAllPhotoSessions()

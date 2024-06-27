@@ -29,6 +29,13 @@ public class SessionOrderController : ControllerBaseApi
         }
     }
 
+    //validate code
+    [HttpPost("validate")]
+    public async Task<SessionOrderResponse> ValidateSessionOrder(ValidateSessionOrderRequest validateSessionPhotoRequest)
+    {
+        return await _sessionService.ValidateSessionOrder(validateSessionPhotoRequest);
+    }
+
     // Read
     [HttpGet]
     public async Task<ActionResult<IEnumerable<SessionOrderResponse>>> GetAllSessions()

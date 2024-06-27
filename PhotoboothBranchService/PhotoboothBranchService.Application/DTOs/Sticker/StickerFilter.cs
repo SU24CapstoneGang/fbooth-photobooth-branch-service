@@ -4,7 +4,7 @@ namespace PhotoboothBranchService.Application.DTOs.Sticker
 {
     public class StickerFilter
     {
-        public string? StickerName { get; set; }
-        public StatusUse Status { get; set; }
+        public string? StickerCode { get; set; } = default!;
+        public StatusUse? Status { get; set; }
     }
 }

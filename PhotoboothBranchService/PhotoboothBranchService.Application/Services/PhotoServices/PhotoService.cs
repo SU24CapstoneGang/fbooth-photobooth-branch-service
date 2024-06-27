@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Photo;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
@@ -15,16 +16,16 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
         private readonly IMapper _mapper;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IPhotoSessionRepository _photoSessionRepository;
-        private readonly IBackgroundRepository _frameRepository;
+        private readonly IBackgroundRepository _backgroundRepository;
         public PhotoService(IPhotoRepository photoRepository, IMapper mapper,
             ICloudinaryService cloudinaryService, IPhotoSessionRepository photoSessionRepository,
-            IBackgroundRepository frameRepository)
+            IBackgroundRepository backgroundRepository)
         {
             _photoRepository = photoRepository;
             _mapper = mapper;
             _cloudinaryService = cloudinaryService;
             _photoSessionRepository = photoSessionRepository;
-            _frameRepository = frameRepository;
+            _backgroundRepository = backgroundRepository;
         }
 
         public async Task<CreatePhotoResponse> CreateAsync(CreatePhotoRequest createModel)
@@ -38,36 +39,53 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
         {
 
             // validate
-            var frame = (await _frameRepository.GetAsync(f => f.BackgroundID.Equals(createPhotoRequest.FrameID))).FirstOrDefault();
-            if (frame == null)
-            {
-                throw new Exception("Frame not found.");
+            if (createPhotoRequest.BackgroundID.HasValue){
+                if (createPhotoRequest.Version == Domain.Enum.PhotoVersion.Original)
+                {
+                    throw new Exception("An original photo can not has Background");
+                }
+            var background = (await _backgroundRepository.GetAsync(f => f.BackgroundID.Equals(createPhotoRequest.BackgroundID))).FirstOrDefault();
+                if (background == null)
+                {
+                    throw new NotFoundException("Background not found.");
+                }
             }
             var photosession = (await _photoSessionRepository.GetAsync(f => f.PhotoSessionID.Equals(createPhotoRequest.PhotoSessionID))).FirstOrDefault();
-            if (frame == null)
+            if (photosession == null)
             {
-                throw new Exception("Photo Session not found.");
+                throw new NotFoundException("Photo Session not found.");
             }
 
             //upload to cloudinary
-            var uploadResult = await _cloudinaryService.AddPhotoAsync(file);
+            string folder;
+            if (createPhotoRequest.Version == Domain.Enum.PhotoVersion.Original)
+            {
+                folder = "FBooth-OriginalPhoto";
+            }
+            else
+            {
+                folder = "FBooth-FinnalPicture";
+            }
+            var uploadResult = await _cloudinaryService.AddPhotoAsync(file, folder);
             if (uploadResult.Error != null)
             {
                 throw new Exception(uploadResult.Error.Message);
             }
 
             //create object from cloudinary's return and CreatePhotoRequest
-            var photo = new Photo
+            Photo photo = new Photo
             {
                 PhotoURL = uploadResult.SecureUrl.AbsoluteUri,
                 CouldID = uploadResult.PublicId,
                 PhotoSessionID = createPhotoRequest.PhotoSessionID,
-                BackgroundID = createPhotoRequest.FrameID,
                 Version = createPhotoRequest.Version
             };
+            if (createPhotoRequest.BackgroundID.HasValue)
+            {
+                photo.BackgroundID = createPhotoRequest.BackgroundID.Value;
+            }
 
             await _photoRepository.AddAsync(photo);
-
             return _mapper.Map<PhotoResponse>(photo);
         }
 

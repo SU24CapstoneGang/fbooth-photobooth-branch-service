@@ -9,6 +9,7 @@ namespace PhotoboothBranchService.Domain.Entities
         public DateTime StartTime { get; set; } = default!;
         public DateTime? EndTime { get; set; } = default!;
         public SessionOrderStatus Status { get; set; }
+        public long ValidateCode { get; set; }
         public Guid BoothID { get; set; }
         public virtual Booth Booth { get; set; } = default!;
         public Guid? AccountID { get; set; }

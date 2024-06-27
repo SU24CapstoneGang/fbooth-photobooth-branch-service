@@ -32,7 +32,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasData(
                 new Service
                 {
-                    ServiceTypeID = new Guid("79497fe3-789f-4555-ac6b-977dfbf0f671"),
+                    ServiceTypeID = new Guid("96eae221-6528-4f26-a97b-3ad5e55256ee"),
                     ServiceDescription = "Take Photo in 30 minutes",
                     ServiceName = "Take Photo in 30 minutes",
                     Measure = 30,
@@ -43,7 +43,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 new Service
                 {
                     ServiceID = new Guid("30c2a7fb-9164-4164-9f1b-7c334744e559"),
-                    ServiceTypeID = new Guid("79497fe3-789f-4555-ac6b-977dfbf0f671"),
+                    ServiceTypeID = new Guid("96eae221-6528-4f26-a97b-3ad5e55256ee"),
                     ServiceDescription = "Take Photo in 15 minutes",
                     ServiceName = "Take Photo in 15 minutes",
                     Measure = 15,
@@ -53,7 +53,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 new Service
                 {
                     ServiceID = new Guid("9b0dc075-557c-4b29-b3ba-c8b5841c4c68"),
-                    ServiceTypeID = new Guid("79497fe3-789f-4555-ac6b-977dfbf0f671"),
+                    ServiceTypeID = new Guid("96eae221-6528-4f26-a97b-3ad5e55256ee"),
                     ServiceDescription = "Take Photo in 60 minutes",
                     ServiceName = "Take Photo in 60 minutes",
                     Measure = 60,

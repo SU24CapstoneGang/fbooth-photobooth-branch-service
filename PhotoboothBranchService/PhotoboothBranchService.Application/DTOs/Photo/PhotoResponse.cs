@@ -10,6 +10,6 @@ namespace PhotoboothBranchService.Application.DTOs.Photo
         public string CouldID { get; set; } = default!;
         public DateTime CreateDate { get; set; }
         public Guid PhotoSessionID { get; set; }
-        public Guid FrameID { get; set; }
+        public Guid BackgroundID { get; set; }
     }
 }

@@ -12,18 +12,29 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
     {
         private readonly IPhotoSessionRepository _photoSessionRepository;
         private readonly IMapper _mapper;
+        private readonly ILayoutRepository _layoutRepository;
         private readonly ISessionOrderRepository _sessionOrderRepository;
-        public PhotoSessionService(IPhotoSessionRepository photoSessionRepository, IMapper mapper, ISessionOrderRepository sessionOrderRepository)
+        public PhotoSessionService(IPhotoSessionRepository photoSessionRepository, IMapper mapper, ILayoutRepository layoutRepository, ISessionOrderRepository sessionOrderRepository)
         {
             _photoSessionRepository = photoSessionRepository;
             _mapper = mapper;
+            _layoutRepository = layoutRepository;
             _sessionOrderRepository = sessionOrderRepository;
         }
 
         // Create
         public async Task<CreatePhotoSessionResponse> CreateAsync(CreatePhotoSessionRequest createModel)
         {
+            var validateSessionOrder = (await _sessionOrderRepository
+                .GetAsync(i => i.SessionOrderID == createModel.SessionOrderID 
+                && (i.EndTime > DateTime.Now && i.StartTime < DateTime.Now) 
+                && i.Status == Domain.Enum.SessionOrderStatus.Processsing)) == null;
+            if (validateSessionOrder)
+            {
+                throw new Exception("Session Order are not going, it expired or not coming");
+            }
             var photoSession = _mapper.Map<PhotoSession>(createModel);
+            photoSession.SessionIndex = (await _photoSessionRepository.GetAsync(i => i.SessionOrderID == createModel.SessionOrderID)).Count() + 1;
             await _photoSessionRepository.AddAsync(photoSession);
             return _mapper.Map<CreatePhotoSessionResponse>(photoSession);
         }
@@ -79,41 +90,27 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
                 throw new KeyNotFoundException("Photo session not found.");
             }
 
+            //case update layout
             var updatedPhotoSession = _mapper.Map(updateModel, photoSession);
-            if (updatedPhotoSession.Status == Domain.Enum.PhotoSessionStatus.Canceled)
+            if (updateModel.LayoutID.HasValue)
+            {
+                var layout = (await _layoutRepository.GetAsync(i => i.LayoutID == updateModel.LayoutID)).FirstOrDefault();
+                if (layout != null)
+                {
+                    updatedPhotoSession.TotalPhotoTaken = layout.PhotoSlot;
+                }
+                else
+                {
+                    throw new NotFoundException("Not found Layout");
+                }
+            }
+            //case end session
+            if (updatedPhotoSession.Status == Domain.Enum.PhotoSessionStatus.Ended)
             {
                 updatedPhotoSession.EndTime = DateTime.Now;
-                await _photoSessionRepository.UpdateAsync(updatedPhotoSession);
-                await _sessionOrderRepository.updateTotalPrice(updatedPhotoSession.SessionOrderID);
-            } else
-            {
-                await _photoSessionRepository.UpdateAsync(updatedPhotoSession);
             }
-        }
 
-        public async Task<bool> ValidatePhotoSession(ValidateSessionPhotoRequest validateSessionPhotoRequest)
-        {
-            var photoSession = (await _photoSessionRepository
-                .GetAsync(i => i.PhotoSessionID == validateSessionPhotoRequest.PhotoSessionID))
-                .FirstOrDefault();
-            if (photoSession != null)
-            {
-                if (photoSession.ValidateCode == validateSessionPhotoRequest.ValidateCode)
-                {
-                    TimeSpan difference = DateTime.Now - photoSession.StartTime;
-                    photoSession.StartTime += difference;
-                    photoSession.EndTime += difference;
-                    photoSession.Status = Domain.Enum.PhotoSessionStatus.Ongoing;
-                    await _photoSessionRepository.UpdateAsync(photoSession);
-                    return true;
-                } else
-                {
-                    throw new Exception("Wrong validate code, please try again");
-                }
-            } else
-            {
-                throw new NotFoundException("No photo session found, please resigter session with our staff");
-            }
+            await _photoSessionRepository.UpdateAsync(updatedPhotoSession);
         }
     }
 }

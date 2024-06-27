@@ -6,6 +6,7 @@ namespace PhotoboothBranchService.Application.DTOs.SessionOrder
     {
         public Guid SessionOrderID { get; set; } = default!;
         public decimal TotalPrice { get; set; } = default!;
+        public long ValidateCode { get; set; }
         public DateTime StartTime { get; set; } = default!;
         public DateTime? EndTime { get; set; } = default!;
         public SessionOrderStatus Status { get; set; }

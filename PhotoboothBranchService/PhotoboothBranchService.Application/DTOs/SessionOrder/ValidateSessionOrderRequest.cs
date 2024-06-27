@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.DTOs.PhotoSession
+namespace PhotoboothBranchService.Application.DTOs.SessionOrder
 {
-    public class ValidateSessionPhotoRequest
+    public class ValidateSessionOrderRequest
     {
-        public Guid PhotoSessionID { get; set; }
+        public Guid BoothID { get; set; }
         public long ValidateCode { get; set; }
     }
 }

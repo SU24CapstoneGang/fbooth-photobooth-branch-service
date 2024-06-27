@@ -23,11 +23,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasData(
                 new ServiceType
                 {
-                    ServiceTypeName = "Take photo",
-                    ServiceTypeID = new Guid("79497fe3-789f-4555-ac6b-977dfbf0f671")
-                },
-                new ServiceType
-                {
                     ServiceTypeName = "Make up",
                     ServiceTypeID = new Guid("06167451-8b59-4dd2-bb9e-88df025eead6")
                 },
@@ -39,7 +34,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 new ServiceType
                 {
                     ServiceTypeID = new Guid("fc34dccb-10a0-4643-84bf-71ac85ca77bb"),
-                    ServiceTypeName = "Relate to \"Take Photo\""
+                    ServiceTypeName = "Relate to Take Photo"
                 }
             );
         }

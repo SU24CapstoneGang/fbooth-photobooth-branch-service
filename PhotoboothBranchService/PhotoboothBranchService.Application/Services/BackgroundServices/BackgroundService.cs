@@ -34,7 +34,7 @@ public class BackgroundService : IBackgroundService
     {
 
         //upload to cloudinary
-        var uploadResult = await _cloudinaryService.AddPhotoAsync(file);
+        var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-Background");
         if (uploadResult.Error != null)
         {
             throw new Exception(uploadResult.Error.Message);

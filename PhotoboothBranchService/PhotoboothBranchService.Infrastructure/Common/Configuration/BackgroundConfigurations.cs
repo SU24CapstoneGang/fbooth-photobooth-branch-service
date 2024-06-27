@@ -46,7 +46,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasMany(p => p.Photos)
                 .WithOne(f => f.Background)
                 .HasForeignKey(f => f.BackgroundID)
-                .IsRequired(); ;
+                .IsRequired(false);
         }
     }
 }

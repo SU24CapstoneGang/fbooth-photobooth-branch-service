@@ -19,7 +19,7 @@ namespace PhotoboothBranchService.Application.Services.CloudinaryServices
             _cloudinary = new Cloudinary(acc);
 
         }
-        public async Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
+        public async Task<ImageUploadResult> AddPhotoAsync(IFormFile file, string folder)
         {
             var uploadResult = new ImageUploadResult();
 
@@ -30,7 +30,8 @@ namespace PhotoboothBranchService.Application.Services.CloudinaryServices
                 {
                     File = new FileDescription(file.FileName, stream),
                     //Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face"),
-                    Folder = "FBooth-FinnalPicture"
+                   // Folder = "FBooth-FinnalPicture"
+                   Folder = folder
                 };
                 uploadResult = await _cloudinary.UploadAsync(uploadParams);
             }

@@ -83,27 +83,10 @@ public class SessionOrderRepository : ISessionOrderRepository
         if (order != null)
         {
             decimal totalPrice = 0;
-            List<Guid> uncount = new List<Guid>();
             foreach (var item in order.ServiceItems)
             {
-                if (item.PhotoSessionID != null)
-                {
-                    if (!uncount.Contains(item.PhotoSessionID.Value))
-                    {
-                        var photoSession = _dbContext.PhotoSessions.Where(i => i.PhotoSessionID == item.PhotoSessionID).FirstOrDefault();
-                        if (photoSession != null && photoSession.Status != Domain.Enum.PhotoSessionStatus.Canceled)
-                        {
-                            totalPrice += item.UnitPrice * item.Quantity;
-                        }
-                        else
-                        {
-                            uncount.Add(item.PhotoSessionID.Value);
-                        }
-                    }
-                } else
-                {
-                    totalPrice += item.UnitPrice * item.Quantity;
-                }
+                totalPrice += item.UnitPrice * item.Quantity;
+
             }
             order.TotalPrice = totalPrice;
             await UpdateAsync(order);

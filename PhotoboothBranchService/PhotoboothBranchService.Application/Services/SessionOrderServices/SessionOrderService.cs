@@ -2,6 +2,7 @@
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.SessionOrder;
+using PhotoboothBranchService.Application.Services.ServiceItemServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -15,12 +16,14 @@ public class SessionOrderService : ISessionOrderService
     private readonly IMapper _mapper;
     private readonly IBoothRepository _boothRepository;
     private readonly IPaymentRepository _paymentRepository;
-    public SessionOrderService(ISessionOrderRepository sessionOrderRepository, IMapper mapper, IBoothRepository boothRepository, IPaymentRepository paymentRepository)
+    private readonly IServiceItemService _serviceItemService;
+    public SessionOrderService(ISessionOrderRepository sessionOrderRepository, IMapper mapper, IBoothRepository boothRepository, IPaymentRepository paymentRepository, IServiceItemService serviceItemService)
     {
         _sessionOrderRepository = sessionOrderRepository;
         _mapper = mapper;
         _boothRepository = boothRepository;
         _paymentRepository = paymentRepository;
+        _serviceItemService = serviceItemService;
     }
 
     // Create a new session
@@ -29,6 +32,7 @@ public class SessionOrderService : ISessionOrderService
         var boothTask = _boothRepository.GetAsync(i => i.BoothID == createModel.BoothID);
         var sessionOrderCheckTask = _sessionOrderRepository.GetAsync(i => i.AccountID == createModel.AccountID && (i.EndTime > DateTime.Now || !i.EndTime.HasValue));
         await Task.WhenAll(sessionOrderCheckTask, boothTask);
+
         //booth validate
         var booth = boothTask.Result.FirstOrDefault();
         if (booth == null)
@@ -39,19 +43,67 @@ public class SessionOrderService : ISessionOrderService
         {
             throw new Exception("Booth is used by another or is inactive, in maintenance");
         }
+
         //validate account's sesion order
         var sessionOrderCheck = sessionOrderCheckTask.Result.FirstOrDefault();
         if (sessionOrderCheck != null)
         {
             throw new Exception("This Account is using another booth");
         }
+
+
+        //add session
         var session = _mapper.Map<SessionOrder>(createModel);
+        session.ValidateCode = new Random().Next(100000, 1000000);
         await _sessionOrderRepository.AddAsync(session);
+        try
+        {
+            await _serviceItemService.AddTheFirstServiceItem(session.SessionOrderID, createModel.ServiceID);
+        } catch (Exception ex)
+        {
+            await _sessionOrderRepository.RemoveAsync(session);
+            throw new Exception(ex.Message);
+        }
+        //update booth
         booth.Status = ManufactureStatus.InUse;
         await _boothRepository.UpdateAsync(booth);
         return _mapper.Map<CreateSessionOrderResponse>(session);
     }
 
+    public async Task<SessionOrderResponse> ValidateSessionOrder(ValidateSessionOrderRequest validateSessionPhotoRequest)
+    {
+        var sessionOrder = (await _sessionOrderRepository
+            .GetAsync(i => i.BoothID == validateSessionPhotoRequest.BoothID && i.StartTime < DateTime.Now && i.EndTime > DateTime.Now))
+            .FirstOrDefault();
+        if (sessionOrder != null)
+        {
+            if (sessionOrder.ValidateCode == validateSessionPhotoRequest.ValidateCode)
+            {
+
+                if (sessionOrder.Status == SessionOrderStatus.Waiting)
+                {
+                    TimeSpan difference = DateTime.Now - sessionOrder.StartTime;
+                    sessionOrder.StartTime += difference;
+                    sessionOrder.EndTime += difference;
+                    sessionOrder.Status = SessionOrderStatus.Processsing;
+                    await _sessionOrderRepository.UpdateAsync(sessionOrder);
+                    return _mapper.Map<SessionOrderResponse>(sessionOrder);
+                }
+                else
+                {
+                    throw new Exception("Session has been cancelled");
+                }
+            }
+            else
+            {
+                throw new Exception("Wrong validate code, please try again");
+            }
+        }
+        else
+        {
+            throw new NotFoundException("No photo session found, please resigter session with our staff");
+        }
+    }
     // Delete a session by ID
     public async Task DeleteAsync(Guid id)
     {

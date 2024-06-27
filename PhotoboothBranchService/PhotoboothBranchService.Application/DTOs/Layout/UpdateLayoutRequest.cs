@@ -6,6 +6,7 @@ namespace PhotoboothBranchService.Application.DTOs.Layout
     {
         public string LayoutURL { get; set; } = default!;
         public string CouldID { get; set; } = default!;
+        public string LayoutCode { get; set; }
         public StatusUse Status { get; set; }
         public int Lenght { get; set; }
         public int Width { get; set; }

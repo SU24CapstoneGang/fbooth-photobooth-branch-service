@@ -30,7 +30,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
 
         private readonly IPaymentRepository _paymentRepository;
         private readonly ISessionOrderRepository _sessionOrderRepository;
-        public MoMoService(IPaymentRepository paymentRepository, ISessionOrderRepository sessionOrderRepository)
+        private readonly IBoothRepository _boothRepository;
+        public MoMoService(IPaymentRepository paymentRepository, ISessionOrderRepository sessionOrderRepository, IBoothRepository boothRepository)
         {
             momo_Api = JsonHelper.GetFromAppSettings("MoMo:momo_Api");
             accessKey = JsonHelper.GetFromAppSettings("MoMo:accessKey");
@@ -41,6 +42,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
 
             _paymentRepository = paymentRepository;
             _sessionOrderRepository = sessionOrderRepository;
+            _boothRepository = boothRepository;
         }
 
         public string CreatePayment(MoMoRequest request)
@@ -135,7 +137,17 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
                 if (sessionOrder != null)
                 {
                     sessionOrder.Status = Domain.Enum.SessionOrderStatus.Paid;
+                    if (sessionOrder.EndTime > DateTime.Now) 
+                    { 
+                        sessionOrder.EndTime = DateTime.Now; 
+                    }
                     await _sessionOrderRepository.UpdateAsync(sessionOrder);
+                    var booth = (await _boothRepository.GetAsync(i => i.BoothID == sessionOrder.BoothID)).FirstOrDefault();
+                    if (booth != null)
+                    {
+                        booth.Status = Domain.Enum.ManufactureStatus.Active;
+                        await _boothRepository.UpdateAsync(booth);
+                    }
                 }
             }
         }

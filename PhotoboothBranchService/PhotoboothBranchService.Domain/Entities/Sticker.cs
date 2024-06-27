@@ -8,6 +8,8 @@ namespace PhotoboothBranchService.Domain.Entities
         public string StickerCode { get; set; } = default!;
         public string StrickerURL { get; set; } = default!;
         public string CouldID { get; set; } = default!;
+        public int stickerLength { get; set; }
+        public int stickerWidth { get; set; }
         public StatusUse Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? LastModified { get; set; }

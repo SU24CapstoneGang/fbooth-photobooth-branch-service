@@ -5,7 +5,7 @@ namespace PhotoboothBranchService.Application.Services.CloudinaryServices
 {
     public interface ICloudinaryService
     {
-        Task<ImageUploadResult> AddPhotoAsync(IFormFile file);
+        Task<ImageUploadResult> AddPhotoAsync(IFormFile file, string folder);
         Task<DeletionResult> DeletePhotoAsync(string publicId);
     }
 }

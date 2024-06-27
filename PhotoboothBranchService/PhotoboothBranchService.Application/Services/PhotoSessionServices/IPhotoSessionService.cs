@@ -6,6 +6,5 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
 {
     public interface IPhotoSessionService : IService<PhotoSessionResponse, CreatePhotoSessionRequest, CreatePhotoSessionResponse, UpdatePhotoSessionRequest, PhotoSessionFilter, PagingModel>
     {
-        public Task<bool> ValidatePhotoSession(ValidateSessionPhotoRequest validateSessionPhotoRequest);
     }
 }

@@ -9,7 +9,7 @@ namespace PhotoboothBranchService.Application.DTOs.PhotoSession
         public int TotalPhotoTaken { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
-        public Guid LayoutID { get; set; }
+        public Guid? LayoutID { get; set; }
         public Guid SessionOrderID { get; set; }
         public PhotoSessionStatus Status { get; set; }
     }

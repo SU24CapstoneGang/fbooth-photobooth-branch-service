@@ -22,7 +22,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
         private readonly IMapper _mapper;
         private readonly IPaymentRepository _paymentRepository;
         private readonly ISessionOrderRepository _sessionOrderRepository;
-        public VNPayService(IPaymentRepository paymentRepository, IMapper mapper, ISessionOrderRepository sessionOrderRepository)
+        private readonly IBoothRepository _boothRepository;
+        public VNPayService(IPaymentRepository paymentRepository, IMapper mapper, ISessionOrderRepository sessionOrderRepository, IBoothRepository boothRepository)
         {
             vnp_Returnurl = JsonHelper.GetFromAppSettings("VNPay:vnp_Returnurl");//URL nhan ket qua tra ve 
             vnp_Url = JsonHelper.GetFromAppSettings("VNPay:vnp_Url"); //URL thanh toan cua VNPAY 
@@ -32,6 +33,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
             _paymentRepository = paymentRepository;
             _mapper = mapper;
             _sessionOrderRepository = sessionOrderRepository;
+            _boothRepository = boothRepository;
         }
 
         public string Pay(VnpayRequest paymentRequest)
@@ -281,6 +283,12 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                     {
                         sessionOrder.Status = Domain.Enum.SessionOrderStatus.Paid;
                         await _sessionOrderRepository.UpdateAsync(sessionOrder);
+                    }
+                    var booth = (await _boothRepository.GetAsync(i => i.BoothID == sessionOrder.BoothID)).FirstOrDefault();
+                    if (booth != null)
+                    {
+                        booth.Status = Domain.Enum.ManufactureStatus.Active;
+                        await _boothRepository.UpdateAsync(booth);
                     }
                 }
             }

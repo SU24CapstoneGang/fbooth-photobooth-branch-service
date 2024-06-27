@@ -35,7 +35,7 @@ public class LayoutService : ILayoutService
     {
 
         //upload to cloudinary
-        var uploadResult = await _cloudinaryService.AddPhotoAsync(file);
+        var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-Layout");
         if (uploadResult.Error != null)
         {
             throw new Exception(uploadResult.Error.Message);
