@@ -22,7 +22,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(l => l.LayoutCode).IsRequired();
             builder.Property(l => l.LayoutURL).IsRequired();
             builder.Property(l => l.CouldID).IsRequired();
-            builder.Property(l => l.Lenght).IsRequired();
+            builder.Property(l => l.Height).IsRequired();
             builder.Property(l => l.Width).IsRequired();
             builder.Property(l => l.PhotoSlot).IsRequired();
 

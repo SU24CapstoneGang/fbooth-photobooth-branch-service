@@ -31,7 +31,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired();
             builder.Property(s => s.stickerWidth)
                .IsRequired(); 
-            builder.Property(s => s.stickerLength)
+            builder.Property(s => s.stickerHeight)
                 .IsRequired();
             builder.Property(s => s.CreatedDate)
                 .IsRequired();

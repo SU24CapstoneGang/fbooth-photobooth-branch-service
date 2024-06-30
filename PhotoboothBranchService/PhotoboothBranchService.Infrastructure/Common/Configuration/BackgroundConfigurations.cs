@@ -26,7 +26,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(f => f.BackgroundURL).IsRequired();
             builder.Property(f => f.CouldID).IsRequired();
             builder.Property(f => f.CreatedDate).IsRequired();
-            builder.Property(f => f.Lenght).IsRequired();
+            builder.Property(f => f.Height).IsRequired();
             builder.Property(f => f.Width).IsRequired();
             builder.Property(f => f.LastModified).IsRequired(false);
 

@@ -14,7 +14,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasColumnName("PhotoBoxID")
                 .ValueGeneratedOnAdd();
             builder.Property(u => u.boxWidth).IsRequired();
-            builder.Property(u => u.boxLength).IsRequired();
+            builder.Property(u => u.boxHeight).IsRequired();
             builder.Property(u => u.CoordinatesX).IsRequired();
             builder.Property(u => u.CoordinatesY).IsRequired();
         }
