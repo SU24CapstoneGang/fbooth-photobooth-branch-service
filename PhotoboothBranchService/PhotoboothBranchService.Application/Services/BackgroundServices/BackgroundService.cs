@@ -79,8 +79,7 @@ public class BackgroundService : IBackgroundService
     {
         var frames = (await _frameRepository.GetAllAsync()).ToList().AutoFilter(filter);
         var listFrameresponse = _mapper.Map<IEnumerable<BackgroundResponse>>(frames);
-        listFrameresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-        return listFrameresponse;
+        return listFrameresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
     }
 
     public async Task<BackgroundResponse> GetByIdAsync(Guid id)

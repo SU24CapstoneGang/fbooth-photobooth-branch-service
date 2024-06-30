@@ -152,8 +152,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         {
             var payments = (await _paymentRepository.GetAllAsync()).ToList().AutoFilter(filter);
             var listPaymentResponse = _mapper.Map<IEnumerable<PaymentResponse>>(payments);
-            listPaymentResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-            return listPaymentResponse;
+            return listPaymentResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         }
 
         // Read by ID

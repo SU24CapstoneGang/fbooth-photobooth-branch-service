@@ -73,8 +73,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
             {
                 var paymentMethods = (await _paymentMethodRepository.GetAllAsync()).ToList().AutoFilter(filter);
                 var paymentMethodsResponse = _mapper.Map<IEnumerable<PaymentMethodResponse>>(paymentMethods);
-                paymentMethodsResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-                return paymentMethodsResponse;
+                return paymentMethodsResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
             }
             catch (Exception ex)
             {

@@ -56,8 +56,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
         {
             var services = (await _serviceRepository.GetAllAsync()).ToList().AutoFilter(filter);
             var listServiceResponse = _mapper.Map<IEnumerable<ServiceResponse>>(services);
-            listServiceResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-            return listServiceResponse;
+            return listServiceResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         }
 
         // Read by ID

@@ -56,8 +56,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoBoxServices
         {
             var photoBoxes = (await _photoBoxRepository.GetAllAsync()).ToList().AutoFilter(filter);
             var photoBoxesResponse = _mapper.Map<IEnumerable<PhotoBoxResponse>>(photoBoxes);
-            photoBoxesResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-            return photoBoxesResponse;
+            return photoBoxesResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         }
 
         public async Task<PhotoBoxResponse> GetByIdAsync(Guid id)

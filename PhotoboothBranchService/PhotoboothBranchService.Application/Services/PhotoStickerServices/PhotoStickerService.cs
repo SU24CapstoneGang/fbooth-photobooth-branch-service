@@ -56,8 +56,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoStickerServices
         {
             var mapStickers = (await _mapStickerRepository.GetAllAsync()).ToList().AutoFilter(filter);
             var listMapStickerResponse = _mapper.Map<IEnumerable<PhotoStickerResponse>>(mapStickers);
-            listMapStickerResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-            return listMapStickerResponse;
+            return listMapStickerResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         }
 
         // Read by ID

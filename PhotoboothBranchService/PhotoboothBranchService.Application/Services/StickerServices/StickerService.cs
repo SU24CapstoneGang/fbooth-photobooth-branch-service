@@ -1,6 +1,10 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet;
+using Microsoft.AspNetCore.Http;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Layout;
 using PhotoboothBranchService.Application.DTOs.Sticker;
+using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -12,11 +16,13 @@ public class StickerService : IStickerService
 {
     private readonly IStickerRepository _stickerRepository;
     private readonly IMapper _mapper;
+    private readonly ICloudinaryService _cloudinaryService;
 
-    public StickerService(IStickerRepository stickerRepository, IMapper mapper)
+    public StickerService(IStickerRepository stickerRepository, IMapper mapper, ICloudinaryService cloudinaryService)
     {
         _stickerRepository = stickerRepository;
         _mapper = mapper;
+        _cloudinaryService = cloudinaryService;
     }
 
     // Create
@@ -28,6 +34,27 @@ public class StickerService : IStickerService
         return _mapper.Map<CreateStickerResponse>(createModel);
     }
 
+    public async Task<StickerResponse> CreateStickerAsync(IFormFile file, CreateStickerRequest createModel)
+    {
+
+        //upload to cloudinary
+        var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-Sticker");
+        if (uploadResult.Error != null)
+        {
+            throw new Exception(uploadResult.Error.Message);
+        }
+
+        //create object from cloudinary's return 
+        var sticker = _mapper.Map<Sticker>(createModel);
+
+        sticker.StrickerURL = uploadResult.SecureUrl.AbsoluteUri;
+        sticker.CouldID = uploadResult.PublicId;
+        sticker.Status = StatusUse.Available;
+
+        await _stickerRepository.AddAsync(sticker);
+
+        return _mapper.Map<StickerResponse>(sticker);
+    }
     // Delete
     public async Task DeleteAsync(Guid id)
     {
@@ -56,8 +83,7 @@ public class StickerService : IStickerService
     {
         var stickers = (await _stickerRepository.GetAllAsync()).ToList().AutoFilter(filter);
         var listStickerresponse = _mapper.Map<IEnumerable<StickerResponse>>(stickers);
-        listStickerresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-        return listStickerresponse;
+        return listStickerresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
     }
 
     public async Task<StickerResponse> GetByIdAsync(Guid id)
