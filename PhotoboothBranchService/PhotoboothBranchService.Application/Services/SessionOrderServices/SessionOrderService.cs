@@ -101,7 +101,7 @@ public class SessionOrderService : ISessionOrderService
         }
         else
         {
-            throw new NotFoundException("No photo session found, please resigter session with our staff");
+            throw new NotFoundException("No session order found, please resigter session with our staff");
         }
     }
     // Delete a session by ID

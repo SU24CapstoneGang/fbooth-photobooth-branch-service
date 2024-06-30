@@ -13,6 +13,6 @@ namespace PhotoboothBranchService.Application.DTOs.Layout
         public int Width { get; set; }
         public short PhotoSlot { get; set; }
         public DateTime CreatedDate { get; set; }
-        public DateTime LastModified { get; set; }
+        public DateTime? LastModified { get; set; }
     }
 }

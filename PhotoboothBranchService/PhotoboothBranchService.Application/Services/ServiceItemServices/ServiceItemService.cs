@@ -56,20 +56,10 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
 
                 if (createModel.Quantity.HasValue)
                 {
-                    ServiceItem? serviceItem;
-                    if (createModel.PhotoSessionID.HasValue)
-                    {
-                        serviceItem = (await _serviceItemRepository.GetAsync(s => s.ServiceID == createModel.ServiceID
-                                                && s.SessionOrderID == sessionOrder.SessionOrderID
-                                                && s.PhotoSessionID == createModel.PhotoSessionID))
-                                                .FirstOrDefault();
-                    }
-                    else
-                    {
-                        serviceItem = (await _serviceItemRepository.GetAsync(s => s.ServiceID == createModel.ServiceID
+                    ServiceItem? serviceItem = (await _serviceItemRepository.GetAsync(s => s.ServiceID == createModel.ServiceID
                                                 && s.SessionOrderID == sessionOrder.SessionOrderID))
                                                 .FirstOrDefault();
-                    }
+                    
                     if (serviceItem == null) // create new item 
                     {
                         serviceItem = _mapper.Map<ServiceItem>(createModel);

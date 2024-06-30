@@ -6,8 +6,6 @@
         public short Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal SubTotal { get; set; }
-        public Guid? PhotoSessionID { get; set; }
-        public virtual PhotoSession PhotoSession { get; set; } = default!;
         public Guid ServiceID { get; set; }
         public virtual Service Service { get; set; } = default!;
         public Guid SessionOrderID { get; set; }

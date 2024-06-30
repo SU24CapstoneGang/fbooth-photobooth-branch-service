@@ -15,6 +15,5 @@ namespace PhotoboothBranchService.Domain.Entities
         public Guid SessionOrderID { get; set; }
         public virtual SessionOrder SessionOrder { get; set; } = default!;
         public virtual ICollection<Photo> Photos { get; set; } = default!;
-        public virtual ICollection<ServiceItem> ServiceItems { get; set; } = default!;
     }
 }
