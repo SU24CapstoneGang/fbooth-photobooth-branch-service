@@ -85,8 +85,7 @@ public class LayoutService : ILayoutService
     {
         var layouts = (await _layoutRepository.GetAllAsync()).ToList().AutoFilter(filter);
         var listLayoutresponse = _mapper.Map<IEnumerable<LayoutResponse>>(layouts);
-        listLayoutresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-        return listLayoutresponse;
+        return listLayoutresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
     }
 
     public async Task<LayoutResponse> GetByIdAsync(Guid id)

@@ -56,8 +56,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceTypeServices
         {
             var serviceTypes = (await _serviceTypeRepository.GetAllAsync()).ToList().AutoFilter(filter);
             var listServiceTypeResponse = _mapper.Map<IEnumerable<ServiceTypeResponse>>(serviceTypes);
-            listServiceTypeResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-            return listServiceTypeResponse;
+            return listServiceTypeResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         }
 
         // Read by ID

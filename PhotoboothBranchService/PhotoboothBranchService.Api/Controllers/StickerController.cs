@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Layout;
 using PhotoboothBranchService.Application.DTOs.Sticker;
 using PhotoboothBranchService.Application.Services.StickerServices;
 
@@ -46,7 +47,7 @@ public class StickerController : ControllerBaseApi
     //get all with filter and paging
     [HttpGet("paging")]
     public async Task<ActionResult<IEnumerable<StickerResponse>>> GetAllStickers(
-        [FromQuery] StickerFilter stickerFilter, PagingModel pagingModel)
+        [FromQuery] StickerFilter stickerFilter, [FromQuery] PagingModel pagingModel)
     {
         try
         {
@@ -117,6 +118,22 @@ public class StickerController : ControllerBaseApi
         catch (Exception ex)
         {
             return StatusCode(500, $"An error occurred while deleting the sticker: {ex.Message}");
+        }
+    }
+
+    [HttpPost("add-sticker-cloud")]
+    public async Task<ActionResult<StickerResponse>> AddPhoto(IFormFile file, [FromQuery] CreateStickerRequest createLayoutRequest)
+    {
+        try
+        {
+
+            var result = await _stickerService.CreateStickerAsync(file, createLayoutRequest);
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while adding the photo: {ex.Message}");
         }
     }
 }

@@ -129,8 +129,7 @@ public class SessionOrderService : ISessionOrderService
     {
         var sessions = (await _sessionOrderRepository.GetAllAsync()).ToList().AutoFilter(filter);
         var listSessionresponse = _mapper.Map<IEnumerable<SessionOrderResponse>>(sessions);
-        listSessionresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-        return listSessionresponse;
+        return listSessionresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
     }
 
     // Get a session by ID

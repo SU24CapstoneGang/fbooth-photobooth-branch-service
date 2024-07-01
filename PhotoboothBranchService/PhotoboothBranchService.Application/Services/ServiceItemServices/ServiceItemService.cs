@@ -190,8 +190,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
         {
             var serviceItems = (await _serviceItemRepository.GetAllAsync()).ToList().AutoFilter(filter);
             var listServiceItemResponse = _mapper.Map<IEnumerable<ServiceItemResponse>>(serviceItems);
-            listServiceItemResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-            return listServiceItemResponse;
+            return listServiceItemResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         }
 
         // Read by ID

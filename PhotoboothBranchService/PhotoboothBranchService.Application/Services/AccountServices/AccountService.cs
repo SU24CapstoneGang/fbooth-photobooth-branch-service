@@ -126,8 +126,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             {
                 var account = (await _accountRepository.GetAllAsync()).ToList().AutoFilter(filter);
                 var listAccountresponse = _mapper.Map<IEnumerable<AccountResponse>>(account);
-                listAccountresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-                return listAccountresponse;
+                return listAccountresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
             }
             catch (Exception ex)
             {

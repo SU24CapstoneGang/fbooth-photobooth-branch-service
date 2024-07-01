@@ -59,8 +59,7 @@ public class BoothBranchService : IBoothBranchService
     {
         var photoBoothBranches = (await _photoBoothBranchRepository.GetAllAsync()).ToList().AutoFilter(filter);
         var listPhotoBoothBranchresponse = _mapper.Map<IEnumerable<BoothBranchResponse>>(photoBoothBranches);
-        listPhotoBoothBranchresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-        return listPhotoBoothBranchresponse;
+        return listPhotoBoothBranchresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
     }
 
     public async Task<BoothBranchResponse> GetByIdAsync(Guid id)

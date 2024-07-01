@@ -69,8 +69,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         {
             var photoSessions = (await _photoSessionRepository.GetAllAsync()).ToList().AutoFilter(filter);
             var listPhotoSessionResponse = _mapper.Map<IEnumerable<PhotoSessionResponse>>(photoSessions);
-            listPhotoSessionResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-            return listPhotoSessionResponse;
+            return listPhotoSessionResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         }
 
         // Read by ID
