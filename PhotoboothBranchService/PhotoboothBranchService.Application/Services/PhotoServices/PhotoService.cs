@@ -39,12 +39,13 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
         {
 
             // validate
-            if (createPhotoRequest.BackgroundID.HasValue){
+            if (createPhotoRequest.BackgroundID.HasValue)
+            {
                 if (createPhotoRequest.Version == Domain.Enum.PhotoVersion.Original)
                 {
                     throw new Exception("An original photo can not has Background");
                 }
-            var background = (await _backgroundRepository.GetAsync(f => f.BackgroundID.Equals(createPhotoRequest.BackgroundID))).FirstOrDefault();
+                var background = (await _backgroundRepository.GetAsync(f => f.BackgroundID.Equals(createPhotoRequest.BackgroundID))).FirstOrDefault();
                 if (background == null)
                 {
                     throw new NotFoundException("Background not found.");

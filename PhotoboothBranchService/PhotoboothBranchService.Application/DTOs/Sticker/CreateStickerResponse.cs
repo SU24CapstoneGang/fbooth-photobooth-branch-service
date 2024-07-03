@@ -6,7 +6,7 @@ namespace PhotoboothBranchService.Application.DTOs.Sticker
     {
         public Guid StickerID { get; set; } = default!;
         public string StickerCode { get; set; } = default!;
-        public string StrickerURL { get; set; } = default!;
+        public string StickerURL { get; set; } = default!;
         public string CouldID { get; set; } = default!;
         public StatusUse Status { get; set; }
         public DateTime CreatedDate { get; set; }

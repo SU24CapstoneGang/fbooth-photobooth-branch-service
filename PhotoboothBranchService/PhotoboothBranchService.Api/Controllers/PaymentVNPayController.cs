@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
+using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Api.Common.Helper;
-using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment;
 using PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices;
-using System.Net;
-using static Google.Apis.Requests.BatchRequest;
 
 namespace PhotoboothBranchService.Api.Controllers
 {

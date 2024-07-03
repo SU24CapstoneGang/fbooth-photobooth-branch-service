@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs.Payment.MoMoPayment;
 using PhotoboothBranchService.Application.Services.PaymentServices.MoMoServices;
 
@@ -45,7 +46,8 @@ namespace PhotoboothBranchService.Api.Controllers
                     </html>";
 
                 return Content(returnContent, "text/html");
-            } else
+            }
+            else
             {
                 return BadRequest(new { Message = "No query string found" });
             }

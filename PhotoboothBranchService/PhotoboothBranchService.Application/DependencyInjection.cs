@@ -10,6 +10,7 @@ using PhotoboothBranchService.Application.Services.BackgroundServices;
 using PhotoboothBranchService.Application.Services.BoothBranchServices;
 using PhotoboothBranchService.Application.Services.BoothServices;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
+using PhotoboothBranchService.Application.Services.DeviceServices;
 using PhotoboothBranchService.Application.Services.FirebaseServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Application.Services.LayoutServices;
@@ -25,6 +26,7 @@ using PhotoboothBranchService.Application.Services.ServiceItemServices;
 using PhotoboothBranchService.Application.Services.ServiceServices;
 using PhotoboothBranchService.Application.Services.ServiceTypeServices;
 using PhotoboothBranchService.Application.Services.SessionOrderServices;
+using PhotoboothBranchService.Application.Services.SessionPackageServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using System.Reflection;
@@ -40,6 +42,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IBoothService, BoothService>();
             services.AddScoped<IBoothBranchService, BoothBranchService>();
             services.AddScoped<IBackgroundService, BackgroundService>();
+            services.AddScoped<IDeviceService, DeviceService>();
             services.AddScoped<ILayoutService, LayoutService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IPaymentMethodService, PaymentMethodService>();
@@ -50,6 +53,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<IServiceTypeService, ServiceTypeService>();
             services.AddScoped<ISessionOrderService, SessionOrderService>();
+            services.AddScoped<ISessionPackageService, SessionPackageService>();
             services.AddScoped<IStickerService, StickerService>();
 
             // cloudinary

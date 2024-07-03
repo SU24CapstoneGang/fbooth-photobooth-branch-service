@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace PhotoboothBranchService.Api.Controllers
+namespace PhotoboothBranchService.Api.Common
 {
     [ApiController]
     [Route("api/[controller]")]

@@ -1,21 +1,12 @@
-﻿using FirebaseAdmin.Messaging;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
-using PhotoboothBranchService.Application.DTOs.Payment;
 using PhotoboothBranchService.Application.DTOs.Payment.MoMoPayment;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using static Google.Apis.Requests.BatchRequest;
 
 namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServices
 {
@@ -89,7 +80,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
             if (jmessage.GetValue("payUrl").IsNullOrEmpty())
             {
                 return jmessage.GetValue("payUrl").ToString();
-            } else
+            }
+            else
             {
                 return jmessage.GetValue("message").ToString();
             }
@@ -112,10 +104,11 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
                    "&transId=" + momoResponse.transId;
 
             var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == momoResponse.orderId)).FirstOrDefault();
-            if ( payment == null )
+            if (payment == null)
             {
                 throw new NotFoundException("No payment found");
-            } else
+            }
+            else
             {
                 MoMoLibrary moMoLibrary = new MoMoLibrary();
                 bool checkSignature = moMoLibrary.ValidateSignature(rawHash, secretKey, momoResponse.signature);
@@ -124,7 +117,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
                     payment.PaymentStatus = Domain.Enum.PaymentStatus.Success;
                     payment.Signature = momoResponse.signature;
                     payment.TransactionID = momoResponse.transId.ToString();
-                } else
+                }
+                else
                 {
                     payment.TransactionID = momoResponse.transId.ToString();
                     payment.PaymentStatus = Domain.Enum.PaymentStatus.Fail;
@@ -137,9 +131,9 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
                 if (sessionOrder != null)
                 {
                     sessionOrder.Status = Domain.Enum.SessionOrderStatus.Paid;
-                    if (sessionOrder.EndTime > DateTime.Now) 
-                    { 
-                        sessionOrder.EndTime = DateTime.Now; 
+                    if (sessionOrder.EndTime > DateTime.Now)
+                    {
+                        sessionOrder.EndTime = DateTime.Now;
                     }
                     await _sessionOrderRepository.UpdateAsync(sessionOrder);
                     var booth = (await _boothRepository.GetAsync(i => i.BoothID == sessionOrder.BoothID)).FirstOrDefault();

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Background;
-using PhotoboothBranchService.Application.DTOs.Photo;
 using PhotoboothBranchService.Application.Services.BackgroundServices;
 
 namespace PhotoboothBranchService.Api.Controllers;

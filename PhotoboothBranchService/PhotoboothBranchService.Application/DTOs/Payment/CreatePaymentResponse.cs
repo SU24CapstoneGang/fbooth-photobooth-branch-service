@@ -1,6 +1,4 @@
-﻿using PhotoboothBranchService.Domain.Enum;
-
-namespace PhotoboothBranchService.Application.DTOs.Payment
+﻿namespace PhotoboothBranchService.Application.DTOs.Payment
 {
     public class CreatePaymentResponse
     {

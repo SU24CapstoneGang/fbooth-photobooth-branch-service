@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.Layout;
 using PhotoboothBranchService.Application.DTOs.Sticker;
 using PhotoboothBranchService.Application.Services.StickerServices;
 

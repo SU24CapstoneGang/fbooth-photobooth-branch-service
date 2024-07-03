@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PhotoboothBranchService.Application.DTOs.Payment.MoMoPayment
+﻿namespace PhotoboothBranchService.Application.DTOs.Payment.MoMoPayment
 {
     public class MoMoResponse
     {
-        public string partnerCode {  get; set; }
+        public string partnerCode { get; set; }
         public Guid orderId { get; set; }
         public Guid requestId { get; set; }
         public long amount { get; set; }

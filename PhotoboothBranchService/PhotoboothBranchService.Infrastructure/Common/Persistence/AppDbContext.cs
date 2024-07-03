@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<Booth> Booths { get; set; }
     public DbSet<BoothBranch> BoothBranches { get; set; }
     public DbSet<Background> Backgrounds { get; set; }
+    public DbSet<Device> Devices { get; set; }
     public DbSet<Layout> Layouts { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
@@ -23,6 +24,7 @@ public class AppDbContext : DbContext
     public DbSet<ServiceItem> ServiceItems { get; set; }
     public DbSet<ServiceType> ServiceTypes { get; set; }
     public DbSet<SessionOrder> SessionOrders { get; set; }
+    public DbSet<SessionPackage> SessionPackages { get; set; }
     public DbSet<Sticker> Stickers { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -55,6 +57,7 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new AccountConfigurations());
         modelBuilder.ApplyConfiguration(new BoothConfiguration());
         modelBuilder.ApplyConfiguration(new BackgroundConfigurations());
+        modelBuilder.ApplyConfiguration(new DeviceConfiguration());
         modelBuilder.ApplyConfiguration(new LayoutConfigurations());
         modelBuilder.ApplyConfiguration(new PaymentConfiguration());
         modelBuilder.ApplyConfiguration(new PaymentMethodConfigurations());
@@ -67,6 +70,7 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ServiceItemConfiguration());
         modelBuilder.ApplyConfiguration(new ServiceTypeConfiguration());
         modelBuilder.ApplyConfiguration(new SessionOrderConfigurations());
+        modelBuilder.ApplyConfiguration(new SessionPackageConfiguration());
         modelBuilder.ApplyConfiguration(new StickerConfigurations());
     }
 }

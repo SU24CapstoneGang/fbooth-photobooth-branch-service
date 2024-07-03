@@ -10,5 +10,6 @@ namespace PhotoboothBranchService.Domain.Entities
         public Guid PhotoBoothBranchID { get; set; }
         public virtual BoothBranch PhotoBoothBranch { get; set; } = default!;
         public virtual ICollection<SessionOrder> SessionOrders { get; set; } = default!;
+        public virtual ICollection<Device> Devices { get; set; } = default!;
     }
 }

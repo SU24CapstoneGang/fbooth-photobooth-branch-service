@@ -26,8 +26,8 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         public async Task<CreatePhotoSessionResponse> CreateAsync(CreatePhotoSessionRequest createModel)
         {
             var validateSessionOrder = (await _sessionOrderRepository
-                .GetAsync(i => i.SessionOrderID == createModel.SessionOrderID 
-                && (i.EndTime > DateTime.Now && i.StartTime < DateTime.Now) 
+                .GetAsync(i => i.SessionOrderID == createModel.SessionOrderID
+                && (i.EndTime > DateTime.Now && i.StartTime < DateTime.Now)
                 && i.Status == Domain.Enum.SessionOrderStatus.Processsing)) == null;
             if (validateSessionOrder)
             {

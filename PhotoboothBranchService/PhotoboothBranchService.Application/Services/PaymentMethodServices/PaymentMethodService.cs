@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
-using CloudinaryDotNet.Actions;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.PaymentMethod;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
-using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.PaymentMethodServices

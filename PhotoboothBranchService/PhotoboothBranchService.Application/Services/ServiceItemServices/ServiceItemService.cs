@@ -59,7 +59,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                     ServiceItem? serviceItem = (await _serviceItemRepository.GetAsync(s => s.ServiceID == createModel.ServiceID
                                                 && s.SessionOrderID == sessionOrder.SessionOrderID))
                                                 .FirstOrDefault();
-                    
+
                     if (serviceItem == null) // create new item 
                     {
                         serviceItem = _mapper.Map<ServiceItem>(createModel);
@@ -152,7 +152,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                                         .FirstOrDefault();
                 if (validateTime != null)
                 {
-                    throw new Exception("There is another Session on this time, please check time to book again");   
+                    throw new Exception("There is another Session on this time, please check time to book again");
                 }
                 await _serviceItemRepository.AddAsync(serviceItem);
                 await _sessionOrderRepository.UpdateAsync(sessionOrder);

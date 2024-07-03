@@ -3,7 +3,6 @@ using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Helper;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
-using System.ComponentModel;
 using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories

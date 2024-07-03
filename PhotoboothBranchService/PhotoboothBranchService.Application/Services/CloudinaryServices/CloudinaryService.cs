@@ -30,8 +30,8 @@ namespace PhotoboothBranchService.Application.Services.CloudinaryServices
                 {
                     File = new FileDescription(file.FileName, stream),
                     //Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face"),
-                   // Folder = "FBooth-FinnalPicture"
-                   Folder = folder
+                    // Folder = "FBooth-FinnalPicture"
+                    Folder = folder
                 };
                 uploadResult = await _cloudinary.UploadAsync(uploadParams);
             }

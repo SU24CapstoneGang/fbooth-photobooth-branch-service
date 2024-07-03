@@ -59,7 +59,8 @@ public class SessionOrderService : ISessionOrderService
         try
         {
             await _serviceItemService.AddTheFirstServiceItem(session.SessionOrderID, createModel.ServiceID);
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             await _sessionOrderRepository.RemoveAsync(session);
             throw new Exception(ex.Message);

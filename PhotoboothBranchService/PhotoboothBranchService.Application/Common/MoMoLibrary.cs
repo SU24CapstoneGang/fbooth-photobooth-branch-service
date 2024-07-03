@@ -1,13 +1,6 @@
-﻿using Microsoft.Extensions.Configuration.UserSecrets;
-using PhotoboothBranchService.Application.DTOs.Payment.MoMoPayment;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Security.Cryptography;
-using System.Security.Cryptography.Xml;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Common
 {

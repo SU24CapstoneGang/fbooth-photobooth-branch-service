@@ -1,5 +1,6 @@
 ﻿// PhotoBoothBranchesController.cs
 using Microsoft.AspNetCore.Mvc;
+using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.BoothBranch;
 using PhotoboothBranchService.Application.Services.BoothBranchServices;
@@ -7,11 +8,11 @@ using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Api.Controllers;
 
-public class BoothBranchesController : ControllerBaseApi
+public class BoothBranchController : ControllerBaseApi
 {
     private readonly IBoothBranchService _photoBoothBranchService;
 
-    public BoothBranchesController(IBoothBranchService photoBoothBranchService)
+    public BoothBranchController(IBoothBranchService photoBoothBranchService)
     {
         _photoBoothBranchService = photoBoothBranchService;
     }

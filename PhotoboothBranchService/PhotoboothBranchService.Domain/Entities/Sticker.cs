@@ -6,7 +6,7 @@ namespace PhotoboothBranchService.Domain.Entities
     {
         public Guid StickerID { get; set; } = default!;
         public string StickerCode { get; set; } = default!;
-        public string StrickerURL { get; set; } = default!;
+        public string StickerURL { get; set; } = default!;
         public string CouldID { get; set; } = default!;
         public int stickerHeight { get; set; }
         public int stickerWidth { get; set; }

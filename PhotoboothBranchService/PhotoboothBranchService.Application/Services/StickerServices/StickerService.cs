@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using CloudinaryDotNet;
 using Microsoft.AspNetCore.Http;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.Layout;
 using PhotoboothBranchService.Application.DTOs.Sticker;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Domain.Common.Helper;
@@ -47,7 +45,7 @@ public class StickerService : IStickerService
         //create object from cloudinary's return 
         var sticker = _mapper.Map<Sticker>(createModel);
 
-        sticker.StrickerURL = uploadResult.SecureUrl.AbsoluteUri;
+        sticker.StickerURL = uploadResult.SecureUrl.AbsoluteUri;
         sticker.CouldID = uploadResult.PublicId;
         sticker.Status = StatusUse.Available;
 

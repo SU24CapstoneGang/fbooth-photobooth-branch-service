@@ -23,14 +23,14 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired()
                 .HasMaxLength(100);
 
-            builder.Property(s => s.StrickerURL)
+            builder.Property(s => s.StickerURL)
                 .IsRequired()
                 .HasMaxLength(255);
 
             builder.Property(s => s.CouldID)
                 .IsRequired();
             builder.Property(s => s.stickerWidth)
-               .IsRequired(); 
+               .IsRequired();
             builder.Property(s => s.stickerHeight)
                 .IsRequired();
             builder.Property(s => s.CreatedDate)

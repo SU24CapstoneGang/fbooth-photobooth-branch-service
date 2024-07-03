@@ -8,11 +8,11 @@ using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Api.Controllers;
 
-public class AccountsController : ControllerBaseApi
+public class AccountController : ControllerBaseApi
 {
     private readonly IAccountService _accountService;
 
-    public AccountsController(IAccountService accountService)
+    public AccountController(IAccountService accountService)
     {
         _accountService = accountService;
     }

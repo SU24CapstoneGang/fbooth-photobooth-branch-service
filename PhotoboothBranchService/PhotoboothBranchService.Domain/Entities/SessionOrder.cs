@@ -14,6 +14,8 @@ namespace PhotoboothBranchService.Domain.Entities
         public virtual Booth Booth { get; set; } = default!;
         public Guid? AccountID { get; set; }
         public virtual Account Account { get; set; } = default!;
+        public Guid SessionPackageID { get; set; }
+        public virtual SessionPackage SessionPackage { get; set; } = default!;
         public virtual ICollection<Payment> Payments { get; set; } = default!;
         public virtual ICollection<ServiceItem> ServiceItems { get; set; } = default!;
         public virtual ICollection<PhotoSession> PhotoSessions { get; set; } = default!;

@@ -5,7 +5,6 @@ using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment;
-using PhotoboothBranchService.Application.Services.SessionOrderServices;
 using PhotoboothBranchService.Domain.IRepository;
 using System.Text;
 
@@ -208,7 +207,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
 
                 if (checkSignature)
                 {
-                    if (payment.Amount==vnp_Amount)
+                    if (payment.Amount == vnp_Amount)
                     {
                         if (payment.PaymentStatus == Domain.Enum.PaymentStatus.Processing)
                         {
@@ -252,7 +251,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                             };
                             payment.PaymentStatus = Domain.Enum.PaymentStatus.Fail;
                             returnContent = "{\"RspCode\":\"02\",\"Message\":\"Order already confirmed\"}";
-                        } 
+                        }
                     }
                     else
                     {
@@ -278,7 +277,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                 await _paymentRepository.UpdateAsync(payment);
                 if (payment.PaymentStatus == Domain.Enum.PaymentStatus.Success)
                 {
-                    var sessionOrder = (await _sessionOrderRepository.GetAsync(i=> i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
+                    var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
                     if (sessionOrder != null)
                     {
                         sessionOrder.Status = Domain.Enum.SessionOrderStatus.Paid;
