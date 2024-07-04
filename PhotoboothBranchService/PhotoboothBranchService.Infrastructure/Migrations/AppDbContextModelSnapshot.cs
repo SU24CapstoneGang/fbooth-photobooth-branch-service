@@ -369,14 +369,14 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         new
                         {
                             PaymentMethodID = new Guid("1b4f2a3e-7d94-4119-8b6d-5c15b02848f6"),
-                            CreateDate = new DateTime(2024, 7, 4, 16, 11, 48, 737, DateTimeKind.Utc).AddTicks(4216),
+                            CreateDate = new DateTime(2024, 7, 4, 16, 37, 59, 476, DateTimeKind.Utc).AddTicks(3150),
                             PaymentMethodName = "VNPay",
                             Status = "Active"
                         },
                         new
                         {
                             PaymentMethodID = new Guid("f3b6e6b2-f90e-4f6b-8cd2-68b467afae0f"),
-                            CreateDate = new DateTime(2024, 7, 4, 16, 11, 48, 737, DateTimeKind.Utc).AddTicks(4221),
+                            CreateDate = new DateTime(2024, 7, 4, 16, 37, 59, 476, DateTimeKind.Utc).AddTicks(3158),
                             PaymentMethodName = "MoMo",
                             Status = "Active"
                         });
@@ -654,7 +654,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<short>("PrintCount")
                         .HasColumnType("smallint");

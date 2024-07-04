@@ -123,8 +123,8 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                 columns: new[] { "PaymentMethodID", "CreateDate", "PaymentMethodName", "Status" },
                 values: new object[,]
                 {
-                    { new Guid("1b4f2a3e-7d94-4119-8b6d-5c15b02848f6"), new DateTime(2024, 7, 4, 16, 11, 48, 737, DateTimeKind.Utc).AddTicks(4216), "VNPay", "Active" },
-                    { new Guid("f3b6e6b2-f90e-4f6b-8cd2-68b467afae0f"), new DateTime(2024, 7, 4, 16, 11, 48, 737, DateTimeKind.Utc).AddTicks(4221), "MoMo", "Active" }
+                    { new Guid("1b4f2a3e-7d94-4119-8b6d-5c15b02848f6"), new DateTime(2024, 7, 4, 16, 37, 59, 476, DateTimeKind.Utc).AddTicks(3150), "VNPay", "Active" },
+                    { new Guid("f3b6e6b2-f90e-4f6b-8cd2-68b467afae0f"), new DateTime(2024, 7, 4, 16, 37, 59, 476, DateTimeKind.Utc).AddTicks(3158), "MoMo", "Active" }
                 });
         }
 

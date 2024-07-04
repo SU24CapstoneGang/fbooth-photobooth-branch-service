@@ -14,7 +14,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(u => u.SessionPackageID).HasColumnName("SessionPackageID").ValueGeneratedOnAdd();
             builder.Property(b => b.SessionPackageName).IsRequired().HasMaxLength(50);
             builder.Property(b => b.SessionPackageDescription).IsRequired().HasMaxLength(250);
-            builder.Property(b => b.Price).IsRequired();
+            builder.Property(b => b.Price).IsRequired().HasColumnType("decimal(18, 2)");
             builder.Property(b => b.Duration).IsRequired();
             builder.Property(b => b.EmailSendCount).IsRequired();
             builder.Property(b => b.PrintCount).IsRequired();
