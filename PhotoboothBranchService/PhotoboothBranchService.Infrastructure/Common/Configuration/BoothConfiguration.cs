@@ -30,6 +30,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .WithOne(i => i.Booth)
                 .HasForeignKey(v => v.BoothID)
                 .IsRequired();
+
+           
         }
     }
 }

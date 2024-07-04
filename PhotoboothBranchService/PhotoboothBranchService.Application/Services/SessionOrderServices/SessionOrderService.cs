@@ -151,7 +151,7 @@ public class SessionOrderService : ISessionOrderService
                 }
                 else
                 {
-                    throw new Exception("Session has been cancelled");
+                    throw new Exception("Session has been cancelled or not paid yet to validate");
                 }
             }
             else

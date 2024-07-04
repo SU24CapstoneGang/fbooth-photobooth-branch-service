@@ -4,6 +4,7 @@ using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PhotoboothBranchService.Application.BackgroundServices;
 using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Application.Services.BackgroundServices;
@@ -93,6 +94,9 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IVNPayService, VNPayService>();
             //momo service
             services.AddScoped<IMoMoService, MoMoService>();
+
+            //background service
+            services.AddHostedService<SessionOrderStatusService>();
             return services;
         }
     }

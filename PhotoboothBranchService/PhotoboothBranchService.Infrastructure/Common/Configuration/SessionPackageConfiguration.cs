@@ -13,7 +13,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasKey(u => u.SessionPackageID);
             builder.Property(u => u.SessionPackageID).HasColumnName("SessionPackageID").ValueGeneratedOnAdd();
             builder.Property(b => b.SessionPackageName).IsRequired().HasMaxLength(50);
-            builder.Property(b => b.SessionPackageDescription).IsRequired().HasMaxLength(50);
+            builder.Property(b => b.SessionPackageDescription).IsRequired().HasMaxLength(250);
             builder.Property(b => b.Price).IsRequired();
             builder.Property(b => b.Duration).IsRequired();
             builder.Property(b => b.EmailSendCount).IsRequired();
@@ -23,6 +23,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .WithOne(i => i.SessionPackage)
                 .HasForeignKey(i => i.SessionPackageID)
                 .IsRequired();
+
         }
     }
 }
