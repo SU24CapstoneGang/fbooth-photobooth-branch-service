@@ -23,9 +23,11 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired()
                 .HasMaxLength(100);
 
-            builder.Property(pb => pb.BranchAddress)
+            builder.Property(pb => pb.Address)
                 .IsRequired()
                 .HasMaxLength(255);
+            builder.Property(pb => pb.Town).IsRequired();
+            builder.Property(pb => pb.City).IsRequired();
 
             builder.Property(pb => pb.CreateDate)
             .IsRequired();
