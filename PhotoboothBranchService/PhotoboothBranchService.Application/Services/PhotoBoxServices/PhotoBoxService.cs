@@ -12,18 +12,31 @@ namespace PhotoboothBranchService.Application.Services.PhotoBoxServices
     {
         private readonly IPhotoBoxRepository _photoBoxRepository;
         private readonly IMapper _mapper;
+        private readonly ILayoutRepository _layoutRepository;
 
-        public PhotoBoxService(IPhotoBoxRepository photoBoxRepository, IMapper mapper)
+        public PhotoBoxService(IPhotoBoxRepository photoBoxRepository, IMapper mapper, ILayoutRepository layoutRepository)
         {
             _photoBoxRepository = photoBoxRepository;
             _mapper = mapper;
+            _layoutRepository = layoutRepository;
         }
 
         public async Task<CreatePhotoBoxResponse> CreateAsync(CreatePhotoBoxRequest createModel)
         {
-            PhotoBox photoBox = _mapper.Map<PhotoBox>(createModel);
-            await _photoBoxRepository.AddAsync(photoBox);
-            return _mapper.Map<CreatePhotoBoxResponse>(photoBox);
+            var layout = (await _layoutRepository.GetAsync(l => l.LayoutID == createModel.LayoutID)).FirstOrDefault();
+
+            if (layout != null)
+            {
+                var photobox = (await _photoBoxRepository.GetAsync(pb => pb.LayoutID == layout.LayoutID));
+                if (photobox.Count() < layout.PhotoSlot)
+                {
+                    PhotoBox photoBox = _mapper.Map<PhotoBox>(createModel);
+                    await _photoBoxRepository.AddAsync(photoBox);
+                    return _mapper.Map<CreatePhotoBoxResponse>(photoBox);
+                }
+                throw new InvalidOperationException("Cannot create photo box, maximum photo slots reached.");
+            }
+            throw new NotFoundException($"Not found layout");
         }
 
         public async Task DeleteAsync(Guid id)

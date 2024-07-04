@@ -4,9 +4,9 @@ namespace PhotoboothBranchService.Application.DTOs.Background
 {
     public class BackgroundFilter
     {
-        public string? BackgroundCode { get; set; } = default!;
-        public string? BackgroundURL { get; set; } = default!;
-        public string? CouldID { get; set; } = default!;
+        public string? BackgroundCode { get; set; }
+        public string? BackgroundURL { get; set; }
+        public string? CouldID { get; set; } 
         public int? Height { get; set; }
         public int? Width { get; set; }
         public StatusUse? Status { get; set; }
