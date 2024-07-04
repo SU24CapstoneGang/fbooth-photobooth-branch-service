@@ -2,8 +2,8 @@
 {
     public class CreateLayoutRequest
     {
-        public string LayoutCode { get; set; }
-        public int Lenght { get; set; }
+        public string LayoutCode { get; set; } = default!;
+        public int Height { get; set; }
         public int Width { get; set; }
         public short PhotoSlot { get; set; }
     }

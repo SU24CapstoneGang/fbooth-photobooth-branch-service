@@ -15,7 +15,7 @@ namespace PhotoboothBranchService.Domain.Entities
         public DateTime CreatedDate { get; set; }
         public DateTime? LastModified { get; set; }
         public virtual ICollection<PhotoBox> PhotoBoxes { get; set; } = default!;
-        public virtual ICollection<Background> Backgrounds { get; set; }
+        public virtual ICollection<Background> Backgrounds { get; set; } = default!;
         public virtual ICollection<PhotoSession> PhotoSessions { get; set; } = default!;
     }
 }

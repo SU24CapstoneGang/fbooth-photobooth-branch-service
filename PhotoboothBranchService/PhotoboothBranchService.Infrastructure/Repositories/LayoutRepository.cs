@@ -25,7 +25,7 @@ public class LayoutRepository : ILayoutRepository
     //Read
     public async Task<IQueryable<Layout>> GetAllAsync()
     {
-        return await Task.FromResult(_dbContext.Layouts);
+        return await Task.FromResult(_dbContext.Layouts.Include(pb => pb.PhotoBoxes).Include(bg => bg.Backgrounds));
     }
 
     public async Task<IQueryable<Layout>> GetAsync(

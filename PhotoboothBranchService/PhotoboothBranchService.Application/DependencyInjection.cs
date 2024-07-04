@@ -58,6 +58,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<ISessionOrderService, SessionOrderService>();
             services.AddScoped<ISessionPackageService, SessionPackageService>();
             services.AddScoped<IStickerService, StickerService>();
+            services.AddScoped<IPhotoBoxService, PhotoBoxService>();
 
             // cloudinary
             services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
