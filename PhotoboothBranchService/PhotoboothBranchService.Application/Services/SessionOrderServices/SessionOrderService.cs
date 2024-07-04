@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.ServiceItem;
 using PhotoboothBranchService.Application.DTOs.SessionOrder;
 using PhotoboothBranchService.Application.Services.ServiceItemServices;
 using PhotoboothBranchService.Domain.Common.Helper;
@@ -17,21 +18,32 @@ public class SessionOrderService : ISessionOrderService
     private readonly IBoothRepository _boothRepository;
     private readonly IPaymentRepository _paymentRepository;
     private readonly IServiceItemService _serviceItemService;
-    public SessionOrderService(ISessionOrderRepository sessionOrderRepository, IMapper mapper, IBoothRepository boothRepository, IPaymentRepository paymentRepository, IServiceItemService serviceItemService)
+    private readonly ISessionPackageRepository _sessionPackageRepository;
+    private readonly IServiceRepository _serviceRepository;
+    public SessionOrderService(ISessionOrderRepository sessionOrderRepository, 
+        IMapper mapper, 
+        IBoothRepository boothRepository, 
+        IPaymentRepository paymentRepository, 
+        IServiceItemService serviceItemService, 
+        ISessionPackageRepository sessionPackageRepository, 
+        IServiceRepository serviceRepository)
     {
         _sessionOrderRepository = sessionOrderRepository;
         _mapper = mapper;
         _boothRepository = boothRepository;
         _paymentRepository = paymentRepository;
         _serviceItemService = serviceItemService;
+        _sessionPackageRepository = sessionPackageRepository;
+        _serviceRepository = serviceRepository;
     }
 
     // Create a new session
     public async Task<CreateSessionOrderResponse> CreateAsync(CreateSessionOrderRequest createModel)
     {
         var boothTask = _boothRepository.GetAsync(i => i.BoothID == createModel.BoothID);
+        var sessionPackageTask = _sessionPackageRepository.GetAsync(i => i.SessionPackageID == createModel.SessionPackageID);
         var sessionOrderCheckTask = _sessionOrderRepository.GetAsync(i => i.AccountID == createModel.AccountID && (i.EndTime > DateTime.Now || !i.EndTime.HasValue));
-        await Task.WhenAll(sessionOrderCheckTask, boothTask);
+        await Task.WhenAll(sessionOrderCheckTask, sessionPackageTask, boothTask);
 
         //booth validate
         var booth = boothTask.Result.FirstOrDefault();
@@ -51,23 +63,60 @@ public class SessionOrderService : ISessionOrderService
             throw new Exception("This Account is using another booth");
         }
 
+        var sessionPackage = sessionPackageTask.Result.FirstOrDefault();
+        if (sessionPackage == null)
+        {
+            throw new NotFoundException("Session Package Not found");
+        }
 
-        //add session
-        var session = _mapper.Map<SessionOrder>(createModel);
+        //validate service list of create model
+        if (createModel.ServiceList.Count > 0)
+        {
+            var serviceIds = createModel.ServiceList.Keys.ToList();
+            var services = await _serviceRepository.GetAsync(i => serviceIds.Contains(i.ServiceID));
+            if (createModel.ServiceList.Count != services.Count())
+            {
+                throw new Exception("Some service in request are not found");
+            }
+        }
+
+        //add session with package
+        SessionOrder session = _mapper.Map<SessionOrder>(createModel);
         session.ValidateCode = new Random().Next(100000, 1000000);
+        if (createModel.StartTime == default(DateTime))
+        {
+            session.StartTime = DateTime.Now;
+            //update booth
+            booth.Status = ManufactureStatus.InUse;
+            await _boothRepository.UpdateAsync(booth);
+        }
+        session.EndTime = session.StartTime.AddMinutes(sessionPackage.Duration);
+        session.TotalPrice = sessionPackage.Price;
+        session.Status = SessionOrderStatus.Created;
+        //validate time to not conflict with other session
+        var validateTime = (await _sessionOrderRepository.GetAsync(i => i.BoothID == session.BoothID
+                                 && ((session.StartTime < i.StartTime && i.StartTime < session.EndTime.Value.AddMinutes(5)) || (session.EndTime.Value.AddMinutes(5) > i.EndTime && i.EndTime > session.StartTime))
+                                 )).FirstOrDefault();
+        if (validateTime != null)
+        {
+            throw new Exception("There is another Session on this time, please check time to book again");
+        }
         await _sessionOrderRepository.AddAsync(session);
-        try
+
+        if (createModel.ServiceList.Count > 0)
         {
-            await _serviceItemService.AddTheFirstServiceItem(session.SessionOrderID, createModel.ServiceID);
+            foreach (var service in createModel.ServiceList)
+            {
+                CreateServiceItemRequest serviceItem = new CreateServiceItemRequest
+                {
+                    Quantity = service.Value,
+                    ServiceID = service.Key,
+                    SessionOrderID = session.SessionOrderID,
+                };
+                await _serviceItemService.CreateAsync(serviceItem);
+            }
         }
-        catch (Exception ex)
-        {
-            await _sessionOrderRepository.RemoveAsync(session);
-            throw new Exception(ex.Message);
-        }
-        //update booth
-        booth.Status = ManufactureStatus.InUse;
-        await _boothRepository.UpdateAsync(booth);
+
         return _mapper.Map<CreateSessionOrderResponse>(session);
     }
 
@@ -76,7 +125,8 @@ public class SessionOrderService : ISessionOrderService
         var sessionOrder = (await _sessionOrderRepository
             .GetAsync(i => i.BoothID == validateSessionPhotoRequest.BoothID && i.StartTime < DateTime.Now && i.EndTime > DateTime.Now))
             .FirstOrDefault();
-        if (sessionOrder != null)
+        var booth = (await _boothRepository.GetAsync(i => i.BoothID == validateSessionPhotoRequest.BoothID)).FirstOrDefault();
+        if (sessionOrder != null && booth != null)
         {
             if (sessionOrder.ValidateCode == validateSessionPhotoRequest.ValidateCode)
             {
@@ -84,10 +134,19 @@ public class SessionOrderService : ISessionOrderService
                 if (sessionOrder.Status == SessionOrderStatus.Waiting)
                 {
                     TimeSpan difference = DateTime.Now - sessionOrder.StartTime;
-                    sessionOrder.StartTime += difference;
-                    sessionOrder.EndTime += difference;
+                    if (difference.TotalMinutes > 15 ){
+                        sessionOrder.StartTime += difference;
+                        sessionOrder.EndTime += difference;
+                    } else
+                    {
+                        sessionOrder.StartTime += difference;
+                    }
                     sessionOrder.Status = SessionOrderStatus.Processsing;
                     await _sessionOrderRepository.UpdateAsync(sessionOrder);
+
+                    //update booth
+                    booth.Status = ManufactureStatus.InUse;
+                    await _boothRepository.UpdateAsync(booth);
                     return _mapper.Map<SessionOrderResponse>(sessionOrder);
                 }
                 else

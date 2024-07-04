@@ -4,7 +4,8 @@
     {
         public Guid BoothID { get; set; }
         public Guid AccountID { get; set; }
-        public Guid ServiceID { get; set; }
-        public DateTime? StartTime { get; set; } = default!;
+        public Guid SessionPackageID { get; set; }
+        public Dictionary<Guid, short> ServiceList { get; set; } = new Dictionary<Guid, short>();
+        public DateTime? StartTime { get; set; }
     }
 }

@@ -45,28 +45,42 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             {
                 throw new NotFoundException("Not found Session to proceed payment");
             }
-            else if (sessionOrder.TotalPrice != createModel.TotalPrice)
-            {
-                //update total price and check the condition again
-                await _sessionOrderRepository.updateTotalPrice(createModel.SessionOrderID);
-                if (sessionOrder.TotalPrice != createModel.TotalPrice)
-                {
-                    throw new BadRequestException("Total price is not equal as the server");
-                }
-            }
 
             //create payment object
             var payment = _mapper.Map<Payment>(createModel);
             payment.PaymentID = Guid.NewGuid();
             payment.PaymentStatus = PaymentStatus.Processing;
             payment.PaymentDateTime = DateTime.Now;
-            payment.Amount = createModel.TotalPrice;
+            switch (createModel.PayType)
+            {
+                case PayType.FullPay:
+                    var payments = await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PaymentStatus == PaymentStatus.Success);
+                    long result = (long)sessionOrder.TotalPrice - payments.Sum(i => i.Amount);
+                    if (result == 0)
+                    {
+                        throw new Exception("Already paid all");
+                    }
+                    else if (result < 0)
+                    {
+                        throw new Exception("System revice more than bill, contact manager about the error");
+                    }
+                    payment.Amount = result;
+                    break;
+                case PayType.Deposit:
+                    if (sessionOrder.Status != SessionOrderStatus.Created)
+                    {
+                        throw new Exception("Deposit only apply on Booking");
+                    }
+                    payment.Amount = (long)Math.Round(sessionOrder.TotalPrice * 0.2m);
+                    break;
+                default:
+                    // Handle unexpected PayType
+                    throw new ArgumentOutOfRangeException(nameof(createModel.PayType), createModel.PayType, "Invalid payment type");
+            }
+
             //response to return 
             CreatePaymentResponse createPaymentResponse = new CreatePaymentResponse() { PaymentID = payment.PaymentID };
-            if (await _paymentRepository.IsOrderPaid(createModel.SessionOrderID))
-            {
-                throw new Exception("Session Order has been paid already");
-            }
+
             //validate and choose payment method
             var paymentMethod = (await _paymentMethodRepository.GetAsync(i => i.PaymentMethodID == createModel.PaymentMethodID)).FirstOrDefault();
             if (paymentMethod != null)
@@ -81,7 +95,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                     case "VNPay":
                         VnpayRequest vnpayRequest = new VnpayRequest
                         {
-                            Amount = createModel.TotalPrice,
+                            Amount = payment.Amount,
                             ClientIpAddress = createModel.ClientIpAddress,
                             SessionOrderID = createModel.SessionOrderID,
                             OrderInformation = createModel.Description,
@@ -98,7 +112,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                     case "MoMo":
                         MoMoRequest moMoRequest = new MoMoRequest
                         {
-                            amount = createModel.TotalPrice,
+                            amount = payment.Amount,
                             orderId = payment.PaymentID.ToString(),
                             extraData = "",
                             orderInfo = createModel.Description,

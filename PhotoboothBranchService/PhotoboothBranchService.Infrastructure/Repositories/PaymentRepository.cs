@@ -75,18 +75,5 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
             _dbContext.Remove(entity);
             await _dbContext.SaveChangesAsync();
         }
-
-        public async Task<bool> IsOrderPaid(Guid SessionOrderID)
-        {
-            var payments = await GetAsync(i => i.SessionOrderID == SessionOrderID);
-            foreach (var payment in payments)
-            {
-                if (payment.PaymentStatus == Domain.Enum.PaymentStatus.Success)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
     }
 }

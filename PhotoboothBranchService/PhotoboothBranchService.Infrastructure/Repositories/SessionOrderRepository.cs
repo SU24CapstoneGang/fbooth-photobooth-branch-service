@@ -78,11 +78,14 @@ public class SessionOrderRepository : ISessionOrderRepository
 
     public async Task updateTotalPrice(Guid SessionOrderID)
     {
-        var order = _dbContext.SessionOrders.Where(i => i.SessionOrderID == SessionOrderID).Include(u => u.ServiceItems).FirstOrDefault();
+        var order = _dbContext.SessionOrders.Where(i => i.SessionOrderID == SessionOrderID)
+            .Include(u => u.ServiceItems)
+            .Include(u => u.SessionPackage)
+            .FirstOrDefault();
 
         if (order != null)
         {
-            decimal totalPrice = 0;
+            decimal totalPrice = order.SessionPackage.Price;
             foreach (var item in order.ServiceItems)
             {
                 totalPrice += item.UnitPrice * item.Quantity;

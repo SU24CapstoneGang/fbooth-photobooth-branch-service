@@ -19,6 +19,7 @@ using PhotoboothBranchService.Application.Services.PaymentServices;
 using PhotoboothBranchService.Application.Services.PaymentServices.MoMoServices;
 using PhotoboothBranchService.Application.Services.PaymentServices.QR;
 using PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices;
+using PhotoboothBranchService.Application.Services.PhotoBoxServices;
 using PhotoboothBranchService.Application.Services.PhotoServices;
 using PhotoboothBranchService.Application.Services.PhotoSessionServices;
 using PhotoboothBranchService.Application.Services.PhotoStickerServices;
@@ -46,6 +47,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<ILayoutService, LayoutService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IPaymentMethodService, PaymentMethodService>();
+            services.AddScoped<IPhotoBoxService, PhotoBoxService>();
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<IPhotoSessionService, PhotoSessionService>();
             services.AddScoped<IPhotoStickerService, PhotoStickerService>();

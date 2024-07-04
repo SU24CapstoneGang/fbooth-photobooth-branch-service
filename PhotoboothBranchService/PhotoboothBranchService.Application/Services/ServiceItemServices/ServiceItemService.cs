@@ -4,6 +4,7 @@ using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.ServiceItem;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.ServiceItemServices
@@ -49,9 +50,9 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                 {
                     throw new Exception("Session has end. Please do Payment with our staff and create another Session Order");
                 }
-                else if (sessionOrder.Status == Domain.Enum.SessionOrderStatus.Paid)
+                else if (sessionOrder.Status == Domain.Enum.SessionOrderStatus.Done)
                 {
-                    throw new Exception("This Session has been paid and ended, please create other Session Order to use our service");
+                    throw new Exception("This Session has been ended, please contect our staff to have new booking");
                 }
 
                 if (createModel.Quantity.HasValue)
@@ -80,7 +81,6 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                 {
                     throw new Exception("No quantity input");
                 }
-
             }
             else
             {
@@ -99,65 +99,60 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
             return _mapper.Map<CreateServiceItemResponse>(createServiceItemResponse);
         }
 
-        //for case need optimize code later
-        //private async Task<ServiceItem> AddServiceItem(decimal subTotal, decimal unitPrice, CreateServiceItemRequest request)
-        //{
-        //    var service = _mapper.Map<ServiceItem>(request);
-        //    if (request.Quantity.HasValue)
-        //    {
-        //        service.Quantity = request.Quantity.Value;
-        //    }
-        //    else
-        //    {
-        //        service.Quantity = 1;
-        //    }
-        //    service.SubTotal = subTotal;
-        //    service.UnitPrice = unitPrice;
-        //    await _serviceItemRepository.AddAsync(service);
-        //    return service;
-        //}
-
-        public async Task AddTheFirstServiceItem(Guid SessionOrderID, Guid ServiceID)
+        public async Task<AddListServiceItemResponse> AddListServiceItem(AddListServiceItemRequest request)
         {
-            var sessionOrderTask = _sessionOrderRepository.GetAsync(i => i.SessionOrderID == SessionOrderID);
-            var serviceTask = _serviceRepository.GetAsync(i => i.ServiceID == ServiceID);
-
-            await Task.WhenAll(sessionOrderTask, serviceTask);
-            var sessionOrder = sessionOrderTask.Result.FirstOrDefault();
-            var service = serviceTask.Result.FirstOrDefault();
-
-            var serviceType = service != null ? (await _serviceTypeRepository.GetAsync(i => i.ServiceTypeID == service.ServiceTypeID)).FirstOrDefault() : null;
-            if (sessionOrder != null && service != null && serviceType != null)
-            {
-                if (!serviceType.ServiceTypeName.Equals("Hire booth") && !sessionOrder.EndTime.HasValue)
-                {
-                    throw new Exception("Please choose the hire booth service first to use the other service");
-                }
-
-                //update session order
-                sessionOrder.EndTime = sessionOrder.StartTime.AddMinutes(service.Measure);
-
-                //create service item
-                var serviceItem = new ServiceItem
-                {
-                    SessionOrderID = SessionOrderID,
-                    ServiceID = ServiceID,
-                    UnitPrice = service.Price,
-                    SubTotal = service.Price,
-                    Quantity = 1
-                };
-                var validateTime = (await _sessionOrderRepository.GetAsync(i => i.BoothID == sessionOrder.BoothID
-                                        && ((sessionOrder.StartTime < i.StartTime && i.StartTime < sessionOrder.EndTime) || (sessionOrder.EndTime > i.EndTime && i.EndTime > sessionOrder.StartTime))
-                                        && i.SessionOrderID != sessionOrder.SessionOrderID))
-                                        .FirstOrDefault();
-                if (validateTime != null)
-                {
-                    throw new Exception("There is another Session on this time, please check time to book again");
-                }
-                await _serviceItemRepository.AddAsync(serviceItem);
-                await _sessionOrderRepository.UpdateAsync(sessionOrder);
-                await _sessionOrderRepository.updateTotalPrice(sessionOrder.SessionOrderID);
+            //find now session order of request booth
+            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BoothID == request.BoothID && i.Status == SessionOrderStatus.Processsing &&(i.EndTime > DateTime.Now && DateTime.Now > i.StartTime))).FirstOrDefault();
+            if (sessionOrder == null) {
+                throw new NotFoundException("Not found Session Order running in this booth");
             }
+            //validate list serviceID
+            List<Service> serviceList = new List<Service>();
+            if (request.ServiceList.Count > 0)
+            {
+                var serviceIds = request.ServiceList.Keys.ToList();
+                var services = await _serviceRepository.GetAsync(i => serviceIds.Contains(i.ServiceID));
+                if (request.ServiceList.Count != services.Count())
+                {
+                    throw new Exception("Some service in request are not found");
+                } else
+                {
+                    serviceList = services.ToList();
+                }
+            }
+            else
+            {
+                throw new Exception("No Service to add");
+            }
+
+            AddListServiceItemResponse response = new AddListServiceItemResponse { 
+                BoothID = request.BoothID,
+                SessionOrderID = sessionOrder.SessionOrderID,
+            };
+            foreach (var req in request.ServiceList)
+            {
+                var serviceItem = (await _serviceItemRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.ServiceID == req.Key)).FirstOrDefault();
+                if (serviceItem != null)
+                {
+                    serviceItem.Quantity += req.Value;
+                    serviceItem.SubTotal = serviceItem.Quantity * serviceItem.UnitPrice;
+                    await _serviceItemRepository.UpdateAsync(serviceItem);
+                } else
+                {
+                    serviceItem = new ServiceItem
+                    {
+                        Quantity = req.Value,
+                        SessionOrderID = sessionOrder.SessionOrderID,
+                        ServiceID = req.Key,
+                        UnitPrice = serviceList.Find(i => i.ServiceID == req.Key).Price,
+                    };
+                    serviceItem.SubTotal = serviceItem.Quantity * serviceItem.UnitPrice;
+                    await _serviceItemRepository.AddAsync(serviceItem);
+                }
+                response.Items.Add(_mapper.Map<ServiceItemResponse>(serviceItem));
+            }
+            await _sessionOrderRepository.updateTotalPrice(sessionOrder.SessionOrderID);
+            return response;
         }
 
         // Delete

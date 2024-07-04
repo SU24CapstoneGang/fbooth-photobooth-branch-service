@@ -5,6 +5,7 @@ using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.Payment.MoMoPayment;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 using System.Reflection;
 
@@ -21,8 +22,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
 
         private readonly IPaymentRepository _paymentRepository;
         private readonly ISessionOrderRepository _sessionOrderRepository;
-        private readonly IBoothRepository _boothRepository;
-        public MoMoService(IPaymentRepository paymentRepository, ISessionOrderRepository sessionOrderRepository, IBoothRepository boothRepository)
+        public MoMoService(IPaymentRepository paymentRepository, ISessionOrderRepository sessionOrderRepository)
         {
             momo_Api = JsonHelper.GetFromAppSettings("MoMo:momo_Api");
             accessKey = JsonHelper.GetFromAppSettings("MoMo:accessKey");
@@ -33,7 +33,6 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
 
             _paymentRepository = paymentRepository;
             _sessionOrderRepository = sessionOrderRepository;
-            _boothRepository = boothRepository;
         }
 
         public string CreatePayment(MoMoRequest request)
@@ -114,33 +113,39 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
                 bool checkSignature = moMoLibrary.ValidateSignature(rawHash, secretKey, momoResponse.signature);
                 if (checkSignature && momoResponse.resultCode == 0)
                 {
-                    payment.PaymentStatus = Domain.Enum.PaymentStatus.Success;
+                    payment.PaymentStatus = PaymentStatus.Success;
                     payment.Signature = momoResponse.signature;
                     payment.TransactionID = momoResponse.transId.ToString();
                 }
                 else
                 {
                     payment.TransactionID = momoResponse.transId.ToString();
-                    payment.PaymentStatus = Domain.Enum.PaymentStatus.Fail;
+                    payment.PaymentStatus = PaymentStatus.Fail;
                 }
             }
             await _paymentRepository.UpdateAsync(payment);
-            if (payment.PaymentStatus == Domain.Enum.PaymentStatus.Success)
+            if (payment.PaymentStatus == PaymentStatus.Success)
             {
                 var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
-                if (sessionOrder != null)
+                if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Created)
                 {
-                    sessionOrder.Status = Domain.Enum.SessionOrderStatus.Paid;
-                    if (sessionOrder.EndTime > DateTime.Now)
+                    if (payment.Amount < sessionOrder.TotalPrice)
                     {
-                        sessionOrder.EndTime = DateTime.Now;
+                        sessionOrder.Status = SessionOrderStatus.Deposited;
+                    }
+                    else if (payment.Amount == sessionOrder.TotalPrice)
+                    {
+                        sessionOrder.Status = SessionOrderStatus.Waiting;
                     }
                     await _sessionOrderRepository.UpdateAsync(sessionOrder);
-                    var booth = (await _boothRepository.GetAsync(i => i.BoothID == sessionOrder.BoothID)).FirstOrDefault();
-                    if (booth != null)
+                }
+                else if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Deposited)
+                {
+                    var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PaymentStatus == PaymentStatus.Success)).FirstOrDefault();
+                    if (paymentCheck.Amount + payment.Amount == sessionOrder.TotalPrice)
                     {
-                        booth.Status = Domain.Enum.ManufactureStatus.Active;
-                        await _boothRepository.UpdateAsync(booth);
+                        sessionOrder.Status = SessionOrderStatus.Waiting;
+                        await _sessionOrderRepository.UpdateAsync(sessionOrder);
                     }
                 }
             }

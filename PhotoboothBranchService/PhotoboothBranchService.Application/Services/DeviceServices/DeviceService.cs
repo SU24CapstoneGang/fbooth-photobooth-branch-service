@@ -23,7 +23,7 @@ namespace PhotoboothBranchService.Application.Services.DeviceServices
         {
             var device = _mapper.Map<Device>(createModel);
             await _deviceRepository.AddAsync(device);
-            return _mapper.Map<CreateDeviceResponse>(createModel);
+            return _mapper.Map<CreateDeviceResponse>(device);
         }
 
         // Delete

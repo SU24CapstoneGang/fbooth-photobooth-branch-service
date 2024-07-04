@@ -30,6 +30,14 @@ namespace PhotoboothBranchService.Api.Controllers
             }
         }
 
+        //add list
+        [HttpPost("add-list")]
+        public async Task<ActionResult<AddListServiceItemResponse>> AddListItems(AddListServiceItemRequest request)
+        {
+            var response = await _serviceItemService.AddListServiceItem(request);
+            return Ok(response);
+        }
+
         // Read
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ServiceItemResponse>>> GetAllServiceItems()

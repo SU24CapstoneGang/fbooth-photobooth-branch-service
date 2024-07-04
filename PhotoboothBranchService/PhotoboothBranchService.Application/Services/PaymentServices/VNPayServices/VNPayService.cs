@@ -5,6 +5,8 @@ using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment;
+using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 using System.Text;
 
@@ -21,8 +23,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
         private readonly IMapper _mapper;
         private readonly IPaymentRepository _paymentRepository;
         private readonly ISessionOrderRepository _sessionOrderRepository;
-        private readonly IBoothRepository _boothRepository;
-        public VNPayService(IPaymentRepository paymentRepository, IMapper mapper, ISessionOrderRepository sessionOrderRepository, IBoothRepository boothRepository)
+        public VNPayService(IPaymentRepository paymentRepository, IMapper mapper, ISessionOrderRepository sessionOrderRepository)
         {
             vnp_Returnurl = JsonHelper.GetFromAppSettings("VNPay:vnp_Returnurl");//URL nhan ket qua tra ve 
             vnp_Url = JsonHelper.GetFromAppSettings("VNPay:vnp_Url"); //URL thanh toan cua VNPAY 
@@ -32,7 +33,6 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
             _paymentRepository = paymentRepository;
             _mapper = mapper;
             _sessionOrderRepository = sessionOrderRepository;
-            _boothRepository = boothRepository;
         }
 
         public string Pay(VnpayRequest paymentRequest)
@@ -209,11 +209,11 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                 {
                     if (payment.Amount == vnp_Amount)
                     {
-                        if (payment.PaymentStatus == Domain.Enum.PaymentStatus.Processing)
+                        if (payment.PaymentStatus == PaymentStatus.Processing)
                         {
                             if (vnp_ResponseCode == "00" && vnp_TransactionStatus == "00")
                             {
-                                payment.PaymentStatus = Domain.Enum.PaymentStatus.Success;
+                                payment.PaymentStatus = PaymentStatus.Success;
                                 vnpayResponse = new VnpayResponse
                                 {
                                     Message = "Giao dịch được thực hiện thành công. Cảm ơn quý khách đã sử dụng dịch vụ",
@@ -227,7 +227,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                             }
                             else
                             {
-                                payment.PaymentStatus = Domain.Enum.PaymentStatus.Fail;
+                                payment.PaymentStatus = PaymentStatus.Fail;
                                 vnpayResponse = new VnpayResponse
                                 {
                                     Message = "Có lỗi xảy ra trong quá trình xử lý.",
@@ -249,7 +249,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                                 Message = "Order already confirmed",
                                 Success = false
                             };
-                            payment.PaymentStatus = Domain.Enum.PaymentStatus.Fail;
+                            payment.PaymentStatus = PaymentStatus.Fail;
                             returnContent = "{\"RspCode\":\"02\",\"Message\":\"Order already confirmed\"}";
                         }
                     }
@@ -260,13 +260,13 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                             Message = "Có lỗi xảy ra trong quá trình xử lý",
                             Success = false
                         };
-                        payment.PaymentStatus = Domain.Enum.PaymentStatus.Fail;
+                        payment.PaymentStatus = PaymentStatus.Fail;
                         returnContent = "{\"RspCode\":\"04\",\"Message\":\"invalid amount\"}";
                     }
                 }
                 else
                 {
-                    payment.PaymentStatus = Domain.Enum.PaymentStatus.Fail;
+                    payment.PaymentStatus = PaymentStatus.Fail;
                     vnpayResponse = new VnpayResponse
                     {
                         Message = "Có lỗi xảy ra trong quá trình xử lý",
@@ -275,19 +275,29 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                     returnContent = "{\"RspCode\":\"97\",\"Message\":\"Invalid signature\"}";
                 }
                 await _paymentRepository.UpdateAsync(payment);
-                if (payment.PaymentStatus == Domain.Enum.PaymentStatus.Success)
+                if (payment.PaymentStatus == PaymentStatus.Success)
                 {
                     var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
-                    if (sessionOrder != null)
+                    if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Created)
                     {
-                        sessionOrder.Status = Domain.Enum.SessionOrderStatus.Paid;
+                        if (payment.Amount < sessionOrder.TotalPrice)
+                        {
+                            sessionOrder.Status = SessionOrderStatus.Deposited;
+                        }
+                        else if (payment.Amount == sessionOrder.TotalPrice)
+                        {
+                            sessionOrder.Status = SessionOrderStatus.Waiting;
+                        }
                         await _sessionOrderRepository.UpdateAsync(sessionOrder);
                     }
-                    var booth = (await _boothRepository.GetAsync(i => i.BoothID == sessionOrder.BoothID)).FirstOrDefault();
-                    if (booth != null)
+                    else if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Deposited)
                     {
-                        booth.Status = Domain.Enum.ManufactureStatus.Active;
-                        await _boothRepository.UpdateAsync(booth);
+                        var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PaymentStatus == PaymentStatus.Success)).FirstOrDefault();
+                        if (paymentCheck.Amount + payment.Amount == sessionOrder.TotalPrice)
+                        {
+                            sessionOrder.Status = SessionOrderStatus.Waiting;
+                            await _sessionOrderRepository.UpdateAsync(sessionOrder);
+                        }
                     }
                 }
             }

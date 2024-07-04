@@ -23,7 +23,7 @@ namespace PhotoboothBranchService.Application.Services.SessionPackageServices
         {
             var sessionPackage = _mapper.Map<SessionPackage>(createModel);
             await _sessionPackageRepository.AddAsync(sessionPackage);
-            return _mapper.Map<CreateSessionPackageResponse>(createModel);
+            return _mapper.Map<CreateSessionPackageResponse>(sessionPackage);
         }
 
         // Delete
