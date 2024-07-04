@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PhotoboothBranchService.Application.Services.PhotoBoxServices;
 using PhotoboothBranchService.Domain.IRepository;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 using PhotoboothBranchService.Infrastructure.Repositories;
@@ -32,6 +33,7 @@ namespace PhotoboothBranchService.Infrastructure
             services.AddScoped<IServiceTypeRepository, ServiceTypeRepository>();
             services.AddScoped<ISessionOrderRepository, SessionOrderRepository>();
             services.AddScoped<IStickerRepository, StickerRepository>();
+            services.AddScoped<IPhotoBoxRepository, PhotoBoxRepository>();
 
             services.AddScoped<IMapper, Mapper>();
 

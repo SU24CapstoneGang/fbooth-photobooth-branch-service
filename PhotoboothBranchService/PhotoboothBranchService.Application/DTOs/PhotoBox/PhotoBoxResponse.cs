@@ -3,7 +3,7 @@
     public class PhotoBoxResponse
     {
         public Guid PhotoBoxID { get; set; }
-        public int boxLength { get; set; }
+        public int boxHeight { get; set; }
         public int boxWidth { get; set; }
         public int CoordinatesX { get; set; }
         public int CoordinatesY { get; set; }

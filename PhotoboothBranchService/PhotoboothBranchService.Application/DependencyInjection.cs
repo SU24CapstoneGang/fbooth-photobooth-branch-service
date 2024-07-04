@@ -18,6 +18,7 @@ using PhotoboothBranchService.Application.Services.PaymentServices;
 using PhotoboothBranchService.Application.Services.PaymentServices.MoMoServices;
 using PhotoboothBranchService.Application.Services.PaymentServices.QR;
 using PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices;
+using PhotoboothBranchService.Application.Services.PhotoBoxServices;
 using PhotoboothBranchService.Application.Services.PhotoServices;
 using PhotoboothBranchService.Application.Services.PhotoSessionServices;
 using PhotoboothBranchService.Application.Services.PhotoStickerServices;
@@ -51,6 +52,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IServiceTypeService, ServiceTypeService>();
             services.AddScoped<ISessionOrderService, SessionOrderService>();
             services.AddScoped<IStickerService, StickerService>();
+            services.AddScoped<IPhotoBoxService, PhotoBoxService>();
 
             // cloudinary
             services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
