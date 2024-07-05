@@ -9,13 +9,13 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
     {
         public BoothBranchMapper()
         {
-            CreateMap<CreateBoothBranchRequest, BoothBranch>().ReverseMap().HandleNullProperty();
-            CreateMap<UpdateBoothBranchRequest, BoothBranch>().ReverseMap().HandleNullProperty();
-            CreateMap<BoothBranch, BoothBranchResponse>()
+            CreateMap<CreateBranchRequest, BoothBranch>().ReverseMap().HandleNullProperty();
+            CreateMap<UpdateBranchRequest, BoothBranch>().ReverseMap().HandleNullProperty();
+            CreateMap<BoothBranch, BranchResponse>()
                 //.ForMember(des => des.AccountName, opt => opt.MapFrom<FullNameResolver>())
                 .ReverseMap()
                 .HandleNullProperty();
-            CreateMap<BoothBranch, CreateBoothBranchResponse>().HandleNullProperty();
+            CreateMap<BoothBranch, CreateBranchResponse>().HandleNullProperty();
         }
     }
 

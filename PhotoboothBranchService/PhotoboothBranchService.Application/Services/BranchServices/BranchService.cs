@@ -8,24 +8,24 @@ using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.BoothBranchServices;
 
-public class BoothBranchService : IBoothBranchService
+public class BranchService : IBranchService
 {
     private readonly IBoothBranchRepository _photoBoothBranchRepository;
     private readonly IMapper _mapper;
 
-    public BoothBranchService(IBoothBranchRepository photoBoothBranchRepository, IMapper mapper)
+    public BranchService(IBoothBranchRepository photoBoothBranchRepository, IMapper mapper)
     {
         _photoBoothBranchRepository = photoBoothBranchRepository;
         _mapper = mapper;
     }
     //Create
-    public async Task<CreateBoothBranchResponse> CreateAsync(CreateBoothBranchRequest createModel)
+    public async Task<CreateBranchResponse> CreateAsync(CreateBranchRequest createModel)
     {
         try
         {
             BoothBranch photoBoothBranch = _mapper.Map<BoothBranch>(createModel);
             await _photoBoothBranchRepository.AddAsync(photoBoothBranch);
-            return _mapper.Map<CreateBoothBranchResponse>(photoBoothBranch);
+            return _mapper.Map<CreateBranchResponse>(photoBoothBranch);
         }
         catch (Exception)
         {
@@ -49,39 +49,39 @@ public class BoothBranchService : IBoothBranchService
         }
     }
     //read
-    public async Task<IEnumerable<BoothBranchResponse>> GetAllAsync()
+    public async Task<IEnumerable<BranchResponse>> GetAllAsync()
     {
-        var photoBoothBranches = await _photoBoothBranchRepository.GetAllAsync();
-        return _mapper.Map<IEnumerable<BoothBranchResponse>>(photoBoothBranches.ToList());
+        var photoBoothBranches = await _photoBoothBranchRepository.GetAsync(null, bth => bth.Booths);
+        return _mapper.Map<IEnumerable<BranchResponse>>(photoBoothBranches.ToList());
     }
 
-    public async Task<IEnumerable<BoothBranchResponse>> GetAllPagingAsync(BoothBranchFilter filter, PagingModel paging)
+    public async Task<IEnumerable<BranchResponse>> GetAllPagingAsync(BranchFilter filter, PagingModel paging)
     {
         var photoBoothBranches = (await _photoBoothBranchRepository.GetAllAsync()).ToList().AutoFilter(filter);
-        var listPhotoBoothBranchresponse = _mapper.Map<IEnumerable<BoothBranchResponse>>(photoBoothBranches);
+        var listPhotoBoothBranchresponse = _mapper.Map<IEnumerable<BranchResponse>>(photoBoothBranches);
         return listPhotoBoothBranchresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
     }
 
-    public async Task<BoothBranchResponse> GetByIdAsync(Guid id)
+    public async Task<BranchResponse> GetByIdAsync(Guid id)
     {
         var photoBoothBranch = (await _photoBoothBranchRepository.GetAsync(p => p.BoothBranchID == id)).FirstOrDefault();
-        return _mapper.Map<BoothBranchResponse>(photoBoothBranch);
+        return _mapper.Map<BranchResponse>(photoBoothBranch);
     }
 
-    public async Task<IEnumerable<BoothBranchResponse>> GetByStatus(ManufactureStatus status)
+    public async Task<IEnumerable<BranchResponse>> GetByStatus(ManufactureStatus status)
     {
         var photoBoothBranch = await _photoBoothBranchRepository.GetAsync(p => p.Status == status);
-        return _mapper.Map<IEnumerable<BoothBranchResponse>>(photoBoothBranch);
+        return _mapper.Map<IEnumerable<BranchResponse>>(photoBoothBranch);
     }
 
-    public async Task<IEnumerable<BoothBranchResponse>> SearchByName(string name)
+    public async Task<IEnumerable<BranchResponse>> SearchByName(string name)
     {
         var photoBoothBranch = await _photoBoothBranchRepository.GetAsync(p => p.BranchName.Contains(name));
-        return _mapper.Map<IEnumerable<BoothBranchResponse>>(photoBoothBranch);
+        return _mapper.Map<IEnumerable<BranchResponse>>(photoBoothBranch);
     }
 
     //update
-    public async Task UpdateAsync(Guid id, UpdateBoothBranchRequest updateModel)
+    public async Task UpdateAsync(Guid id, UpdateBranchRequest updateModel)
     {
         var photobranch = (await _photoBoothBranchRepository.GetAsync(p => p.BoothBranchID == id)).FirstOrDefault();
         if (photobranch == null)

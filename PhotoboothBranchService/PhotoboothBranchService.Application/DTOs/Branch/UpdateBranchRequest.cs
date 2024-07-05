@@ -2,7 +2,7 @@
 
 namespace PhotoboothBranchService.Application.DTOs.BoothBranch
 {
-    public class UpdateBoothBranchRequest
+    public class UpdateBranchRequest
     {
         public string BranchName { get; set; } = default!;
         public string Address { get; set; } = default!;

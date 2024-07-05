@@ -1,8 +1,9 @@
-﻿using PhotoboothBranchService.Domain.Enum;
+﻿using PhotoboothBranchService.Application.DTOs.Booth;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Application.DTOs.BoothBranch
 {
-    public class BoothBranchFilter
+    public class BranchFilter
     {
         public string? BranchName { get; set; } = default!;
         public string? Address { get; set; } = default!;
