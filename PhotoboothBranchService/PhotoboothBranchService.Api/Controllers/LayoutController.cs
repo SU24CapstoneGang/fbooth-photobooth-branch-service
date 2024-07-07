@@ -124,4 +124,20 @@ public class LayoutController : ControllerBaseApi
             return StatusCode(500, $"An error occurred while adding the photo: {ex.Message}");
         }
     }
+
+    [HttpPost("add-layout-auto")]
+    public async Task<ActionResult<LayoutResponse>> AddLayout(IFormFile file)
+    {
+        try
+        {
+
+            var result = await _layoutService.CreateLayoutAuto(file);
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while adding the photo: {ex.Message}");
+        }
+    }
 }
