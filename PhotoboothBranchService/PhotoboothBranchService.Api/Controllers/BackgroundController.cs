@@ -15,20 +15,20 @@ public class BackgroundController : ControllerBaseApi
         _backgroundService = backgroundService;
     }
 
-    // Create
-    [HttpPost]
-    public async Task<ActionResult<CreateBackgroundResponse>> CreateBackground(CreateBackgroundRequest createBackgroundRequest)
-    {
-        try
-        {
-            var createBackgroundResponse = await _backgroundService.CreateAsync(createBackgroundRequest);
-            return Ok(createBackgroundResponse);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while creating the background: {ex.Message}");
-        }
-    }
+    //// Create
+    //[HttpPost]
+    //public async Task<ActionResult<CreateBackgroundResponse>> CreateBackground(CreateBackgroundRequest createBackgroundRequest)
+    //{
+    //    try
+    //    {
+    //        var createBackgroundResponse = await _backgroundService.CreateAsync(createBackgroundRequest);
+    //        return Ok(createBackgroundResponse);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, $"An error occurred while creating the background: {ex.Message}");
+    //    }
+    //}
 
     // Read
     [HttpGet]
@@ -94,12 +94,12 @@ public class BackgroundController : ControllerBaseApi
     }
 
     // Update
-    [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateBackground(Guid id, UpdateBackgroundRequest updateBackgroundRequest)
+    [HttpPut("{backGroundID}")]
+    public async Task<ActionResult> UpdateBackground(IFormFile file, Guid backGroundID,[FromQuery] UpdateBackgroundRequest updateBackgroundRequest)
     {
         try
         {
-            await _backgroundService.UpdateAsync(id, updateBackgroundRequest);
+            await _backgroundService.UpdateBackGroundAsync(file, backGroundID, updateBackgroundRequest);
             return Ok();
         }
         catch (Exception ex)
@@ -123,12 +123,12 @@ public class BackgroundController : ControllerBaseApi
         }
     }
     [HttpPost("add-frame-cloud")]
-    public async Task<ActionResult<BackgroundResponse>> AddBackground(IFormFile file, [FromQuery] CreateBackgroundRequest createBackgroundRequest)
+    public async Task<ActionResult<BackgroundResponse>> AddBackground(IFormFile file, Guid layoutID)
     {
         try
         {
 
-            var result = await _backgroundService.CreateBackgroundAsync(file, createBackgroundRequest);
+            var result = await _backgroundService.CreateBackgroundAsync(file, layoutID);
 
             return Ok(result);
         }
