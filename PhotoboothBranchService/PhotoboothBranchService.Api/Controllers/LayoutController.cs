@@ -15,20 +15,20 @@ public class LayoutController : ControllerBaseApi
         _layoutService = layoutService;
     }
 
-    // Create
-    [HttpPost]
-    public async Task<ActionResult<CreateLayoutResponse>> CreateLayout(CreateLayoutRequest createLayoutRequest)
-    {
-        try
-        {
-            var createLayoutResponse = await _layoutService.CreateAsync(createLayoutRequest);
-            return Ok(createLayoutResponse);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while creating the layout: {ex.Message}");
-        }
-    }
+    //// Create
+    //[HttpPost]
+    //public async Task<ActionResult<CreateLayoutResponse>> CreateLayout(CreateLayoutRequest createLayoutRequest)
+    //{
+    //    try
+    //    {
+    //        var createLayoutResponse = await _layoutService.CreateAsync(createLayoutRequest);
+    //        return Ok(createLayoutResponse);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, $"An error occurred while creating the layout: {ex.Message}");
+    //    }
+    //}
 
     // Read
     [HttpGet]
