@@ -81,11 +81,11 @@ public class LayoutController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateLayout(Guid id, UpdateLayoutRequest updateLayoutRequest)
+    public async Task<ActionResult> UpdateLayout(IFormFile file, Guid id, UpdateLayoutRequest updateLayoutRequest)
     {
         try
         {
-            await _layoutService.UpdateAsync(id, updateLayoutRequest);
+            await _layoutService.UpdateLayoutAsync(file, id, updateLayoutRequest);
             return Ok();
         }
         catch (Exception ex)
