@@ -4,7 +4,10 @@ using PhotoboothBranchService.Domain.Common.Interfaces;
 
 namespace PhotoboothBranchService.Application.Services.SessionPackageServices
 {
-    public interface ISessionPackageService : IServiceBase<SessionPackageResponse, CreateSessionPackageRequest, CreateSessionPackageResponse, UpdateSessionPackageRequest, SessionPackageFilter, PagingModel>
+    public interface ISessionPackageService : IServiceBase<SessionPackageResponse, SessionPackageFilter, PagingModel>
     {
+        public Task<CreateSessionPackageResponse> CreateAsync(CreateSessionPackageRequest createModel);
+        public Task UpdateAsync(Guid id, UpdateSessionPackageRequest updateModel);
+        public Task DeleteAsync(Guid id);
     }
 }
