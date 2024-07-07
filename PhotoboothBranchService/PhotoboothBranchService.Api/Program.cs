@@ -1,5 +1,4 @@
 ﻿using Microsoft.OpenApi.Models;
-using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Api.Common.MiddleWares;
 using PhotoboothBranchService.Application;
 using PhotoboothBranchService.Infrastructure;
