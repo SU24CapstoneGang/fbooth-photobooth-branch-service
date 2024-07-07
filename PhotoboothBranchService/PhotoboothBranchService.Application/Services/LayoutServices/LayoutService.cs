@@ -20,46 +20,46 @@ public class LayoutService : ILayoutService
     private readonly ILayoutRepository _layoutRepository;
     private readonly IMapper _mapper;
     private readonly ICloudinaryService _cloudinaryService;
-    private readonly IPhotoBoxService _photoBoxService;
 
-    public LayoutService(ILayoutRepository layoutRepository, IMapper mapper, ICloudinaryService cloudinaryService, IPhotoBoxService photoBoxService)
+    public LayoutService(ILayoutRepository layoutRepository, IMapper mapper, ICloudinaryService cloudinaryService)
     {
         _layoutRepository = layoutRepository;
         _mapper = mapper;
         _cloudinaryService = cloudinaryService;
-        _photoBoxService = photoBoxService;
     }
 
-    // Create
-    public async Task<CreateLayoutResponse> CreateAsync(CreateLayoutRequest createModel)
-    {
-        Layout layout = _mapper.Map<Layout>(createModel);
-        await _layoutRepository.AddAsync(layout);
-        return _mapper.Map<CreateLayoutResponse>(layout);
-    }
-    public async Task<LayoutResponse> CreateLayoutAsync(IFormFile file, CreateLayoutRequest createModel)
-    {
+    //// Create
+    //public async Task<CreateLayoutResponse> CreateAsync(CreateLayoutRequest createModel)
+    //{
+    //    Layout layout = _mapper.Map<Layout>(createModel);
+    //    await _layoutRepository.AddAsync(layout);
+    //    return _mapper.Map<CreateLayoutResponse>(layout);
+    //}
 
-        //upload to cloudinary
-        var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-Layout");
-        if (uploadResult.Error != null)
-        {
-            throw new Exception(uploadResult.Error.Message);
-        }
+    ////[HttpPost("add-layout-cloud")]
+    //public async Task<LayoutResponse> CreateLayoutAsync(IFormFile file, CreateLayoutRequest createModel)
+    //{
 
-        //create object from cloudinary's return 
-        var layout = _mapper.Map<Layout>(createModel);
+    //    //upload to cloudinary
+    //    var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-Layout");
+    //    if (uploadResult.Error != null)
+    //    {
+    //        throw new Exception(uploadResult.Error.Message);
+    //    }
 
-        layout.LayoutURL = uploadResult.SecureUrl.AbsoluteUri;
-        layout.CouldID = uploadResult.PublicId;
-        layout.Status = StatusUse.Available;
+    //    //create object from cloudinary's return 
+    //    var layout = _mapper.Map<Layout>(createModel);
 
-        await _layoutRepository.AddAsync(layout);
+    //    layout.LayoutURL = uploadResult.SecureUrl.AbsoluteUri;
+    //    layout.CouldID = uploadResult.PublicId;
+    //    layout.Status = StatusUse.Available;
 
-        return _mapper.Map<LayoutResponse>(layout);
-    }
+    //    await _layoutRepository.AddAsync(layout);
 
+    //    return _mapper.Map<LayoutResponse>(layout);
+    //}
 
+    //[HttpPost("add-layout-auto")]
     public async Task<LayoutResponse> CreateLayoutAuto(IFormFile file)
     {
 
@@ -161,15 +161,16 @@ public class LayoutService : ILayoutService
             if (layout != null)
             {
                 await _layoutRepository.RemoveAsync(layout);
+                await _cloudinaryService.DeletePhotoAsync(layout.CouldID);
             }
             else
             {
-                throw new NotFoundException($"Not found kayout id {id}");
+                throw new NotFoundException($"Not found layout id {id}");
             }
         }
         catch
         {
-            throw;
+            throw new BadRequestException("Fail for deleting layout"); ;
         }
     }
 
@@ -193,8 +194,8 @@ public class LayoutService : ILayoutService
         return _mapper.Map<LayoutResponse>(layout);
     }
 
-    // Update
-    public async Task UpdateAsync(Guid id, UpdateLayoutRequest updateMdel)
+    // Update bo
+    public async Task UpdateAsync(Guid id, UpdateLayoutRequest updateModel)
     {
         var layout = (await _layoutRepository.GetAsync(l => l.LayoutID == id)).FirstOrDefault();
         if (layout == null)
@@ -202,9 +203,23 @@ public class LayoutService : ILayoutService
             throw new KeyNotFoundException("Layout not found.");
         }
 
-        var updateLayout = _mapper.Map(updateMdel, layout);
+        var updateLayout = _mapper.Map(updateModel, layout);
         updateLayout.LastModified = DateTime.UtcNow;
         await _layoutRepository.UpdateAsync(updateLayout);
+    }
+
+    public async Task UpdateLayoutAsync(IFormFile file, Guid BackGroundID, UpdateLayoutRequest updateLayoutRequest)
+    {
+        var layout = (await _layoutRepository.GetAsync(l => l.LayoutID == BackGroundID)).FirstOrDefault();
+        if (layout == null)
+        {
+            throw new KeyNotFoundException("Layout not found.");
+        }
+
+        var updateLayout = _mapper.Map(updateLayoutRequest, layout);
+        updateLayout.LastModified = DateTime.UtcNow;
+        await _layoutRepository.UpdateAsync(updateLayout);
+        await _cloudinaryService.UpdatePhotoAsync(file, layout.CouldID);
     }
 }
 

@@ -15,20 +15,7 @@ public class StickerController : ControllerBaseApi
         _stickerService = stickerService;
     }
 
-    // Create
-    [HttpPost]
-    public async Task<ActionResult<CreateStickerResponse>> CreateSticker(CreateStickerRequest createStickerRequest)
-    {
-        try
-        {
-            var createStickerResponse = await _stickerService.CreateAsync(createStickerRequest);
-            return Ok(createStickerResponse);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while creating the sticker: {ex.Message}");
-        }
-    }
+
 
     // Read
     [HttpGet]
@@ -93,11 +80,11 @@ public class StickerController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateSticker(Guid id, UpdateStickerRequest updateStickerRequest)
+    public async Task<ActionResult> UpdateSticker(IFormFile file, Guid id, UpdateStickerRequest updateStickerRequest)
     {
         try
         {
-            await _stickerService.UpdateAsync(id, updateStickerRequest);
+            await _stickerService.UpdateStickerAsync(file, id, updateStickerRequest);
             return Ok();
         }
         catch (Exception ex)
@@ -122,12 +109,12 @@ public class StickerController : ControllerBaseApi
     }
 
     [HttpPost("add-sticker-cloud")]
-    public async Task<ActionResult<StickerResponse>> AddPhoto(IFormFile file, [FromQuery] CreateStickerRequest createLayoutRequest)
+    public async Task<ActionResult<StickerResponse>> AddPhoto(IFormFile file)
     {
         try
         {
 
-            var result = await _stickerService.CreateStickerAsync(file, createLayoutRequest);
+            var result = await _stickerService.CreateStickerAsync(file);
 
             return Ok(result);
         }

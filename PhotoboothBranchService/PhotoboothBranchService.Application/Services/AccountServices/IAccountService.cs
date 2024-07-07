@@ -13,7 +13,6 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
         Task<LoginResponeModel> Login(LoginRequestModel request);
         Task<LoginResponeModel> RefreshToken(RefreshTokenRequestModel request);
         Task<string> ResetPassword(string email);
-        public Task<AccountRegisterResponse> CreateAsync(CreateAccountRequestModel createModel);
         public Task UpdateAsync(Guid id, UpdateAccountRequestModel updateModel);
         public Task DeleteAsync(Guid id);
     }
