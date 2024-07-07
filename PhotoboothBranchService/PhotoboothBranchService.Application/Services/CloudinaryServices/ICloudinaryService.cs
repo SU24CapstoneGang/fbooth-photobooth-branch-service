@@ -7,5 +7,6 @@ namespace PhotoboothBranchService.Application.Services.CloudinaryServices
     {
         Task<ImageUploadResult> AddPhotoAsync(IFormFile file, string folder);
         Task<DeletionResult> DeletePhotoAsync(string publicId);
+        Task<ImageUploadResult> UpdatePhotoAsync(IFormFile file, string publicId);
     }
 }

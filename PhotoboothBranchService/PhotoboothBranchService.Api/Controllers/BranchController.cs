@@ -8,18 +8,18 @@ using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Api.Controllers;
 
-public class BoothBranchController : ControllerBaseApi
+public class BranchController : ControllerBaseApi
 {
-    private readonly IBoothBranchService _photoBoothBranchService;
+    private readonly IBranchService _photoBoothBranchService;
 
-    public BoothBranchController(IBoothBranchService photoBoothBranchService)
+    public BranchController(IBranchService photoBoothBranchService)
     {
         _photoBoothBranchService = photoBoothBranchService;
     }
 
     //Create
     [HttpPost]
-    public async Task<ActionResult<CreateBoothBranchResponse>> CreatePhotoBoothBranch(CreateBoothBranchRequest createPhotoBoothBranchRequest)
+    public async Task<ActionResult<CreateBranchResponse>> CreateBranch(CreateBranchRequest createPhotoBoothBranchRequest)
     {
         try
         {
@@ -34,7 +34,7 @@ public class BoothBranchController : ControllerBaseApi
 
     //Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<BoothBranchResponse>>> GetAllPhotoBoothBranches()
+    public async Task<ActionResult<IEnumerable<BranchResponse>>> GetAllBranches()
     {
         try
         {
@@ -48,8 +48,8 @@ public class BoothBranchController : ControllerBaseApi
     }
     //get all with filter and paging
     [HttpGet("paging")]
-    public async Task<ActionResult<IEnumerable<BoothBranchResponse>>> GetAllPhotoBoothBranches(
-        [FromQuery] BoothBranchFilter photoBoothBranchFilter, [FromQuery] PagingModel pagingModel)
+    public async Task<ActionResult<IEnumerable<BranchResponse>>> GetAllBranches(
+        [FromQuery] BranchFilter photoBoothBranchFilter, [FromQuery] PagingModel pagingModel)
     {
         try
         {
@@ -63,7 +63,7 @@ public class BoothBranchController : ControllerBaseApi
     }
 
     [HttpGet("status/{status}")]
-    public async Task<ActionResult<IEnumerable<BoothBranchResponse>>> GetPhotoBoothBranchesByStatus(ManufactureStatus status)
+    public async Task<ActionResult<IEnumerable<BranchResponse>>> GetBranchesByStatus(ManufactureStatus status)
     {
         try
         {
@@ -77,7 +77,7 @@ public class BoothBranchController : ControllerBaseApi
     }
 
     [HttpGet("name/{name}")]
-    public async Task<ActionResult<IEnumerable<BoothBranchResponse>>> GetPhotoBoothBranchesByName(string name)
+    public async Task<ActionResult<IEnumerable<BranchResponse>>> GetBranchesByName(string name)
     {
         try
         {
@@ -91,7 +91,7 @@ public class BoothBranchController : ControllerBaseApi
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<BoothBranchResponse>> GetPhotoBoothBranchById(Guid id)
+    public async Task<ActionResult<BranchResponse>> GetBranchById(Guid id)
     {
         try
         {
@@ -110,7 +110,7 @@ public class BoothBranchController : ControllerBaseApi
 
     //Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdatePhotoBoothBranch(Guid id, UpdateBoothBranchRequest updatePhotoBoothBranchRequest)
+    public async Task<ActionResult> UpdateBranch(Guid id, UpdateBranchRequest updatePhotoBoothBranchRequest)
     {
         try
         {
@@ -125,7 +125,7 @@ public class BoothBranchController : ControllerBaseApi
 
     //Delete
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeletePhotoBoothBranch(Guid id)
+    public async Task<ActionResult> DeleteBranch(Guid id)
     {
         try
         {

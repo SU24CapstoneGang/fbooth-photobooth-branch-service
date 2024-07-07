@@ -1,8 +1,9 @@
-﻿using PhotoboothBranchService.Domain.Enum;
+﻿using PhotoboothBranchService.Application.DTOs.Booth;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Application.DTOs.BoothBranch
 {
-    public class BoothBranchResponse
+    public class CreateBranchResponse
     {
         public Guid BoothBranchID { get; set; }
         public string BranchName { get; set; } = default!;
@@ -12,5 +13,7 @@ namespace PhotoboothBranchService.Application.DTOs.BoothBranch
         public DateTime CreateDate { get; set; }
         public ManufactureStatus Status { get; set; } = default!;
         public Guid ManagerID { get; set; }
+        public List<BoothResponse> Booths { get; set; }
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Background;
 using PhotoboothBranchService.Application.DTOs.Layout;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 
@@ -9,4 +10,6 @@ public interface ILayoutService : IService<LayoutResponse, CreateLayoutRequest, 
 {
     Task<LayoutResponse> CreateLayoutAsync(IFormFile file, CreateLayoutRequest createModel);
     Task<LayoutResponse> CreateLayoutAuto(IFormFile file);
+    Task UpdateLayoutAsync(IFormFile file, Guid BackGroundID, UpdateLayoutRequest updateLayoutRequest);
+
 }
