@@ -122,7 +122,7 @@ public class BackgroundController : ControllerBaseApi
             return StatusCode(500, $"An error occurred while deleting the background: {ex.Message}");
         }
     }
-    [HttpPost("add-frame-cloud")]
+    [HttpPost("add-background-cloud")]
     public async Task<ActionResult<BackgroundResponse>> AddBackground(IFormFile file, Guid layoutID)
     {
         try
