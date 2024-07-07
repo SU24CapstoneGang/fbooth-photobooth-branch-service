@@ -5,7 +5,7 @@ using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Application.Services.BoothBranchServices;
 
-public interface IBranchService : IService<BranchResponse,
+public interface IBranchService : IServiceBase<BranchResponse,
     CreateBranchRequest,
     CreateBranchResponse,
     UpdateBranchRequest,

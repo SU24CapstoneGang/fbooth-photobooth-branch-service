@@ -4,7 +4,7 @@ using PhotoboothBranchService.Domain.Common.Interfaces;
 
 namespace PhotoboothBranchService.Application.Services.ServiceTypeServices
 {
-    public interface IServiceTypeService : IService<ServiceTypeResponse, CreateServiceTypeRequest, CreateServiceTypeResponse, UpdateServiceTypeRequest, ServiceTypeFilter, PagingModel>
+    public interface IServiceTypeService : IServiceBase<ServiceTypeResponse, CreateServiceTypeRequest, CreateServiceTypeResponse, UpdateServiceTypeRequest, ServiceTypeFilter, PagingModel>
     {
         Task<IEnumerable<ServiceTypeResponse>> GetByName(string name);
     }
