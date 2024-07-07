@@ -125,7 +125,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
             var vnp_Version = "2.1.0";
             var vnp_Command = "refund";
             var vnp_TransactionType = request.RefundCategory;
-            var vnp_Amount = Convert.ToInt64(request.Amount) * 100;
+            var vnp_Amount = request.Amount * 100;
             var vnp_TxnRef = request.SessionId;
             var vnp_OrderInfo = "Hoan tien giao dich:" + request.SessionId;
             var vnp_TransactionNo = request.TransId;
@@ -292,8 +292,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                     }
                     else if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Deposited)
                     {
-                        var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PaymentStatus == PaymentStatus.Success)).FirstOrDefault();
-                        if (paymentCheck.Amount + payment.Amount == sessionOrder.TotalPrice)
+                        var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PaymentStatus == PaymentStatus.Success)).ToList();
+                        if (paymentCheck.Sum(i => i.Amount) == sessionOrder.TotalPrice)
                         {
                             sessionOrder.Status = SessionOrderStatus.Waiting;
                             await _sessionOrderRepository.UpdateAsync(sessionOrder);

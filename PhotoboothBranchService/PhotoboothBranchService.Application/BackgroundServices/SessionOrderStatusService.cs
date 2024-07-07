@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PhotoboothBranchService.Application.Services.PaymentServices;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 using System;
@@ -33,6 +34,7 @@ namespace PhotoboothBranchService.Application.BackgroundServices
             using (var scope = _serviceProvider.CreateScope())
             {
                 var sessionOrderRepository = scope.ServiceProvider.GetRequiredService<ISessionOrderRepository>();
+                var boothRepository = scope.ServiceProvider.GetRequiredService<IBoothRepository>();
 
                 var now = DateTime.Now;
                 var orders = (await sessionOrderRepository.GetAsync(o =>
@@ -44,15 +46,22 @@ namespace PhotoboothBranchService.Application.BackgroundServices
 
                 foreach (var order in orders)
                 {
-                    if ((now - order.StartTime).TotalMinutes >= 15 &&
-                        (order.Status == SessionOrderStatus.Deposited || order.Status == SessionOrderStatus.Waiting || order.Status == SessionOrderStatus.Created))
+                    if ((now - order.StartTime).TotalMinutes >= 15)
                     {
                         if (order.Status == SessionOrderStatus.Waiting)
                         {
                             //thuc hien hoan tien o day
+                            var paymentService = scope.ServiceProvider.GetRequiredService<IPaymentService>();
+                            //var payments = paymentRepository.get
                         }
                         order.Status = SessionOrderStatus.Canceled;
                         await sessionOrderRepository.UpdateAsync(order);
+                        var booth = (await boothRepository.GetAsync(i => i.BoothID == order.BoothID)).FirstOrDefault();
+                        if (booth != null)
+                        {
+                            booth.Status = ManufactureStatus.Active;
+                            await boothRepository.UpdateAsync(booth);
+                        }
                     }
                 }
             }

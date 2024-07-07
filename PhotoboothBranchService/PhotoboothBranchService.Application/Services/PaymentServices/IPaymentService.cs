@@ -6,5 +6,6 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
 {
     public interface IPaymentService : IService<PaymentResponse, CreatePaymentRequest, CreatePaymentResponse, UpdatePaymentRequest, PaymentFilter, PagingModel>
     {
+        public Task<IEnumerable<PaymentResponse>> GetByOrderIdAsync(Guid id);
     }
 }

@@ -141,8 +141,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
                 }
                 else if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Deposited)
                 {
-                    var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PaymentStatus == PaymentStatus.Success)).FirstOrDefault();
-                    if (paymentCheck.Amount + payment.Amount == sessionOrder.TotalPrice)
+                    var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PaymentStatus == PaymentStatus.Success)).ToList();
+                    if (paymentCheck.Sum(i=>i.Amount) == sessionOrder.TotalPrice)
                     {
                         sessionOrder.Status = SessionOrderStatus.Waiting;
                         await _sessionOrderRepository.UpdateAsync(sessionOrder);

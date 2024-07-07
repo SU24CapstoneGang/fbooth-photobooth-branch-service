@@ -11,6 +11,7 @@ using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
+using System.Net;
 
 namespace PhotoboothBranchService.Application.Services.PaymentServices
 {
@@ -45,7 +46,10 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             {
                 throw new NotFoundException("Not found Session to proceed payment");
             }
-
+            if (sessionOrder.Status == SessionOrderStatus.Canceled || sessionOrder.Status == SessionOrderStatus.Done)
+            {
+                throw new Exception("The Order has been ended or cancelled");
+            }
             //create payment object
             var payment = _mapper.Map<Payment>(createModel);
             payment.PaymentID = Guid.NewGuid();
@@ -136,6 +140,40 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             return createPaymentResponse;
         }
 
+        //refund 
+        public async Task RefundByID(Guid id, bool isFullRefund)
+        {
+            var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == id, i => i.PaymentMethod)).FirstOrDefault();
+            if (payment == null)
+            {
+                throw new NotFoundException("Not found Payment ID to refund");
+            }
+            if (payment.PaymentMethod.Status != PaymentMethodStatus.Active)
+            {
+                throw new Exception("This method not availble to refund anymore");
+            }
+            switch (payment.PaymentMethod.PaymentMethodName) 
+            {
+                case "VNPay":
+                    var order = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
+                    VnpayRefundRequest refundRequest = new VnpayRefundRequest
+                    {
+                        Amount = isFullRefund ? payment.Amount : (payment.Amount / 10 * 5),
+                        PayDate = payment.PaymentDateTime,
+                        RefundCategory = isFullRefund ? "02" : "03",
+                        SessionId = payment.SessionOrderID.ToString(),
+                        TransId = payment.TransactionID,
+                        User = order.AccountID.ToString(),
+                    };
+                    IPAddress localIp = Dns.GetHostEntry(Dns.GetHostName()).AddressList[0];
+                    var response = _vNPayService.RefundTransaction(refundRequest, localIp.ToString());
+                    break;
+                case "MoMo":
+                    break;
+                default:
+                    throw new Exception("Payment method not availbe to use, please try later");
+            }
+        }
         // Delete
         public async Task DeleteAsync(Guid id)
         {
@@ -167,6 +205,12 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             var payments = (await _paymentRepository.GetAllAsync()).ToList().AutoFilter(filter);
             var listPaymentResponse = _mapper.Map<IEnumerable<PaymentResponse>>(payments);
             return listPaymentResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+        }
+
+        public async Task<IEnumerable<PaymentResponse>> GetByOrderIdAsync(Guid id)
+        {
+            var payments = await _paymentRepository.GetAsync(p => p.SessionOrderID == id);
+            return _mapper.Map<IEnumerable<PaymentResponse>>(payments);
         }
 
         // Read by ID
