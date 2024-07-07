@@ -14,6 +14,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasKey(u => u.BoothID);
             builder.Property(u => u.BoothID).HasColumnName("BoothID").ValueGeneratedOnAdd();
             builder.Property(b => b.BoothName).IsRequired().HasMaxLength(50);
+            builder.Property(b => b.BackgroundColor).IsRequired();
+            builder.Property(b => b.Concept).IsRequired();
+            builder.Property(b => b.PeopleInBooth).IsRequired();
 
             // ManufactureStatus enum mapping
             builder.Property(pb => pb.Status)

@@ -2,12 +2,12 @@
 
 namespace PhotoboothBranchService.Application.DTOs.BoothBranch
 {
-    public class BoothBranchResponse
+    public class UpdateBranchRequest
     {
-        public Guid BoothBranchID { get; set; }
         public string BranchName { get; set; } = default!;
-        public string BranchAddress { get; set; } = default!;
-        public DateTime CreateDate { get; set; }
+        public string Address { get; set; } = default!;
+        public string Town { get; set; } = default!;
+        public string City { get; set; } = default!;
         public ManufactureStatus Status { get; set; } = default!;
         public Guid ManagerID { get; set; }
     }
