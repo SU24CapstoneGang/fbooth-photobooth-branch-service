@@ -15,20 +15,6 @@ public class BackgroundController : ControllerBaseApi
         _backgroundService = backgroundService;
     }
 
-    //// Create
-    //[HttpPost]
-    //public async Task<ActionResult<CreateBackgroundResponse>> CreateBackground(CreateBackgroundRequest createBackgroundRequest)
-    //{
-    //    try
-    //    {
-    //        var createBackgroundResponse = await _backgroundService.CreateAsync(createBackgroundRequest);
-    //        return Ok(createBackgroundResponse);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return StatusCode(500, $"An error occurred while creating the background: {ex.Message}");
-    //    }
-    //}
 
     // Read
     [HttpGet]

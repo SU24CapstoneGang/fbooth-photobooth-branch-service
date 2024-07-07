@@ -15,8 +15,6 @@ public class StickerController : ControllerBaseApi
         _stickerService = stickerService;
     }
 
-
-
     // Read
     [HttpGet]
     public async Task<ActionResult<IEnumerable<StickerResponse>>> GetAllStickers()
@@ -31,6 +29,7 @@ public class StickerController : ControllerBaseApi
             return StatusCode(500, $"An error occurred while retrieving stickers: {ex.Message}");
         }
     }
+
     //get all with filter and paging
     [HttpGet("paging")]
     public async Task<ActionResult<IEnumerable<StickerResponse>>> GetAllStickers(
