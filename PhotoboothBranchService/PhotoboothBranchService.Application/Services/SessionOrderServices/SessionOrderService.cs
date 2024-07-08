@@ -134,7 +134,7 @@ public class SessionOrderService : ISessionOrderService
                 if (sessionOrder.Status == SessionOrderStatus.Waiting)
                 {
                     TimeSpan difference = DateTime.Now - sessionOrder.StartTime;
-                    if (difference.TotalMinutes > 15 ){
+                    if (difference.TotalMinutes < 5 ){
                         sessionOrder.StartTime += difference;
                         sessionOrder.EndTime += difference;
                     } else

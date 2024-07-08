@@ -46,7 +46,7 @@ namespace PhotoboothBranchService.Application.BackgroundServices
 
                 foreach (var order in orders)
                 {
-                    if ((now - order.StartTime).TotalMinutes >= 15)
+                    if ((now - order.StartTime).TotalMinutes > 15)
                     {
                         if (order.Status == SessionOrderStatus.Waiting)
                         {
