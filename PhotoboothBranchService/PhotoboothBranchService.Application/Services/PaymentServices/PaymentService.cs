@@ -37,7 +37,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         }
 
         // Create
-        public async Task<CreatePaymentResponse> CreateAsync(CreatePaymentRequest createModel)
+        public async Task<CreatePaymentResponse> CreateAsync(CreatePaymentRequest createModel, string ClientIpAddress)
         {
             //validate session and total price
             var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == createModel.SessionOrderID)).FirstOrDefault();
@@ -96,7 +96,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                         VnpayRequest vnpayRequest = new VnpayRequest
                         {
                             Amount = payment.Amount,
-                            ClientIpAddress = createModel.ClientIpAddress,
+                            ClientIpAddress = ClientIpAddress,
                             SessionOrderID = createModel.SessionOrderID,
                             OrderInformation = createModel.Description,
                             PaymentID = payment.PaymentID,

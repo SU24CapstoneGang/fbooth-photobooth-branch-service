@@ -7,9 +7,9 @@ namespace PhotoboothBranchService.Application.Services.BackgroundServices;
 
 public interface IBackgroundService : IServiceBase<BackgroundResponse, BackgroundFilter, PagingModel>
 {
-    Task<IEnumerable<BackgroundResponse>> GetByName(string name);
+    public Task<IEnumerable<BackgroundResponse>> GetByName(string name);
     public Task DeleteAsync(Guid id);
-    Task<BackgroundResponse> CreateBackgroundAsync(IFormFile file, Guid layoutID);
-    Task UpdateBackGroundAsync(IFormFile file, Guid BackGroundID, UpdateBackgroundRequest updateBackgroundRequest);
+    public Task<BackgroundResponse> CreateBackgroundAsync(IFormFile file, Guid layoutID);
+    public Task UpdateBackGroundAsync(IFormFile file, Guid BackGroundID, UpdateBackgroundRequest updateBackgroundRequest);
 
 }

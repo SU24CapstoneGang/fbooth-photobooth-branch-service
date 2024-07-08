@@ -6,7 +6,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
 {
     public interface IBoothService : IServiceBase<BoothResponse, BoothFilter, PagingModel>
     {
-        Task<IEnumerable<BoothResponse>> GetByName(string name);
+        public Task<IEnumerable<BoothResponse>> GetByName(string name);
         public Task<CreateBoothResponse> CreateAsync(CreateBoothRequest createModel);
         public Task UpdateAsync(Guid id, UpdateBoothRequest updateModel);
         public Task DeleteAsync(Guid id);
