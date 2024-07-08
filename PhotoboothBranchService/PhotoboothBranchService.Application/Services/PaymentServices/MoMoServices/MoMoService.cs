@@ -85,7 +85,6 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
                 return jmessage.GetValue("message").ToString();
             }
         }
-
         public async Task HandlePaymentResponeIPN(MoMoResponse momoResponse)
         {
             var rawHash = "accessKey=" + accessKey +
@@ -193,5 +192,10 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
             await HandlePaymentResponeIPN(response);
 
         }
+        public async Task RefundById(Guid paymentID)
+        {
+
+        }
+
     }
 }

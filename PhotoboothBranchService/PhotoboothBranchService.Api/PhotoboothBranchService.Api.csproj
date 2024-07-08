@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PhotoboothBranchService.Application\PhotoboothBranchService.Application.csproj" />
+    <ProjectReference Include="..\PhotoboothBranchService.Infrastructure\PhotoboothBranchService.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
