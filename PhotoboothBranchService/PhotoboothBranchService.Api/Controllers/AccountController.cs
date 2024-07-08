@@ -17,21 +17,6 @@ public class AccountController : ControllerBaseApi
         _accountService = accountService;
     }
 
-    //// Create
-    //[HttpPost]
-    //public async Task<ActionResult<Guid>> CreateAccount(CreateAccountRequestModel createAccountRequest)
-    //{
-    //    try
-    //    {
-    //        var id = await _accountService.CreateAsync(createAccountRequest);
-    //        return Ok(id);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return StatusCode(500, $"An error occurred while creating the account: {ex.Message}");
-    //    }
-    //}
-
     // Read all
     [Authorization("ADMIN", "CUSTOMER")]
     [HttpGet]

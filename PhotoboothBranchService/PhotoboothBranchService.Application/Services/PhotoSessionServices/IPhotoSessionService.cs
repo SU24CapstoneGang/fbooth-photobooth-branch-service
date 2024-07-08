@@ -4,7 +4,10 @@ using PhotoboothBranchService.Domain.Common.Interfaces;
 
 namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
 {
-    public interface IPhotoSessionService : IService<PhotoSessionResponse, CreatePhotoSessionRequest, CreatePhotoSessionResponse, UpdatePhotoSessionRequest, PhotoSessionFilter, PagingModel>
+    public interface IPhotoSessionService : IServiceBase<PhotoSessionResponse, PhotoSessionFilter, PagingModel>
     {
+        public Task<CreatePhotoSessionResponse> CreateAsync(CreatePhotoSessionRequest createModel);
+        public Task UpdateAsync(Guid id, UpdatePhotoSessionRequest updateModel);
+        public Task DeleteAsync(Guid id);
     }
 }

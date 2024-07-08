@@ -6,7 +6,6 @@
         public Guid PaymentMethodID { get; set; }
         public Guid SessionOrderID { get; set; }
         public string? BankCode { get; set; }
-        public string? ClientIpAddress { get; set; }
         public PayType PayType { get; set; }
     }
 

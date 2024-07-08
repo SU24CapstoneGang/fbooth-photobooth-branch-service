@@ -24,10 +24,9 @@ namespace PhotoboothBranchService.Api.Controllers
             {
                 //get ip from request
                 var clientIpAddress = IpAddressHelper.GetClientIpAddress(HttpContext);
-                createPaymentRequest.ClientIpAddress = clientIpAddress;
 
                 //sent to service layer
-                var createPaymentResponse = await _paymentService.CreateAsync(createPaymentRequest);
+                var createPaymentResponse = await _paymentService.CreateAsync(createPaymentRequest, clientIpAddress);
 
                 return Ok(createPaymentResponse);
             }

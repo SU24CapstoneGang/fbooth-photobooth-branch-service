@@ -15,21 +15,6 @@ public class LayoutController : ControllerBaseApi
         _layoutService = layoutService;
     }
 
-    //// Create
-    //[HttpPost]
-    //public async Task<ActionResult<CreateLayoutResponse>> CreateLayout(CreateLayoutRequest createLayoutRequest)
-    //{
-    //    try
-    //    {
-    //        var createLayoutResponse = await _layoutService.CreateAsync(createLayoutRequest);
-    //        return Ok(createLayoutResponse);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return StatusCode(500, $"An error occurred while creating the layout: {ex.Message}");
-    //    }
-    //}
-
     // Read
     [HttpGet]
     public async Task<ActionResult<IEnumerable<LayoutResponse>>> GetAllLayouts()
@@ -106,22 +91,6 @@ public class LayoutController : ControllerBaseApi
         catch (Exception ex)
         {
             return StatusCode(500, $"An error occurred while deleting the layout: {ex.Message}");
-        }
-    }
-
-    [HttpPost("add-layout-cloud")]
-    public async Task<ActionResult<LayoutResponse>> AddPhoto(IFormFile file, [FromQuery] CreateLayoutRequest createLayoutRequest)
-    {
-        try
-        {
-
-            var result = await _layoutService.CreateLayoutAsync(file, createLayoutRequest);
-
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while adding the photo: {ex.Message}");
         }
     }
 

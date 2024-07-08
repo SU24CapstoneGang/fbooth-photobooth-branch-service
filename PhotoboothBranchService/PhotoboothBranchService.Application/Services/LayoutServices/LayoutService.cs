@@ -28,36 +28,6 @@ public class LayoutService : ILayoutService
         _cloudinaryService = cloudinaryService;
     }
 
-    // Create
-    public async Task<CreateLayoutResponse> CreateAsync(CreateLayoutRequest createModel)
-    {
-        Layout layout = _mapper.Map<Layout>(createModel);
-        await _layoutRepository.AddAsync(layout);
-        return _mapper.Map<CreateLayoutResponse>(layout);
-    }
-
-    //[HttpPost("add-layout-cloud")]
-    public async Task<LayoutResponse> CreateLayoutAsync(IFormFile file, CreateLayoutRequest createModel)
-    {
-
-        //upload to cloudinary
-        var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-Layout");
-        if (uploadResult.Error != null)
-        {
-            throw new Exception(uploadResult.Error.Message);
-        }
-
-        //create object from cloudinary's return 
-        var layout = _mapper.Map<Layout>(createModel);
-
-        layout.LayoutURL = uploadResult.SecureUrl.AbsoluteUri;
-        layout.CouldID = uploadResult.PublicId;
-        layout.Status = StatusUse.Available;
-
-        await _layoutRepository.AddAsync(layout);
-
-        return _mapper.Map<LayoutResponse>(layout);
-    }
 
     //[HttpPost("add-layout-auto")]
     public async Task<LayoutResponse> CreateLayoutAuto(IFormFile file)
@@ -192,20 +162,6 @@ public class LayoutService : ILayoutService
     {
         var layout = (await _layoutRepository.GetAsync(l => l.LayoutID == id)).FirstOrDefault();
         return _mapper.Map<LayoutResponse>(layout);
-    }
-
-    // Update bo
-    public async Task UpdateAsync(Guid id, UpdateLayoutRequest updateModel)
-    {
-        var layout = (await _layoutRepository.GetAsync(l => l.LayoutID == id)).FirstOrDefault();
-        if (layout == null)
-        {
-            throw new KeyNotFoundException("Layout not found.");
-        }
-
-        var updateLayout = _mapper.Map(updateModel, layout);
-        updateLayout.LastModified = DateTime.UtcNow;
-        await _layoutRepository.UpdateAsync(updateLayout);
     }
 
     public async Task UpdateLayoutAsync(IFormFile file, Guid BackGroundID, UpdateLayoutRequest updateLayoutRequest)

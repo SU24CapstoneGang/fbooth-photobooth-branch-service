@@ -5,14 +5,11 @@ using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Application.Services.BoothBranchServices;
 
-public interface IBranchService : IService<BranchResponse,
-    CreateBranchRequest,
-    CreateBranchResponse,
-    UpdateBranchRequest,
-    BranchFilter,
-    PagingModel>
+public interface IBranchService : IServiceBase<BranchResponse, BranchFilter, PagingModel>
 {
-    Task<IEnumerable<BranchResponse>> SearchByName(string name);
-    Task<IEnumerable<BranchResponse>> GetByStatus(ManufactureStatus status);
-
+    public Task<IEnumerable<BranchResponse>> SearchByName(string name);
+    public Task<IEnumerable<BranchResponse>> GetByStatus(ManufactureStatus status);
+    public Task<CreateBranchResponse> CreateAsync(CreateBranchRequest createModel);
+    public Task UpdateAsync(Guid id, UpdateBranchRequest updateModel);
+    public Task DeleteAsync(Guid id);
 }

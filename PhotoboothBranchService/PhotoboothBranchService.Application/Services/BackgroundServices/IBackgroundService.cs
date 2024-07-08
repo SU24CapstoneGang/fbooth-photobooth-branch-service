@@ -5,10 +5,11 @@ using PhotoboothBranchService.Domain.Common.Interfaces;
 
 namespace PhotoboothBranchService.Application.Services.BackgroundServices;
 
-public interface IBackgroundService : IService<BackgroundResponse, CreateBackgroundRequest, CreateBackgroundResponse, UpdateBackgroundRequest, BackgroundFilter, PagingModel>
+public interface IBackgroundService : IServiceBase<BackgroundResponse, BackgroundFilter, PagingModel>
 {
-    Task<IEnumerable<BackgroundResponse>> GetByName(string name);
-    Task<BackgroundResponse> CreateBackgroundAsync(IFormFile file, Guid layoutID);
-    Task UpdateBackGroundAsync(IFormFile file, Guid BackGroundID, UpdateBackgroundRequest updateBackgroundRequest);
+    public Task<IEnumerable<BackgroundResponse>> GetByName(string name);
+    public Task DeleteAsync(Guid id);
+    public Task<BackgroundResponse> CreateBackgroundAsync(IFormFile file, Guid layoutID);
+    public Task UpdateBackGroundAsync(IFormFile file, Guid BackGroundID, UpdateBackgroundRequest updateBackgroundRequest);
 
 }

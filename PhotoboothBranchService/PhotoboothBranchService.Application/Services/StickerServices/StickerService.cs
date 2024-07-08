@@ -23,14 +23,6 @@ public class StickerService : IStickerService
         _cloudinaryService = cloudinaryService;
     }
 
-    // Create khong sai
-    public async Task<CreateStickerResponse> CreateAsync(CreateStickerRequest createModel)
-    {
-        Sticker sticker = _mapper.Map<Sticker>(createModel);
-        sticker.Status = StatusUse.Available;
-        await _stickerRepository.AddAsync(sticker);
-        return _mapper.Map<CreateStickerResponse>(createModel);
-    }
 
     public async Task<StickerResponse> CreateStickerAsync(IFormFile file)
     {
@@ -99,19 +91,6 @@ public class StickerService : IStickerService
     {
         var stickers = await _stickerRepository.GetAsync(s => s.StickerCode.Contains(name));
         return _mapper.Map<IEnumerable<StickerResponse>>(stickers.ToList());
-    }
-
-    // Update
-    public async Task UpdateAsync(Guid id, UpdateStickerRequest updateModel)
-    {
-        var sticker = (await _stickerRepository.GetAsync(s => s.StickerID == id)).FirstOrDefault();
-        if (sticker == null)
-        {
-            throw new KeyNotFoundException("Sticker not found.");
-        }
-        var updatedSticker = _mapper.Map(updateModel, sticker);
-        updatedSticker.LastModified = DateTime.UtcNow;
-        await _stickerRepository.UpdateAsync(updatedSticker);
     }
 
     public async Task UpdateStickerAsync(IFormFile file, Guid id, UpdateStickerRequest updateModel)

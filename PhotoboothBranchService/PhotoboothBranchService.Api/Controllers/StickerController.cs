@@ -15,21 +15,6 @@ public class StickerController : ControllerBaseApi
         _stickerService = stickerService;
     }
 
-    // Create
-    [HttpPost]
-    public async Task<ActionResult<CreateStickerResponse>> CreateSticker(CreateStickerRequest createStickerRequest)
-    {
-        try
-        {
-            var createStickerResponse = await _stickerService.CreateAsync(createStickerRequest);
-            return Ok(createStickerResponse);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while creating the sticker: {ex.Message}");
-        }
-    }
-
     // Read
     [HttpGet]
     public async Task<ActionResult<IEnumerable<StickerResponse>>> GetAllStickers()
@@ -44,6 +29,7 @@ public class StickerController : ControllerBaseApi
             return StatusCode(500, $"An error occurred while retrieving stickers: {ex.Message}");
         }
     }
+
     //get all with filter and paging
     [HttpGet("paging")]
     public async Task<ActionResult<IEnumerable<StickerResponse>>> GetAllStickers(
@@ -93,11 +79,11 @@ public class StickerController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateSticker(Guid id, UpdateStickerRequest updateStickerRequest)
+    public async Task<ActionResult> UpdateSticker(IFormFile file, Guid id, UpdateStickerRequest updateStickerRequest)
     {
         try
         {
-            await _stickerService.UpdateAsync(id, updateStickerRequest);
+            await _stickerService.UpdateStickerAsync(file, id, updateStickerRequest);
             return Ok();
         }
         catch (Exception ex)

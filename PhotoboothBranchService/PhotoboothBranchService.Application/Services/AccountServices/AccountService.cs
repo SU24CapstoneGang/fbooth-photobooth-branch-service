@@ -32,14 +32,6 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             _firebaseService = firebaseService;
         }
 
-        //khong co sai
-        public async Task<AccountRegisterResponse> CreateAsync(CreateAccountRequestModel createModel)
-        {
-            Account account = _mapper.Map<Account>(createModel);
-            await _accountRepository.AddAsync(account);
-            return _mapper.Map<AccountRegisterResponse>(account);
-        }
-
         public async Task<string> ResetPassword(string email)
         {
             var link = await _firebaseService.GetResetPasswordLink(email);

@@ -26,15 +26,6 @@ public class BackgroundService : IBackgroundService
         _layoutRepository = layoutRepository;
     }
 
-    // Create k sai
-    public async Task<CreateBackgroundResponse> CreateAsync(CreateBackgroundRequest createModel)
-    {
-        Background backGround = _mapper.Map<Background>(createModel);
-        backGround.Status = StatusUse.Available;
-        await _backgroundRepository.AddAsync(backGround);
-        return _mapper.Map<CreateBackgroundResponse>(backGround);
-    }
-
     public async Task<BackgroundResponse> CreateBackgroundAsync(IFormFile file, Guid layoutID)
     {
         var layout = (await _layoutRepository.GetAsync(l => l.LayoutID == layoutID)).FirstOrDefault();
@@ -108,18 +99,6 @@ public class BackgroundService : IBackgroundService
         return _mapper.Map<IEnumerable<BackgroundResponse>>(backGrounds.ToList());
     }
 
-    // Update
-    public async Task UpdateAsync(Guid id, UpdateBackgroundRequest updateModel)
-    {
-        var backGround = (await _backgroundRepository.GetAsync(f => f.BackgroundID == id)).FirstOrDefault();
-        if (backGround == null)
-        {
-            throw new KeyNotFoundException("BackGround not found.");
-        }
-
-        var updateBackGround = _mapper.Map(updateModel, backGround);
-        await _backgroundRepository.UpdateAsync(updateBackGround);
-    }
 
     public async Task UpdateBackGroundAsync(IFormFile file, Guid BackGroundID, UpdateBackgroundRequest updateBackgroundRequest)
     {
