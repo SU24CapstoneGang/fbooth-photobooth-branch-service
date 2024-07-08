@@ -116,7 +116,7 @@ public class SessionOrderService : ISessionOrderService
                 await _serviceItemService.CreateAsync(serviceItem);
             }
         }
-
+        session.ValidateCode = default;
         return _mapper.Map<CreateSessionOrderResponse>(session);
     }
 
@@ -199,6 +199,10 @@ public class SessionOrderService : ISessionOrderService
         if (session == null)
         {
             throw new KeyNotFoundException("Session not found.");
+        }
+        if (session.Status == SessionOrderStatus.Deposited || session.Status == SessionOrderStatus.Created)
+        {
+            session.ValidateCode = default;
         }
         return _mapper.Map<SessionOrderResponse>(session);
     }
