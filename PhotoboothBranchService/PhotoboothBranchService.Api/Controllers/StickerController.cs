@@ -122,12 +122,12 @@ public class StickerController : ControllerBaseApi
     }
 
     [HttpPost("add-sticker-cloud")]
-    public async Task<ActionResult<StickerResponse>> AddPhoto(IFormFile file, [FromQuery] CreateStickerRequest createLayoutRequest)
+    public async Task<ActionResult<StickerResponse>> AddPhoto(IFormFile file)
     {
         try
         {
 
-            var result = await _stickerService.CreateStickerAsync(file, createLayoutRequest);
+            var result = await _stickerService.CreateStickerAsync(file);
 
             return Ok(result);
         }

@@ -15,20 +15,20 @@ public class LayoutController : ControllerBaseApi
         _layoutService = layoutService;
     }
 
-    // Create
-    [HttpPost]
-    public async Task<ActionResult<CreateLayoutResponse>> CreateLayout(CreateLayoutRequest createLayoutRequest)
-    {
-        try
-        {
-            var createLayoutResponse = await _layoutService.CreateAsync(createLayoutRequest);
-            return Ok(createLayoutResponse);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while creating the layout: {ex.Message}");
-        }
-    }
+    //// Create
+    //[HttpPost]
+    //public async Task<ActionResult<CreateLayoutResponse>> CreateLayout(CreateLayoutRequest createLayoutRequest)
+    //{
+    //    try
+    //    {
+    //        var createLayoutResponse = await _layoutService.CreateAsync(createLayoutRequest);
+    //        return Ok(createLayoutResponse);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, $"An error occurred while creating the layout: {ex.Message}");
+    //    }
+    //}
 
     // Read
     [HttpGet]
@@ -81,11 +81,11 @@ public class LayoutController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateLayout(Guid id, UpdateLayoutRequest updateLayoutRequest)
+    public async Task<ActionResult> UpdateLayout(IFormFile file, Guid id, UpdateLayoutRequest updateLayoutRequest)
     {
         try
         {
-            await _layoutService.UpdateAsync(id, updateLayoutRequest);
+            await _layoutService.UpdateLayoutAsync(file, id, updateLayoutRequest);
             return Ok();
         }
         catch (Exception ex)
@@ -116,6 +116,22 @@ public class LayoutController : ControllerBaseApi
         {
 
             var result = await _layoutService.CreateLayoutAsync(file, createLayoutRequest);
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while adding the photo: {ex.Message}");
+        }
+    }
+
+    [HttpPost("add-layout-auto")]
+    public async Task<ActionResult<LayoutResponse>> AddLayout(IFormFile file)
+    {
+        try
+        {
+
+            var result = await _layoutService.CreateLayoutAuto(file);
 
             return Ok(result);
         }

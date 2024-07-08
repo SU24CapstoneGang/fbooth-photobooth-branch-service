@@ -1,13 +1,17 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using OpenCvSharp;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Layout;
+using PhotoboothBranchService.Application.DTOs.PhotoBox;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
+using PhotoboothBranchService.Application.Services.PhotoBoxServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
+using System;
 
 namespace PhotoboothBranchService.Application.Services.LayoutServices;
 
@@ -31,6 +35,8 @@ public class LayoutService : ILayoutService
         await _layoutRepository.AddAsync(layout);
         return _mapper.Map<CreateLayoutResponse>(layout);
     }
+
+    //[HttpPost("add-layout-cloud")]
     public async Task<LayoutResponse> CreateLayoutAsync(IFormFile file, CreateLayoutRequest createModel)
     {
 
@@ -53,6 +59,99 @@ public class LayoutService : ILayoutService
         return _mapper.Map<LayoutResponse>(layout);
     }
 
+    //[HttpPost("add-layout-auto")]
+    public async Task<LayoutResponse> CreateLayoutAuto(IFormFile file)
+    {
+
+        // Upload lên Cloudinary
+        var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-Layout");
+        if (uploadResult.Error != null)
+        {
+            throw new Exception(uploadResult.Error.Message);
+        }
+
+        var layout = new Layout
+        {
+            LayoutCode = Path.GetFileNameWithoutExtension(file.FileName),
+            LayoutURL = uploadResult.SecureUrl.AbsoluteUri,
+            CouldID = uploadResult.PublicId,
+            Status = StatusUse.Available,
+            PhotoBoxes = new List<PhotoBox>()
+        };
+
+        // Tải xuống hình ảnh từ Cloudinary
+        using (var httpClient = new HttpClient())
+        {
+            var imageBytes = await httpClient.GetByteArrayAsync(layout.LayoutURL);
+            using (var ms = new MemoryStream(imageBytes))
+            {
+                using (var srcImage = OpenCvSharp.Mat.FromStream(ms, ImreadModes.Unchanged))
+                {
+                    Mat[] channels = Cv2.Split(srcImage);
+                    if (channels.Length < 4)
+                    {
+                        throw new Exception("Hình ảnh không có kênh alpha.");
+                    }
+
+                    //(kênh trong suốt)
+                    Mat alphaChannel = channels[3];
+                    Mat binaryImage = new Mat();
+                    Cv2.Threshold(alphaChannel, binaryImage, 0, 255, ThresholdTypes.BinaryInv);
+
+                    // Tìm các đường viền của các vùng trong suốt
+                    Point[][] contours;
+                    HierarchyIndex[] hierarchy;
+                    Cv2.FindContours(binaryImage, out contours, out hierarchy, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
+
+                    // Lưu trữ các hình chữ nhật bao quanh
+                    List<Rect> boundingRects = new List<Rect>();
+                    foreach (var contour in contours)
+                    {
+                        var rect = Cv2.BoundingRect(contour);
+                        if (rect.Width > 50 && rect.Height > 50) 
+                        {
+                            boundingRects.Add(rect);
+                        }
+                    }
+
+                    // Sắp xếp các hình chữ nhật bao quanh theo tọa độ Y (từ trên xuống dưới) và sau đó theo tọa độ X (từ trái sang phải)
+                    boundingRects.Sort((r1, r2) =>
+                    {
+                        int result = r1.Y.CompareTo(r2.Y);
+                        return result == 0 ? r1.X.CompareTo(r2.X) : result;
+                    });
+
+                    // Tạo các đối tượng PhotoBox
+                    short boxCount = 0;
+                    foreach (var rect in boundingRects)
+                    {
+                        boxCount++;
+                        var photoBox = new PhotoBox
+                        {
+                            BoxHeight = rect.Height,
+                            BoxWidth = rect.Width,
+                            CoordinatesX = rect.X,
+                            CoordinatesY = rect.Y,
+                            LayoutID = layout.LayoutID
+                        };
+                        layout.PhotoBoxes.Add(photoBox);
+                    }
+
+                    // Thiết lập kích thước layout và số lượng ô ảnh
+                    layout.Height = srcImage.Height;
+                    layout.Width = srcImage.Width;
+                    layout.PhotoSlot = boxCount;
+                }
+            }
+        }
+
+        await _layoutRepository.AddAsync(layout);
+
+        return _mapper.Map<LayoutResponse>(layout);
+    }
+
+
+
     // Delete
     public async Task DeleteAsync(Guid id)
     {
@@ -62,15 +161,16 @@ public class LayoutService : ILayoutService
             if (layout != null)
             {
                 await _layoutRepository.RemoveAsync(layout);
+                await _cloudinaryService.DeletePhotoAsync(layout.CouldID);
             }
             else
             {
-                throw new NotFoundException($"Not found kayout id {id}");
+                throw new NotFoundException($"Not found layout id {id}");
             }
         }
         catch
         {
-            throw;
+            throw new BadRequestException("Fail for deleting layout"); ;
         }
     }
 
@@ -94,8 +194,8 @@ public class LayoutService : ILayoutService
         return _mapper.Map<LayoutResponse>(layout);
     }
 
-    // Update
-    public async Task UpdateAsync(Guid id, UpdateLayoutRequest updateMdel)
+    // Update bo
+    public async Task UpdateAsync(Guid id, UpdateLayoutRequest updateModel)
     {
         var layout = (await _layoutRepository.GetAsync(l => l.LayoutID == id)).FirstOrDefault();
         if (layout == null)
@@ -103,9 +203,23 @@ public class LayoutService : ILayoutService
             throw new KeyNotFoundException("Layout not found.");
         }
 
-        var updateLayout = _mapper.Map(updateMdel, layout);
+        var updateLayout = _mapper.Map(updateModel, layout);
         updateLayout.LastModified = DateTime.UtcNow;
         await _layoutRepository.UpdateAsync(updateLayout);
+    }
+
+    public async Task UpdateLayoutAsync(IFormFile file, Guid BackGroundID, UpdateLayoutRequest updateLayoutRequest)
+    {
+        var layout = (await _layoutRepository.GetAsync(l => l.LayoutID == BackGroundID)).FirstOrDefault();
+        if (layout == null)
+        {
+            throw new KeyNotFoundException("Layout not found.");
+        }
+
+        var updateLayout = _mapper.Map(updateLayoutRequest, layout);
+        updateLayout.LastModified = DateTime.UtcNow;
+        await _layoutRepository.UpdateAsync(updateLayout);
+        await _cloudinaryService.UpdatePhotoAsync(file, layout.CouldID);
     }
 }
 

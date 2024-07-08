@@ -44,5 +44,23 @@ namespace PhotoboothBranchService.Application.Services.CloudinaryServices
 
             return await _cloudinary.DestroyAsync(deleteParams);
         }
+
+        public async Task<ImageUploadResult> UpdatePhotoAsync(IFormFile file, string publicId)
+        {
+            var uploadResult = new ImageUploadResult();
+
+            if (file.Length > 0)
+            {
+                using var stream = file.OpenReadStream();
+                var uploadParams = new ImageUploadParams
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    PublicId = publicId, // Use the same public ID to overwrite the existing image
+                    Overwrite = true // Ensure overwrite is set to true
+                };
+                uploadResult = await _cloudinary.UploadAsync(uploadParams);
+            }
+            return uploadResult;
+        }
     }
 }

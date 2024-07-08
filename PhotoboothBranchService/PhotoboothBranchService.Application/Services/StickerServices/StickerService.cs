@@ -23,7 +23,7 @@ public class StickerService : IStickerService
         _cloudinaryService = cloudinaryService;
     }
 
-    // Create
+    // Create khong sai
     public async Task<CreateStickerResponse> CreateAsync(CreateStickerRequest createModel)
     {
         Sticker sticker = _mapper.Map<Sticker>(createModel);
@@ -32,7 +32,7 @@ public class StickerService : IStickerService
         return _mapper.Map<CreateStickerResponse>(createModel);
     }
 
-    public async Task<StickerResponse> CreateStickerAsync(IFormFile file, CreateStickerRequest createModel)
+    public async Task<StickerResponse> CreateStickerAsync(IFormFile file)
     {
 
         //upload to cloudinary
@@ -43,11 +43,15 @@ public class StickerService : IStickerService
         }
 
         //create object from cloudinary's return 
-        var sticker = _mapper.Map<Sticker>(createModel);
-
-        sticker.StickerURL = uploadResult.SecureUrl.AbsoluteUri;
-        sticker.CouldID = uploadResult.PublicId;
-        sticker.Status = StatusUse.Available;
+        var sticker = new Sticker
+        {
+            StickerCode = file.FileName,
+            stickerHeight = uploadResult.Height,
+            stickerWidth = uploadResult.Width,
+            StickerURL = uploadResult.SecureUrl.AbsoluteUri,
+            CouldID = uploadResult.PublicId,
+            Status = StatusUse.Available,
+        };
 
         await _stickerRepository.AddAsync(sticker);
 
@@ -62,11 +66,12 @@ public class StickerService : IStickerService
             if (sticker != null)
             {
                 await _stickerRepository.RemoveAsync(sticker);
+                await _cloudinaryService.DeletePhotoAsync(sticker.CouldID);
             }
         }
         catch
         {
-            throw;
+            throw new BadHttpRequestException("An error occurred while deleting the sticker");
         }
     }
 
@@ -107,6 +112,19 @@ public class StickerService : IStickerService
         var updatedSticker = _mapper.Map(updateModel, sticker);
         updatedSticker.LastModified = DateTime.UtcNow;
         await _stickerRepository.UpdateAsync(updatedSticker);
+    }
+
+    public async Task UpdateStickerAsync(IFormFile file, Guid id, UpdateStickerRequest updateModel)
+    {
+        var sticker = (await _stickerRepository.GetAsync(s => s.StickerID == id)).FirstOrDefault();
+        if (sticker == null)
+        {
+            throw new KeyNotFoundException("Sticker not found.");
+        }
+        var updatedSticker = _mapper.Map(updateModel, sticker);
+        updatedSticker.LastModified = DateTime.UtcNow;
+        await _stickerRepository.UpdateAsync(updatedSticker);
+        await _cloudinaryService.UpdatePhotoAsync(file, sticker.CouldID);
     }
 }
 
