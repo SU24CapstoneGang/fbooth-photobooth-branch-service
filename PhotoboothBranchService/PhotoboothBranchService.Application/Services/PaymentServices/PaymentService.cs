@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using PhotoboothBranchService.Application.Common.Exceptions;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Payment;
 using PhotoboothBranchService.Application.DTOs.Payment.MoMoPayment;
@@ -141,7 +143,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         }
 
         //refund 
-        public async Task RefundByID(Guid id, bool isFullRefund)
+        public async Task RefundByID(Guid id, bool isFullRefund, string ipAddress)
         {
             var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == id, i => i.PaymentMethod)).FirstOrDefault();
             if (payment == null)
@@ -163,12 +165,17 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                         RefundCategory = isFullRefund ? "02" : "03",
                         SessionId = payment.SessionOrderID.ToString(),
                         TransId = payment.TransactionID,
-                        User = order.AccountID.ToString(),
+                        User = GuidAlphanumericConverter.GuidToAlphanumeric(order.AccountID.Value),
                     };
-                    IPAddress localIp = Dns.GetHostEntry(Dns.GetHostName()).AddressList[0];
-                    var response = _vNPayService.RefundTransaction(refundRequest, localIp.ToString());
+               //     IPAddress localIp = Dns.GetHostEntry(Dns.GetHostName()).AddressList[0];
+                    var response = await _vNPayService.RefundTransaction(refundRequest, ipAddress);
+
+                    if (response.Vnp_ResponseCode != "00"){
+                        payment.PaymentStatus = response.Vnp_TransactionType.Equals("02") ? PaymentStatus.RefundedFull : PaymentStatus.RefundedPartial;
+                    } 
                     break;
                 case "MoMo":
+
                     break;
                 default:
                     throw new Exception("Payment method not availbe to use, please try later");
