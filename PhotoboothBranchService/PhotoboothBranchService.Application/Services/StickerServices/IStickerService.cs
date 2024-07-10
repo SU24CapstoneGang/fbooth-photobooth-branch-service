@@ -8,9 +8,9 @@ namespace PhotoboothBranchService.Application.Services.StickerServices;
 
 public interface IStickerService : IServiceBase<StickerResponse, StickerFilter, PagingModel>
 {
-    public Task<IEnumerable<StickerResponse>> GetByName(string name);
-    public Task DeleteAsync(Guid id);
-    public Task<StickerResponse> CreateStickerAsync(IFormFile file);
-    public Task UpdateStickerAsync(IFormFile file, Guid StickerId, UpdateStickerRequest updateStickerRequest);
+    Task<IEnumerable<StickerResponse>> GetByName(string name);
+    Task DeleteAsync(Guid id);
+    Task<StickerResponse> CreateStickerAsync(IFormFile file);
+    Task UpdateStickerAsync(IFormFile file, Guid StickerId, UpdateStickerRequest updateStickerRequest);
 
 }

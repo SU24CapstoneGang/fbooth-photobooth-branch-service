@@ -7,8 +7,8 @@ namespace PhotoboothBranchService.Application.Services.ServiceTypeServices
     public interface IServiceTypeService : IServiceBase<ServiceTypeResponse, ServiceTypeFilter, PagingModel>
     {
         Task<IEnumerable<ServiceTypeResponse>> GetByName(string name);
-        public Task<CreateServiceTypeResponse> CreateAsync(CreateServiceTypeRequest createModel);
-        public Task UpdateAsync(Guid id, UpdateServiceTypeRequest updateModel);
-        public Task DeleteAsync(Guid id);
+        Task<CreateServiceTypeResponse> CreateAsync(CreateServiceTypeRequest createModel);
+        Task UpdateAsync(Guid id, UpdateServiceTypeRequest updateModel);
+        Task DeleteAsync(Guid id);
     }
 }

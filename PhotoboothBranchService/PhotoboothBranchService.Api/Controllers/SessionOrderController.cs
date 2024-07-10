@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Api.Common;
+using PhotoboothBranchService.Api.Common.Helper;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.SessionOrder;
 using PhotoboothBranchService.Application.Services.SessionOrderServices;
@@ -96,6 +97,21 @@ public class SessionOrderController : ControllerBaseApi
         catch (Exception ex)
         {
             return StatusCode(500, $"An error occurred while updating the session: {ex.Message}");
+        }
+    }
+    [HttpPost("cancel/{sessionOrderID}")]
+    public async Task<ActionResult> CancelSession(Guid sessionOrderID)
+    {
+        try
+        {
+            var clientIp = IpAddressHelper.GetClientIpAddress(HttpContext);
+            await _sessionService.CancelSessionOrder(sessionOrderID, clientIp);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+
+            return StatusCode(500, $"An error occurred while cancel the session: {ex.Message}");
         }
     }
 

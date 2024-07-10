@@ -6,8 +6,8 @@ namespace PhotoboothBranchService.Application.Services.DeviceServices
 {
     public interface IDeviceService : IServiceBase<DeviceResponse, DeviceFilter, PagingModel>
     {
-        public Task<CreateDeviceResponse> CreateAsync(CreateDeviceRequest createModel);
-        public Task UpdateAsync(Guid id, UpdateDeviceRequest updateModel);
-        public Task DeleteAsync(Guid id);
+        Task<CreateDeviceResponse> CreateAsync(CreateDeviceRequest createModel);
+        Task UpdateAsync(Guid id, UpdateDeviceRequest updateModel);
+        Task DeleteAsync(Guid id);
     }
 }

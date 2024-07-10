@@ -39,21 +39,14 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                 var now = DateTime.Now;
                 var orders = (await sessionOrderRepository.GetAsync(o =>
                     (o.Status == SessionOrderStatus.Deposited ||
-                     o.Status == SessionOrderStatus.Waiting ||
                      o.Status == SessionOrderStatus.Created) &&
                      o.StartTime <= now &&
                      o.EndTime >= now)).ToList();
 
                 foreach (var order in orders)
                 {
-                    if ((now - order.StartTime).TotalMinutes >= 15)
+                    if ((now - order.StartTime).TotalMinutes > 15)
                     {
-                        if (order.Status == SessionOrderStatus.Waiting)
-                        {
-                            //thuc hien hoan tien o day
-                            var paymentService = scope.ServiceProvider.GetRequiredService<IPaymentService>();
-                            //var payments = paymentRepository.get
-                        }
                         order.Status = SessionOrderStatus.Canceled;
                         await sessionOrderRepository.UpdateAsync(order);
                         var booth = (await boothRepository.GetAsync(i => i.BoothID == order.BoothID)).FirstOrDefault();

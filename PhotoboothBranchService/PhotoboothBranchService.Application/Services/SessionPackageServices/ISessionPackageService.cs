@@ -6,8 +6,8 @@ namespace PhotoboothBranchService.Application.Services.SessionPackageServices
 {
     public interface ISessionPackageService : IServiceBase<SessionPackageResponse, SessionPackageFilter, PagingModel>
     {
-        public Task<CreateSessionPackageResponse> CreateAsync(CreateSessionPackageRequest createModel);
-        public Task UpdateAsync(Guid id, UpdateSessionPackageRequest updateModel);
-        public Task DeleteAsync(Guid id);
+        Task<CreateSessionPackageResponse> CreateAsync(CreateSessionPackageRequest createModel);
+        Task UpdateAsync(Guid id, UpdateSessionPackageRequest updateModel);
+        Task DeleteAsync(Guid id);
     }
 }

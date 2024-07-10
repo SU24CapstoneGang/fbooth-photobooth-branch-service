@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OpenCvSharp.ImgHash;
 using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
@@ -8,36 +10,40 @@ using PhotoboothBranchService.Application.DTOs.Payment.MoMoPayment;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServices
 {
     public class MoMoService : IMoMoService
     {
-        private readonly string momo_Api;
+        private readonly string momo_Api_Pay;
+        private readonly string momo_Api_Refund;
         private readonly string accessKey;
         private readonly string secretKey;
         private readonly string partnerCode;
         private readonly string redirectUrl;
         private readonly string ipnUrl;
-
+        private readonly string public_key;
         private readonly IPaymentRepository _paymentRepository;
         private readonly ISessionOrderRepository _sessionOrderRepository;
         public MoMoService(IPaymentRepository paymentRepository, ISessionOrderRepository sessionOrderRepository)
         {
-            momo_Api = JsonHelper.GetFromAppSettings("MoMo:momo_Api");
+            momo_Api_Pay = JsonHelper.GetFromAppSettings("MoMo:momo_Api");
+            momo_Api_Refund = JsonHelper.GetFromAppSettings("MoMo:momo_refund_endpoint");
             accessKey = JsonHelper.GetFromAppSettings("MoMo:accessKey");
             secretKey = JsonHelper.GetFromAppSettings("MoMo:secretKey");
             partnerCode = JsonHelper.GetFromAppSettings("MoMo:partnerCode");
             redirectUrl = JsonHelper.GetFromAppSettings("MoMo:redirectUrl");
             ipnUrl = JsonHelper.GetFromAppSettings("MoMo:ipnUrl");
-
+            public_key = JsonHelper.GetFromAppSettings("MoMo:public_key");
             _paymentRepository = paymentRepository;
             _sessionOrderRepository = sessionOrderRepository;
         }
 
         public string CreatePayment(MoMoRequest request)
         {
-            string endpoint = momo_Api;
+            string endpoint = momo_Api_Pay;
 
             string requestType = "captureWallet";
 
@@ -192,9 +198,42 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
             await HandlePaymentResponeIPN(response);
 
         }
-        public async Task RefundById(Guid paymentID)
+        public async Task<MoMoRefundResponse> RefundById(Guid paymentID, bool isFullRefund)
         {
 
+            var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == paymentID)).FirstOrDefault();
+            if (payment != null)
+            {
+                string merchantRefId = payment.PaymentID.ToString();
+                string momoTransId = payment.TransactionID;
+                string version = "2.0";
+                string requestId = Guid.NewGuid().ToString();
+                string description = "Hoan tien giao dich" + payment.PaymentID.ToString();
+                long amount = isFullRefund ? payment.Amount : payment.Amount*50/100;
+                MoMoLibrary moMoLibrary = new MoMoLibrary();
+                string hash = moMoLibrary.buildRefundHash(partnerCode, merchantRefId, momoTransId, amount,
+                description,public_key);
+
+                string jsonRequest = "{\"partnerCode\":\"" +
+                partnerCode + "\",\"requestId\":\"" +
+                requestId + "\",\"version\":" +
+                version + ",\"hash\":\"" +
+                hash + "\"}";
+
+                string responseMomo = MoMoLibrary.sendPaymentRequest(momo_Api_Refund, jsonRequest.ToString());
+                if (responseMomo != null)
+                {
+                    MoMoRefundResponse response = JsonConvert.DeserializeObject<MoMoRefundResponse>(responseMomo);
+                    return response;
+                } else
+                {
+                    throw new Exception("Error happend in refund progress");
+                }
+            }
+            else
+            {
+                throw new NotFoundException("Payment not found");
+            }
         }
 
     }

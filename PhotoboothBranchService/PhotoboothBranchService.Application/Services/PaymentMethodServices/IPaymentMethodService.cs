@@ -7,8 +7,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
     public interface IPaymentMethodService : IServiceBase<PaymentMethodResponse, PaymentMethodFilter, PagingModel>
     {
         Task<IEnumerable<PaymentMethodResponse>> GetByName(string name);
-        public Task<CreatePaymentMethodResponse> CreateAsync(CreatePaymentMethodRequest createModel);
-        public Task UpdateAsync(Guid id, UpdatePaymentMethodRequest updateModel);
-        public Task DeleteAsync(Guid id);
+        Task<CreatePaymentMethodResponse> CreateAsync(CreatePaymentMethodRequest createModel);
+        Task UpdateAsync(Guid id, UpdatePaymentMethodRequest updateModel);
+        Task DeleteAsync(Guid id);
     }
 }
