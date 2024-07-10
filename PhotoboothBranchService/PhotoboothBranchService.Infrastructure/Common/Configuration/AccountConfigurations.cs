@@ -48,7 +48,7 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
 
         // Indexes
         builder.HasIndex(a => a.Email).IsUnique();
-
+        builder.HasIndex(a => a.PhoneNumber).IsUnique();
         //builder.HasData(
         //    new Account
         //    {
