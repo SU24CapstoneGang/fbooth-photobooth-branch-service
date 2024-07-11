@@ -5,6 +5,7 @@ namespace PhotoboothBranchService.Application.DTOs.Account
     public class AccountResponse
     {
         public Guid AccountID { get; set; }
+        public string AccountFBID { get; set; } = default!;
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateOnly DateOfBirth { get; set; }

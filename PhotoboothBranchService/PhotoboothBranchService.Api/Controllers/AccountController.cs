@@ -4,6 +4,7 @@ using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Authentication;
 using PhotoboothBranchService.Application.Services.AccountServices;
+using PhotoboothBranchService.Application.Services.FirebaseServices;
 using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Api.Controllers;
@@ -11,14 +12,15 @@ namespace PhotoboothBranchService.Api.Controllers;
 public class AccountController : ControllerBaseApi
 {
     private readonly IAccountService _accountService;
+    private readonly IFirebaseService _firebaseService;
 
-    public AccountController(IAccountService accountService)
+    public AccountController(IAccountService accountService, IFirebaseService firebaseService)
     {
         _accountService = accountService;
+        _firebaseService = firebaseService;
     }
 
     // Read all
-    [Authorization("ADMIN", "CUSTOMER")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAllAccount()
     {
@@ -161,6 +163,36 @@ public class AccountController : ControllerBaseApi
         if (result != null)
             return Ok(result);
         return BadRequest();
+    }
+
+    [HttpGet("firebase-users")]
+    public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAllFirebaseUsers()
+    {
+        try
+        {
+            var users = await _firebaseService.GetAllUsersAsync();
+            return Ok(users);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving Firebase users: {ex.Message}");
+        }
+    }
+
+    // Delete
+    //[Authorization("ADMIN")]
+    [HttpDelete("delete-firebase/{firebaseEmail}")]
+    public async Task<ActionResult> DeleteFireBase(string firebaseEmail)
+    {
+        try
+        {
+            await _firebaseService.DeleteUserAsync(firebaseEmail);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while deleting the account: {ex.Message}");
+        }
     }
 }
 

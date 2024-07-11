@@ -1,5 +1,6 @@
 ﻿using FirebaseAdmin.Auth;
 using PhotoboothBranchService.Application.Common.Exceptions;
+using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.FirebaseServices
@@ -87,6 +88,25 @@ namespace PhotoboothBranchService.Application.Services.FirebaseServices
                 // Xử lý các lỗi khác
                 throw new Exception($"An error occurred while updating password on Firebase: {ex.Message}");
             }
+        }
+
+        public async Task<IEnumerable<AccountResponse>> GetAllUsersAsync()
+        {
+            var users = new List<AccountResponse>();
+            var pagedEnumerable = FirebaseAuth.DefaultInstance.ListUsersAsync(null);
+
+            await foreach (var user in pagedEnumerable)
+            {
+                users.Add(new AccountResponse
+                {
+                    AccountFBID = user.Uid,
+                    Email = user.Email,
+                    LastName = user.DisplayName
+                    // Add other properties as needed
+                });
+            }
+
+            return users;
         }
     }
 }
