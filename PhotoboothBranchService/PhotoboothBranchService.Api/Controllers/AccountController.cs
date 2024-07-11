@@ -61,6 +61,19 @@ public class AccountController : ControllerBaseApi
             return StatusCode(500, $"An error occurred while retrieving account by name: {ex.Message}");
         }
     }
+    [HttpGet("phone-number/{phone}")]
+    public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAccountByPhoneNumber(string phone)
+    {
+        try
+        {
+            var account = await _accountService.GetByPhoneNumber(phone);
+            return Ok(account);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving account by name: {ex.Message}");
+        }
+    }
 
     // Read by ID
     [HttpGet("{id}")]
