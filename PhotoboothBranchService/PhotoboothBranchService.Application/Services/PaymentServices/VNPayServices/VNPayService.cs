@@ -125,34 +125,34 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
             var vnp_Version = "2.1.0";
             var vnp_Command = "refund";
             var vnp_TransactionType = request.RefundCategory;
-            var vnp_Amount = Convert.ToInt64(request.Amount) * 100;
-            var vnp_TxnRef = request.SessionId;
-            var vnp_OrderInfo = "Hoan tien giao dich:" + request.SessionId;
+            var vnp_Amount = request.Amount * 100;
+            var vnp_TxnRef = request.PaymentID;
+            var vnp_OrderInfo = "Hoan tien giao dich:" + request.PaymentID;
             var vnp_TransactionNo = request.TransId;
-            var vnp_TransactionDate = request.PayDate;
+            var vnp_TransactionDate = request.PayDate.ToString("yyyyMMddHHmmss");
             var vnp_CreateDate = DateTime.Now.ToString("yyyyMMddHHmmss");
             var vnp_CreateBy = request.User;
             var vnp_IpAddr = clientIp;
 
-            var signData = $"{vnp_RequestId}|{vnp_Version}|{vnp_Command}|{vnp_TmnCode}|{vnp_TransactionType}|{vnp_TxnRef}|{vnp_Amount}|{vnp_TransactionNo}|{vnp_TransactionDate}|{vnp_CreateBy}|{vnp_CreateDate}|{vnp_IpAddr}|{vnp_OrderInfo}";
+            var signData = vnp_RequestId + "|" + vnp_Version + "|" + vnp_Command + "|" + vnp_TmnCode + "|" + vnp_TransactionType + "|" + vnp_TxnRef + "|" + vnp_Amount + "|" + vnp_TransactionNo + "|" + vnp_TransactionDate + "|" + vnp_CreateBy + "|" + vnp_CreateDate + "|" + vnp_IpAddr + "|" + vnp_OrderInfo;
             var vnp_SecureHash = Utils.HmacSHA512(vnp_HashSecret, signData);
 
             var rfData = new
             {
-                vnp_RequestId,
-                vnp_Version,
-                vnp_Command,
-                vnp_TmnCode,
-                vnp_TransactionType,
-                vnp_TxnRef,
-                vnp_Amount,
-                vnp_OrderInfo,
-                vnp_TransactionNo,
-                vnp_TransactionDate,
-                vnp_CreateBy,
-                vnp_CreateDate,
-                vnp_IpAddr,
-                vnp_SecureHash
+                vnp_RequestId = vnp_RequestId,
+                vnp_Version = vnp_Version,
+                vnp_Command = vnp_Command,
+                vnp_TmnCode = vnp_TmnCode,
+                vnp_TransactionType = vnp_TransactionType,
+                vnp_TxnRef = vnp_TxnRef,
+                vnp_Amount = vnp_Amount,
+                vnp_OrderInfo = vnp_OrderInfo,
+                vnp_TransactionNo = vnp_TransactionNo,
+                vnp_TransactionDate = vnp_TransactionDate,
+                vnp_CreateBy = vnp_CreateBy,
+                vnp_CreateDate = vnp_CreateDate,
+                vnp_IpAddr = vnp_IpAddr,
+                vnp_SecureHash = vnp_SecureHash
             };
             var jsonData = JsonConvert.SerializeObject(rfData);
 
@@ -292,8 +292,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                     }
                     else if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Deposited)
                     {
-                        var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PaymentStatus == PaymentStatus.Success)).FirstOrDefault();
-                        if (paymentCheck.Amount + payment.Amount == sessionOrder.TotalPrice)
+                        var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PaymentStatus == PaymentStatus.Success)).ToList();
+                        if (paymentCheck.Sum(i => i.Amount) == sessionOrder.TotalPrice)
                         {
                             sessionOrder.Status = SessionOrderStatus.Waiting;
                             await _sessionOrderRepository.UpdateAsync(sessionOrder);

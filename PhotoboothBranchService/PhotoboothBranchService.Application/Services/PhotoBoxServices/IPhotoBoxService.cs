@@ -6,8 +6,8 @@ namespace PhotoboothBranchService.Application.Services.PhotoBoxServices
 {
     public interface IPhotoBoxService : IServiceBase<PhotoBoxResponse, PhotoBoxFilter, PagingModel>
     {
-        public Task<CreatePhotoBoxResponse> CreateAsync(CreatePhotoBoxRequest createModel);
-        public Task UpdateAsync(Guid id, UpdatePhotoBoxRequest updateModel);
-        public Task DeleteAsync(Guid id);
+        Task<CreatePhotoBoxResponse> CreateAsync(CreatePhotoBoxRequest createModel);
+        Task UpdateAsync(Guid id, UpdatePhotoBoxRequest updateModel);
+        Task DeleteAsync(Guid id);
     }
 }

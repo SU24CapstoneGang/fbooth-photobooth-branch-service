@@ -6,9 +6,9 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
 {
     public interface IServiceItemService : IServiceBase<ServiceItemResponse, ServiceItemFilter, PagingModel>
     {
-        public Task<AddListServiceItemResponse> AddListServiceItem(AddListServiceItemRequest request);
-        public Task<CreateServiceItemResponse> CreateAsync(CreateServiceItemRequest createModel);
-        public Task UpdateAsync(Guid id, UpdateServiceItemRequest updateModel);
-        public Task DeleteAsync(Guid id);
+        Task<AddListServiceItemResponse> AddListServiceItem(AddListServiceItemRequest request);
+        Task<CreateServiceItemResponse> CreateAsync(CreateServiceItemRequest createModel);
+        Task UpdateAsync(Guid id, UpdateServiceItemRequest updateModel);
+        Task DeleteAsync(Guid id);
     }
 }

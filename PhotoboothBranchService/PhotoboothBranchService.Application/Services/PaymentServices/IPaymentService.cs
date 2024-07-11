@@ -6,8 +6,10 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
 {
     public interface IPaymentService : IServiceBase<PaymentResponse, PaymentFilter, PagingModel>
     {
-        public Task<CreatePaymentResponse> CreateAsync(CreatePaymentRequest createModel, string ClientIpAddress);
-        public Task UpdateAsync(Guid id, UpdatePaymentRequest updateModel);
-        public Task DeleteAsync(Guid id);
+        Task<CreatePaymentResponse> CreateAsync(CreatePaymentRequest createModel, string ClientIpAddress);
+        Task UpdateAsync(Guid id, UpdatePaymentRequest updateModel);
+        Task DeleteAsync(Guid id);
+        Task<IEnumerable<PaymentResponse>> GetBySessionOrderAsync(Guid sessionOrderID);
+        Task RefundByPaymentID(Guid id, bool isFullRefund, string ipAddress);
     }
 }

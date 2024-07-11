@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.ServiceItem;
 using PhotoboothBranchService.Application.DTOs.SessionOrder;
+using PhotoboothBranchService.Application.Services.PaymentServices;
 using PhotoboothBranchService.Application.Services.ServiceItemServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
@@ -16,14 +18,14 @@ public class SessionOrderService : ISessionOrderService
     private readonly ISessionOrderRepository _sessionOrderRepository;
     private readonly IMapper _mapper;
     private readonly IBoothRepository _boothRepository;
-    private readonly IPaymentRepository _paymentRepository;
+    private readonly IPaymentService _paymentService;
     private readonly IServiceItemService _serviceItemService;
     private readonly ISessionPackageRepository _sessionPackageRepository;
     private readonly IServiceRepository _serviceRepository;
     public SessionOrderService(ISessionOrderRepository sessionOrderRepository, 
         IMapper mapper, 
-        IBoothRepository boothRepository, 
-        IPaymentRepository paymentRepository, 
+        IBoothRepository boothRepository,
+        IPaymentService paymentService, 
         IServiceItemService serviceItemService, 
         ISessionPackageRepository sessionPackageRepository, 
         IServiceRepository serviceRepository)
@@ -31,7 +33,7 @@ public class SessionOrderService : ISessionOrderService
         _sessionOrderRepository = sessionOrderRepository;
         _mapper = mapper;
         _boothRepository = boothRepository;
-        _paymentRepository = paymentRepository;
+        _paymentService = paymentService;
         _serviceItemService = serviceItemService;
         _sessionPackageRepository = sessionPackageRepository;
         _serviceRepository = serviceRepository;
@@ -89,7 +91,11 @@ public class SessionOrderService : ISessionOrderService
             //update booth
             booth.Status = ManufactureStatus.InUse;
             await _boothRepository.UpdateAsync(booth);
+        } else if (createModel.StartTime < DateTime.Now)
+        {
+            throw new Exception("Can not booking with start time in past");
         }
+       
         session.EndTime = session.StartTime.AddMinutes(sessionPackage.Duration);
         session.TotalPrice = sessionPackage.Price;
         session.Status = SessionOrderStatus.Created;
@@ -213,6 +219,36 @@ public class SessionOrderService : ISessionOrderService
         }
         var updatedSession = _mapper.Map(updateModel, session);
         await _sessionOrderRepository.UpdateAsync(updatedSession);
+    }
+    public async Task CancelSessionOrder(Guid sessionOrdeID, string? ipAddress)
+    {
+        var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == sessionOrdeID)).FirstOrDefault();
+        if (null == sessionOrder)
+        {
+            throw new NotFoundException("Session Order not found");
+        }
+        else
+        {
+            if (DateTime.Now > sessionOrder.StartTime 
+                && (sessionOrder.Status ==SessionOrderStatus.Waiting 
+                    || sessionOrder.Status==SessionOrderStatus.Created 
+                    || sessionOrder.Status == SessionOrderStatus.Deposited))
+            {
+                throw new Exception("Can not cancel anymore, the session already start");
+            }
+            
+            if (sessionOrder.Status == SessionOrderStatus.Waiting) 
+            {
+                //doing refund
+                var payments = await _paymentService.GetBySessionOrderAsync(sessionOrdeID);
+                foreach (var payment in payments)
+                {
+                    await _paymentService.RefundByPaymentID(payment.PaymentID, false, string.IsNullOrEmpty(ipAddress) ? null : ipAddress);
+                }
+            }
+            sessionOrder.Status = SessionOrderStatus.Canceled;
+            await _sessionOrderRepository.UpdateAsync(sessionOrder);
+        }
     }
 }
 

@@ -9,7 +9,7 @@ namespace PhotoboothBranchService.Application.Services.LayoutServices;
 public interface ILayoutService : IServiceBase<LayoutResponse, LayoutFilter, PagingModel>
 {
     Task<LayoutResponse> CreateLayoutAuto(IFormFile file);
-    public Task DeleteAsync(Guid id);
+    Task DeleteAsync(Guid id);
     Task UpdateLayoutAsync(IFormFile file, Guid BackGroundID, UpdateLayoutRequest updateLayoutRequest);
 
 }
