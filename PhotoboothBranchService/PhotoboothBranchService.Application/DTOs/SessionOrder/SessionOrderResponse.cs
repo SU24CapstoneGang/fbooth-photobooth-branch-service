@@ -6,6 +6,7 @@ namespace PhotoboothBranchService.Application.DTOs.SessionOrder
     public class SessionOrderResponse
     {
         public Guid SessionOrderID { get; set; }
+        public long ValidateCode { get; set; }
         public decimal TotalPrice { get; set; } = default!;
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
@@ -13,6 +14,6 @@ namespace PhotoboothBranchService.Application.DTOs.SessionOrder
         public Guid AccountID { get; set; }
         public Guid BoothID { get; set; }
         public Guid SessionPackageID { get; set; }
-        public List<ServiceItemResponse> ServiceItems { get; set; } = new List<ServiceItemResponse>();
+        public List<ServiceItemResponse> ServiceItems { get; set; }
     }
 }
