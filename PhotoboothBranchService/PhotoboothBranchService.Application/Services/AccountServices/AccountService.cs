@@ -223,5 +223,22 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                 throw new Exception("An error occurred while getting the account: " + ex.Message);
             }
         }
+
+        public async Task<AccountResponse> GetByPhoneNumber(string phoneNumber)
+        {
+            try
+            {
+                var account = (await _accountRepository.GetAsync(a => a.PhoneNumber.Equals(phoneNumber))).FirstOrDefault();
+                if (account == null)
+                {
+                    throw new NotFoundException("Account", phoneNumber, "Phone number does not exist in the system.");
+                }
+                return _mapper.Map<AccountResponse>(account);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while getting the account: " + ex.Message);
+            }
+        }
     }
 }
