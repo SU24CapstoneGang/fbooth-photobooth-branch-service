@@ -36,6 +36,7 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                 var sessionOrderRepository = scope.ServiceProvider.GetRequiredService<ISessionOrderRepository>();
                 var boothRepository = scope.ServiceProvider.GetRequiredService<IBoothRepository>();
 
+                //cancel service
                 var now = DateTime.Now;
                 var orders = (await sessionOrderRepository.GetAsync(o =>
                     (o.Status == SessionOrderStatus.Deposited ||
@@ -48,6 +49,26 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                     if ((now - order.StartTime).TotalMinutes > 15)
                     {
                         order.Status = SessionOrderStatus.Canceled;
+                        await sessionOrderRepository.UpdateAsync(order);
+                        var booth = (await boothRepository.GetAsync(i => i.BoothID == order.BoothID)).FirstOrDefault();
+                        if (booth != null)
+                        {
+                            booth.Status = ManufactureStatus.Active;
+                            await boothRepository.UpdateAsync(booth);
+                        }
+                    }
+                }
+
+                //end session service
+                orders = (await sessionOrderRepository.GetAsync(o =>
+                    (o.Status == SessionOrderStatus.Waiting ||
+                     o.Status == SessionOrderStatus.Processsing) &&
+                     o.EndTime <= now)).ToList();
+                foreach (var order in orders)
+                {
+                    if ((now - order.EndTime.Value).TotalMinutes > 3)
+                    {
+                        order.Status = SessionOrderStatus.Done;
                         await sessionOrderRepository.UpdateAsync(order);
                         var booth = (await boothRepository.GetAsync(i => i.BoothID == order.BoothID)).FirstOrDefault();
                         if (booth != null)

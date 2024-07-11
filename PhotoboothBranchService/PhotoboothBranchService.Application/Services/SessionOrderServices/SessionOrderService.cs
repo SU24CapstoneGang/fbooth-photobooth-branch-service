@@ -10,6 +10,7 @@ using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
+using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Application.Services.SessionOrderServices;
 
@@ -44,7 +45,7 @@ public class SessionOrderService : ISessionOrderService
     {
         var boothTask = _boothRepository.GetAsync(i => i.BoothID == createModel.BoothID);
         var sessionPackageTask = _sessionPackageRepository.GetAsync(i => i.SessionPackageID == createModel.SessionPackageID);
-        var sessionOrderCheckTask = _sessionOrderRepository.GetAsync(i => i.AccountID == createModel.AccountID && (i.EndTime > DateTime.Now || !i.EndTime.HasValue));
+        var sessionOrderCheckTask = _sessionOrderRepository.GetAsync(i => i.AccountID == createModel.AccountID && (i.EndTime > DateTime.Now && DateTime.Now > i.StartTime));
         await Task.WhenAll(sessionOrderCheckTask, sessionPackageTask, boothTask);
 
         //booth validate
@@ -129,7 +130,12 @@ public class SessionOrderService : ISessionOrderService
     public async Task<SessionOrderResponse> ValidateSessionOrder(ValidateSessionOrderRequest validateSessionPhotoRequest)
     {
         var sessionOrder = (await _sessionOrderRepository
-            .GetAsync(i => i.BoothID == validateSessionPhotoRequest.BoothID && i.StartTime < DateTime.Now && i.EndTime > DateTime.Now))
+            .GetAsync(i => i.BoothID == validateSessionPhotoRequest.BoothID && i.StartTime < DateTime.Now && i.EndTime > DateTime.Now,
+            includeProperties: new Expression<Func<SessionOrder, object>>[]
+            {
+                i => i.ServiceItems,
+                i => i.SessionPackage
+            }))
             .FirstOrDefault();
         var booth = (await _boothRepository.GetAsync(i => i.BoothID == validateSessionPhotoRequest.BoothID)).FirstOrDefault();
         if (sessionOrder != null && booth != null)
@@ -140,7 +146,7 @@ public class SessionOrderService : ISessionOrderService
                 if (sessionOrder.Status == SessionOrderStatus.Waiting)
                 {
                     TimeSpan difference = DateTime.Now - sessionOrder.StartTime;
-                    if (difference.TotalMinutes > 15 ){
+                    if (difference.TotalMinutes < 5 ){
                         sessionOrder.StartTime += difference;
                         sessionOrder.EndTime += difference;
                     } else
@@ -201,7 +207,12 @@ public class SessionOrderService : ISessionOrderService
     // Get a session by ID
     public async Task<SessionOrderResponse> GetByIdAsync(Guid id)
     {
-        var session = (await _sessionOrderRepository.GetAsync(s => s.SessionOrderID == id, i => i.ServiceItems)).FirstOrDefault();
+        var session = (await _sessionOrderRepository.GetAsync(s => s.SessionOrderID == id, 
+            includeProperties: new Expression<Func<SessionOrder, object>>[] 
+            { 
+                i => i.ServiceItems,
+                i => i.SessionPackage 
+            })).FirstOrDefault();
         if (session == null)
         {
             throw new KeyNotFoundException("Session not found.");
