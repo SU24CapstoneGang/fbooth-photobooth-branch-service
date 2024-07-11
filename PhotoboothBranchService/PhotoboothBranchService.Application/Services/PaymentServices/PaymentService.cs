@@ -50,7 +50,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             }
             if (sessionOrder.Status == SessionOrderStatus.Canceled || sessionOrder.Status == SessionOrderStatus.Done)
             {
-                throw new Exception("The Order has been ended or cancelled");
+                throw new BadRequestException("The Order has been ended or cancelled");
             }
             //create payment object
             var payment = _mapper.Map<Payment>(createModel);
@@ -65,18 +65,18 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                     long result = (long)sessionOrder.TotalPrice - payments.Sum(i => i.Amount);
                     if (result == 0)
                     {
-                        throw new Exception("Already paid all");
+                        throw new BadRequestException("Already paid all");
                     }
                     else if (result < 0)
                     {
-                        throw new Exception("System revice more than bill, contact manager about the error");
+                        throw new BadRequestException("System revice more than bill, contact manager about the error");
                     }
                     payment.Amount = result;
                     break;
                 case PayType.Deposit:
                     if (sessionOrder.Status != SessionOrderStatus.Created)
                     {
-                        throw new Exception("Deposit only apply on Booking");
+                        throw new BadRequestException("Deposit only apply on Booking");
                     }
                     payment.Amount = (long)Math.Round(sessionOrder.TotalPrice * 0.2m);
                     break;
@@ -95,7 +95,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                 //check method status
                 if (paymentMethod.Status == PaymentMethodStatus.Inactive)
                 {
-                    throw new Exception("This method is not availble or in maintenance, please try this later");
+                    throw new BadRequestException("This method is not availble or in maintenance, please try this later");
                 }
                 switch (paymentMethod.PaymentMethodName)
                 {
@@ -129,7 +129,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                         break;
 
                     default:
-                        throw new Exception("Payment method not availbe to use, please try later");
+                        throw new BadRequestException("Payment method not availbe to use, please try later");
                 }
             }
             else
@@ -153,11 +153,11 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             }
             if (payment.PaymentStatus == PaymentStatus.RefundedFull)
             {
-                throw new Exception("Already refund this payment, can not refund anymore");
+                throw new BadRequestException("Already refund this payment, can not refund anymore");
             }
             if (payment.PaymentMethod.Status != PaymentMethodStatus.Active)
             {
-                throw new Exception("This method not availble to refund anymore");
+                throw new BadRequestException("This method not availble to refund anymore");
             }
             if (ipAddress.IsNullOrEmpty())
             {
@@ -183,7 +183,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                         payment.PaymentStatus = responseVNPay.Vnp_TransactionType.Equals("02") ? PaymentStatus.RefundedFull : PaymentStatus.RefundedPartial;
                     } else
                     {
-                        throw new Exception("An error in refund process");
+                        throw new BadRequestException("An error in refund process");
                     }
                     break;
                 case "MoMo":
@@ -198,11 +198,11 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                         }
                     } else
                     {
-                        throw new Exception("An error in refund process");
+                        throw new BadRequestException("An error in refund process");
                     }
                     break;
                 default:
-                    throw new Exception("Payment method not availbe to use, please try later");
+                    throw new BadRequestException("Payment method not availbe to use, please try later");
             }
             await _paymentRepository.UpdateAsync(payment);
         }

@@ -56,14 +56,14 @@ public class SessionOrderService : ISessionOrderService
         }
         else if (booth.Status == ManufactureStatus.InUse || booth.Status == ManufactureStatus.Maintenance || booth.Status == ManufactureStatus.Inactive)
         {
-            throw new Exception("Booth is used by another or is inactive, in maintenance");
+            throw new BadRequestException("Booth is used by another or is inactive, in maintenance");
         }
 
         //validate account's sesion order
         var sessionOrderCheck = sessionOrderCheckTask.Result.FirstOrDefault();
         if (sessionOrderCheck != null)
         {
-            throw new Exception("This Account is using another booth");
+            throw new BadRequestException("This Account is using another booth");
         }
 
         var sessionPackage = sessionPackageTask.Result.FirstOrDefault();
@@ -79,7 +79,7 @@ public class SessionOrderService : ISessionOrderService
             var services = await _serviceRepository.GetAsync(i => serviceIds.Contains(i.ServiceID));
             if (createModel.ServiceList.Count != services.Count())
             {
-                throw new Exception("Some service in request are not found");
+                throw new BadRequestException("Some service in request are not found");
             }
         }
 
@@ -94,7 +94,7 @@ public class SessionOrderService : ISessionOrderService
             await _boothRepository.UpdateAsync(booth);
         } else if (createModel.StartTime < DateTime.Now)
         {
-            throw new Exception("Can not booking with start time in past");
+            throw new BadRequestException("Can not booking with start time in past");
         }
        
         session.EndTime = session.StartTime.AddMinutes(sessionPackage.Duration);
@@ -106,7 +106,7 @@ public class SessionOrderService : ISessionOrderService
                                  )).FirstOrDefault();
         if (validateTime != null)
         {
-            throw new Exception("There is another Session on this time, please check time to book again");
+            throw new BadRequestException("There is another Session on this time, please check time to book again");
         }
         await _sessionOrderRepository.AddAsync(session);
 
@@ -163,12 +163,12 @@ public class SessionOrderService : ISessionOrderService
                 }
                 else
                 {
-                    throw new Exception("Session has been cancelled or not paid yet to validate");
+                    throw new BadRequestException("Session has been cancelled or not paid yet to validate");
                 }
             }
             else
             {
-                throw new Exception("Wrong validate code, please try again");
+                throw new BadRequestException("Wrong validate code, please try again");
             }
         }
         else
@@ -193,13 +193,21 @@ public class SessionOrderService : ISessionOrderService
     // Get all sessions
     public async Task<IEnumerable<SessionOrderResponse>> GetAllAsync()
     {
-        var sessions = await _sessionOrderRepository.GetAllAsync();
+        var sessions = await _sessionOrderRepository.GetAsync(null, includeProperties: new Expression<Func<SessionOrder, object>>[]
+            {
+                i => i.ServiceItems,
+                i => i.SessionPackage
+            });
         return _mapper.Map<IEnumerable<SessionOrderResponse>>(sessions.ToList());
     }
 
     public async Task<IEnumerable<SessionOrderResponse>> GetAllPagingAsync(SessionOrderFilter filter, PagingModel paging)
     {
-        var sessions = (await _sessionOrderRepository.GetAllAsync()).ToList().AutoFilter(filter);
+        var sessions = (await _sessionOrderRepository.GetAsync(null, includeProperties: new Expression<Func<SessionOrder, object>>[]
+            {
+                i => i.ServiceItems,
+                i => i.SessionPackage
+            })).ToList().AutoFilter(filter);
         var listSessionresponse = _mapper.Map<IEnumerable<SessionOrderResponse>>(sessions);
         return listSessionresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
     }
@@ -207,7 +215,7 @@ public class SessionOrderService : ISessionOrderService
     // Get a session by ID
     public async Task<SessionOrderResponse> GetByIdAsync(Guid id)
     {
-        var session = (await _sessionOrderRepository.GetAsync(s => s.SessionOrderID == id, 
+        var session = (await _sessionOrderRepository.GetAsync(s => s.SessionOrderID == id,
             includeProperties: new Expression<Func<SessionOrder, object>>[] 
             { 
                 i => i.ServiceItems,
@@ -245,7 +253,7 @@ public class SessionOrderService : ISessionOrderService
                     || sessionOrder.Status==SessionOrderStatus.Created 
                     || sessionOrder.Status == SessionOrderStatus.Deposited))
             {
-                throw new Exception("Can not cancel anymore, the session already start");
+                throw new BadRequestException("Can not cancel anymore, the session already start");
             }
             
             if (sessionOrder.Status == SessionOrderStatus.Waiting) 
