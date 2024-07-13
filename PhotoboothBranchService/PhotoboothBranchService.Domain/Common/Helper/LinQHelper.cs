@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Linq.Expressions;
+using System.Reflection;
 
 namespace PhotoboothBranchService.Domain.Common.Helper
 {
@@ -62,7 +63,15 @@ namespace PhotoboothBranchService.Domain.Common.Helper
 
             return query.Where(e => isContain(e, filterObject)).ToList();
         }
-
+        public static Expression<Func<T, bool>> AndAlso<T>(Expression<Func<T, bool>> expr1, Expression<Func<T, bool>> expr2)
+        {
+            var parameter = Expression.Parameter(typeof(T));
+            var body = Expression.AndAlso(
+                Expression.Invoke(expr1, parameter),
+                Expression.Invoke(expr2, parameter)
+            );
+            return Expression.Lambda<Func<T, bool>>(body, parameter);
+        }
         public static IQueryable<TEntity> AutoPaging<TEntity>(this IQueryable<TEntity> query, int pagingSize, int pagingIndex)
         {
             if (pagingIndex <= 0)
