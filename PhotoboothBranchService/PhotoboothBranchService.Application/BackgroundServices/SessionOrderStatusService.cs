@@ -59,6 +59,23 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                     }
                 }
 
+                //change booth to InUse
+                orders = (await sessionOrderRepository.GetAsync(o =>
+                    (o.Status == SessionOrderStatus.Deposited ||
+                     o.Status == SessionOrderStatus.Created ||
+                     o.Status == SessionOrderStatus.Waiting) &&
+                     o.StartTime <= now &&
+                     o.EndTime >= now, i => i.Booth)).ToList();
+                foreach (var order in orders)
+                {
+                    if (order.Booth.Status == ManufactureStatus.Active)
+                    {
+                        var booth = order.Booth;
+                        booth.Status = ManufactureStatus.InUse;
+                        await boothRepository.UpdateAsync(booth);
+                    }
+                }
+
                 //end session service
                 orders = (await sessionOrderRepository.GetAsync(o =>
                     (o.Status == SessionOrderStatus.Waiting ||
