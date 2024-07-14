@@ -12,8 +12,8 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
             CreateMap<CreateSessionOrderRequest, SessionOrder>().HandleNullProperty();
             CreateMap<UpdateSessionOrderRequest, SessionOrder>().ReverseMap().HandleNullProperty();
             CreateMap<SessionOrder, SessionOrderResponse>().HandleNullProperty();
-            //   .ForMember(dest => dest.ServiceItems, opt => opt.MapFrom(src => src.ServiceItems));
             CreateMap<SessionOrder, CreateSessionOrderResponse>().HandleNullProperty();
+            CreateMap<CustomerBookingSessionOrderRequest, CreateSessionOrderRequest>().HandleNullProperty();
         }
     }
 }

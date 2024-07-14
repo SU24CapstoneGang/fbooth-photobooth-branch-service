@@ -11,6 +11,7 @@ using PhotoboothBranchService.Application.Services.BackgroundServices;
 using PhotoboothBranchService.Application.Services.BoothBranchServices;
 using PhotoboothBranchService.Application.Services.BoothServices;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
+using PhotoboothBranchService.Application.Services.DashboardServices;
 using PhotoboothBranchService.Application.Services.DeviceServices;
 using PhotoboothBranchService.Application.Services.FirebaseServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
@@ -44,6 +45,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IBoothService, BoothService>();
             services.AddScoped<IBranchService, BranchService>();
             services.AddScoped<IBackgroundService, BackgroundService>();
+            services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IDeviceService, DeviceService>();
             services.AddScoped<ILayoutService, LayoutService>();
             services.AddScoped<IPaymentService, PaymentService>();

@@ -23,13 +23,15 @@ public class SessionOrderService : ISessionOrderService
     private readonly IServiceItemService _serviceItemService;
     private readonly ISessionPackageRepository _sessionPackageRepository;
     private readonly IServiceRepository _serviceRepository;
+    private readonly IAccountRepository _accountRepository;
     public SessionOrderService(ISessionOrderRepository sessionOrderRepository, 
         IMapper mapper, 
         IBoothRepository boothRepository,
         IPaymentService paymentService, 
         IServiceItemService serviceItemService, 
         ISessionPackageRepository sessionPackageRepository, 
-        IServiceRepository serviceRepository)
+        IServiceRepository serviceRepository,
+        IAccountRepository accountRepository)
     {
         _sessionOrderRepository = sessionOrderRepository;
         _mapper = mapper;
@@ -38,11 +40,46 @@ public class SessionOrderService : ISessionOrderService
         _serviceItemService = serviceItemService;
         _sessionPackageRepository = sessionPackageRepository;
         _serviceRepository = serviceRepository;
+        _accountRepository = accountRepository;
     }
 
     // Create a new session
     public async Task<CreateSessionOrderResponse> CreateAsync(CreateSessionOrderRequest createModel)
     {
+        //validate account
+        if (createModel.AccountID.HasValue)
+        {
+            if ((await _accountRepository.GetAsync(i => i.AccountID == createModel.AccountID && i.Status == AccountStatus.Active && i.Role == AccountRole.Customer)).FirstOrDefault() == null)
+            {
+                throw new BadRequestException("Account not found");
+            }
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(createModel.PhoneNumber) && !string.IsNullOrEmpty(createModel.Email))
+            {
+                var account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(createModel.PhoneNumber) && i.Email.Equals(createModel.Email) && i.Status == AccountStatus.Active)).FirstOrDefault();
+                createModel.AccountID = account == null ? null : account.AccountID;
+            } else if (!string.IsNullOrEmpty(createModel.PhoneNumber))
+            {
+                var account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(createModel.PhoneNumber) && i.Status == AccountStatus.Active)).FirstOrDefault();
+                createModel.AccountID = account == null ? null : account.AccountID;
+            }
+            else if (!string.IsNullOrEmpty(createModel.Email))
+            {
+                var account = (await _accountRepository.GetAsync(i => i.Email.Equals(createModel.Email) && i.Status == AccountStatus.Active)).FirstOrDefault();
+                createModel.AccountID = account == null ? null : account.AccountID;
+            }
+            else
+            {
+                throw new BadRequestException("No customer value input");
+            }
+            if (!createModel.AccountID.HasValue)
+            {
+                throw new BadRequestException("Account not found");
+            }
+        }
+
         var boothTask = _boothRepository.GetAsync(i => i.BoothID == createModel.BoothID);
         var sessionPackageTask = _sessionPackageRepository.GetAsync(i => i.SessionPackageID == createModel.SessionPackageID);
         var sessionOrderCheckTask = _sessionOrderRepository.GetAsync(i => i.AccountID == createModel.AccountID && (i.EndTime > DateTime.Now && DateTime.Now > i.StartTime));
@@ -98,6 +135,12 @@ public class SessionOrderService : ISessionOrderService
         }
        
         session.EndTime = session.StartTime.AddMinutes(sessionPackage.Duration);
+        //validate time in a date and in branch's open time
+        if (!ValidateTimeRange(session.StartTime, session.EndTime.Value))
+        {
+            throw new BadRequestException("Not valide time, our Branch open from 8:00 to 23:00 of a day");
+        }
+
         session.TotalPrice = sessionPackage.Price;
         session.Status = SessionOrderStatus.Created;
         //validate time to not conflict with other session
@@ -125,6 +168,17 @@ public class SessionOrderService : ISessionOrderService
         }
 
         return _mapper.Map<CreateSessionOrderResponse>(session);
+    }
+
+    public async Task<CreateSessionOrderResponse> CustomerBooking(CustomerBookingSessionOrderRequest request, string email)
+    {
+        if ((request.StartTime - DateTime.Now).TotalMinutes <= 30)
+        {
+            throw new BadRequestException("You must booking a session with start time at least 30 minutes from now");
+        }
+        var createSessionOrderRequest = _mapper.Map<CreateSessionOrderRequest>(request);
+        createSessionOrderRequest.Email = email;
+        return await this.CreateAsync(createSessionOrderRequest);
     }
 
     public async Task<SessionOrderResponse> ValidateSessionOrder(ValidateSessionOrderRequest validateSessionPhotoRequest)
@@ -268,6 +322,17 @@ public class SessionOrderService : ISessionOrderService
             sessionOrder.Status = SessionOrderStatus.Canceled;
             await _sessionOrderRepository.UpdateAsync(sessionOrder);
         }
+    }
+    private bool ValidateTimeRange(DateTime startTime, DateTime endTime)
+    {
+        DateTime lowerBound = new DateTime(startTime.Year, startTime.Month, startTime.Day, 8, 0, 0); // 8:00 AM
+        DateTime upperBound = new DateTime(startTime.Year, startTime.Month, startTime.Day, 23, 0, 0); // 11:00 PM
+
+        bool isSameDate = startTime.Date == endTime.Date;
+        bool isStartTimeValid = startTime >= lowerBound && startTime <= upperBound;
+        bool isEndTimeValid = endTime >= lowerBound && endTime <= upperBound;
+
+        return isSameDate && isStartTimeValid && isEndTimeValid;
     }
 }
 

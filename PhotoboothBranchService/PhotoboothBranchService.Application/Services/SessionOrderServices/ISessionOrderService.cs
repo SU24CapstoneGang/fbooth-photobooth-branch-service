@@ -8,6 +8,7 @@ public interface ISessionOrderService : IServiceBase<SessionOrderResponse, Sessi
 {
     Task<SessionOrderResponse> ValidateSessionOrder(ValidateSessionOrderRequest validateSessionOrderRequest);
     Task<CreateSessionOrderResponse> CreateAsync(CreateSessionOrderRequest createModel);
+    Task<CreateSessionOrderResponse> CustomerBooking(CustomerBookingSessionOrderRequest request, string email);
     Task UpdateAsync(Guid id, UpdateSessionOrderRequest updateModel);
     Task DeleteAsync(Guid id);
     Task CancelSessionOrder(Guid sessionOrdeID, string? ipAddress);

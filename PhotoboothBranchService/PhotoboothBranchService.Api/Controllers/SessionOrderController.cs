@@ -17,8 +17,8 @@ public class SessionOrderController : ControllerBaseApi
     }
 
     // Create
-    [HttpPost]
-    public async Task<ActionResult<CreateSessionOrderResponse>> CreateSession(CreateSessionOrderRequest createSessionRequest)
+    [HttpPost("staff")]
+    public async Task<ActionResult<CreateSessionOrderResponse>> StaffCreateSession(CreateSessionOrderRequest createSessionRequest)
     {
         try
         {
@@ -30,7 +30,20 @@ public class SessionOrderController : ControllerBaseApi
             return StatusCode(500, $"An error occurred while creating the session: {ex.Message}");
         }
     }
-
+    [HttpPost("customer")]
+    public async Task<ActionResult<CreateSessionOrderResponse>> CustomerCreateSession(CustomerBookingSessionOrderRequest customerBookingSessionOrderRequest)
+    {
+        try
+        {
+            var email = Request.HttpContext.Items["Email"]?.ToString();
+            var createSessionOrderResponse = await _sessionService.CustomerBooking(customerBookingSessionOrderRequest, email);
+            return Ok(createSessionOrderResponse);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while creating the session: {ex.Message}");
+        }
+    }
     //validate code
     [HttpPost("validate")]
     public async Task<SessionOrderResponse> ValidateSessionOrder(ValidateSessionOrderRequest validateSessionPhotoRequest)
