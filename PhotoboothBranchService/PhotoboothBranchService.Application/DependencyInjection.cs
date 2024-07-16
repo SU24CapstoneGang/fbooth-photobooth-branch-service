@@ -13,6 +13,7 @@ using PhotoboothBranchService.Application.Services.BoothServices;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Application.Services.DashboardServices;
 using PhotoboothBranchService.Application.Services.DeviceServices;
+using PhotoboothBranchService.Application.Services.EmailServices;
 using PhotoboothBranchService.Application.Services.FirebaseServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Application.Services.LayoutServices;
@@ -97,7 +98,8 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IVNPayService, VNPayService>();
             //momo service
             services.AddScoped<IMoMoService, MoMoService>();
-
+            //email sender service
+            services.AddScoped<IEmailService, EmailService>();
             //background service
             services.AddHostedService<SessionOrderStatusService>();
             return services;

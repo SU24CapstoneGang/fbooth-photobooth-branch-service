@@ -5,6 +5,7 @@ using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment;
+using PhotoboothBranchService.Application.Services.EmailServices;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
@@ -23,7 +24,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
         private readonly IMapper _mapper;
         private readonly IPaymentRepository _paymentRepository;
         private readonly ISessionOrderRepository _sessionOrderRepository;
-        public VNPayService(IPaymentRepository paymentRepository, IMapper mapper, ISessionOrderRepository sessionOrderRepository)
+        private readonly IEmailService _emailService;
+        public VNPayService(IPaymentRepository paymentRepository, IMapper mapper, ISessionOrderRepository sessionOrderRepository, IEmailService emailService)
         {
             vnp_Returnurl = JsonHelper.GetFromAppSettings("VNPay:vnp_Returnurl");//URL nhan ket qua tra ve 
             vnp_Url = JsonHelper.GetFromAppSettings("VNPay:vnp_Url"); //URL thanh toan cua VNPAY 
@@ -33,6 +35,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
             _paymentRepository = paymentRepository;
             _mapper = mapper;
             _sessionOrderRepository = sessionOrderRepository;
+            _emailService = emailService;
         }
 
         public string Pay(VnpayRequest paymentRequest)
@@ -277,6 +280,14 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                 await _paymentRepository.UpdateAsync(payment);
                 if (payment.PaymentStatus == PaymentStatus.Success)
                 {
+                    try
+                    {
+                        await _emailService.SendBillInformation(payment.PaymentID);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                     var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
                     if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Created)
                     {
@@ -287,6 +298,17 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                         else if (payment.Amount == sessionOrder.TotalPrice)
                         {
                             sessionOrder.Status = SessionOrderStatus.Waiting;
+                            try
+                            {
+                                if (sessionOrder.StartTime > DateTime.Now)
+                                {
+                                    await _emailService.SendBookingInformation(sessionOrder.SessionOrderID);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                            }
                         }
                         await _sessionOrderRepository.UpdateAsync(sessionOrder);
                     }
@@ -296,6 +318,16 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                         if (paymentCheck.Sum(i => i.Amount) == sessionOrder.TotalPrice)
                         {
                             sessionOrder.Status = SessionOrderStatus.Waiting;
+                            try
+                            {
+                                if (sessionOrder.StartTime > DateTime.Now){
+                                    await _emailService.SendBookingInformation(sessionOrder.SessionOrderID);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                            }
                             await _sessionOrderRepository.UpdateAsync(sessionOrder);
                         }
                     }
