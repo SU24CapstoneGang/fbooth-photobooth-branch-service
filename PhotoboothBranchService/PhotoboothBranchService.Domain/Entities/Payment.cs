@@ -16,5 +16,6 @@ namespace PhotoboothBranchService.Domain.Entities
         public virtual PaymentMethod PaymentMethod { get; set; } = default!;
         public Guid SessionOrderID { get; set; }
         public virtual SessionOrder SessionOrder { get; set; } = default!;
+        public virtual ICollection<Refund> Refunds { get; set; }
     }
 }
