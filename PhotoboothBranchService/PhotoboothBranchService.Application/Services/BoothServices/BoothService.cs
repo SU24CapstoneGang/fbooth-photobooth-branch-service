@@ -23,7 +23,6 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         public async Task<CreateBoothResponse> CreateAsync(CreateBoothRequest createModel)
         {
             Booth booth = _mapper.Map<Booth>(createModel);
-            booth.Status = ManufactureStatus.Active;
             await _boothRepository.AddAsync(booth);
             return _mapper.Map<CreateBoothResponse>(booth);
         }
