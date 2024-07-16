@@ -7,6 +7,7 @@ using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.Payment.MoMoPayment;
+using PhotoboothBranchService.Application.Services.EmailServices;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 using System.Reflection;
@@ -27,7 +28,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
         private readonly string public_key;
         private readonly IPaymentRepository _paymentRepository;
         private readonly ISessionOrderRepository _sessionOrderRepository;
-        public MoMoService(IPaymentRepository paymentRepository, ISessionOrderRepository sessionOrderRepository)
+        private readonly IEmailService _emailService;
+        public MoMoService(IPaymentRepository paymentRepository, ISessionOrderRepository sessionOrderRepository, IEmailService emailService)
         {
             momo_Api_Pay = JsonHelper.GetFromAppSettings("MoMo:momo_Api");
             momo_Api_Refund = JsonHelper.GetFromAppSettings("MoMo:momo_refund_endpoint");
@@ -39,6 +41,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
             public_key = JsonHelper.GetFromAppSettings("MoMo:public_key");
             _paymentRepository = paymentRepository;
             _sessionOrderRepository = sessionOrderRepository;
+            _emailService = emailService;
         }
 
         public string CreatePayment(MoMoRequest request)
@@ -131,6 +134,14 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
             await _paymentRepository.UpdateAsync(payment);
             if (payment.PaymentStatus == PaymentStatus.Success)
             {
+                try
+                {
+                    await _emailService.SendBillInformation(payment.PaymentID);
+                } catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                
                 var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
                 if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Created)
                 {
@@ -141,6 +152,17 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
                     else if (payment.Amount == sessionOrder.TotalPrice)
                     {
                         sessionOrder.Status = SessionOrderStatus.Waiting;
+                        try
+                        {
+                            if (sessionOrder.StartTime > DateTime.Now)
+                            {
+                                await _emailService.SendBookingInformation(sessionOrder.SessionOrderID);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
                     }
                     await _sessionOrderRepository.UpdateAsync(sessionOrder);
                 }
@@ -150,6 +172,17 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
                     if (paymentCheck.Sum(i=>i.Amount) == sessionOrder.TotalPrice)
                     {
                         sessionOrder.Status = SessionOrderStatus.Waiting;
+                        try
+                        {
+                            if (sessionOrder.StartTime > DateTime.Now)
+                            {
+                                await _emailService.SendBookingInformation(sessionOrder.SessionOrderID);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
                         await _sessionOrderRepository.UpdateAsync(sessionOrder);
                     }
                 }
