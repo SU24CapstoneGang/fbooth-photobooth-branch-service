@@ -2,6 +2,6 @@
 {
     public class UpdateServiceTypeRequest
     {
-        public string ServiceTypeName { get; set; }
+        public string? ServiceTypeName { get; set; }
     }
 }

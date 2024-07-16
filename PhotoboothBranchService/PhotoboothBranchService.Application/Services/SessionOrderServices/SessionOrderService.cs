@@ -88,18 +88,19 @@ public class SessionOrderService : ISessionOrderService
             session.StartTime = DateTime.Now;
             //update booth
             booth.Status = ManufactureStatus.InUse;
-            await _boothRepository.UpdateAsync(booth);
         }
         session.EndTime = session.StartTime.AddMinutes(sessionPackage.Duration);
         session.TotalPrice = sessionPackage.Price;
         session.Status = SessionOrderStatus.Created;
         //validate time to not conflict with other session
-        var validateTime = (await _sessionOrderRepository.GetAsync(i => i.BoothID == session.BoothID
-                                 && ((session.StartTime < i.StartTime && i.StartTime < session.EndTime.Value.AddMinutes(5)) || (session.EndTime.Value.AddMinutes(5) > i.EndTime && i.EndTime > session.StartTime))
-                                 )).FirstOrDefault();
-        if (validateTime != null)
+        if ((await this.ValidateBookingTime(session.BoothID,session.StartTime,session.EndTime.Value)) == false)
         {
             throw new Exception("There is another Session on this time, please check time to book again");
+        }
+
+        if (booth.Status == ManufactureStatus.InUse)
+        {
+            await _boothRepository.UpdateAsync(booth);
         }
         await _sessionOrderRepository.AddAsync(session);
 
@@ -211,8 +212,40 @@ public class SessionOrderService : ISessionOrderService
         {
             throw new KeyNotFoundException("Session not found.");
         }
+        bool check = true;
+
+        DateTime startTime,endTime;
+        if (updateModel.StartTime.HasValue && default(DateTime) != updateModel.StartTime.Value)
+        {
+            startTime = updateModel.StartTime.Value;
+            TimeSpan duration = session.EndTime.Value - session.StartTime;
+            endTime = startTime + duration;
+        } else
+        {
+            startTime = session.StartTime;
+            endTime = session.EndTime.Value;
+        }
+        if (updateModel.BoothID.Value != null && updateModel.BoothID.Value != default(Guid))
+        {
+            check = await this.ValidateBookingTime(updateModel.BoothID.Value, startTime, endTime);
+        } else
+        {
+            check = await this.ValidateBookingTime(session.BoothID, startTime, endTime);
+        }
+        if (!check)
+        {
+            throw new BadRequestException("There is another Session on this time, please check time to update again");
+        }
         var updatedSession = _mapper.Map(updateModel, session);
         await _sessionOrderRepository.UpdateAsync(updatedSession);
+    }
+
+    private async Task<bool> ValidateBookingTime(Guid boothId, DateTime startTime, DateTime endTime)
+    {
+        var validateTime = (await _sessionOrderRepository.GetAsync(i => i.BoothID == boothId
+                                 && ((startTime < i.StartTime && i.StartTime < endTime.AddMinutes(5)) || (endTime.AddMinutes(5) > i.EndTime && i.EndTime > startTime))
+                                 )).FirstOrDefault();
+        return validateTime == null;
     }
 }
 

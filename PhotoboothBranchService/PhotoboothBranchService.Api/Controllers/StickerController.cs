@@ -108,7 +108,7 @@ public class StickerController : ControllerBaseApi
     }
 
     [HttpPost("add-sticker-cloud")]
-    public async Task<ActionResult<StickerResponse>> AddPhoto(IFormFile file)
+    public async Task<ActionResult<StickerResponse>> AddSticker(IFormFile file)
     {
         try
         {
