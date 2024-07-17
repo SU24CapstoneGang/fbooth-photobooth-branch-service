@@ -18,6 +18,7 @@ public class AppDbContext : DbContext
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<Photo> Photos { get; set; }
     public DbSet<PhotoBox> PhotoBoxes { get; set; }
+    public DbSet<Refund> Refunds { get; set; }
     public DbSet<PhotoSession> PhotoSessions { get; set; }
     public DbSet<PhotoSticker> PhotoStickers { get; set; }
     public DbSet<Service> Services { get; set; }
@@ -63,6 +64,7 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new PaymentMethodConfigurations());
         modelBuilder.ApplyConfiguration(new BoothBranchConfigurations());
         modelBuilder.ApplyConfiguration(new PhotoBoxConfiguration());
+        modelBuilder.ApplyConfiguration(new RefundConfiguration());
         modelBuilder.ApplyConfiguration(new PhotoConfiguration());
         modelBuilder.ApplyConfiguration(new PhotoSessionConfiguration());
         modelBuilder.ApplyConfiguration(new PhotoStickerConfigurations());

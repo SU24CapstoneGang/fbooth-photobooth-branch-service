@@ -13,24 +13,26 @@ using PhotoboothBranchService.Application.Services.BoothServices;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Application.Services.DashboardServices;
 using PhotoboothBranchService.Application.Services.DeviceServices;
+using PhotoboothBranchService.Application.Services.EmailServices;
 using PhotoboothBranchService.Application.Services.FirebaseServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Application.Services.LayoutServices;
+using PhotoboothBranchService.Application.Services.MoMoServices;
 using PhotoboothBranchService.Application.Services.PaymentMethodServices;
 using PhotoboothBranchService.Application.Services.PaymentServices;
-using PhotoboothBranchService.Application.Services.PaymentServices.MoMoServices;
 using PhotoboothBranchService.Application.Services.PaymentServices.QR;
-using PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices;
 using PhotoboothBranchService.Application.Services.PhotoBoxServices;
 using PhotoboothBranchService.Application.Services.PhotoServices;
 using PhotoboothBranchService.Application.Services.PhotoSessionServices;
 using PhotoboothBranchService.Application.Services.PhotoStickerServices;
+using PhotoboothBranchService.Application.Services.RefundServices;
 using PhotoboothBranchService.Application.Services.ServiceItemServices;
 using PhotoboothBranchService.Application.Services.ServiceServices;
 using PhotoboothBranchService.Application.Services.ServiceTypeServices;
 using PhotoboothBranchService.Application.Services.SessionOrderServices;
 using PhotoboothBranchService.Application.Services.SessionPackageServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
+using PhotoboothBranchService.Application.Services.VNPayServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using System.Reflection;
 
@@ -54,6 +56,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<IPhotoSessionService, PhotoSessionService>();
             services.AddScoped<IPhotoStickerService, PhotoStickerService>();
+            services.AddScoped<IRefundService, RefundService>();
             services.AddScoped<IServiceItemService, ServiceItemService>();
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<IServiceTypeService, ServiceTypeService>();
@@ -97,7 +100,8 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IVNPayService, VNPayService>();
             //momo service
             services.AddScoped<IMoMoService, MoMoService>();
-
+            //email sender service
+            services.AddScoped<IEmailService, EmailService>();
             //background service
             services.AddHostedService<SessionOrderStatusService>();
             return services;

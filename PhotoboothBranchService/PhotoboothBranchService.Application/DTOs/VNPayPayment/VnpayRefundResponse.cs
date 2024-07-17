@@ -1,4 +1,4 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment
+﻿namespace PhotoboothBranchService.Application.DTOs.VNPayPayment
 {
     public class VnpayRefundResponse
     {

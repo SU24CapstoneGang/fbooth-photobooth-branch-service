@@ -1,4 +1,4 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.Payment.MoMoPayment
+﻿namespace PhotoboothBranchService.Application.DTOs.MoMoPayment
 {
     public class MoMoResponse
     {

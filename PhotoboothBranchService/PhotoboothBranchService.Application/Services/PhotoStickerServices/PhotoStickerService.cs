@@ -63,7 +63,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoStickerServices
         public async Task<PhotoStickerResponse> GetByIdAsync(Guid id)
         {
             var mapStickers = await _mapStickerRepository.GetAsync(m => m.PhotoStickerID == id);
-            return _mapper.Map<PhotoStickerResponse>(mapStickers);
+            return _mapper.Map<PhotoStickerResponse>(mapStickers.FirstOrDefault());
         }
 
         // Update

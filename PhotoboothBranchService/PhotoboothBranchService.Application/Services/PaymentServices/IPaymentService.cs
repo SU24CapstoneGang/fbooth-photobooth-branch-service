@@ -10,6 +10,5 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         Task UpdateAsync(Guid id, UpdatePaymentRequest updateModel);
         Task DeleteAsync(Guid id);
         Task<IEnumerable<PaymentResponse>> GetBySessionOrderAsync(Guid sessionOrderID);
-        Task RefundByPaymentID(Guid id, bool isFullRefund, string ipAddress);
     }
 }

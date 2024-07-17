@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 
@@ -11,9 +12,11 @@ using PhotoboothBranchService.Infrastructure.Common.Persistence;
 namespace PhotoboothBranchService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240716183916_PhotoBoothVerH16")]
+    partial class PhotoBoothVerH16
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -372,14 +375,14 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         new
                         {
                             PaymentMethodID = new Guid("1b4f2a3e-7d94-4119-8b6d-5c15b02848f6"),
-                            CreateDate = new DateTime(2024, 7, 17, 4, 15, 43, 817, DateTimeKind.Utc).AddTicks(7931),
+                            CreateDate = new DateTime(2024, 7, 16, 18, 39, 16, 506, DateTimeKind.Utc).AddTicks(6859),
                             PaymentMethodName = "VNPay",
                             Status = "Active"
                         },
                         new
                         {
                             PaymentMethodID = new Guid("f3b6e6b2-f90e-4f6b-8cd2-68b467afae0f"),
-                            CreateDate = new DateTime(2024, 7, 17, 4, 15, 43, 817, DateTimeKind.Utc).AddTicks(7942),
+                            CreateDate = new DateTime(2024, 7, 16, 18, 39, 16, 506, DateTimeKind.Utc).AddTicks(6862),
                             PaymentMethodName = "MoMo",
                             Status = "Active"
                         });
@@ -527,9 +530,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<Guid>("RefundID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("Amount")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("Description")
                         .IsRequired()

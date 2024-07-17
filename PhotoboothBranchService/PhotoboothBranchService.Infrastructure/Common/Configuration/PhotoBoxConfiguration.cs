@@ -17,6 +17,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(u => u.BoxHeight).IsRequired();
             builder.Property(u => u.CoordinatesX).IsRequired();
             builder.Property(u => u.CoordinatesY).IsRequired();
+            builder.Property(u => u.IsLandscape).IsRequired();
+            builder.Property(u => u.BoxIndex).IsRequired();
         }
     }
 }

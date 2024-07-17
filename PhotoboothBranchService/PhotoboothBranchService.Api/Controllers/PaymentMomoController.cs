@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Api.Common;
-using PhotoboothBranchService.Application.DTOs.Payment.MoMoPayment;
-using PhotoboothBranchService.Application.Services.PaymentServices.MoMoServices;
+using PhotoboothBranchService.Application.DTOs.MoMoPayment;
+using PhotoboothBranchService.Application.Services.MoMoServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
