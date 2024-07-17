@@ -32,93 +32,103 @@ public class LayoutService : ILayoutService
     //[HttpPost("add-layout-auto")]
     public async Task<LayoutResponse> CreateLayoutAuto(IFormFile file)
     {
-
-        // Upload lên Cloudinary
-        var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-Layout");
-        if (uploadResult.Error != null)
+        // Load the image from the file
+        using (var ms = new MemoryStream())
         {
-            throw new Exception(uploadResult.Error.Message);
-        }
+            await file.CopyToAsync(ms);
+            ms.Seek(0, SeekOrigin.Begin);
 
-        var layout = new Layout
-        {
-            LayoutCode = Path.GetFileNameWithoutExtension(file.FileName),
-            LayoutURL = uploadResult.SecureUrl.AbsoluteUri,
-            CouldID = uploadResult.PublicId,
-            Status = StatusUse.Available,
-            PhotoBoxes = new List<PhotoBox>()
-        };
-
-        // Tải xuống hình ảnh từ Cloudinary
-        using (var httpClient = new HttpClient())
-        {
-            var imageBytes = await httpClient.GetByteArrayAsync(layout.LayoutURL);
-            using (var ms = new MemoryStream(imageBytes))
+            using (var srcImage = OpenCvSharp.Mat.FromStream(ms, ImreadModes.Unchanged))
             {
-                using (var srcImage = OpenCvSharp.Mat.FromStream(ms, ImreadModes.Unchanged))
+                Mat[] channels = Cv2.Split(srcImage);
+                if (channels.Length < 4)
                 {
-                    Mat[] channels = Cv2.Split(srcImage);
-                    if (channels.Length < 4)
-                    {
-                        throw new Exception("Hình ảnh không có kênh alpha.");
-                    }
-
-                    //(kênh trong suốt)
-                    Mat alphaChannel = channels[3];
-                    Mat binaryImage = new Mat();
-                    Cv2.Threshold(alphaChannel, binaryImage, 0, 255, ThresholdTypes.BinaryInv);
-
-                    // Tìm các đường viền của các vùng trong suốt
-                    Point[][] contours;
-                    HierarchyIndex[] hierarchy;
-                    Cv2.FindContours(binaryImage, out contours, out hierarchy, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
-
-                    // Lưu trữ các hình chữ nhật bao quanh
-                    List<Rect> boundingRects = new List<Rect>();
-                    foreach (var contour in contours)
-                    {
-                        var rect = Cv2.BoundingRect(contour);
-                        if (rect.Width > 50 && rect.Height > 50) 
-                        {
-                            boundingRects.Add(rect);
-                        }
-                    }
-
-                    // Sắp xếp các hình chữ nhật bao quanh theo tọa độ Y (từ trên xuống dưới) và sau đó theo tọa độ X (từ trái sang phải)
-                    boundingRects.Sort((r1, r2) =>
-                    {
-                        int result = r1.Y.CompareTo(r2.Y);
-                        return result == 0 ? r1.X.CompareTo(r2.X) : result;
-                    });
-
-                    // Tạo các đối tượng PhotoBox
-                    short boxCount = 0;
-                    foreach (var rect in boundingRects)
-                    {
-                        boxCount++;
-                        var photoBox = new PhotoBox
-                        {
-                            BoxHeight = rect.Height,
-                            BoxWidth = rect.Width,
-                            CoordinatesX = rect.X,
-                            CoordinatesY = rect.Y,
-                            LayoutID = layout.LayoutID
-                        };
-                        layout.PhotoBoxes.Add(photoBox);
-                    }
-
-                    // Thiết lập kích thước layout và số lượng ô ảnh
-                    layout.Height = srcImage.Height;
-                    layout.Width = srcImage.Width;
-                    layout.PhotoSlot = boxCount;
+                    throw new Exception("Hình ảnh không có kênh alpha.");
                 }
+
+                //(kênh trong suốt)
+                Mat alphaChannel = channels[3];
+                Mat binaryImage = new Mat();
+                Cv2.Threshold(alphaChannel, binaryImage, 0, 255, ThresholdTypes.BinaryInv);
+
+                // Tìm các đường viền của các vùng trong suốt
+                Point[][] contours;
+                HierarchyIndex[] hierarchy;
+                Cv2.FindContours(binaryImage, out contours, out hierarchy, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
+
+                // Lưu trữ các hình chữ nhật bao quanh
+                List<Rect> boundingRects = new List<Rect>();
+                foreach (var contour in contours)
+                {
+                    var rect = Cv2.BoundingRect(contour);
+                    if (rect.Width > 50 && rect.Height > 50)
+                    {
+                        boundingRects.Add(rect);
+                    }
+                }
+
+                // Kiểm tra nếu không có ô trống thì không phải là layout
+                if (boundingRects.Count == 0)
+                {
+                    throw new Exception("Hình ảnh không phải là layout hợp lệ (không có ô trống).");
+                }
+
+                // Upload lên Cloudinary
+                var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-Layout");
+                if (uploadResult.Error != null)
+                {
+                    throw new Exception(uploadResult.Error.Message);
+                }
+
+                var layout = new Layout
+                {
+                    LayoutCode = Path.GetFileNameWithoutExtension(file.FileName),
+                    LayoutURL = uploadResult.SecureUrl.AbsoluteUri,
+                    CouldID = uploadResult.PublicId,
+                    Status = StatusUse.Available,
+                    PhotoBoxes = new List<PhotoBox>()
+                };
+
+                // Sắp xếp các hình chữ nhật bao quanh theo tọa độ Y (từ trên xuống dưới) và sau đó theo tọa độ X (từ trái sang phải)
+                boundingRects.Sort((r1, r2) =>
+                {
+                    int result = r1.Y.CompareTo(r2.Y);
+                    return result == 0 ? r1.X.CompareTo(r2.X) : result;
+                });
+
+                // Tạo các đối tượng PhotoBox và thiết lập các thuộc tính
+                short boxCount = 0;
+                foreach (var rect in boundingRects)
+                {
+                    boxCount++;
+                    var photoBox = new PhotoBox
+                    {
+                        BoxHeight = rect.Height,
+                        BoxWidth = rect.Width,
+                        CoordinatesX = rect.X,
+                        CoordinatesY = rect.Y,
+                        LayoutID = layout.LayoutID
+                    };
+
+                    // Thiết lập IsLandscape và BoxIndex
+                    photoBox.IsLandscape = rect.Width > rect.Height;
+                    photoBox.BoxIndex = boxCount;
+
+                    layout.PhotoBoxes.Add(photoBox);
+                }
+
+                // Thiết lập kích thước layout và số lượng ô ảnh
+                layout.Height = srcImage.Height;
+                layout.Width = srcImage.Width;
+                layout.PhotoSlot = boxCount;
+
+                await _layoutRepository.AddAsync(layout);
+
+                return _mapper.Map<LayoutResponse>(layout);
             }
         }
-
-        await _layoutRepository.AddAsync(layout);
-
-        return _mapper.Map<LayoutResponse>(layout);
     }
+
 
 
 
