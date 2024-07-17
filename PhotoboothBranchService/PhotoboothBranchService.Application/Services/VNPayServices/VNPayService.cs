@@ -4,14 +4,14 @@ using Newtonsoft.Json;
 using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
-using PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment;
+using PhotoboothBranchService.Application.DTOs.VNPayPayment;
 using PhotoboothBranchService.Application.Services.EmailServices;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 using System.Text;
 
-namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices
+namespace PhotoboothBranchService.Application.Services.VNPayServices
 {
     public class VNPayService : IVNPayService
     {
@@ -142,20 +142,20 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
 
             var rfData = new
             {
-                vnp_RequestId = vnp_RequestId,
-                vnp_Version = vnp_Version,
-                vnp_Command = vnp_Command,
-                vnp_TmnCode = vnp_TmnCode,
-                vnp_TransactionType = vnp_TransactionType,
-                vnp_TxnRef = vnp_TxnRef,
-                vnp_Amount = vnp_Amount,
-                vnp_OrderInfo = vnp_OrderInfo,
-                vnp_TransactionNo = vnp_TransactionNo,
-                vnp_TransactionDate = vnp_TransactionDate,
-                vnp_CreateBy = vnp_CreateBy,
-                vnp_CreateDate = vnp_CreateDate,
-                vnp_IpAddr = vnp_IpAddr,
-                vnp_SecureHash = vnp_SecureHash
+                vnp_RequestId,
+                vnp_Version,
+                vnp_Command,
+                vnp_TmnCode,
+                vnp_TransactionType,
+                vnp_TxnRef,
+                vnp_Amount,
+                vnp_OrderInfo,
+                vnp_TransactionNo,
+                vnp_TransactionDate,
+                vnp_CreateBy,
+                vnp_CreateDate,
+                vnp_IpAddr,
+                vnp_SecureHash
             };
             var jsonData = JsonConvert.SerializeObject(rfData);
 
@@ -171,7 +171,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
             }
         }
 
-        public async Task<(VnpayResponse response, string returnContent)> Return(IQueryCollection queryString)
+        public async Task<(VnpayResponse response, string returnContent, Payment paymentResult)> Return(IQueryCollection queryString)
         {
             VnPayLibrary vnpay = new VnPayLibrary();
 
@@ -216,7 +216,6 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                         {
                             if (vnp_ResponseCode == "00" && vnp_TransactionStatus == "00")
                             {
-                                payment.PaymentStatus = PaymentStatus.Success;
                                 vnpayResponse = new VnpayResponse
                                 {
                                     Message = "Giao dịch được thực hiện thành công. Cảm ơn quý khách đã sử dụng dịch vụ",
@@ -225,12 +224,11 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                                     VnpayTranId = vnpayTranId,
                                     Amount = vnp_Amount,
                                     BankCode = bankCode,
-                                    Success = true
+                                    Success = true,
                                 };
                             }
                             else
                             {
-                                payment.PaymentStatus = PaymentStatus.Fail;
                                 vnpayResponse = new VnpayResponse
                                 {
                                     Message = "Có lỗi xảy ra trong quá trình xử lý.",
@@ -240,7 +238,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                                     VnpayTranId = vnpayTranId,
                                     Amount = vnp_Amount,
                                     BankCode = bankCode,
-                                    Success = false
+                                    Success = false,
                                 };
                             }
                             returnContent = "{\"RspCode\":\"00\",\"Message\":\"Confirm Success\"}";
@@ -250,9 +248,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                             vnpayResponse = new VnpayResponse
                             {
                                 Message = "Order already confirmed",
-                                Success = false
+                                Success = false,
                             };
-                            payment.PaymentStatus = PaymentStatus.Fail;
                             returnContent = "{\"RspCode\":\"02\",\"Message\":\"Order already confirmed\"}";
                         }
                     }
@@ -261,7 +258,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                         vnpayResponse = new VnpayResponse
                         {
                             Message = "Có lỗi xảy ra trong quá trình xử lý",
-                            Success = false
+                            Success = false,
                         };
                         payment.PaymentStatus = PaymentStatus.Fail;
                         returnContent = "{\"RspCode\":\"04\",\"Message\":\"invalid amount\"}";
@@ -269,75 +266,20 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.VNPayServ
                 }
                 else
                 {
-                    payment.PaymentStatus = PaymentStatus.Fail;
                     vnpayResponse = new VnpayResponse
                     {
                         Message = "Có lỗi xảy ra trong quá trình xử lý",
-                        Success = false
+                        Success = false,
                     };
                     returnContent = "{\"RspCode\":\"97\",\"Message\":\"Invalid signature\"}";
                 }
                 await _paymentRepository.UpdateAsync(payment);
-                if (payment.PaymentStatus == PaymentStatus.Success)
-                {
-                    try
-                    {
-                        await _emailService.SendBillInformation(payment.PaymentID);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
-                    var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
-                    if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Created)
-                    {
-                        if (payment.Amount < sessionOrder.TotalPrice)
-                        {
-                            sessionOrder.Status = SessionOrderStatus.Deposited;
-                        }
-                        else if (payment.Amount == sessionOrder.TotalPrice)
-                        {
-                            sessionOrder.Status = SessionOrderStatus.Waiting;
-                            try
-                            {
-                                if (sessionOrder.StartTime > DateTime.Now)
-                                {
-                                    await _emailService.SendBookingInformation(sessionOrder.SessionOrderID);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine(ex.Message);
-                            }
-                        }
-                        await _sessionOrderRepository.UpdateAsync(sessionOrder);
-                    }
-                    else if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Deposited)
-                    {
-                        var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PaymentStatus == PaymentStatus.Success)).ToList();
-                        if (paymentCheck.Sum(i => i.Amount) == sessionOrder.TotalPrice)
-                        {
-                            sessionOrder.Status = SessionOrderStatus.Waiting;
-                            try
-                            {
-                                if (sessionOrder.StartTime > DateTime.Now){
-                                    await _emailService.SendBookingInformation(sessionOrder.SessionOrderID);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine(ex.Message);
-                            }
-                            await _sessionOrderRepository.UpdateAsync(sessionOrder);
-                        }
-                    }
-                }
             }
             else
             {
                 throw new NotFoundException("No Payment with id saved in server");
             }
-            return (vnpayResponse, returnContent);
+            return (vnpayResponse, returnContent, payment);
         }
     }
 }

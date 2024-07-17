@@ -6,15 +6,16 @@ using OpenCvSharp.ImgHash;
 using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
-using PhotoboothBranchService.Application.DTOs.Payment.MoMoPayment;
+using PhotoboothBranchService.Application.DTOs.MoMoPayment;
 using PhotoboothBranchService.Application.Services.EmailServices;
+using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServices
+namespace PhotoboothBranchService.Application.Services.MoMoServices
 {
     public class MoMoService : IMoMoService
     {
@@ -94,7 +95,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
                 return jmessage.GetValue("message").ToString();
             }
         }
-        public async Task HandlePaymentResponeIPN(MoMoResponse momoResponse)
+        public async Task<Payment> HandlePaymentResponeIPN(MoMoResponse momoResponse)
         {
             var rawHash = "accessKey=" + accessKey +
                    "&amount=" + momoResponse.amount +
@@ -132,63 +133,9 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
                 }
             }
             await _paymentRepository.UpdateAsync(payment);
-            if (payment.PaymentStatus == PaymentStatus.Success)
-            {
-                try
-                {
-                    await _emailService.SendBillInformation(payment.PaymentID);
-                } catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                
-                var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
-                if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Created)
-                {
-                    if (payment.Amount < sessionOrder.TotalPrice)
-                    {
-                        sessionOrder.Status = SessionOrderStatus.Deposited;
-                    }
-                    else if (payment.Amount == sessionOrder.TotalPrice)
-                    {
-                        sessionOrder.Status = SessionOrderStatus.Waiting;
-                        try
-                        {
-                            if (sessionOrder.StartTime > DateTime.Now)
-                            {
-                                await _emailService.SendBookingInformation(sessionOrder.SessionOrderID);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.Message);
-                        }
-                    }
-                    await _sessionOrderRepository.UpdateAsync(sessionOrder);
-                }
-                else if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Deposited)
-                {
-                    var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PaymentStatus == PaymentStatus.Success)).ToList();
-                    if (paymentCheck.Sum(i=>i.Amount) == sessionOrder.TotalPrice)
-                    {
-                        sessionOrder.Status = SessionOrderStatus.Waiting;
-                        try
-                        {
-                            if (sessionOrder.StartTime > DateTime.Now)
-                            {
-                                await _emailService.SendBookingInformation(sessionOrder.SessionOrderID);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.Message);
-                        }
-                        await _sessionOrderRepository.UpdateAsync(sessionOrder);
-                    }
-                }
-            }
+            return payment;
         }
-        public async Task Return(IQueryCollection queryString)
+        public async Task<Payment> Return(IQueryCollection queryString)
         {
 
             MoMoResponse response = new MoMoResponse();
@@ -228,7 +175,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
                     }
                 }
             }
-            await HandlePaymentResponeIPN(response);
+            return await HandlePaymentResponeIPN(response);
 
         }
         public async Task<MoMoRefundResponse> RefundById(Guid paymentID, bool isFullRefund)
@@ -242,10 +189,10 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
                 string version = "2.0";
                 string requestId = Guid.NewGuid().ToString();
                 string description = "Hoan tien giao dich" + payment.PaymentID.ToString();
-                long amount = isFullRefund ? payment.Amount : payment.Amount*50/100;
+                long amount = isFullRefund ? payment.Amount : payment.Amount * 50 / 100;
                 MoMoLibrary moMoLibrary = new MoMoLibrary();
                 string hash = moMoLibrary.buildRefundHash(partnerCode, merchantRefId, momoTransId, amount,
-                description,public_key);
+                description, public_key);
 
                 string jsonRequest = "{\"partnerCode\":\"" +
                 partnerCode + "\",\"requestId\":\"" +
@@ -258,7 +205,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices.MoMoServi
                 {
                     MoMoRefundResponse response = JsonConvert.DeserializeObject<MoMoRefundResponse>(responseMomo);
                     return response;
-                } else
+                }
+                else
                 {
                     throw new Exception("Error happend in refund progress");
                 }

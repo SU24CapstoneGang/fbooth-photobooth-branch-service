@@ -17,9 +17,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasKey(r => r.RefundID);
             builder.Property(r => r.RefundID).ValueGeneratedOnAdd();
             builder.Property(r => r.RefundDateTime);
+            builder.Property(r => r.Amount);
             builder.Property(r => r.Description);
             builder.Property(r => r.Status);
-
         }
     }
 }

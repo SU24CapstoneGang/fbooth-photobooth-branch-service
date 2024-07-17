@@ -13,6 +13,7 @@ namespace PhotoboothBranchService.Domain.Entities
         public Guid RefundID { get; set; }
         public string TransactionID { get; set; }
         public DateTime RefundDateTime { get; set; }
+        public long Amount { get; set; }
         public string Description { get; set; }
         public RefundStatus Status { get; set; }
         public Guid PaymentID { get; set; }

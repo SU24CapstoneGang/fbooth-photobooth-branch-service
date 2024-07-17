@@ -5,6 +5,7 @@ using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.ServiceItem;
 using PhotoboothBranchService.Application.DTOs.SessionOrder;
 using PhotoboothBranchService.Application.Services.PaymentServices;
+using PhotoboothBranchService.Application.Services.RefundServices;
 using PhotoboothBranchService.Application.Services.ServiceItemServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
@@ -24,6 +25,7 @@ public class SessionOrderService : ISessionOrderService
     private readonly ISessionPackageRepository _sessionPackageRepository;
     private readonly IServiceRepository _serviceRepository;
     private readonly IAccountRepository _accountRepository;
+    private readonly IRefundService _refundService;
     public SessionOrderService(ISessionOrderRepository sessionOrderRepository, 
         IMapper mapper, 
         IBoothRepository boothRepository,
@@ -31,7 +33,8 @@ public class SessionOrderService : ISessionOrderService
         IServiceItemService serviceItemService, 
         ISessionPackageRepository sessionPackageRepository, 
         IServiceRepository serviceRepository,
-        IAccountRepository accountRepository)
+        IAccountRepository accountRepository,
+        IRefundService refundService)
     {
         _sessionOrderRepository = sessionOrderRepository;
         _mapper = mapper;
@@ -41,6 +44,7 @@ public class SessionOrderService : ISessionOrderService
         _sessionPackageRepository = sessionPackageRepository;
         _serviceRepository = serviceRepository;
         _accountRepository = accountRepository;
+        _refundService = refundService;
     }
 
     // Create a new session
@@ -128,7 +132,6 @@ public class SessionOrderService : ISessionOrderService
             session.StartTime = DateTime.Now;
             //update booth
             booth.Status = ManufactureStatus.InUse;
-            await _boothRepository.UpdateAsync(booth);
         } else if (createModel.StartTime < DateTime.Now)
         {
             throw new BadRequestException("Can not booking with start time in past");
@@ -305,6 +308,10 @@ public class SessionOrderService : ISessionOrderService
             startTime = session.StartTime;
             endTime = session.EndTime.Value;
         }
+        if (this.ValidateTimeRange(startTime, endTime) == false)
+        {
+            throw new BadRequestException("Not valide time, our Branch open from 8:00 to 23:00 of a day");
+        }
         if (updateModel.BoothID.Value != null && updateModel.BoothID.Value != default(Guid))
         {
             check = await this.ValidateBookingTime(updateModel.BoothID.Value, startTime, endTime);
@@ -342,7 +349,7 @@ public class SessionOrderService : ISessionOrderService
                 var payments = await _paymentService.GetBySessionOrderAsync(sessionOrdeID);
                 foreach (var payment in payments)
                 {
-                    await _paymentService.RefundByPaymentID(payment.PaymentID, false, string.IsNullOrEmpty(ipAddress) ? null : ipAddress);
+                    await _refundService.RefundByPaymentID(payment.PaymentID, false, string.IsNullOrEmpty(ipAddress) ? null : ipAddress);
                 }
             }
             sessionOrder.Status = SessionOrderStatus.Canceled;

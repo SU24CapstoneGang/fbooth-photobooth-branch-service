@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Api.Common.Helper;
-using PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment;
-using PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices;
+using PhotoboothBranchService.Application.DTOs.VNPayPayment;
+using PhotoboothBranchService.Application.Services.VNPayServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {

@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.MoMoPayment;
 using PhotoboothBranchService.Application.DTOs.Payment;
-using PhotoboothBranchService.Application.DTOs.Payment.MoMoPayment;
-using PhotoboothBranchService.Application.DTOs.Payment.VNPayPayment;
-using PhotoboothBranchService.Application.Services.PaymentServices.MoMoServices;
-using PhotoboothBranchService.Application.Services.PaymentServices.VNPayServices;
+using PhotoboothBranchService.Application.DTOs.VNPayPayment;
+using PhotoboothBranchService.Application.Services.EmailServices;
+using PhotoboothBranchService.Application.Services.MoMoServices;
+using PhotoboothBranchService.Application.Services.RefundServices;
+using PhotoboothBranchService.Application.Services.VNPayServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -25,11 +28,15 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         private readonly IVNPayService _vNPayService;
         private readonly ISessionOrderRepository _sessionOrderRepository;
         private readonly IMoMoService _moMoService;
+        private readonly IEmailService _emailService;
+        private readonly IRefundService _refundService;
         public PaymentService(IPaymentRepository paymentRepository, IMapper mapper,
             IPaymentMethodRepository paymentMethodRepository,
             IVNPayService vNPayService,
             ISessionOrderRepository sessionOrderRepository,
-            IMoMoService moMoService)
+            IMoMoService moMoService,
+            IEmailService emailService,
+            IRefundService refundService)
         {
             _paymentRepository = paymentRepository;
             _mapper = mapper;
@@ -37,6 +44,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             _vNPayService = vNPayService;
             _sessionOrderRepository = sessionOrderRepository;
             _moMoService = moMoService;
+            _emailService = emailService;
+            _refundService = refundService;
         }
 
         // Create
@@ -142,70 +151,43 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
 
             return createPaymentResponse;
         }
-
-        //refund 
-        public async Task RefundByPaymentID(Guid id, bool isFullRefund, string? ipAddress)
+        //handle response
+        public async Task<(VnpayResponse response, string returnContent)> HandleVnpayResponse(IQueryCollection queryString)
         {
-            var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == id, i => i.PaymentMethod)).FirstOrDefault();
-            if (payment == null)
+            var result = await _vNPayService.Return(queryString);
+            var responseBody = result.response;
+            if (responseBody.Success)
             {
-                throw new NotFoundException("Not found Payment ID to refund");
+                try
+                {
+                    await _emailService.SendBillInformation(responseBody.PaymentID);
+                    await this.updateAfterSuccessPaymentAsync(result.paymentResult);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
-            if (payment.PaymentStatus == PaymentStatus.RefundedFull)
-            {
-                throw new BadRequestException("Already refund this payment, can not refund anymore");
-            }
-            if (payment.PaymentMethod.Status != PaymentMethodStatus.Active)
-            {
-                throw new BadRequestException("This method not availble to refund anymore");
-            }
-            if (ipAddress.IsNullOrEmpty())
-            {
-                IPAddress localIp = Dns.GetHostEntry(Dns.GetHostName()).AddressList[0];
-                ipAddress = localIp.ToString();
-            }
-            switch (payment.PaymentMethod.PaymentMethodName) 
-            {
-                case "VNPay":
-                    var order = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
-                    VnpayRefundRequest refundRequest = new VnpayRefundRequest
-                    {
-                        Amount = isFullRefund ? payment.Amount : (payment.Amount / 10 * 5),
-                        PayDate = payment.PaymentDateTime,
-                        RefundCategory = isFullRefund ? "02" : "03",
-                        PaymentID = GuidAlphanumericConverter.GuidToAlphanumeric(payment.PaymentID),
-                        TransId = payment.TransactionID,
-                        User = GuidAlphanumericConverter.GuidToAlphanumeric(order.AccountID.Value),
-                    };
-                    var responseVNPay = await _vNPayService.RefundTransaction(refundRequest, ipAddress);
 
-                    if (responseVNPay.Vnp_ResponseCode == "00"){
-                        payment.PaymentStatus = responseVNPay.Vnp_TransactionType.Equals("02") ? PaymentStatus.RefundedFull : PaymentStatus.RefundedPartial;
-                    } else
-                    {
-                        throw new BadRequestException("An error in refund process");
-                    }
-                    break;
-                case "MoMo":
-                    MoMoRefundResponse responseMoMo = await _moMoService.RefundById(payment.PaymentID, isFullRefund);
-                    if (responseMoMo.Status == 0)
-                    {
-                        if (payment.PaymentStatus == PaymentStatus.RefundedPartial)
-                        {
-                            payment.PaymentStatus = PaymentStatus.RefundedFull;
-                        } else {
-                            payment.PaymentStatus = responseMoMo.Amount == payment.Amount ? PaymentStatus.RefundedFull : PaymentStatus.RefundedPartial;
-                        }
-                    } else
-                    {
-                        throw new BadRequestException("An error in refund process");
-                    }
-                    break;
-                default:
-                    throw new BadRequestException("Payment method not availbe to use, please try later");
-            }
-            await _paymentRepository.UpdateAsync(payment);
+            return (result.response, result.returnContent);
         }
+        public async Task HandleMomoResponse(IQueryCollection queryString)
+        {
+            var response = await _moMoService.Return(queryString);
+            if (response.PaymentStatus == PaymentStatus.Success)
+            {
+                try
+                {
+                    await _emailService.SendBillInformation(response.PaymentID);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                await this.updateAfterSuccessPaymentAsync(response);
+            }
+        }
+
         // Delete
         public async Task DeleteAsync(Guid id)
         {
@@ -223,14 +205,12 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                 throw;
             }
         }
-
         // Read all
         public async Task<IEnumerable<PaymentResponse>> GetAllAsync()
         {
             var payments = await _paymentRepository.GetAllAsync();
             return _mapper.Map<IEnumerable<PaymentResponse>>(payments.ToList());
         }
-
         // Read all with paging and filter
         public async Task<IEnumerable<PaymentResponse>> GetAllPagingAsync(PaymentFilter filter, PagingModel paging)
         {
@@ -240,16 +220,14 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         }
         public async Task<IEnumerable<PaymentResponse>> GetBySessionOrderAsync(Guid sessionOrderID)
         {
-            var payments = await _paymentRepository.GetAsync(i=>i.SessionOrderID == sessionOrderID);
+            var payments = await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrderID);
             return _mapper.Map<IEnumerable<PaymentResponse>>(payments.ToList());
         }
-
         public async Task<IEnumerable<PaymentResponse>> GetByOrderIdAsync(Guid id)
         {
             var payments = await _paymentRepository.GetAsync(p => p.SessionOrderID == id);
             return _mapper.Map<IEnumerable<PaymentResponse>>(payments);
         }
-
         // Read by ID
         public async Task<PaymentResponse> GetByIdAsync(Guid id)
         {
@@ -257,7 +235,6 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             var payment = payments.FirstOrDefault();
             return _mapper.Map<PaymentResponse>(payment);
         }
-
         // Update
         public async Task UpdateAsync(Guid id, UpdatePaymentRequest updateModel)
         {
@@ -269,6 +246,53 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
 
             var updatedPayment = _mapper.Map(updateModel, payment);
             await _paymentRepository.UpdateAsync(updatedPayment);
+        }
+        private async Task updateAfterSuccessPaymentAsync(Payment payment)
+        {
+            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
+            if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Created)
+            {
+                if (payment.Amount < sessionOrder.TotalPrice)
+                {
+                    sessionOrder.Status = SessionOrderStatus.Deposited;
+                }
+                else if (payment.Amount == sessionOrder.TotalPrice)
+                {
+                    sessionOrder.Status = SessionOrderStatus.Waiting;
+                    try
+                    {
+                        if (sessionOrder.StartTime > DateTime.Now)
+                        {
+                            await _emailService.SendBookingInformation(sessionOrder.SessionOrderID);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+                await _sessionOrderRepository.UpdateAsync(sessionOrder);
+            }
+            else if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Deposited)
+            {
+                var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PaymentStatus == PaymentStatus.Success)).ToList();
+                if (paymentCheck.Sum(i => i.Amount) == sessionOrder.TotalPrice)
+                {
+                    sessionOrder.Status = SessionOrderStatus.Waiting;
+                    try
+                    {
+                        if (sessionOrder.StartTime > DateTime.Now)
+                        {
+                            await _emailService.SendBookingInformation(sessionOrder.SessionOrderID);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                    await _sessionOrderRepository.UpdateAsync(sessionOrder);
+                }
+            }
         }
     }
 }
