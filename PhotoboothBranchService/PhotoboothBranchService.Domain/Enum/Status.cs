@@ -26,7 +26,6 @@ public enum PaymentMethodStatus
     Inactive = 0,
 }
 
-
 public enum PaymentStatus
 {
     Success = 1,

@@ -20,15 +20,9 @@ public class BackgroundController : ControllerBaseApi
     [HttpGet]
     public async Task<ActionResult<IEnumerable<BackgroundResponse>>> GetAllBackgrounds()
     {
-        try
-        {
-            var frames = await _backgroundService.GetAllAsync();
-            return Ok(frames);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving background: {ex.Message}");
-        }
+
+        var frames = await _backgroundService.GetAllAsync();
+        return Ok(frames);
     }
 
     // Read with paging and filter
@@ -36,91 +30,48 @@ public class BackgroundController : ControllerBaseApi
     public async Task<ActionResult<IEnumerable<BackgroundResponse>>> GetPagingBackgrounds(
         [FromQuery] BackgroundFilter backgroundFilter, [FromQuery] PagingModel pagingModel)
     {
-        try
-        {
-            var frames = await _backgroundService.GetAllPagingAsync(backgroundFilter, pagingModel);
-            return Ok(frames);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving background: {ex.Message}");
-        }
+        var frames = await _backgroundService.GetAllPagingAsync(backgroundFilter, pagingModel);
+        return Ok(frames);
     }
 
     [HttpGet("name/{name}")]
     public async Task<ActionResult<IEnumerable<BackgroundResponse>>> GetBackgroundByName(string name)
     {
-        try
-        {
-            var frames = await _backgroundService.GetByName(name);
-            return Ok(frames);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving background by name: {ex.Message}");
-        }
+
+        var frames = await _backgroundService.GetByName(name);
+        return Ok(frames);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<BackgroundResponse>> GetBackgroundById(Guid id)
     {
-        try
+        var frame = await _backgroundService.GetByIdAsync(id);
+        if (frame == null)
         {
-            var frame = await _backgroundService.GetByIdAsync(id);
-            if (frame == null)
-            {
-                return NotFound();
-            }
-            return Ok(frame);
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving the background by ID: {ex.Message}");
-        }
+        return Ok(frame);
     }
 
     // Update
     [HttpPut("{backGroundID}")]
-    public async Task<ActionResult> UpdateBackground(IFormFile file, Guid backGroundID,[FromQuery] UpdateBackgroundRequest updateBackgroundRequest)
+    public async Task<ActionResult> UpdateBackground(IFormFile file, Guid backGroundID, [FromQuery] UpdateBackgroundRequest updateBackgroundRequest)
     {
-        try
-        {
-            await _backgroundService.UpdateBackGroundAsync(file, backGroundID, updateBackgroundRequest);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while updating the background: {ex.Message}");
-        }
+        await _backgroundService.UpdateBackGroundAsync(file, backGroundID, updateBackgroundRequest);
+        return Ok();
     }
 
     // Delete
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteFrame(Guid id)
     {
-        try
-        {
-            await _backgroundService.DeleteAsync(id);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while deleting the background: {ex.Message}");
-        }
+        await _backgroundService.DeleteAsync(id);
+        return Ok();
     }
     [HttpPost("add-background-cloud")]
     public async Task<ActionResult<BackgroundResponse>> AddBackground(IFormFile file, Guid layoutID)
     {
-        try
-        {
-
-            var result = await _backgroundService.CreateBackgroundAsync(file, layoutID);
-
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while adding the background: {ex.Message}");
-        }
+        var result = await _backgroundService.CreateBackgroundAsync(file, layoutID);
+        return Ok(result);
     }
 }

@@ -19,30 +19,20 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<CreateServiceResponse>> CreateService(CreateServiceRequest createServiceRequest)
         {
-            try
-            {
-                var createServiceResponse = await _serviceService.CreateAsync(createServiceRequest);
-                return Ok(createServiceResponse);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while creating the service: {ex.Message}");
-            }
+
+            var createServiceResponse = await _serviceService.CreateAsync(createServiceRequest);
+            return Ok(createServiceResponse);
+
         }
 
         // Read
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ServiceResponse>>> GetAllServices()
         {
-            try
-            {
-                var services = await _serviceService.GetAllAsync();
-                return Ok(services);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving services: {ex.Message}");
-            }
+
+            var services = await _serviceService.GetAllAsync();
+            return Ok(services);
+
         }
 
         // Read with paging and filter
@@ -50,77 +40,52 @@ namespace PhotoboothBranchService.Api.Controllers
         public async Task<ActionResult<IEnumerable<ServiceResponse>>> GetAllServices(
             [FromQuery] ServiceFilter serviceFilter, [FromQuery] PagingModel pagingModel)
         {
-            try
-            {
-                var services = await _serviceService.GetAllPagingAsync(serviceFilter, pagingModel);
-                return Ok(services);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving services: {ex.Message}");
-            }
+
+            var services = await _serviceService.GetAllPagingAsync(serviceFilter, pagingModel);
+            return Ok(services);
+
         }
 
         [HttpGet("name/{name}")]
         public async Task<ActionResult<IEnumerable<ServiceResponse>>> GetServicesByName(string name)
         {
-            try
-            {
-                var services = await _serviceService.GetByName(name);
-                return Ok(services);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving services by name: {ex.Message}");
-            }
+
+            var services = await _serviceService.GetByName(name);
+            return Ok(services);
+
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ServiceResponse>> GetServiceById(Guid id)
         {
-            try
+
+            var service = await _serviceService.GetByIdAsync(id);
+            if (service == null)
             {
-                var service = await _serviceService.GetByIdAsync(id);
-                if (service == null)
-                {
-                    return NotFound();
-                }
-                return Ok(service);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving the service by ID: {ex.Message}");
-            }
+            return Ok(service);
+
         }
 
         // Update
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateService(Guid id, UpdateServiceRequest updateServiceRequest)
         {
-            try
-            {
-                await _serviceService.UpdateAsync(id, updateServiceRequest);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while updating the service: {ex.Message}");
-            }
+
+            await _serviceService.UpdateAsync(id, updateServiceRequest);
+            return Ok();
+
         }
 
         // Delete
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteService(Guid id)
         {
-            try
-            {
-                await _serviceService.DeleteAsync(id);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while deleting the service: {ex.Message}");
-            }
+
+            await _serviceService.DeleteAsync(id);
+            return Ok();
+
         }
     }
 }

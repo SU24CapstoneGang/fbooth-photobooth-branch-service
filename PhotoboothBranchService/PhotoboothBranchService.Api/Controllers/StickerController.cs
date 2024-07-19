@@ -19,15 +19,8 @@ public class StickerController : ControllerBaseApi
     [HttpGet]
     public async Task<ActionResult<IEnumerable<StickerResponse>>> GetAllStickers()
     {
-        try
-        {
-            var stickers = await _stickerService.GetAllAsync();
-            return Ok(stickers);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving stickers: {ex.Message}");
-        }
+        var stickers = await _stickerService.GetAllAsync();
+        return Ok(stickers);
     }
 
     //get all with filter and paging
@@ -35,91 +28,47 @@ public class StickerController : ControllerBaseApi
     public async Task<ActionResult<IEnumerable<StickerResponse>>> GetAllStickers(
         [FromQuery] StickerFilter stickerFilter, [FromQuery] PagingModel pagingModel)
     {
-        try
-        {
-            var stickers = await _stickerService.GetAllPagingAsync(stickerFilter, pagingModel);
-            return Ok(stickers);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving stickers: {ex.Message}");
-        }
+        var stickers = await _stickerService.GetAllPagingAsync(stickerFilter, pagingModel);
+        return Ok(stickers);
     }
     [HttpGet("name/{name}")]
     public async Task<ActionResult<IEnumerable<StickerResponse>>> GetStickersByName(string name)
     {
-        try
-        {
-            var stickers = await _stickerService.GetByName(name);
-            return Ok(stickers);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving stickers by name: {ex.Message}");
-        }
+        var stickers = await _stickerService.GetByName(name);
+        return Ok(stickers);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<StickerResponse>> GetStickerById(Guid id)
     {
-        try
+        var sticker = await _stickerService.GetByIdAsync(id);
+        if (sticker == null)
         {
-            var sticker = await _stickerService.GetByIdAsync(id);
-            if (sticker == null)
-            {
-                return NotFound();
-            }
-            return Ok(sticker);
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving the sticker by ID: {ex.Message}");
-        }
+        return Ok(sticker);
     }
 
     // Update
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateSticker(IFormFile file, Guid id, UpdateStickerRequest updateStickerRequest)
     {
-        try
-        {
-            await _stickerService.UpdateStickerAsync(file, id, updateStickerRequest);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while updating the sticker: {ex.Message}");
-        }
+        await _stickerService.UpdateStickerAsync(file, id, updateStickerRequest);
+        return Ok();
     }
 
     // Delete
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteSticker(Guid id)
     {
-        try
-        {
-            await _stickerService.DeleteAsync(id);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while deleting the sticker: {ex.Message}");
-        }
+        await _stickerService.DeleteAsync(id);
+        return Ok();
     }
 
     [HttpPost("add-sticker-cloud")]
     public async Task<ActionResult<StickerResponse>> AddSticker(IFormFile file)
     {
-        try
-        {
-
-            var result = await _stickerService.CreateStickerAsync(file);
-
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while adding the photo: {ex.Message}");
-        }
+        var result = await _stickerService.CreateStickerAsync(file);
+        return Ok(result);
     }
 }

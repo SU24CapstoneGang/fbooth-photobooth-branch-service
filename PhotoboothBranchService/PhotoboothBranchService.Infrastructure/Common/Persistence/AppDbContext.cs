@@ -10,7 +10,7 @@ public class AppDbContext : DbContext
 {
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Booth> Booths { get; set; }
-    public DbSet<BoothBranch> BoothBranches { get; set; }
+    public DbSet<Branch> BoothBranches { get; set; }
     public DbSet<Background> Backgrounds { get; set; }
     public DbSet<Device> Devices { get; set; }
     public DbSet<Layout> Layouts { get; set; }
@@ -62,7 +62,7 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new LayoutConfigurations());
         modelBuilder.ApplyConfiguration(new PaymentConfiguration());
         modelBuilder.ApplyConfiguration(new PaymentMethodConfigurations());
-        modelBuilder.ApplyConfiguration(new BoothBranchConfigurations());
+        modelBuilder.ApplyConfiguration(new BranchConfigurations());
         modelBuilder.ApplyConfiguration(new PhotoBoxConfiguration());
         modelBuilder.ApplyConfiguration(new RefundConfiguration());
         modelBuilder.ApplyConfiguration(new PhotoConfiguration());

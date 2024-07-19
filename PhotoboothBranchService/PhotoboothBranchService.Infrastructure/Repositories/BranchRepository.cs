@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories;
 
-public class BranchRepository : IBoothBranchRepository
+public class BranchRepository : IBranchRepository
 {
     private readonly AppDbContext _dbContext;
 
@@ -17,7 +17,7 @@ public class BranchRepository : IBoothBranchRepository
     }
 
     //Create
-    public async Task<BoothBranch> AddAsync(BoothBranch photoBoothBranch)
+    public async Task<Branch> AddAsync(Branch photoBoothBranch)
     {
         var result = await _dbContext.AddAsync(photoBoothBranch);
         await _dbContext.SaveChangesAsync();
@@ -25,21 +25,21 @@ public class BranchRepository : IBoothBranchRepository
     }
 
     //Read
-    public async Task<IQueryable<BoothBranch>> GetAllAsync()
+    public async Task<IQueryable<Branch>> GetAllAsync()
     {
         return await Task.FromResult(_dbContext.BoothBranches);
     }
 
-    public async Task<IQueryable<BoothBranch>> GetAsync(
-        Expression<Func<BoothBranch, bool>> predicate = null,
-        params Expression<Func<BoothBranch, object>>[] includeProperties)
+    public async Task<IQueryable<Branch>> GetAsync(
+        Expression<Func<Branch, bool>> predicate = null,
+        params Expression<Func<Branch, object>>[] includeProperties)
     {
         try
         {
             var result = predicate == null ? _dbContext.BoothBranches : _dbContext.BoothBranches.Where(predicate);
             if (!result.Any())
             {
-                return await Task.FromResult(Enumerable.Empty<BoothBranch>().AsQueryable());
+                return await Task.FromResult(Enumerable.Empty<Branch>().AsQueryable());
             }
             else
             {
@@ -63,14 +63,14 @@ public class BranchRepository : IBoothBranchRepository
     }
 
     //Update
-    public async Task UpdateAsync(BoothBranch photoBoothBranch)
+    public async Task UpdateAsync(Branch photoBoothBranch)
     {
         _dbContext.Update(photoBoothBranch);
         await _dbContext.SaveChangesAsync();
     }
 
     //Delete
-    public async Task RemoveAsync(BoothBranch photoBoothBranch)
+    public async Task RemoveAsync(Branch photoBoothBranch)
     {
         _dbContext.Remove(photoBoothBranch);
         await _dbContext.SaveChangesAsync();

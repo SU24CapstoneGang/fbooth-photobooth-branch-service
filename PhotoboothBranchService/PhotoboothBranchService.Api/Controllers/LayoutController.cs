@@ -19,15 +19,8 @@ public class LayoutController : ControllerBaseApi
     [HttpGet]
     public async Task<ActionResult<IEnumerable<LayoutResponse>>> GetAllLayouts()
     {
-        try
-        {
-            var layouts = await _layoutService.GetAllAsync();
-            return Ok(layouts);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving layouts: {ex.Message}");
-        }
+        var layouts = await _layoutService.GetAllAsync();
+        return Ok(layouts);
     }
 
     // gat all with filter and paging
@@ -35,78 +28,43 @@ public class LayoutController : ControllerBaseApi
     public async Task<ActionResult<IEnumerable<LayoutResponse>>> GetAllLayouts(
         [FromQuery] LayoutFilter layoutFilter, [FromQuery] PagingModel pagingModel)
     {
-        try
-        {
-            var layouts = await _layoutService.GetAllPagingAsync(layoutFilter, pagingModel);
-            return Ok(layouts);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving layouts: {ex.Message}");
-        }
+        var layouts = await _layoutService.GetAllPagingAsync(layoutFilter, pagingModel);
+        return Ok(layouts);
+
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<LayoutResponse>> GetLayoutById(Guid id)
     {
-        try
+        var layout = await _layoutService.GetByIdAsync(id);
+        if (layout == null)
         {
-            var layout = await _layoutService.GetByIdAsync(id);
-            if (layout == null)
-            {
-                return NotFound();
-            }
-            return Ok(layout);
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving the layout by ID: {ex.Message}");
-        }
+        return Ok(layout);
+
     }
 
     // Update
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateLayout(IFormFile file, Guid id, UpdateLayoutRequest updateLayoutRequest)
     {
-        try
-        {
-            await _layoutService.UpdateLayoutAsync(file, id, updateLayoutRequest);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while updating the layout: {ex.Message}");
-        }
+        await _layoutService.UpdateLayoutAsync(file, id, updateLayoutRequest);
+        return Ok();
     }
 
     // Delete
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteLayout(Guid id)
     {
-        try
-        {
-            await _layoutService.DeleteAsync(id);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while deleting the layout: {ex.Message}");
-        }
+        await _layoutService.DeleteAsync(id);
+        return Ok();
     }
 
     [HttpPost("add-layout-auto")]
     public async Task<ActionResult<LayoutResponse>> AddLayout(IFormFile file)
     {
-        try
-        {
-
-            var result = await _layoutService.CreateLayoutAuto(file);
-
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while adding the photo: {ex.Message}");
-        }
+        var result = await _layoutService.CreateLayoutAuto(file);
+        return Ok(result);
     }
 }

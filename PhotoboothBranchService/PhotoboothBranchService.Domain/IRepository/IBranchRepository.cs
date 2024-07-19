@@ -3,6 +3,6 @@ using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Domain.IRepository;
 
-public interface IBoothBranchRepository : IRepositoryBase<BoothBranch>
+public interface IBranchRepository : IRepositoryBase<Branch>
 {
 }

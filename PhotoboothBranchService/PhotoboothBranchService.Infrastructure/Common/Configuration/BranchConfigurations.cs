@@ -6,16 +6,16 @@ using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
-    public class BoothBranchConfigurations : IEntityTypeConfiguration<BoothBranch>
+    public class BranchConfigurations : IEntityTypeConfiguration<Branch>
     {
-        public void Configure(EntityTypeBuilder<BoothBranch> builder)
+        public void Configure(EntityTypeBuilder<Branch> builder)
         {
             // Table name
-            builder.ToTable("BoothBranches");
+            builder.ToTable("Branches");
 
             // Primary key
-            builder.HasKey(pb => pb.BoothBranchID);
-            builder.Property(pb => pb.BoothBranchID).HasColumnName("BoothBranchID")
+            builder.HasKey(pb => pb.BranchID);
+            builder.Property(pb => pb.BranchID).HasColumnName("BranchID")
                 .ValueGeneratedOnAdd();
 
             // Other properties
@@ -42,22 +42,22 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired()
                 .HasConversion(
                     v => v.ToString(),
-                    v => (ManufactureStatus)Enum.Parse(typeof(ManufactureStatus), v));
+                    v => (BranchStatus)Enum.Parse(typeof(BranchStatus), v));
 
             // Relationship with Account - manager
             builder.HasOne(pb => pb.Manager)
-                .WithOne(a => a.BoothBranchManage)
-                .HasForeignKey<BoothBranch>(pb => pb.ManagerID)
+                .WithOne(a => a.BranchManage)
+                .HasForeignKey<Branch>(pb => pb.ManagerID)
                 .IsRequired(false);
             // Relationship with Account - staff
             builder.HasMany(pb => pb.Staffs)
-                .WithOne(a => a.BoothBranchBelong)
-                .HasForeignKey(a => a.PhotoBoothBranchID)
+                .WithOne(a => a.BranchBelong)
+                .HasForeignKey(a => a.BranchID)
                 .IsRequired(false);
 
             builder.HasMany(b => b.Booths)
-                .WithOne(a => a.PhotoBoothBranch)
-                .HasForeignKey(a => a.PhotoBoothBranchID)
+                .WithOne(a => a.Branch)
+                .HasForeignKey(a => a.BranchID)
                 .IsRequired();
 
         

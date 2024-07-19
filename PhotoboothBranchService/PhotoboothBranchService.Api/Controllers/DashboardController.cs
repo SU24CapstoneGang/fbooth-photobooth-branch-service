@@ -15,7 +15,7 @@ namespace PhotoboothBranchService.Api.Controllers
         }
         //basic
         [HttpGet("branch-basic")]
-        public async Task<ActionResult<BasicBranchDashboardResponse>> BasicBranchDashboard([FromQuery]Guid branchID)
+        public async Task<ActionResult<BasicBranchDashboardResponse>> BasicBranchDashboard([FromQuery] Guid branchID)
         {
             return await _dashboardService.BasicBranchDashboard(branchID);
         }
@@ -26,7 +26,7 @@ namespace PhotoboothBranchService.Api.Controllers
         }
         //service
         [HttpGet("branch-service")]
-        public async Task<ActionResult<List<DashboardServiceResponse>>> BranchDashboradService([FromQuery]Guid branchID, [FromQuery]DateOnly? startDate, [FromQuery] DateOnly? endDate)
+        public async Task<ActionResult<List<DashboardServiceResponse>>> BranchDashboradService([FromQuery] Guid branchID, [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate)
         {
             return await _dashboardService.DashboradService(branchID, startDate, endDate);
         }
@@ -37,7 +37,7 @@ namespace PhotoboothBranchService.Api.Controllers
         }
         //session package
         [HttpGet("branch-session-package")]
-        public async Task<ActionResult<List<DashboardSessionPackageResponse>>> BranchDashboradSessionPackage([FromQuery]Guid branchID, [FromQuery]DateOnly? startDate, [FromQuery] DateOnly? endDate)
+        public async Task<ActionResult<List<DashboardSessionPackageResponse>>> BranchDashboradSessionPackage([FromQuery] Guid branchID, [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate)
         {
             return await _dashboardService.DashboradSessionPackage(branchID, startDate, endDate);
         }

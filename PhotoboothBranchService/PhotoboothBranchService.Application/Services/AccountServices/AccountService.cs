@@ -183,6 +183,10 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                         {
                             throw new Exception("Email is already in use. Please choose a different email.");
                         }
+                        if (!await _accountRepository.IsPhoneNumberUnique(request.PhoneNumber))
+                        {
+                            throw new Exception("Phone number is already in use. Please choose a different Phone number.");
+                        }
 
                         var newAccount = _mapper.Map<Account>(request);
                         newAccount.AccountFBID = uid;

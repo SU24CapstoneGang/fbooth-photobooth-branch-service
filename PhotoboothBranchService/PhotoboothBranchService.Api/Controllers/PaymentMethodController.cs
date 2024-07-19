@@ -20,30 +20,20 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<CreatePaymentMethodResponse>> CreatePaymentMethod(CreatePaymentMethodRequest createPaymentMethodRequest)
         {
-            try
-            {
-                var createPaymentMethodResponse = await _paymentMethodService.CreateAsync(createPaymentMethodRequest);
-                return Ok(createPaymentMethodResponse);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while creating the paymentMethod: {ex.Message}");
-            }
+
+            var createPaymentMethodResponse = await _paymentMethodService.CreateAsync(createPaymentMethodRequest);
+            return Ok(createPaymentMethodResponse);
+
         }
 
         // Read all
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PaymentMethodResponse>>> GetAllPaymentMethods()
         {
-            try
-            {
-                var paymentMethods = await _paymentMethodService.GetAllAsync();
-                return Ok(paymentMethods);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving paymentMethods: {ex.Message}");
-            }
+
+            var paymentMethods = await _paymentMethodService.GetAllAsync();
+            return Ok(paymentMethods);
+
         }
 
         // Read all with paging and filter
@@ -51,79 +41,54 @@ namespace PhotoboothBranchService.Api.Controllers
         public async Task<ActionResult<IEnumerable<PaymentMethodResponse>>> GetPagingPaymentMethods(
             [FromQuery] PaymentMethodFilter paymentMethodFilter, [FromQuery] PagingModel pagingModel)
         {
-            try
-            {
-                var paymentMethods = await _paymentMethodService.GetAllPagingAsync(paymentMethodFilter, pagingModel);
-                return Ok(paymentMethods);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving paymentMethods: {ex.Message}");
-            }
+
+            var paymentMethods = await _paymentMethodService.GetAllPagingAsync(paymentMethodFilter, pagingModel);
+            return Ok(paymentMethods);
+
         }
 
         // Read by name
         [HttpGet("name/{name}")]
         public async Task<ActionResult<IEnumerable<PaymentMethodResponse>>> GetPaymentMethodsByName(string name)
         {
-            try
-            {
-                var paymentMethods = await _paymentMethodService.GetByName(name);
-                return Ok(paymentMethods);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving paymentMethods by name: {ex.Message}");
-            }
+
+            var paymentMethods = await _paymentMethodService.GetByName(name);
+            return Ok(paymentMethods);
+
         }
 
         // Read by ID
         [HttpGet("{id}")]
         public async Task<ActionResult<PaymentMethodResponse>> GetPaymentMethodById(Guid id)
         {
-            try
+
+            var paymentMethod = await _paymentMethodService.GetByIdAsync(id);
+            if (paymentMethod == null)
             {
-                var paymentMethod = await _paymentMethodService.GetByIdAsync(id);
-                if (paymentMethod == null)
-                {
-                    return NotFound();
-                }
-                return Ok(paymentMethod);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving the paymentMethod by ID: {ex.Message}");
-            }
+            return Ok(paymentMethod);
+
         }
 
         // Update
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdatePaymentMethod(Guid id, UpdatePaymentMethodRequest updatePaymentMethodRequest)
         {
-            try
-            {
-                await _paymentMethodService.UpdateAsync(id, updatePaymentMethodRequest);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while updating the paymentMethod: {ex.Message}");
-            }
+
+            await _paymentMethodService.UpdateAsync(id, updatePaymentMethodRequest);
+            return Ok();
+
         }
 
         // Delete
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeletePaymentMethod(Guid id)
         {
-            try
-            {
-                await _paymentMethodService.DeleteAsync(id);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while deleting the paymentMethod: {ex.Message}");
-            }
+
+            await _paymentMethodService.DeleteAsync(id);
+            return Ok();
+
         }
     }
 }

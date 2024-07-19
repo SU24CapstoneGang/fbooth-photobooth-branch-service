@@ -25,13 +25,13 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
         private IAccountRepository _accountRepository;
         private IPaymentRepository _paymentRepository;
         private ISessionOrderRepository _sessionOrderRepository;
-        private IBoothBranchRepository _boothBranchRepository;
+        private IBranchRepository _boothBranchRepository;
         private IServiceItemRepository _serviceItemRepository;
 
         public EmailService(IAccountRepository accountRepository, 
             IPaymentRepository paymentRepository, 
             ISessionOrderRepository sessionOrderRepository, 
-            IBoothBranchRepository boothBranchRepository, 
+            IBranchRepository boothBranchRepository, 
             IServiceItemRepository serviceItemRepository)
         {
             this.smtpServerName = JsonHelper.GetFromAppSettings("EmailConfig:SmtpServerName");
@@ -94,7 +94,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             {
                 throw new NotFoundException("Not found user");
             }
-            var branch = (await _boothBranchRepository.GetAsync(i => i.BoothBranchID == sessionOrder.Booth.PhotoBoothBranchID)).FirstOrDefault();
+            var branch = (await _boothBranchRepository.GetAsync(i => i.BranchID == sessionOrder.Booth.BranchID)).FirstOrDefault();
             if (branch == null)
             {
                 throw new NotFoundException("Not found branch");
@@ -102,20 +102,20 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             string subject = "Booking information";
             StringBuilder sbBody = new StringBuilder();
             sbBody.AppendLine("<p>Here is your booking's information</p>");
-            sbBody.AppendLine("<p></p>");
-            sbBody.AppendLine($"<p>Session Order ID: {sessionOrder.SessionOrderID}</p>");
+            sbBody.AppendLine("<br>");
+            sbBody.AppendLine($"<p><strong>Session Order ID:</strong> {sessionOrder.SessionOrderID}</p>");
 
-            sbBody.AppendLine($"<p>Branch name: {branch.BranchName}</p>");
-            sbBody.AppendLine($"<p>Branch adress ID: {branch.Address}</p>");
+            sbBody.AppendLine("<h3>Branch Details</h3>");
+            sbBody.AppendLine($"<p><strong>Branch Name:</strong> {branch.BranchName}</p>");
+            sbBody.AppendLine($"<p><strong>Branch Address:</strong> {branch.Address}</p>");
+            sbBody.AppendLine($"<p><strong>Booth Name:</strong> {sessionOrder.Booth.BoothName}</p>");
 
-            sbBody.AppendLine($"<p>Booth name: {sessionOrder.Booth.BoothName}</p>");
-
-            sbBody.AppendLine($"<p>Package Information:</p>");
-            sbBody.AppendLine($"<p style='text-indent: 30px;'>Package name: {sessionOrder.SessionPackage.SessionPackageName}</p>");
-            sbBody.AppendLine($"<p style='text-indent: 30px;'>Time to send photos to mail: {sessionOrder.SessionPackage.EmailSendCount} time(s)</p>");
-            sbBody.AppendLine($"<p style='text-indent: 30px;'>Print picture times: {sessionOrder.SessionPackage.PrintCount} time(s)</p>");
-            sbBody.AppendLine($"<p style='text-indent: 30px;'>Duration: {sessionOrder.SessionPackage.Duration} minutes</p>");
-            sbBody.AppendLine($"<p style='text-indent: 30px;'>Price: {sessionOrder.SessionPackage.Price:N0} VND</p>");
+            sbBody.AppendLine("<h3>Package Information</h3>");
+            sbBody.AppendLine($"<p style='text-indent: 30px;'><strong>Package Name:</strong> {sessionOrder.SessionPackage.SessionPackageName}</p>");
+            sbBody.AppendLine($"<p style='text-indent: 30px;'><strong>Email Send Count:</strong> {sessionOrder.SessionPackage.EmailSendCount} time(s)</p>");
+            sbBody.AppendLine($"<p style='text-indent: 30px;'><strong>Print Count:</strong> {sessionOrder.SessionPackage.PrintCount} time(s)</p>");
+            sbBody.AppendLine($"<p style='text-indent: 30px;'><strong>Duration:</strong> {sessionOrder.SessionPackage.Duration} minutes</p>");
+            sbBody.AppendLine($"<p style='text-indent: 30px;'><strong>Price:</strong> {sessionOrder.SessionPackage.Price:N0} VND</p>");
 
             if (sessionOrder.ServiceItems.Count > 0)
             {
@@ -124,8 +124,8 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                     ).ToList();
                 if (serviceItemList != null && serviceItemList.Count == sessionOrder.ServiceItems.Count)
                 {
-                    sbBody.AppendLine($"<p>Service(s) in Order:</p>");
-
+                    sbBody.AppendLine("<p>Service(s) in Order:</p>");
+                    sbBody.AppendLine("<br>");
                     sbBody.AppendLine("<table style='width:100%; border-collapse: collapse;'>");
                     sbBody.AppendLine("<tr>");
                     sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Service Name</th>");
@@ -189,15 +189,19 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
 
                 StringBuilder sbBody = new StringBuilder();
                 sbBody.AppendLine("<html>");
-                sbBody.AppendLine("<body>");
-                sbBody.AppendLine("<h1>Hi,</h1>");
+                sbBody.AppendLine("<head>");
+                sbBody.AppendLine("<style>");
+                sbBody.AppendLine("p { margin: 5px 0; }"); 
+                sbBody.AppendLine("</style>");
+                sbBody.AppendLine("</head>");
+                sbBody.AppendLine("<body style='font-family: Arial, sans-serif;'>");
                 sbBody.AppendLine("<p>Thank you for using our photo booth! </p>");
-                sbBody.AppendLine("<p></p>");
+                sbBody.AppendLine("<br>");
 
                 //insert body need to send
                 sbBody.AppendLine(body);
 
-                sbBody.AppendLine("<p></p>");
+                sbBody.AppendLine("<br>");
                 sbBody.AppendLine("<p>Best regards,</p>");
                 sbBody.AppendLine("<p>FBooth Team</p>");
                 sbBody.AppendLine("</body>");

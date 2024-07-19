@@ -20,7 +20,17 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasForeignKey(b => b.ServiceTypeID)
                 .IsRequired();
 
-         
+            builder.HasData(
+                    new ServiceType
+                    {
+                        ServiceTypeName = "Make up",
+                        ServiceTypeID = new Guid("06167451-8b59-4dd2-bb9e-88df025eead6")
+                    },
+                    new ServiceType
+                    {
+                        ServiceTypeID = new Guid("fc34dccb-10a0-4643-84bf-71ac85ca77bb"),
+                        ServiceTypeName = "Relate to Take Photo"
+                    });
         }
     }
 }

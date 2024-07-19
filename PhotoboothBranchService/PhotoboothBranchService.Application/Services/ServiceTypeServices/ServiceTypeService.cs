@@ -23,7 +23,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceTypeServices
         {
             var serviceType = _mapper.Map<ServiceType>(createModel);
             await _serviceTypeRepository.AddAsync(serviceType);
-            return _mapper.Map<CreateServiceTypeResponse>(createModel);
+            return _mapper.Map<CreateServiceTypeResponse>(serviceType);
         }
 
         // Delete

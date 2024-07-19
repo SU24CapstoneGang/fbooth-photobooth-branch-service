@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.BoothBranch;
 using PhotoboothBranchService.Domain.Common.Helper;
@@ -10,26 +11,53 @@ namespace PhotoboothBranchService.Application.Services.BoothBranchServices;
 
 public class BranchService : IBranchService
 {
-    private readonly IBoothBranchRepository _photoBoothBranchRepository;
+    private readonly IBranchRepository _photoBoothBranchRepository;
+    private readonly IAccountRepository _accountRepository;
     private readonly IMapper _mapper;
 
-    public BranchService(IBoothBranchRepository photoBoothBranchRepository, IMapper mapper)
+    public BranchService(IBranchRepository photoBoothBranchRepository, IMapper mapper, IAccountRepository accountRepository)
     {
         _photoBoothBranchRepository = photoBoothBranchRepository;
         _mapper = mapper;
+        _accountRepository = accountRepository;
     }
     //Create
     public async Task<CreateBranchResponse> CreateAsync(CreateBranchRequest createModel)
     {
         try
         {
-            BoothBranch photoBoothBranch = _mapper.Map<BoothBranch>(createModel);
+            //validate input
+            var brnach = (await _photoBoothBranchRepository.GetAsync(i => i.ManagerID == createModel.ManagerID)).FirstOrDefault();
+            if (brnach != null) {
+                throw new BadRequestException("This manager is in another branch");
+            }
+            var account = (await _accountRepository.GetAsync(i => i.AccountID == createModel.ManagerID)).FirstOrDefault();
+            if (account == null)
+            {
+                throw new NotFoundException("Not found Account");
+            }
+            if (account.Role != AccountRole.Manager)
+            {
+                throw new BadRequestException("Account assign is not manager");
+            }
+            if (account.Status != AccountStatus.Active)
+            {
+                throw new BadRequestException("Account is not active in system");
+            }
+            Branch photoBoothBranch = _mapper.Map<Branch>(createModel);
             await _photoBoothBranchRepository.AddAsync(photoBoothBranch);
             return _mapper.Map<CreateBranchResponse>(photoBoothBranch);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            if (ex.InnerException != null)
+            {
+                throw ex.InnerException;
+            }
+            else
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
     //Delete
@@ -37,7 +65,7 @@ public class BranchService : IBranchService
     {
         try
         {
-            var photoBoothBranch = (await _photoBoothBranchRepository.GetAsync(p => p.BoothBranchID == id)).FirstOrDefault();
+            var photoBoothBranch = (await _photoBoothBranchRepository.GetAsync(p => p.BranchID == id)).FirstOrDefault();
             if (photoBoothBranch != null)
             {
                 await _photoBoothBranchRepository.RemoveAsync(photoBoothBranch);
@@ -64,11 +92,11 @@ public class BranchService : IBranchService
 
     public async Task<BranchResponse> GetByIdAsync(Guid id)
     {
-        var photoBoothBranch = (await _photoBoothBranchRepository.GetAsync(p => p.BoothBranchID == id)).FirstOrDefault();
+        var photoBoothBranch = (await _photoBoothBranchRepository.GetAsync(p => p.BranchID == id)).FirstOrDefault();
         return _mapper.Map<BranchResponse>(photoBoothBranch);
     }
 
-    public async Task<IEnumerable<BranchResponse>> GetByStatus(ManufactureStatus status)
+    public async Task<IEnumerable<BranchResponse>> GetByStatus(BranchStatus status)
     {
         var photoBoothBranch = await _photoBoothBranchRepository.GetAsync(p => p.Status == status);
         return _mapper.Map<IEnumerable<BranchResponse>>(photoBoothBranch);
@@ -83,7 +111,7 @@ public class BranchService : IBranchService
     //update
     public async Task UpdateAsync(Guid id, UpdateBranchRequest updateModel)
     {
-        var photobranch = (await _photoBoothBranchRepository.GetAsync(p => p.BoothBranchID == id)).FirstOrDefault();
+        var photobranch = (await _photoBoothBranchRepository.GetAsync(p => p.BranchID == id)).FirstOrDefault();
         if (photobranch == null)
         {
             throw new KeyNotFoundException("Branch not found.");

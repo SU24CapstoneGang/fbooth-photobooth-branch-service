@@ -20,7 +20,7 @@ namespace PhotoboothBranchService.Infrastructure
             //Repositories
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IBoothRepository, BoothRepository>();
-            services.AddScoped<IBoothBranchRepository, BranchRepository>();
+            services.AddScoped<IBranchRepository, BranchRepository>();
             services.AddScoped<IBackgroundRepository, BackgroundRepository>();
             services.AddScoped<IDeviceRepository, DeviceRepository>();
             services.AddScoped<ILayoutRepository, LayoutRepository>();

@@ -28,9 +28,8 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
         private readonly string ipnUrl;
         private readonly string public_key;
         private readonly IPaymentRepository _paymentRepository;
-        private readonly ISessionOrderRepository _sessionOrderRepository;
-        private readonly IEmailService _emailService;
-        public MoMoService(IPaymentRepository paymentRepository, ISessionOrderRepository sessionOrderRepository, IEmailService emailService)
+
+        public MoMoService(IPaymentRepository paymentRepository)
         {
             momo_Api_Pay = JsonHelper.GetFromAppSettings("MoMo:momo_Api");
             momo_Api_Refund = JsonHelper.GetFromAppSettings("MoMo:momo_refund_endpoint");
@@ -41,8 +40,6 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
             ipnUrl = JsonHelper.GetFromAppSettings("MoMo:ipnUrl");
             public_key = JsonHelper.GetFromAppSettings("MoMo:public_key");
             _paymentRepository = paymentRepository;
-            _sessionOrderRepository = sessionOrderRepository;
-            _emailService = emailService;
         }
 
         public string CreatePayment(MoMoRequest request)
@@ -180,7 +177,6 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
         }
         public async Task<MoMoRefundResponse> RefundById(Guid paymentID, bool isFullRefund)
         {
-
             var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == paymentID)).FirstOrDefault();
             if (payment != null)
             {
@@ -204,6 +200,7 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                 if (responseMomo != null)
                 {
                     MoMoRefundResponse response = JsonConvert.DeserializeObject<MoMoRefundResponse>(responseMomo);
+                    response.RequestId = new Guid(requestId);
                     return response;
                 }
                 else

@@ -41,8 +41,8 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                 var orders = (await sessionOrderRepository.GetAsync(o =>
                     (o.Status == SessionOrderStatus.Deposited ||
                      o.Status == SessionOrderStatus.Created) &&
-                     o.StartTime <= now &&
-                     o.EndTime >= now)).ToList();
+                     o.StartTime <= now
+                     )).ToList();
 
                 foreach (var order in orders)
                 {
@@ -83,7 +83,7 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                      o.EndTime <= now)).ToList();
                 foreach (var order in orders)
                 {
-                    if ((now - order.EndTime.Value).TotalMinutes > 3)
+                    if ((now - order.EndTime.Value).TotalMinutes > 5)
                     {
                         order.Status = SessionOrderStatus.Done;
                         await sessionOrderRepository.UpdateAsync(order);

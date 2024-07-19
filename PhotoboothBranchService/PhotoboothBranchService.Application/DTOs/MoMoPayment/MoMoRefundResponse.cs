@@ -8,6 +8,7 @@ namespace PhotoboothBranchService.Application.DTOs.MoMoPayment
 {
     public class MoMoRefundResponse
     {
+        public Guid RequestId { get; set; }
         public int Status { get; set; }
         public string Message { get; set; }
         public string PartnerRefId { get; set; }

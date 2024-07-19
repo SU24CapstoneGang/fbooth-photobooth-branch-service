@@ -1,4 +1,5 @@
 ﻿using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Payment;
 using PhotoboothBranchService.Application.DTOs.Refund;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using System;
@@ -11,6 +12,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
 {
     public interface IRefundService : IServiceBase<RefundResponse, RefundFilter, PagingModel>
     {
-        Task RefundByPaymentID(Guid id, bool isFullRefund, string ipAddress);
+        Task<RefundResponse> RefundByPaymentID(Guid paymentId, bool isFullRefund, string ipAddress);
+        Task<(IEnumerable<RefundResponse> refundResponses, IEnumerable<PaymentResponse> failPayment)> RefundByOrderId(Guid orderId, bool isFullRefund, string? ipAddress);
     }
 }

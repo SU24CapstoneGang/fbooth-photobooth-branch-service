@@ -20,7 +20,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
 {
     public class DashboardService : IDashboardService
     {
-        private readonly IBoothBranchRepository _boothBranchRepository;
+        private readonly IBranchRepository _boothBranchRepository;
         private readonly IBoothRepository _boothRepository;
         private readonly IAccountRepository _accountRepository;
         private readonly ISessionOrderRepository _sessionOrderRepository;
@@ -30,7 +30,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
         private readonly IPhotoRepository _photoRepository;
         private readonly IMapper _mapper;
 
-        public DashboardService(IBoothBranchRepository boothBranchRepository,
+        public DashboardService(IBranchRepository boothBranchRepository,
             IBoothRepository boothRepository,
             IAccountRepository accountRepository,
             ISessionOrderRepository sessionOrderRepository,
@@ -54,8 +54,8 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
         public async Task<BasicBranchDashboardResponse> BasicBranchDashboard(Guid branchID)
         {
             BasicBranchDashboardResponse response = new BasicBranchDashboardResponse();
-            response.TotalStaff = (await _accountRepository.GetAsync(i => i.PhotoBoothBranchID == branchID &&i.Status == AccountStatus.Active && i.Role == Domain.Enum.AccountRole.Staff)).Count();
-            var booths = await _boothRepository.GetAsync(i => i.PhotoBoothBranchID == branchID);
+            response.TotalStaff = (await _accountRepository.GetAsync(i => i.BranchID == branchID &&i.Status == AccountStatus.Active && i.Role == Domain.Enum.AccountRole.Staff)).Count();
+            var booths = await _boothRepository.GetAsync(i => i.BranchID == branchID);
             response.TotalBooth = booths.Count();
             if (response.TotalBooth == 0)
             {
@@ -191,7 +191,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
         }
         private async Task<List<SessionOrder>> GetSessionOrders(Guid? branchID, DateOnly? startDate, DateOnly? endDate, params Expression<Func<SessionOrder, object>>[] includeProperties)
         {
-            var booths = branchID.HasValue ? await _boothRepository.GetAsync(i => i.PhotoBoothBranchID == branchID) : null;
+            var booths = branchID.HasValue ? await _boothRepository.GetAsync(i => i.BranchID == branchID) : null;
             if (branchID.HasValue && booths.Count() == 0)
             {
                 return new List<SessionOrder>();

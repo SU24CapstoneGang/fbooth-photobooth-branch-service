@@ -8,7 +8,7 @@ namespace PhotoboothBranchService.Application.DTOs.BoothBranch
         public string Address { get; set; } = default!;
         public string Town { get; set; } = default!;
         public string City { get; set; } = default!;
-        public ManufactureStatus Status { get; set; } = default!;
-        public Guid ManagerID { get; set; }
+        public BranchStatus Status { get; set; } = default!;
+        public Guid? ManagerID { get; set; }
     }
 }

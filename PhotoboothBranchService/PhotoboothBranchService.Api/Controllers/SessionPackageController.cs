@@ -19,30 +19,16 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<CreateSessionPackageResponse>> CreateSessionPackage(CreateSessionPackageRequest createSessionPackageRequest)
         {
-            try
-            {
-                var createSessionPackageResponse = await _sessionPackageService.CreateAsync(createSessionPackageRequest);
-                return Ok(createSessionPackageResponse);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while creating the session package: {ex.Message}");
-            }
+            var createSessionPackageResponse = await _sessionPackageService.CreateAsync(createSessionPackageRequest);
+            return Ok(createSessionPackageResponse);
         }
 
         // Read
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SessionPackageResponse>>> GetAllSessionPackages()
         {
-            try
-            {
-                var sessionPackages = await _sessionPackageService.GetAllAsync();
-                return Ok(sessionPackages);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving session packages: {ex.Message}");
-            }
+            var sessionPackages = await _sessionPackageService.GetAllAsync();
+            return Ok(sessionPackages);
         }
 
         // Read with paging and filter
@@ -50,63 +36,35 @@ namespace PhotoboothBranchService.Api.Controllers
         public async Task<ActionResult<IEnumerable<SessionPackageResponse>>> GetAllSessionPackages(
             [FromQuery] SessionPackageFilter sessionPackageFilter, [FromQuery] PagingModel pagingModel)
         {
-            try
-            {
-                var sessionPackages = await _sessionPackageService.GetAllPagingAsync(sessionPackageFilter, pagingModel);
-                return Ok(sessionPackages);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving session packages: {ex.Message}");
-            }
+            var sessionPackages = await _sessionPackageService.GetAllPagingAsync(sessionPackageFilter, pagingModel);
+            return Ok(sessionPackages);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<SessionPackageResponse>> GetSessionPackageById(Guid id)
         {
-            try
+            var sessionPackage = await _sessionPackageService.GetByIdAsync(id);
+            if (sessionPackage == null)
             {
-                var sessionPackage = await _sessionPackageService.GetByIdAsync(id);
-                if (sessionPackage == null)
-                {
-                    return NotFound();
-                }
-                return Ok(sessionPackage);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving the session package by ID: {ex.Message}");
-            }
+            return Ok(sessionPackage);
         }
 
         // Update
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateSessionPackage(Guid id, UpdateSessionPackageRequest updateSessionPackageRequest)
         {
-            try
-            {
-                await _sessionPackageService.UpdateAsync(id, updateSessionPackageRequest);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while updating the session package: {ex.Message}");
-            }
+            await _sessionPackageService.UpdateAsync(id, updateSessionPackageRequest);
+            return Ok();
         }
 
         // Delete
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteSessionPackage(Guid id)
         {
-            try
-            {
-                await _sessionPackageService.DeleteAsync(id);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while deleting the session package: {ex.Message}");
-            }
+            await _sessionPackageService.DeleteAsync(id);
+            return Ok();
         }
     }
 }

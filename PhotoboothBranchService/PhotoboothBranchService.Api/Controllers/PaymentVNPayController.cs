@@ -30,36 +30,5 @@ namespace PhotoboothBranchService.Api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("return")]
-        public async Task<IActionResult> VnpayReturn()
-        {
-            if (Request.QueryString.HasValue)
-            {
-                var response = await _vnpayService.Return(Request.Query);
-                string returnContent = $@"
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Payment Return</title>
-                        <script>
-                            window.onload = function() {{
-                                setTimeout(function() {{
-                                    window.close();
-                                }}, 3000); // Close after 3 seconds
-                            }}
-                        </script>
-                    </head>
-                    <body>
-                        <h1>Payment Processed</h1>
-                        <p>Your payment has been processed. This tab will close automatically.</p>
-                        <h2>Response Data:</h2>
-                        <pre>{response.returnContent}</pre> <!-- Display JSON response here -->
-                    </body>
-                    </html>";
-
-                return Content(returnContent, "text/html");
-            }
-            return BadRequest(new { Message = "No query string found" });
-        }
     }
 }
