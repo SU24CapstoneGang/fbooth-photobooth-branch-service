@@ -3,9 +3,11 @@ using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.ServiceType;
 using PhotoboothBranchService.Application.Services.ServiceTypeServices;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
+    [Route("api/service-type")]
     public class ServiceTypeController : ControllerBaseApi
     {
         private readonly IServiceTypeService _serviceTypeService;
@@ -17,9 +19,9 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<CreateServiceTypeResponse>> CreateServiceType(CreateServiceTypeRequest createServiceTypeRequest)
+        public async Task<ActionResult<CreateServiceTypeResponse>> CreateServiceType([FromBody]CreateServiceTypeRequest createServiceTypeRequest, StatusUse status)
         {
-            var createServiceTypeResponse = await _serviceTypeService.CreateAsync(createServiceTypeRequest);
+            var createServiceTypeResponse = await _serviceTypeService.CreateAsync(createServiceTypeRequest, status);
             return Ok(createServiceTypeResponse);
         }
 
@@ -60,9 +62,9 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateServiceType(Guid id, UpdateServiceTypeRequest updateServiceTypeRequest)
+        public async Task<ActionResult> UpdateServiceType(Guid id, UpdateServiceTypeRequest updateServiceTypeRequest, [FromQuery] StatusUse status)
         {
-            await _serviceTypeService.UpdateAsync(id, updateServiceTypeRequest);
+            await _serviceTypeService.UpdateAsync(id, updateServiceTypeRequest, status);
             return Ok();
         }
 

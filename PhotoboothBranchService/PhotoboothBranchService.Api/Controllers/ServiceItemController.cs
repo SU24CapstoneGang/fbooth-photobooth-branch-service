@@ -6,6 +6,7 @@ using PhotoboothBranchService.Application.Services.ServiceItemServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
+    [Route("api/service-item")]
     public class ServiceItemController : ControllerBaseApi
     {
         private readonly IServiceItemService _serviceItemService;
@@ -29,6 +30,10 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpPost("add-list")]
         public async Task<ActionResult<AddListServiceItemResponse>> AddListItems(AddListServiceItemRequest request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var response = await _serviceItemService.AddListServiceItem(request);
             return Ok(response);
         }
@@ -67,6 +72,10 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateServiceItem(Guid id, UpdateServiceItemRequest updateServiceItemRequest)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             await _serviceItemService.UpdateAsync(id, updateServiceItemRequest);
             return Ok();
         }

@@ -3,6 +3,7 @@ using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Booth;
 using PhotoboothBranchService.Application.Services.BoothServices;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Api.Controllers;
 
@@ -17,9 +18,9 @@ public class BoothController : ControllerBaseApi
 
     // Create
     [HttpPost]
-    public async Task<ActionResult<CreateBoothResponse>> CreateBooth(CreateBoothRequest createBoothRequest)
+    public async Task<ActionResult<CreateBoothResponse>> CreateBooth([FromBody]CreateBoothRequest createBoothRequest, ManufactureStatus status )
     {
-        var createBoothResponse = await _boothService.CreateAsync(createBoothRequest);
+        var createBoothResponse = await _boothService.CreateAsync(createBoothRequest, status);
         return Ok(createBoothResponse);
     }
 
@@ -63,9 +64,9 @@ public class BoothController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateBooth(Guid id, UpdateBoothRequest updateBoothRequest)
+    public async Task<ActionResult> UpdateBooth(Guid id, UpdateBoothRequest updateBoothRequest, [FromQuery] ManufactureStatus? status)
     {
-        await _boothService.UpdateAsync(id, updateBoothRequest);
+        await _boothService.UpdateAsync(id, updateBoothRequest,status);
         return Ok();
     }
 

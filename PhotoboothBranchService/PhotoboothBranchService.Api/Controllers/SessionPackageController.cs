@@ -6,6 +6,7 @@ using PhotoboothBranchService.Application.Services.SessionPackageServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
+    [Route("api/session-package")]
     public class SessionPackageController : ControllerBaseApi
     {
         private readonly ISessionPackageService _sessionPackageService;
@@ -19,6 +20,10 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<CreateSessionPackageResponse>> CreateSessionPackage(CreateSessionPackageRequest createSessionPackageRequest)
         {
+            if (!ModelState.IsValid)
+            { 
+                return BadRequest(ModelState); 
+            }
             var createSessionPackageResponse = await _sessionPackageService.CreateAsync(createSessionPackageRequest);
             return Ok(createSessionPackageResponse);
         }
@@ -55,6 +60,10 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateSessionPackage(Guid id, UpdateSessionPackageRequest updateSessionPackageRequest)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             await _sessionPackageService.UpdateAsync(id, updateSessionPackageRequest);
             return Ok();
         }

@@ -3,6 +3,7 @@ using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Service;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.ServiceServices
@@ -19,9 +20,10 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
         }
 
         // Create
-        public async Task<CreateServiceResponse> CreateAsync(CreateServiceRequest createModel)
+        public async Task<CreateServiceResponse> CreateAsync(CreateServiceRequest createModel, StatusUse status)
         {
             var service = _mapper.Map<Service>(createModel);
+            service.Status = status;
             await _serviceRepository.AddAsync(service);
             return _mapper.Map<CreateServiceResponse>(service);
         }
@@ -74,7 +76,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
         }
 
         // Update
-        public async Task UpdateAsync(Guid id, UpdateServiceRequest updateModel)
+        public async Task UpdateAsync(Guid id, UpdateServiceRequest updateModel, StatusUse? status)
         {
             var service = (await _serviceRepository.GetAsync(s => s.ServiceID == id)).FirstOrDefault();
             if (service == null)
@@ -83,6 +85,10 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
             }
 
             var updatedService = _mapper.Map(updateModel, service);
+            if (status.HasValue)
+            {
+                updatedService.Status = status.Value;
+            }
             await _serviceRepository.UpdateAsync(updatedService);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs.Background;
 using PhotoboothBranchService.Application.DTOs.Dashboard;
 using PhotoboothBranchService.Application.DTOs.Layout;
@@ -27,7 +28,11 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
         private readonly IPhotoSessionRepository _photoSessionRepository;
         private readonly IPhotoStickerRepository _photoStickerRepository;
         private readonly IServiceItemRepository _serviceItemRepository;
+        private readonly IServiceRepository _serviceRepository;
         private readonly IPhotoRepository _photoRepository;
+        private readonly ISessionPackageRepository _sessionPackageRepository;
+        private readonly ILayoutRepository _layoutRepository;
+        private readonly IBackgroundRepository _backgroundRepository;
         private readonly IMapper _mapper;
 
         public DashboardService(IBranchRepository boothBranchRepository,
@@ -38,7 +43,11 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             IPhotoStickerRepository photoStickerRepository,
             IServiceItemRepository serviceItemRepository,
             IPhotoRepository photoRepository,
-            IMapper mapper)
+            IMapper mapper,
+            IServiceRepository serviceRepository,
+            ISessionPackageRepository sessionPackageRepository,
+            ILayoutRepository layoutRepository,
+            IBackgroundRepository backgroundRepository)
         {
             _boothBranchRepository = boothBranchRepository;
             _boothRepository = boothRepository;
@@ -49,6 +58,10 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             _serviceItemRepository = serviceItemRepository;
             _photoRepository = photoRepository;
             _mapper = mapper;
+            _serviceRepository = serviceRepository;
+            _sessionPackageRepository = sessionPackageRepository;
+            _layoutRepository = layoutRepository;
+            _backgroundRepository = backgroundRepository;
         }
 
         public async Task<BasicBranchDashboardResponse> BasicBranchDashboard(Guid branchID)
@@ -117,9 +130,21 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
                 {
                     Quantity = g.Sum(o => o.Quantity),
                     Service = _mapper.Map<ServiceResponse>(g.Key)
-                })
-                .OrderByDescending(i => i.Quantity);
-            return ServiceCount.ToList();
+                }).ToList();
+            var services = await _serviceRepository.GetAsync();
+            var existedId = ServiceCount.Select(i => i.Service.ServiceID);
+            foreach (var item in services)
+            {
+                if (!existedId.Contains(item.ServiceID))
+                {
+                    ServiceCount.Add(new DashboardServiceResponse {
+                        Quantity = 0, 
+                        Service = _mapper.Map<ServiceResponse>(item)
+                    });
+                }
+            }
+
+            return ServiceCount.OrderByDescending(i => i.Quantity).ToList();
         }
         public async Task<List<DashboardSessionPackageResponse>> DashboradSessionPackage(Guid? branchID, DateOnly? startDate, DateOnly? endDate)
         {
@@ -136,9 +161,23 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
                     {
                         Count = g.Count(),
                         SessionPackage = _mapper.Map<SessionPackageResponse>(g.Key)
-                    })
-                    .OrderByDescending(i => i.Count);
-                return sessionPackageCount.ToList();
+                    }).ToList();
+
+                var packages = await _sessionPackageRepository.GetAsync();
+                var existedId = sessionPackageCount.Select(i => i.SessionPackage.SessionPackageID);
+                foreach (var item in packages)
+                {
+                    if (!existedId.Contains(item.SessionPackageID))
+                    {
+                        sessionPackageCount.Add(new DashboardSessionPackageResponse
+                        {
+                            Count = 0,
+                            SessionPackage = _mapper.Map<SessionPackageResponse>(item)
+                        });
+                    }
+                }
+                
+                return sessionPackageCount.OrderByDescending(i => i.Count).ToList();
             }
             catch (Exception ex)
             {
@@ -157,10 +196,23 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
                 .Select(g => new DashboardLayoutResponse
                 {
                     Count = g.Count(),
-                    Layout = _mapper.Map<LayoutResponse>(g.Key)
-                })
-                .OrderByDescending(i => i.Count);
-            return layoutCount.ToList();
+                    Layout = _mapper.Map<LayoutSummaryResponse>(g.Key)
+                }).ToList();
+
+            var layouts = await _layoutRepository.GetAsync();
+            var existedId = layoutCount.Select(i => i.Layout.LayoutID);
+            foreach (var item in layouts)
+            {
+                if (!existedId.Contains(item.LayoutID))
+                {
+                    layoutCount.Add(new DashboardLayoutResponse
+                    {
+                        Count = 0,
+                        Layout = _mapper.Map<LayoutSummaryResponse>(item)
+                    });
+                }
+            }
+            return layoutCount.OrderByDescending(i => i.Count).ToList();
         }
         public async Task<List<DashboardBackgroundResponse>> DashboardBackground(Guid? branchID, DateOnly? startDate, DateOnly? endDate)
         {
@@ -175,9 +227,21 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
                 {
                     Count = g.Count(),
                     Background = _mapper.Map<BackgroundResponse>(g.Key)
-                })
-                .OrderByDescending(i => i.Count);
-            return backgroundCount.ToList();
+                }).ToList();
+            var backgrounds = await _backgroundRepository.GetAsync();
+            var existedId = backgroundCount.Select(i => i.Background.BackgroundID);
+            foreach (var item in backgrounds)
+            {
+                if (!existedId.Contains(item.BackgroundID))
+                {
+                    backgroundCount.Add(new DashboardBackgroundResponse
+                    {
+                        Count = 0,
+                        Background = _mapper.Map<BackgroundResponse>(item)
+                    });
+                }
+            }
+            return backgroundCount.OrderByDescending(i => i.Count).ToList();
         }
         private async Task<List<Photo>> GetPhotos(Guid? branchID, DateOnly? startDate, DateOnly? endDate, params Expression<Func<Photo, object>>[] includeProperties)
         {
@@ -196,16 +260,25 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             {
                 return new List<SessionOrder>();
             }
-
+            bool isEnd = false; 
+            bool isStart = false;
             Expression<Func<SessionOrder, bool>> pre = branchID.HasValue ? i => booths.Select(b => b.BoothID).ToList().Contains(i.BoothID) : i => true;
             pre = LinQHelper.AndAlso(pre, i => i.Status == SessionOrderStatus.Done);
             if (endDate != null && endDate != default(DateOnly))
             {
-                pre = LinQHelper.AndAlso(pre, so => DateOnly.FromDateTime(so.EndTime.Value) <= endDate);
+                isEnd = true;
+                pre = LinQHelper.AndAlso(pre, so => so.EndTime.Value.Date <= new DateTime(endDate.Value.Year, endDate.Value.Month, endDate.Value.Day));
             }
             if (startDate != null && startDate != default(DateOnly))
             {
-                pre = LinQHelper.AndAlso(pre, so => DateOnly.FromDateTime(so.StartTime) >= startDate);
+                isStart = true;
+                pre = LinQHelper.AndAlso(pre, so => so.EndTime.Value.Date >= new DateTime(startDate.Value.Year, startDate.Value.Month, startDate.Value.Day));
+            }
+
+            //make sure endtime after start time
+            if (endDate <= startDate && isStart && isEnd)
+            {
+                throw new BadRequestException("The end date must be later than the start date.");
             }
 
             return (await _sessionOrderRepository.GetAsync(pre, includeProperties)).ToList();

@@ -78,7 +78,7 @@ public class SessionOrderService : ISessionOrderService
             throw new BadRequestException("Account is not Customer");
         }
 
-        var boothTask = _boothRepository.GetAsync(i => i.BoothID == createModel.BoothID);
+        var boothTask = _boothRepository.GetAsync(i => i.BoothID == createModel.BoothID, i => i.Branch);
         var sessionPackageTask = _sessionPackageRepository.GetAsync(i => i.SessionPackageID == createModel.SessionPackageID);
         var sessionOrderCheckTask = _sessionOrderRepository.GetAsync(i => i.AccountID == account.AccountID && (i.EndTime > DateTime.Now && DateTime.Now > i.StartTime));
         await Task.WhenAll(sessionOrderCheckTask, sessionPackageTask, boothTask);
@@ -92,6 +92,9 @@ public class SessionOrderService : ISessionOrderService
         else if (booth.Status == ManufactureStatus.InUse || booth.Status == ManufactureStatus.Maintenance || booth.Status == ManufactureStatus.Inactive)
         {
             throw new BadRequestException("Booth is used by another or is inactive, in maintenance");
+        } else if (booth.Branch.Status == BranchStatus.Inactive)
+        {
+            throw new BadRequestException("Branch of this booth has been closed, plase try another booth");
         }
 
         //validate account's sesion order

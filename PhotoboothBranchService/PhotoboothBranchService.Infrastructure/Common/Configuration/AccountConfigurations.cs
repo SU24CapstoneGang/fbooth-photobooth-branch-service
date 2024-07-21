@@ -50,8 +50,7 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
         builder.HasIndex(a => a.Email).IsUnique();
         builder.HasIndex(a => a.PhoneNumber).IsUnique();
         //builder.HasData(
-        
-     );
+        // );
     }
 
     //private List<Account> SetAccount()

@@ -60,7 +60,24 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasForeignKey(a => a.BranchID)
                 .IsRequired();
 
-        
+            builder.HasData(new Branch
+            {
+                BranchID = new Guid("b7fb8774-e3ac-4316-862c-23b81869c381"),
+                Address = "Vincom Le Van Viet q9",
+                BranchName = "Vincom Le Van Viet q9",
+                Status = BranchStatus.Active,
+                City = "HCMC",
+                Town = "district 9"
+            },
+            new Branch
+            {
+                BranchID = new Guid("0a1f2e05-f744-4d9b-937c-bfe7bad52a90"),
+                Address = "Mega Mall Pham Van Dong",
+                BranchName = "Mega Mall Pham Van Dong",
+                Status = BranchStatus.Active,
+                City = "Thanh pho Thu Duc",
+                Town = "Thu Duc"
+            });
         }
     }
 }

@@ -6,6 +6,7 @@ using PhotoboothBranchService.Application.Services.PhotoBoxServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
+    [Route("api/photo-box")]
     public class PhotoBoxController : ControllerBaseApi
     {
         private readonly IPhotoBoxService _photoBoxService;

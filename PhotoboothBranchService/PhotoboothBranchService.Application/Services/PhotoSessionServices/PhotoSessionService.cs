@@ -4,6 +4,7 @@ using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.PhotoSession;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
@@ -28,12 +29,22 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
             var validateSessionOrder = (await _sessionOrderRepository
                 .GetAsync(i => i.SessionOrderID == createModel.SessionOrderID
                 && (i.EndTime > DateTime.Now && i.StartTime < DateTime.Now)
-                && i.Status == Domain.Enum.SessionOrderStatus.Processsing)) == null;
+                && i.Status == SessionOrderStatus.Processsing)) == null;
             if (validateSessionOrder)
             {
                 throw new Exception("Session Order are not going, it expired or not coming");
             }
+            var layout = (await _layoutRepository.GetAsync(i => i.LayoutID == createModel.LayoutID)).FirstOrDefault();
+            if (layout == null)
+            {
+                throw new NotFoundException("Not found Layout");
+            }
+            if (layout.Status == StatusUse.Unusable)
+            {
+                throw new BadRequestException("Layout from request is unable to use now");
+            }
             var photoSession = _mapper.Map<PhotoSession>(createModel);
+            photoSession.TotalPhotoTaken = layout.PhotoSlot;
             photoSession.SessionIndex = (await _photoSessionRepository.GetAsync(i => i.SessionOrderID == createModel.SessionOrderID)).Count() + 1;
             await _photoSessionRepository.AddAsync(photoSession);
             return _mapper.Map<CreatePhotoSessionResponse>(photoSession);

@@ -20,9 +20,11 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         }
 
         // Create
-        public async Task<CreateBoothResponse> CreateAsync(CreateBoothRequest createModel)
+        public async Task<CreateBoothResponse> CreateAsync(CreateBoothRequest createModel, ManufactureStatus status)
         {
             Booth booth = _mapper.Map<Booth>(createModel);
+            booth.Status = status;
+            booth.CreateDate = DateTime.UtcNow;
             await _boothRepository.AddAsync(booth);
             return _mapper.Map<CreateBoothResponse>(booth);
         }
@@ -71,7 +73,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         }
 
         // Update
-        public async Task UpdateAsync(Guid id, UpdateBoothRequest updateModel)
+        public async Task UpdateAsync(Guid id, UpdateBoothRequest updateModel, ManufactureStatus? status)
         {
             var booth = (await _boothRepository.GetAsync(b => b.BoothID == id)).FirstOrDefault();
             if (booth == null)
@@ -80,6 +82,10 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
             }
 
             var updatedBooth = _mapper.Map(updateModel, booth);
+            if (status.HasValue)
+            {
+                updatedBooth.Status = status.Value;
+            }
             await _boothRepository.UpdateAsync(updatedBooth);
         }
     }

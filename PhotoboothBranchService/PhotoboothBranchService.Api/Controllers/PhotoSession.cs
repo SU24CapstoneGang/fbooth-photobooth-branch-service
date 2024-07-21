@@ -6,6 +6,7 @@ using PhotoboothBranchService.Application.Services.PhotoSessionServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
+    [Route("api/photo-session")]
     public class PhotoSessionController : ControllerBaseApi
     {
         private readonly IPhotoSessionService _photoSessionService;

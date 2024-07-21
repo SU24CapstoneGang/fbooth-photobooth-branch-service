@@ -4,6 +4,7 @@ using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.PaymentMethod;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
@@ -19,7 +20,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
             _mapper = mapper;
         }
 
-        public async Task<CreatePaymentMethodResponse> CreateAsync(CreatePaymentMethodRequest createModel)
+        public async Task<CreatePaymentMethodResponse> CreateAsync(CreatePaymentMethodRequest createModel, PaymentMethodStatus status)
         {
             try
             {
@@ -27,6 +28,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
                 if (isPaymentExist != null) throw new BadRequestException("Payment method is already existed");
 
                 PaymentMethod paymentMethod = _mapper.Map<PaymentMethod>(createModel);
+                paymentMethod.Status = status;
                 await _paymentMethodRepository.AddAsync(paymentMethod);
                 return _mapper.Map<CreatePaymentMethodResponse>(createModel);
             }
@@ -107,15 +109,19 @@ namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
             }
         }
 
-        public async Task UpdateAsync(Guid id, UpdatePaymentMethodRequest updateModel)
+        public async Task UpdateAsync(Guid id, UpdatePaymentMethodRequest updateModel, PaymentMethodStatus? status)
         {
             try
             {
                 var paymentMethod = (await _paymentMethodRepository.GetAsync(p => p.PaymentMethodID == id)).FirstOrDefault();
-                if (paymentMethod == null)
+                if (paymentMethod == null){
                     throw new NotFoundException("Payment method", id, "Payment method id not found");
-
+}
                 var updatedPaymentMethod = _mapper.Map(updateModel, paymentMethod);
+                if (status.HasValue)
+                {
+                    updatedPaymentMethod.Status = status.Value;
+                }
                 await _paymentMethodRepository.UpdateAsync(updatedPaymentMethod);
             }
             catch (Exception ex)

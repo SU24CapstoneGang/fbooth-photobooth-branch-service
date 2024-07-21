@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
+using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.PhotoSticker;
 using PhotoboothBranchService.Application.Services.PhotoStickerServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class PhotoStickerController : ControllerBase
+    [Route("api/photo-sticker")]
+    public class PhotoStickerController : ControllerBaseApi
     {
         private readonly IPhotoStickerService _mapStickerService;
 

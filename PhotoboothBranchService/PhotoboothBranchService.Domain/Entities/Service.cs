@@ -1,4 +1,6 @@
-﻿namespace PhotoboothBranchService.Domain.Entities
+﻿using PhotoboothBranchService.Domain.Enum;
+
+namespace PhotoboothBranchService.Domain.Entities
 {
     public class Service
     {
@@ -8,6 +10,7 @@
         public decimal Price { get; set; }
         public int Measure { get; set; }
         public string Unit { get; set; } = default!;
+        public StatusUse Status { get; set; }
         public Guid ServiceTypeID { get; set; }
         public ServiceType ServiceType { get; set; } = default!;
         public virtual ICollection<ServiceItem> ServiceItems { get; set; } = default!;

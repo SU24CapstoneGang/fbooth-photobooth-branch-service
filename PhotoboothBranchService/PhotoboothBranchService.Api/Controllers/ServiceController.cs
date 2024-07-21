@@ -3,6 +3,7 @@ using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Service;
 using PhotoboothBranchService.Application.Services.ServiceServices;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
@@ -17,10 +18,10 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<CreateServiceResponse>> CreateService(CreateServiceRequest createServiceRequest)
+        public async Task<ActionResult<CreateServiceResponse>> CreateService([FromBody]CreateServiceRequest createServiceRequest, StatusUse status)
         {
 
-            var createServiceResponse = await _serviceService.CreateAsync(createServiceRequest);
+            var createServiceResponse = await _serviceService.CreateAsync(createServiceRequest, status);
             return Ok(createServiceResponse);
 
         }
@@ -70,10 +71,10 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateService(Guid id, UpdateServiceRequest updateServiceRequest)
+        public async Task<ActionResult> UpdateService(Guid id, UpdateServiceRequest updateServiceRequest, [FromQuery]StatusUse? status)
         {
 
-            await _serviceService.UpdateAsync(id, updateServiceRequest);
+            await _serviceService.UpdateAsync(id, updateServiceRequest, status);
             return Ok();
 
         }

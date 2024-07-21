@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
+using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.PaymentMethod;
 using PhotoboothBranchService.Application.Services.PaymentMethodServices;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class PaymentMethodController : ControllerBase
+    [Route("api/payment-method")]
+    public class PaymentMethodController : ControllerBaseApi
     {
         private readonly IPaymentMethodService _paymentMethodService;
 
@@ -18,10 +19,10 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<CreatePaymentMethodResponse>> CreatePaymentMethod(CreatePaymentMethodRequest createPaymentMethodRequest)
+        public async Task<ActionResult<CreatePaymentMethodResponse>> CreatePaymentMethod(CreatePaymentMethodRequest createPaymentMethodRequest, PaymentMethodStatus status)
         {
 
-            var createPaymentMethodResponse = await _paymentMethodService.CreateAsync(createPaymentMethodRequest);
+            var createPaymentMethodResponse = await _paymentMethodService.CreateAsync(createPaymentMethodRequest, status);
             return Ok(createPaymentMethodResponse);
 
         }
@@ -73,10 +74,10 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdatePaymentMethod(Guid id, UpdatePaymentMethodRequest updatePaymentMethodRequest)
+        public async Task<ActionResult> UpdatePaymentMethod(Guid id, UpdatePaymentMethodRequest updatePaymentMethodRequest, [FromQuery]PaymentMethodStatus? status)
         {
 
-            await _paymentMethodService.UpdateAsync(id, updatePaymentMethodRequest);
+            await _paymentMethodService.UpdateAsync(id, updatePaymentMethodRequest,status);
             return Ok();
 
         }

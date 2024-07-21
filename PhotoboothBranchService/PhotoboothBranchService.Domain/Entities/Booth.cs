@@ -10,6 +10,7 @@ namespace PhotoboothBranchService.Domain.Entities
         public string Concept { get; set; } = default!;
         public short PeopleInBooth { get; set; }
         public ManufactureStatus Status { get; set; }
+        public DateTime CreateDate { get; set; }
         public Guid BranchID { get; set; }
         public virtual Branch Branch { get; set; } = default!;
         public virtual ICollection<SessionOrder> SessionOrders { get; set; } = default!;

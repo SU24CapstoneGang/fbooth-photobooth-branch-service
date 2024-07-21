@@ -73,7 +73,6 @@ public class StickerRepository : IStickerRepository
     //Update
     public async Task UpdateAsync(Sticker sticker)
     {
-        sticker.LastModified = DateTime.UtcNow;
         _dbContext.Update(sticker);
         await _dbContext.SaveChangesAsync();
     }

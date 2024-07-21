@@ -10,6 +10,6 @@ namespace PhotoboothBranchService.Application.DTOs.Dashboard
     public class DashboardLayoutResponse
     {
         public int Count { get; set; }
-        public LayoutResponse Layout { get; set; }
+        public LayoutSummaryResponse Layout { get; set; }
     }
 }
