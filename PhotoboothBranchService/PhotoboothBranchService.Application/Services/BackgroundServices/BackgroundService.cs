@@ -47,7 +47,7 @@ public class BackgroundService : IBackgroundService
                 Status = StatusUse.Available,
                 Width = uploadResult.Width,
                 Height = uploadResult.Height,
-                LayoutID = layoutID
+                LayoutID = layoutID,
                 CreatedDate = DateTime.UtcNow,
             };
 
