@@ -22,7 +22,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
 {
     public class PaymentService : IPaymentService
     {
-        private readonly IPaymentRepository _paymentRepository;
+        private readonly ITransactionRepository _paymentRepository;
         private readonly IMapper _mapper;
         private readonly IPaymentMethodRepository _paymentMethodRepository;
         private readonly IVNPayService _vNPayService;
@@ -30,7 +30,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         private readonly IMoMoService _moMoService;
         private readonly IEmailService _emailService;
         private readonly IRefundService _refundService;
-        public PaymentService(IPaymentRepository paymentRepository, IMapper mapper,
+        public PaymentService(ITransactionRepository paymentRepository, IMapper mapper,
             IPaymentMethodRepository paymentMethodRepository,
             IVNPayService vNPayService,
             ISessionOrderRepository sessionOrderRepository,
@@ -62,11 +62,10 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                 throw new BadRequestException("The Order has been ended or cancelled");
             }
             //create payment object
-            var payment = _mapper.Map<Payment>(createModel);
-            payment.PaymentID = Guid.NewGuid();
+            var payment = _mapper.Map<Transaction>(createModel);
+            payment.TransactionID = Guid.NewGuid();
             payment.PaymentStatus = PaymentStatus.Processing;
-            payment.PaymentDateTime = DateTime.Now;
-            payment.ClientIpAddress = ClientIpAddress;
+            payment.TransactionDateTime = DateTime.Now;
             switch (createModel.PayType)
             {
                 case PayType.FullPay:
@@ -95,7 +94,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             }
 
             //response to return 
-            CreatePaymentResponse createPaymentResponse = new CreatePaymentResponse() { PaymentID = payment.PaymentID };
+            CreatePaymentResponse createPaymentResponse = new CreatePaymentResponse() { PaymentID = payment.TransactionID };
 
             //validate and choose payment method
             var paymentMethod = (await _paymentMethodRepository.GetAsync(i => i.PaymentMethodID == payment.PaymentMethodID)).FirstOrDefault();
@@ -115,8 +114,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                             ClientIpAddress = ClientIpAddress,
                             SessionOrderID = createModel.SessionOrderID,
                             OrderInformation = createModel.Description,
-                            PaymentID = payment.PaymentID,
-                            PaymentDateTime = payment.PaymentDateTime
+                            PaymentID = payment.TransactionID,
+                            PaymentDateTime = payment.TransactionDateTime
                         };
                         if (!createModel.BankCode.IsNullOrEmpty())
                         {
@@ -129,7 +128,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                         MoMoRequest moMoRequest = new MoMoRequest
                         {
                             amount = payment.Amount,
-                            orderId = payment.PaymentID.ToString(),
+                            orderId = payment.TransactionID.ToString(),
                             extraData = "",
                             orderInfo = createModel.Description,
                             requestId = Guid.NewGuid().ToString(),
@@ -178,7 +177,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             {
                 try
                 {
-                    await _emailService.SendBillInformation(response.PaymentID);
+                    await _emailService.SendBillInformation(response.TransactionID);
                 }
                 catch (Exception ex)
                 {
@@ -193,7 +192,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         {
             try
             {
-                var payments = await _paymentRepository.GetAsync(p => p.PaymentID == id);
+                var payments = await _paymentRepository.GetAsync(p => p.TransactionID == id);
                 var payment = payments.FirstOrDefault();
                 if (payment != null)
                 {
@@ -231,14 +230,14 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         // Read by ID
         public async Task<PaymentResponse> GetByIdAsync(Guid id)
         {
-            var payments = await _paymentRepository.GetAsync(p => p.PaymentID == id);
+            var payments = await _paymentRepository.GetAsync(p => p.TransactionID == id);
             var payment = payments.FirstOrDefault();
             return _mapper.Map<PaymentResponse>(payment);
         }
         // Update
         public async Task UpdateAsync(Guid id, UpdatePaymentRequest updateModel)
         {
-            var payment = (await _paymentRepository.GetAsync(p => p.PaymentID == id)).FirstOrDefault();
+            var payment = (await _paymentRepository.GetAsync(p => p.TransactionID == id)).FirstOrDefault();
             if (payment == null)
             {
                 throw new KeyNotFoundException("Payment not found.");
@@ -247,7 +246,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             var updatedPayment = _mapper.Map(updateModel, payment);
             await _paymentRepository.UpdateAsync(updatedPayment);
         }
-        private async Task updateAfterSuccessPaymentAsync(Payment payment)
+        private async Task updateAfterSuccessPaymentAsync(Transaction payment)
         {
             var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
             if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Created)

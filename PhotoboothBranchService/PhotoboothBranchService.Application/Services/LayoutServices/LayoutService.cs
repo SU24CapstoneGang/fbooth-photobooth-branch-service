@@ -173,7 +173,6 @@ public class LayoutService : ILayoutService
         }
 
         var updateLayout = _mapper.Map(updateLayoutRequest, layout);
-        updateLayout.LastModified = DateTime.UtcNow;
         await _layoutRepository.UpdateAsync(updateLayout);
         await _cloudinaryService.UpdatePhotoAsync(file, layout.CouldID);
     }

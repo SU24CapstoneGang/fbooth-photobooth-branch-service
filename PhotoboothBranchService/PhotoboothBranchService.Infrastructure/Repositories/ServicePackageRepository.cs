@@ -7,17 +7,17 @@ using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories
 {
-    public class ServiceRepository : IServiceRepository
+    public class ServicePackageRepository : IServicePackageRepository
     {
         private readonly AppDbContext _dbContext;
 
-        public ServiceRepository(AppDbContext dbContext)
+        public ServicePackageRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
         // Create
-        public async Task<Service> AddAsync(Service entity)
+        public async Task<ServicePackage> AddAsync(ServicePackage entity)
         {
             var result = await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
@@ -25,21 +25,21 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Read
-        public async Task<IQueryable<Service>> GetAllAsync()
+        public async Task<IQueryable<ServicePackage>> GetAllAsync()
         {
-            return await Task.FromResult(_dbContext.Services.AsQueryable());
+            return await Task.FromResult(_dbContext.ServicePackages.AsQueryable());
         }
 
-        public async Task<IQueryable<Service>> GetAsync(
-        Expression<Func<Service, bool>> predicate = null,
-        params Expression<Func<Service, object>>[] includeProperties)
+        public async Task<IQueryable<ServicePackage>> GetAsync(
+        Expression<Func<ServicePackage, bool>> predicate = null,
+        params Expression<Func<ServicePackage, object>>[] includeProperties)
         {
             try
             {
-                var result = predicate == null ? _dbContext.Services : _dbContext.Services.Where(predicate);
+                var result = predicate == null ? _dbContext.ServicePackages : _dbContext.ServicePackages.Where(predicate);
                 if (!result.Any())
                 {
-                    return await Task.FromResult(Enumerable.Empty<Service>().AsQueryable());
+                    return await Task.FromResult(Enumerable.Empty<ServicePackage>().AsQueryable());
                 }
                 else
                 {
@@ -63,14 +63,14 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Update
-        public async Task UpdateAsync(Service entity)
+        public async Task UpdateAsync(ServicePackage entity)
         {
             _dbContext.Update(entity);
             await _dbContext.SaveChangesAsync();
         }
 
         // Delete
-        public async Task RemoveAsync(Service entity)
+        public async Task RemoveAsync(ServicePackage entity)
         {
             _dbContext.Remove(entity);
             await _dbContext.SaveChangesAsync();

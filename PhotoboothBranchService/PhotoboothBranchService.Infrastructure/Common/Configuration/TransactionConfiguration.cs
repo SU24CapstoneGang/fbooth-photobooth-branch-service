@@ -5,19 +5,19 @@ using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
-    public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
+    public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
     {
-        public void Configure(EntityTypeBuilder<Payment> builder)
+        public void Configure(EntityTypeBuilder<Transaction> builder)
         {
-            builder.ToTable("Payment");
-            builder.HasKey(s => s.PaymentID);
-            builder.Property(s => s.PaymentID).IsRequired().HasColumnName("PaymentID");
-            builder.Property(s => s.TransactionID).IsRequired(false);
-            builder.Property(s => s.PaymentDateTime).IsRequired();
+            builder.ToTable("Transactions");
+            builder.HasKey(s => s.TransactionID);
+            builder.Property(s => s.TransactionID).IsRequired();
+
+            builder.Property(s => s.GatewayTransactionID).IsRequired(false);
+            builder.Property(s => s.TransactionDateTime).IsRequired();
             builder.Property(s => s.Description).IsRequired(false);
             builder.Property(s => s.Amount).IsRequired();
-            builder.Property(s => s.Signature).IsRequired(false);
-            builder.Property(s => s.ClientIpAddress).IsRequired();
+
             // Status enum mapping
             builder.Property(ep => ep.PaymentStatus)
                 .IsRequired()

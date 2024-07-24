@@ -53,7 +53,7 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                         var booth = (await boothRepository.GetAsync(i => i.BoothID == order.BoothID)).FirstOrDefault();
                         if (booth != null)
                         {
-                            booth.Status = ManufactureStatus.Active;
+                            booth.Status = BoothStatus.Active;
                             await boothRepository.UpdateAsync(booth);
                         }
                     }
@@ -68,10 +68,10 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                      o.EndTime >= now, i => i.Booth)).ToList();
                 foreach (var order in orders)
                 {
-                    if (order.Booth.Status == ManufactureStatus.Active)
+                    if (order.Booth.Status == BoothStatus.Active)
                     {
                         var booth = order.Booth;
-                        booth.Status = ManufactureStatus.InUse;
+                        booth.Status = BoothStatus.InUse;
                         await boothRepository.UpdateAsync(booth);
                     }
                 }
@@ -90,7 +90,7 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                         var booth = (await boothRepository.GetAsync(i => i.BoothID == order.BoothID)).FirstOrDefault();
                         if (booth != null)
                         {
-                            booth.Status = ManufactureStatus.Active;
+                            booth.Status = BoothStatus.Active;
                             await boothRepository.UpdateAsync(booth);
                         }
                     }

@@ -27,7 +27,7 @@ public class BranchRepository : IBranchRepository
     //Read
     public async Task<IQueryable<Branch>> GetAllAsync()
     {
-        return await Task.FromResult(_dbContext.BoothBranches);
+        return await Task.FromResult(_dbContext.Branches);
     }
 
     public async Task<IQueryable<Branch>> GetAsync(
@@ -36,7 +36,7 @@ public class BranchRepository : IBranchRepository
     {
         try
         {
-            var result = predicate == null ? _dbContext.BoothBranches : _dbContext.BoothBranches.Where(predicate);
+            var result = predicate == null ? _dbContext.Branches : _dbContext.Branches.Where(predicate);
             if (!result.Any())
             {
                 return await Task.FromResult(Enumerable.Empty<Branch>().AsQueryable());

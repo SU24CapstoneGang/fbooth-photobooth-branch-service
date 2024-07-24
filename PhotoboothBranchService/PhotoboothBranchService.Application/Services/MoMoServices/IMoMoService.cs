@@ -7,8 +7,8 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
     public interface IMoMoService
     {
         string CreatePayment(MoMoRequest request);
-        Task<Payment> HandlePaymentResponeIPN(MoMoResponse momoResponse);
-        Task<Payment> Return(IQueryCollection queryString);
+        Task<Transaction> HandlePaymentResponeIPN(MoMoResponse momoResponse);
+        Task<Transaction> Return(IQueryCollection queryString);
         Task<MoMoRefundResponse> RefundById(Guid paymentID, bool isFullRefund);
     }
 }

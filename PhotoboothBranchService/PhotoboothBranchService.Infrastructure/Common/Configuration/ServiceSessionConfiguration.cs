@@ -4,14 +4,13 @@ using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
-    public class ServiceItemConfiguration : IEntityTypeConfiguration<ServiceItem>
+    public class ServiceSessionConfiguration : IEntityTypeConfiguration<ServiceSession>
     {
-        public void Configure(EntityTypeBuilder<ServiceItem> builder)
+        public void Configure(EntityTypeBuilder<ServiceSession> builder)
         {
-            builder.ToTable("ServiceItems");
+            builder.ToTable("ServiceSessions");
             builder.HasKey(s => s.ServiceItemID);
             builder.Property(s => s.ServiceItemID)
-                .HasColumnName("ServiceItemID")
                 .ValueGeneratedOnAdd();
             builder.Property(s => s.Quantity);
             builder.Property(s => s.UnitPrice).HasColumnType("decimal(18, 2)"); ;

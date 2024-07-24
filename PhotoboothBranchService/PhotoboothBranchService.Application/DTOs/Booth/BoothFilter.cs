@@ -5,7 +5,7 @@ namespace PhotoboothBranchService.Application.DTOs.Booth
     public class BoothFilter
     {
         public string? BoothName { get; set; }
-        public ManufactureStatus? Status { get; set; }
+        public BoothStatus? Status { get; set; }
         public string? BackgroundColor { get; set; } = default!;
         public string? Concept { get; set; } = default!;
         public short? PeopleInBooth { get; set; }

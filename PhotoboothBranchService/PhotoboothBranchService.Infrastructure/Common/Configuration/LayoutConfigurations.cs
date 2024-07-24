@@ -35,11 +35,15 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(l => l.LastModified);
 
-            //auto add CreateDate and ignore change after update
-            builder.Property(a => a.CreatedDate)
-              .ValueGeneratedOnAdd()
-              .HasDefaultValueSql("GETDATE()")
-              .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+            //auto add CreateDate
+            builder.Property(c => c.CreatedDate)
+                .IsRequired()
+                .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
+
+            builder.Property(c => c.LastModified)
+                   .IsRequired()
+                   .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
+                   .ValueGeneratedOnAddOrUpdate();
 
             builder.HasMany(t => t.PhotoSessions)
                 .WithOne(p => p.Layout)

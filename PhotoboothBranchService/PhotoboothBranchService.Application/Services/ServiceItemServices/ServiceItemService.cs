@@ -12,15 +12,15 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
 {
     public class ServiceItemService : IServiceItemService
     {
-        private readonly IServiceItemRepository _serviceItemRepository;
+        private readonly IServiceSessionRepository _serviceItemRepository;
         private readonly IMapper _mapper;
         private readonly ISessionOrderRepository _sessionOrderRepository;
-        private readonly IServiceRepository _serviceRepository;
+        private readonly IServicePackageRepository _serviceRepository;
         private readonly IServiceTypeRepository _serviceTypeRepository;
         private readonly IBoothRepository _boothRepository;
-        public ServiceItemService(IServiceItemRepository serviceItemRepository, IMapper mapper
+        public ServiceItemService(IServiceSessionRepository serviceItemRepository, IMapper mapper
             , ISessionOrderRepository sessionOrderRepository
-            , IServiceRepository serviceRepository, IServiceTypeRepository serviceTypeRepository, IBoothRepository boothRepository)
+            , IServicePackageRepository serviceRepository, IServiceTypeRepository serviceTypeRepository, IBoothRepository boothRepository)
         {
             _serviceItemRepository = serviceItemRepository;
             _mapper = mapper;
@@ -34,7 +34,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
         {
             var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == createModel.SessionOrderID)).FirstOrDefault();
 
-            ServiceItem createServiceItemResponse = null;
+            ServiceSession createServiceItemResponse = null;
             if (sessionOrder != null)
             {
                 this.ValidateOrderToAddServiceItem(sessionOrder);
@@ -43,13 +43,13 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                     {createModel.ServiceID , createModel.Quantity}
                 })).Single();
 
-                ServiceItem? serviceItem = (await _serviceItemRepository.GetAsync(s => s.ServiceID == createModel.ServiceID
+                ServiceSession? serviceItem = (await _serviceItemRepository.GetAsync(s => s.ServiceID == createModel.ServiceID
                                             && s.SessionOrderID == sessionOrder.SessionOrderID))
                                             .FirstOrDefault();
 
                 if (serviceItem == null) // create new item 
                 {
-                    serviceItem = _mapper.Map<ServiceItem>(createModel);
+                    serviceItem = _mapper.Map<ServiceSession>(createModel);
                     serviceItem.UnitPrice = service.Price;
                     serviceItem.SubTotal = createModel.Quantity * serviceItem.UnitPrice;
                     createServiceItemResponse = await _serviceItemRepository.AddAsync(serviceItem);
@@ -87,7 +87,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
             }
             this.ValidateOrderToAddServiceItem(sessionOrder);
             //validate list serviceID
-            List<Service> serviceList = new List<Service>();
+            List<ServicePackage> serviceList = new List<ServicePackage>();
             if (request.ServiceList.Count > 0)
             {
                 serviceList = await this.ValidateServiceList(request.ServiceList);
@@ -113,7 +113,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                 }
                 else
                 {
-                    serviceItem = new ServiceItem
+                    serviceItem = new ServiceSession
                     {
                         Quantity = req.Value,
                         SessionOrderID = sessionOrder.SessionOrderID,
@@ -145,9 +145,9 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
             }
         }
 
-        private async Task<List<Service>> ValidateServiceList(Dictionary<Guid, short> serviceItems)
+        private async Task<List<ServicePackage>> ValidateServiceList(Dictionary<Guid, short> serviceItems)
         {
-            List<Service> serviceList = new List<Service>();
+            List<ServicePackage> serviceList = new List<ServicePackage>();
             var serviceIds = serviceItems.Keys.ToList();
             serviceList = (await _serviceRepository.GetAsync(i => serviceIds.Contains(i.ServiceID), i => i.ServiceType)).ToList();
             if (serviceItems.Count() != serviceList.Count)

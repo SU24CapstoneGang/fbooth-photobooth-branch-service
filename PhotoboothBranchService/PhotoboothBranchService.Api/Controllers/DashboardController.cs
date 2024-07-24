@@ -35,17 +35,6 @@ namespace PhotoboothBranchService.Api.Controllers
         {
             return await _dashboardService.DashboradService(null, startDate, endDate);
         }
-        //session package
-        [HttpGet("branch-session-package")]
-        public async Task<ActionResult<List<DashboardSessionPackageResponse>>> BranchDashboradSessionPackage([FromQuery] Guid branchID, [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate)
-        {
-            return await _dashboardService.DashboradSessionPackage(branchID, startDate, endDate);
-        }
-        [HttpGet("session-package")]
-        public async Task<ActionResult<List<DashboardSessionPackageResponse>>> DashboradSessionPackage([FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate)
-        {
-            return await _dashboardService.DashboradSessionPackage(null, startDate, endDate);
-        }
         //layout
         [HttpGet("branch-layout")]
         public async Task<ActionResult<List<DashboardLayoutResponse>>> BranchDashboardLayout([FromQuery] Guid branchID, [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate)

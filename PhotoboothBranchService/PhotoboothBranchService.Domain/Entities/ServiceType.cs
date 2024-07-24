@@ -6,7 +6,8 @@ namespace PhotoboothBranchService.Domain.Entities
     {
         public Guid ServiceTypeID { get; set; }
         public string ServiceTypeName { get; set; } = default!;
+        public string Unit { get; set; } = default!;
         public StatusUse Status {  get; set; }
-        public virtual ICollection<Service> Services { get; set; } = default!;
+        public virtual ICollection<ServicePackage> Services { get; set; } = default!;
     }
 }

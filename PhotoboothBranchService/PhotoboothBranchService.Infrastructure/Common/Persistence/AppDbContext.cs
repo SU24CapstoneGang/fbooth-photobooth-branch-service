@@ -10,22 +10,22 @@ public class AppDbContext : DbContext
 {
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Booth> Booths { get; set; }
-    public DbSet<Branch> BoothBranches { get; set; }
+    public DbSet<Branch> Branches { get; set; }
     public DbSet<Background> Backgrounds { get; set; }
+    public DbSet<Constant> Constants { get; set; }
     public DbSet<Device> Devices { get; set; }
     public DbSet<Layout> Layouts { get; set; }
-    public DbSet<Payment> Payments { get; set; }
+    public DbSet<Transaction> Transactions { get; set; }
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<Photo> Photos { get; set; }
     public DbSet<PhotoBox> PhotoBoxes { get; set; }
     public DbSet<Refund> Refunds { get; set; }
     public DbSet<PhotoSession> PhotoSessions { get; set; }
     public DbSet<PhotoSticker> PhotoStickers { get; set; }
-    public DbSet<Service> Services { get; set; }
-    public DbSet<ServiceItem> ServiceItems { get; set; }
+    public DbSet<ServicePackage> ServicePackages { get; set; }
+    public DbSet<ServiceSession> ServiceSessions { get; set; }
     public DbSet<ServiceType> ServiceTypes { get; set; }
     public DbSet<SessionOrder> SessionOrders { get; set; }
-    public DbSet<SessionPackage> SessionPackages { get; set; }
     public DbSet<Sticker> Stickers { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -58,9 +58,10 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new AccountConfigurations());
         modelBuilder.ApplyConfiguration(new BoothConfiguration());
         modelBuilder.ApplyConfiguration(new BackgroundConfigurations());
+        modelBuilder.ApplyConfiguration(new ConstantConfiguration());
         modelBuilder.ApplyConfiguration(new DeviceConfiguration());
         modelBuilder.ApplyConfiguration(new LayoutConfigurations());
-        modelBuilder.ApplyConfiguration(new PaymentConfiguration());
+        modelBuilder.ApplyConfiguration(new TransactionConfiguration());
         modelBuilder.ApplyConfiguration(new PaymentMethodConfigurations());
         modelBuilder.ApplyConfiguration(new BranchConfigurations());
         modelBuilder.ApplyConfiguration(new PhotoBoxConfiguration());
@@ -68,11 +69,10 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new PhotoConfiguration());
         modelBuilder.ApplyConfiguration(new PhotoSessionConfiguration());
         modelBuilder.ApplyConfiguration(new PhotoStickerConfigurations());
-        modelBuilder.ApplyConfiguration(new ServiceConfiguration());
-        modelBuilder.ApplyConfiguration(new ServiceItemConfiguration());
+        modelBuilder.ApplyConfiguration(new ServicePackageConfiguration());
+        modelBuilder.ApplyConfiguration(new ServiceSessionConfiguration());
         modelBuilder.ApplyConfiguration(new ServiceTypeConfiguration());
         modelBuilder.ApplyConfiguration(new SessionOrderConfigurations());
-        modelBuilder.ApplyConfiguration(new SessionPackageConfiguration());
         modelBuilder.ApplyConfiguration(new StickerConfigurations());
     }
 }

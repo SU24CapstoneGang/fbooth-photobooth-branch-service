@@ -18,7 +18,7 @@ public class BoothController : ControllerBaseApi
 
     // Create
     [HttpPost]
-    public async Task<ActionResult<CreateBoothResponse>> CreateBooth([FromBody]CreateBoothRequest createBoothRequest, ManufactureStatus status )
+    public async Task<ActionResult<CreateBoothResponse>> CreateBooth([FromBody]CreateBoothRequest createBoothRequest, BoothStatus status )
     {
         var createBoothResponse = await _boothService.CreateAsync(createBoothRequest, status);
         return Ok(createBoothResponse);
@@ -64,7 +64,7 @@ public class BoothController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateBooth(Guid id, UpdateBoothRequest updateBoothRequest, [FromQuery] ManufactureStatus? status)
+    public async Task<ActionResult> UpdateBooth(Guid id, UpdateBoothRequest updateBoothRequest, [FromQuery] BoothStatus? status)
     {
         await _boothService.UpdateAsync(id, updateBoothRequest,status);
         return Ok();

@@ -22,8 +22,8 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
         private readonly string vnp_Api;
 
         private readonly IMapper _mapper;
-        private readonly IPaymentRepository _paymentRepository;
-        public VNPayService(IPaymentRepository paymentRepository, IMapper mapper)
+        private readonly ITransactionRepository _paymentRepository;
+        public VNPayService(ITransactionRepository paymentRepository, IMapper mapper)
         {
             vnp_Returnurl = JsonHelper.GetFromAppSettings("VNPay:vnp_Returnurl");//URL nhan ket qua tra ve 
             vnp_Url = JsonHelper.GetFromAppSettings("VNPay:vnp_Url"); //URL thanh toan cua VNPAY 
@@ -167,7 +167,7 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
             }
         }
 
-        public async Task<(VnpayResponse response, string returnContent, Payment paymentResult)> Return(IQueryCollection queryString)
+        public async Task<(VnpayResponse response, string returnContent, Transaction paymentResult)> Return(IQueryCollection queryString)
         {
             VnPayLibrary vnpay = new VnPayLibrary();
 
@@ -196,13 +196,12 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
 
             //get paymentID and find in db
             Guid paymentIDGUID = GuidAlphanumericConverter.AlphanumericToGuid(paymentID);
-            var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == paymentIDGUID)).FirstOrDefault();
+            var payment = (await _paymentRepository.GetAsync(i => i.TransactionID == paymentIDGUID)).FirstOrDefault();
 
             string returnContent = string.Empty;
             if (payment != null)
             {
-                payment.Signature = vnp_SecureHash;
-                payment.TransactionID = vnpayTranId.ToString();
+                payment.GatewayTransactionID = vnpayTranId.ToString();
 
                 if (checkSignature)
                 {

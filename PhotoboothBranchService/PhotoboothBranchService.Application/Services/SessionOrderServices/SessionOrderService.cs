@@ -4,6 +4,7 @@ using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.ServiceItem;
 using PhotoboothBranchService.Application.DTOs.SessionOrder;
+using PhotoboothBranchService.Application.Services.ConstantServices;
 using PhotoboothBranchService.Application.Services.PaymentServices;
 using PhotoboothBranchService.Application.Services.RefundServices;
 using PhotoboothBranchService.Application.Services.ServiceItemServices;
@@ -11,6 +12,7 @@ using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
+using System.Globalization;
 using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Application.Services.SessionOrderServices;
@@ -22,29 +24,29 @@ public class SessionOrderService : ISessionOrderService
     private readonly IBoothRepository _boothRepository;
     private readonly IPaymentService _paymentService;
     private readonly IServiceItemService _serviceItemService;
-    private readonly ISessionPackageRepository _sessionPackageRepository;
-    private readonly IServiceRepository _serviceRepository;
+    private readonly IServicePackageRepository _serviceRepository;
     private readonly IAccountRepository _accountRepository;
     private readonly IRefundService _refundService;
+    private readonly IConstantService _constantService;
     public SessionOrderService(ISessionOrderRepository sessionOrderRepository,
         IMapper mapper,
         IBoothRepository boothRepository,
         IPaymentService paymentService,
         IServiceItemService serviceItemService,
-        ISessionPackageRepository sessionPackageRepository,
-        IServiceRepository serviceRepository,
+        IServicePackageRepository serviceRepository,
         IAccountRepository accountRepository,
-        IRefundService refundService)
+        IRefundService refundService,
+        IConstantService constantService)
     {
         _sessionOrderRepository = sessionOrderRepository;
         _mapper = mapper;
         _boothRepository = boothRepository;
         _paymentService = paymentService;
         _serviceItemService = serviceItemService;
-        _sessionPackageRepository = sessionPackageRepository;
         _serviceRepository = serviceRepository;
         _accountRepository = accountRepository;
         _refundService = refundService;
+        _constantService = constantService;
     }
 
     // Create a new session
@@ -55,15 +57,15 @@ public class SessionOrderService : ISessionOrderService
 
         if (!string.IsNullOrEmpty(createModel.CustomerPhoneNumber) && !string.IsNullOrEmpty(createModel.CustomerEmail))
         {
-            account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(createModel.CustomerPhoneNumber) && i.Email.Equals(createModel.CustomerEmail) && i.Status == AccountStatus.Active)).FirstOrDefault();
+            account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(createModel.CustomerPhoneNumber) && i.Email.Equals(createModel.CustomerEmail))).FirstOrDefault();
         }
         else if (!string.IsNullOrEmpty(createModel.CustomerPhoneNumber))
         {
-            account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(createModel.CustomerPhoneNumber) && i.Status == AccountStatus.Active)).FirstOrDefault();
+            account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(createModel.CustomerPhoneNumber))).FirstOrDefault();
         }
         else if (!string.IsNullOrEmpty(createModel.CustomerEmail))
         {
-            account = (await _accountRepository.GetAsync(i => i.Email.Equals(createModel.CustomerEmail) && i.Status == AccountStatus.Active)).FirstOrDefault();
+            account = (await _accountRepository.GetAsync(i => i.Email.Equals(createModel.CustomerEmail))).FirstOrDefault();
         }
         else
         {
@@ -77,11 +79,14 @@ public class SessionOrderService : ISessionOrderService
         {
             throw new BadRequestException("Account is not Customer");
         }
+        if (account.Status != AccountStatus.Active)
+        {
+            throw new BadRequestException("Account is not active to do this function");
+        }
 
         var boothTask = _boothRepository.GetAsync(i => i.BoothID == createModel.BoothID, i => i.Branch);
-        var sessionPackageTask = _sessionPackageRepository.GetAsync(i => i.SessionPackageID == createModel.SessionPackageID);
         var sessionOrderCheckTask = _sessionOrderRepository.GetAsync(i => i.AccountID == account.AccountID && (i.EndTime > DateTime.Now && DateTime.Now > i.StartTime));
-        await Task.WhenAll(sessionOrderCheckTask, sessionPackageTask, boothTask);
+        await Task.WhenAll(sessionOrderCheckTask, boothTask);
 
         //booth validate
         var booth = boothTask.Result.FirstOrDefault();
@@ -89,12 +94,12 @@ public class SessionOrderService : ISessionOrderService
         {
             throw new NotFoundException("Booth not found on server, try again later");
         }
-        else if (booth.Status == ManufactureStatus.InUse || booth.Status == ManufactureStatus.Maintenance || booth.Status == ManufactureStatus.Inactive)
+        else if (booth.Status == BoothStatus.InUse || booth.Status == BoothStatus.Maintenance || booth.Status == BoothStatus.Inactive)
         {
             throw new BadRequestException("Booth is used by another or is inactive, in maintenance");
         } else if (booth.Branch.Status == BranchStatus.Inactive)
         {
-            throw new BadRequestException("Branch of this booth has been closed, plase try another booth");
+            throw new BadRequestException("Branch of this booth has been closed, plase try another branch");
         }
 
         //validate account's sesion order
@@ -102,23 +107,6 @@ public class SessionOrderService : ISessionOrderService
         if (sessionOrderCheck != null)
         {
             throw new BadRequestException("This Account is using another booth in booking time");
-        }
-
-        var sessionPackage = sessionPackageTask.Result.FirstOrDefault();
-        if (sessionPackage == null)
-        {
-            throw new NotFoundException("Session Package Not found");
-        }
-
-        //validate service list of create model
-        if (createModel.ServiceList.Count > 0)
-        {
-            var serviceIds = createModel.ServiceList.Keys.ToList();
-            var services = await _serviceRepository.GetAsync(i => serviceIds.Contains(i.ServiceID));
-            if (createModel.ServiceList.Count != services.Count())
-            {
-                throw new BadRequestException("Some service in request are not found");
-            }
         }
 
         //add session with package
@@ -129,21 +117,31 @@ public class SessionOrderService : ISessionOrderService
         {
             session.StartTime = DateTime.Now;
             //update booth
-            booth.Status = ManufactureStatus.InUse;
+            booth.Status = BoothStatus.InUse;
         }
         else if (createModel.StartTime < DateTime.Now)
         {
             throw new BadRequestException("Can not booking with start time in past");
         }
-
-        session.EndTime = session.StartTime.AddMinutes(sessionPackage.Duration);
+        //validate service list of create model
+        if (createModel.ServiceList.Count > 0)
+        {
+            var serviceIds = createModel.ServiceList.Keys.ToList();
+            var services = await _serviceRepository.GetAsync(i => serviceIds.Contains(i.ServiceID));
+            //validate number of service
+            if (createModel.ServiceList.Count != services.Count())
+            {
+                throw new BadRequestException("Some service in request are not found");
+            }
+            //validate is there any service about hire booth and update endtime
+            session.EndTime = session.StartTime;
+        }
         //validate time in a date and in branch's open time
         if (!ValidateTimeRange(session.StartTime, session.EndTime.Value))
         {
             throw new BadRequestException("Not valide time, our Branch open from 8:00 to 23:00 of a day");
         }
 
-        session.TotalPrice = sessionPackage.Price;
         session.Status = SessionOrderStatus.Created;
         //validate time to not conflict with other session
         if ((await this.ValidateBookingTime(session.BoothID, session.StartTime, session.EndTime.Value)) == false)
@@ -151,7 +149,7 @@ public class SessionOrderService : ISessionOrderService
             throw new BadRequestException("There is another Session on this time, please check time to book again");
         }
 
-        if (booth.Status == ManufactureStatus.InUse)
+        if (booth.Status == BoothStatus.InUse)
         {
             await _boothRepository.UpdateAsync(booth);
         }
@@ -192,7 +190,6 @@ public class SessionOrderService : ISessionOrderService
             includeProperties: new Expression<Func<SessionOrder, object>>[]
             {
                 i => i.ServiceItems,
-                i => i.SessionPackage
             })).ToList();
         var booth = (await _boothRepository.GetAsync(i => i.BoothID == validateSessionPhotoRequest.BoothID)).FirstOrDefault();
         if (sessionOrders.Count() == 0 && booth != null)
@@ -223,7 +220,7 @@ public class SessionOrderService : ISessionOrderService
                 await _sessionOrderRepository.UpdateAsync(sessionOrder);
 
                 //update booth
-                booth.Status = ManufactureStatus.InUse;
+                booth.Status = BoothStatus.InUse;
                 await _boothRepository.UpdateAsync(booth);
                 return _mapper.Map<SessionOrderResponse>(sessionOrder);
             }
@@ -257,7 +254,6 @@ public class SessionOrderService : ISessionOrderService
         var sessions = await _sessionOrderRepository.GetAsync(null, includeProperties: new Expression<Func<SessionOrder, object>>[]
             {
                 i => i.ServiceItems,
-                i => i.SessionPackage
             });
         return _mapper.Map<IEnumerable<SessionOrderResponse>>(sessions.ToList());
     }
@@ -267,7 +263,6 @@ public class SessionOrderService : ISessionOrderService
         var sessions = (await _sessionOrderRepository.GetAsync(null, includeProperties: new Expression<Func<SessionOrder, object>>[]
             {
                 i => i.ServiceItems,
-                i => i.SessionPackage
             })).ToList().AutoFilter(filter);
         var listSessionresponse = _mapper.Map<IEnumerable<SessionOrderResponse>>(sessions);
         return listSessionresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
@@ -280,7 +275,6 @@ public class SessionOrderService : ISessionOrderService
             includeProperties: new Expression<Func<SessionOrder, object>>[]
             {
                 i => i.ServiceItems,
-                i => i.SessionPackage
             })).FirstOrDefault();
         if (session == null)
         {
@@ -313,7 +307,7 @@ public class SessionOrderService : ISessionOrderService
         }
         if (this.ValidateTimeRange(startTime, endTime) == false)
         {
-            throw new BadRequestException("Not valide time, our Branch open from 8:00 to 23:00 of a day");
+            throw new BadRequestException("Not valide time, please check our Branch open and close time");
         }
         if (updateModel.BoothID.Value != null && updateModel.BoothID.Value != default(Guid))
         {
@@ -358,6 +352,12 @@ public class SessionOrderService : ISessionOrderService
     }
     private bool ValidateTimeRange(DateTime startTime, DateTime endTime)
     {
+        //DateTime baseDate = startTime.Date;
+        //TimeSpan.TryParseExact(_constantService.GetConstantValue("OpenTime"), "hh\\:mm", CultureInfo.InvariantCulture, out TimeSpan timeSpan);
+        //DateTime lowerBound = baseDate.Add(timeSpan);
+        //TimeSpan.TryParseExact(_constantService.GetConstantValue("CloseTime"), "hh\\:mm", CultureInfo.InvariantCulture, out timeSpan);
+        //DateTime upperBound = baseDate.Add(timeSpan);
+
         DateTime lowerBound = new DateTime(startTime.Year, startTime.Month, startTime.Day, 8, 0, 0); // 8:00 AM
         DateTime upperBound = new DateTime(startTime.Year, startTime.Month, startTime.Day, 23, 0, 0); // 11:00 PM
 

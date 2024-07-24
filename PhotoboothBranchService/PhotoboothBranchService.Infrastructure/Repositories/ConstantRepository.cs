@@ -7,39 +7,39 @@ using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories
 {
-    public class ServiceItemRepository : IServiceItemRepository
+    public class ConstantRepository : IConstantRepository
     {
         private readonly AppDbContext _dbContext;
 
-        public ServiceItemRepository(AppDbContext dbContext)
+        public ConstantRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        // Create
-        public async Task<ServiceItem> AddAsync(ServiceItem entity)
+        //Create
+        public async Task<Constant> AddAsync(Constant entity)
         {
             var result = await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
             return result.Entity;
         }
 
-        // Read
-        public async Task<IQueryable<ServiceItem>> GetAllAsync()
+        //Read
+        public async Task<IQueryable<Constant>> GetAllAsync()
         {
-            return await Task.FromResult(_dbContext.ServiceItems.AsQueryable());
+            return await Task.FromResult(_dbContext.Constants);
         }
 
-        public async Task<IQueryable<ServiceItem>> GetAsync(
-        Expression<Func<ServiceItem, bool>> predicate = null,
-        params Expression<Func<ServiceItem, object>>[] includeProperties)
+        public async Task<IQueryable<Constant>> GetAsync(
+            Expression<Func<Constant, bool>> predicate = null,
+            params Expression<Func<Constant, object>>[] includeProperties)
         {
             try
             {
-                var result = predicate == null ? _dbContext.ServiceItems : _dbContext.ServiceItems.Where(predicate);
+                var result = predicate == null ? _dbContext.Constants : _dbContext.Constants.Where(predicate);
                 if (!result.Any())
                 {
-                    return await Task.FromResult(Enumerable.Empty<ServiceItem>().AsQueryable());
+                    return await Task.FromResult(Enumerable.Empty<Constant>().AsQueryable());
                 }
                 else
                 {
@@ -62,17 +62,17 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
             }
         }
 
-        // Update
-        public async Task UpdateAsync(ServiceItem entity)
+        //Delete
+        public async Task RemoveAsync(Constant entity)
         {
-            _dbContext.Update(entity);
+            _dbContext.Remove(entity);
             await _dbContext.SaveChangesAsync();
         }
 
-        // Delete
-        public async Task RemoveAsync(ServiceItem entity)
+        //Update
+        public async Task UpdateAsync(Constant entity)
         {
-            _dbContext.Remove(entity);
+            _dbContext.Update(entity);
             await _dbContext.SaveChangesAsync();
         }
     }

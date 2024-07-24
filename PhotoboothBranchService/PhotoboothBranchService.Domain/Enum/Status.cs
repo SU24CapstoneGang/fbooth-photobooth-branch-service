@@ -1,6 +1,6 @@
 ﻿namespace PhotoboothBranchService.Domain.Enum;
 
-public enum ManufactureStatus
+public enum BoothStatus
 {
     Active = 1,
     Inactive = 2,

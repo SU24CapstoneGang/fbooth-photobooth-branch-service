@@ -10,10 +10,10 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
 {
     public class ServiceService : IServiceService
     {
-        private readonly IServiceRepository _serviceRepository;
+        private readonly IServicePackageRepository _serviceRepository;
         private readonly IMapper _mapper;
 
-        public ServiceService(IServiceRepository serviceRepository, IMapper mapper)
+        public ServiceService(IServicePackageRepository serviceRepository, IMapper mapper)
         {
             _serviceRepository = serviceRepository;
             _mapper = mapper;
@@ -22,7 +22,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
         // Create
         public async Task<CreateServiceResponse> CreateAsync(CreateServiceRequest createModel, StatusUse status)
         {
-            var service = _mapper.Map<Service>(createModel);
+            var service = _mapper.Map<ServicePackage>(createModel);
             service.Status = status;
             await _serviceRepository.AddAsync(service);
             return _mapper.Map<CreateServiceResponse>(service);

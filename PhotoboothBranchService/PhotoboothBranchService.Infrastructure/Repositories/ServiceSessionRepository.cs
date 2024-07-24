@@ -7,17 +7,17 @@ using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories
 {
-    public class SessionPackageRepository : ISessionPackageRepository
+    public class ServiceSessionRepository : IServiceSessionRepository
     {
         private readonly AppDbContext _dbContext;
 
-        public SessionPackageRepository(AppDbContext dbContext)
+        public ServiceSessionRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
         // Create
-        public async Task<SessionPackage> AddAsync(SessionPackage entity)
+        public async Task<ServiceSession> AddAsync(ServiceSession entity)
         {
             var result = await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
@@ -25,21 +25,21 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Read
-        public async Task<IQueryable<SessionPackage>> GetAllAsync()
+        public async Task<IQueryable<ServiceSession>> GetAllAsync()
         {
-            return await Task.FromResult(_dbContext.SessionPackages);
+            return await Task.FromResult(_dbContext.ServiceSessions.AsQueryable());
         }
 
-        public async Task<IQueryable<SessionPackage>> GetAsync(
-            Expression<Func<SessionPackage, bool>> predicate = null,
-            params Expression<Func<SessionPackage, object>>[] includeProperties)
+        public async Task<IQueryable<ServiceSession>> GetAsync(
+        Expression<Func<ServiceSession, bool>> predicate = null,
+        params Expression<Func<ServiceSession, object>>[] includeProperties)
         {
             try
             {
-                var result = predicate == null ? _dbContext.SessionPackages : _dbContext.SessionPackages.Where(predicate);
+                var result = predicate == null ? _dbContext.ServiceSessions : _dbContext.ServiceSessions.Where(predicate);
                 if (!result.Any())
                 {
-                    return await Task.FromResult(Enumerable.Empty<SessionPackage>().AsQueryable());
+                    return await Task.FromResult(Enumerable.Empty<ServiceSession>().AsQueryable());
                 }
                 else
                 {
@@ -62,17 +62,17 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
             }
         }
 
-        // Delete
-        public async Task RemoveAsync(SessionPackage entity)
+        // Update
+        public async Task UpdateAsync(ServiceSession entity)
         {
-            _dbContext.Remove(entity);
+            _dbContext.Update(entity);
             await _dbContext.SaveChangesAsync();
         }
 
-        // Update
-        public async Task UpdateAsync(SessionPackage entity)
+        // Delete
+        public async Task RemoveAsync(ServiceSession entity)
         {
-            _dbContext.Update(entity);
+            _dbContext.Remove(entity);
             await _dbContext.SaveChangesAsync();
         }
     }

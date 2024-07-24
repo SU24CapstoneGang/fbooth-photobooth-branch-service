@@ -27,9 +27,9 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
         private readonly string redirectUrl;
         private readonly string ipnUrl;
         private readonly string public_key;
-        private readonly IPaymentRepository _paymentRepository;
+        private readonly ITransactionRepository _paymentRepository;
 
-        public MoMoService(IPaymentRepository paymentRepository)
+        public MoMoService(ITransactionRepository paymentRepository)
         {
             momo_Api_Pay = JsonHelper.GetFromAppSettings("MoMo:momo_Api");
             momo_Api_Refund = JsonHelper.GetFromAppSettings("MoMo:momo_refund_endpoint");
@@ -92,7 +92,7 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                 return jmessage.GetValue("message").ToString();
             }
         }
-        public async Task<Payment> HandlePaymentResponeIPN(MoMoResponse momoResponse)
+        public async Task<Transaction> HandlePaymentResponeIPN(MoMoResponse momoResponse)
         {
             var rawHash = "accessKey=" + accessKey +
                    "&amount=" + momoResponse.amount +
@@ -108,7 +108,7 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                    "&resultCode=" + momoResponse.resultCode +
                    "&transId=" + momoResponse.transId;
 
-            var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == momoResponse.orderId)).FirstOrDefault();
+            var payment = (await _paymentRepository.GetAsync(i => i.TransactionID == momoResponse.orderId)).FirstOrDefault();
             if (payment == null)
             {
                 throw new NotFoundException("No payment found");
@@ -120,19 +120,18 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                 if (checkSignature && momoResponse.resultCode == 0)
                 {
                     payment.PaymentStatus = PaymentStatus.Success;
-                    payment.Signature = momoResponse.signature;
-                    payment.TransactionID = momoResponse.transId.ToString();
+                    payment.GatewayTransactionID = momoResponse.transId.ToString();
                 }
                 else
                 {
-                    payment.TransactionID = momoResponse.transId.ToString();
+                    payment.GatewayTransactionID = momoResponse.transId.ToString();
                     payment.PaymentStatus = PaymentStatus.Fail;
                 }
             }
             await _paymentRepository.UpdateAsync(payment);
             return payment;
         }
-        public async Task<Payment> Return(IQueryCollection queryString)
+        public async Task<Transaction> Return(IQueryCollection queryString)
         {
 
             MoMoResponse response = new MoMoResponse();
@@ -177,14 +176,14 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
         }
         public async Task<MoMoRefundResponse> RefundById(Guid paymentID, bool isFullRefund)
         {
-            var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == paymentID)).FirstOrDefault();
+            var payment = (await _paymentRepository.GetAsync(i => i.TransactionID == paymentID)).FirstOrDefault();
             if (payment != null)
             {
-                string merchantRefId = payment.PaymentID.ToString();
-                string momoTransId = payment.TransactionID;
+                string merchantRefId = payment.TransactionID.ToString();
+                string momoTransId = payment.GatewayTransactionID;
                 string version = "2.0";
                 string requestId = Guid.NewGuid().ToString();
-                string description = "Hoan tien giao dich" + payment.PaymentID.ToString();
+                string description = "Hoan tien giao dich" + payment.TransactionID.ToString();
                 long amount = isFullRefund ? payment.Amount : payment.Amount * 50 / 100;
                 MoMoLibrary moMoLibrary = new MoMoLibrary();
                 string hash = moMoLibrary.buildRefundHash(partnerCode, merchantRefId, momoTransId, amount,

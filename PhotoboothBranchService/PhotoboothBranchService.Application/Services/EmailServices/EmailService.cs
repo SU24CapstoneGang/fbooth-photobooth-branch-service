@@ -23,16 +23,16 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
         private string emailHostPassword;
 
         private IAccountRepository _accountRepository;
-        private IPaymentRepository _paymentRepository;
+        private ITransactionRepository _paymentRepository;
         private ISessionOrderRepository _sessionOrderRepository;
         private IBranchRepository _boothBranchRepository;
-        private IServiceItemRepository _serviceItemRepository;
+        private IServiceSessionRepository _serviceItemRepository;
 
         public EmailService(IAccountRepository accountRepository, 
-            IPaymentRepository paymentRepository, 
+            ITransactionRepository paymentRepository, 
             ISessionOrderRepository sessionOrderRepository, 
             IBranchRepository boothBranchRepository, 
-            IServiceItemRepository serviceItemRepository)
+            IServiceSessionRepository serviceItemRepository)
         {
             this.smtpServerName = JsonHelper.GetFromAppSettings("EmailConfig:SmtpServerName");
             this.smtpPortNumber = JsonHelper.GetFromAppSettings("EmailConfig:SmtpPortNumber");
@@ -47,7 +47,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
 
         public async Task SendBillInformation(Guid paymentId)
         {
-            var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == paymentId, i=>i.PaymentMethod)).FirstOrDefault();
+            var payment = (await _paymentRepository.GetAsync(i => i.TransactionID == paymentId, i=>i.PaymentMethod)).FirstOrDefault();
             if (payment == null)
             {
                 throw new NotFoundException("Not found payment");
@@ -68,7 +68,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             sbBody.AppendLine("<p></p>");
             sbBody.AppendLine($"<p>Payment method: {payment.PaymentMethod.PaymentMethodName}</p>");
             sbBody.AppendLine($"<p>Payment amount: {payment.Amount.ToString()}</p>");
-            sbBody.AppendLine($"<p>Payment time: {payment.PaymentDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
+            sbBody.AppendLine($"<p>Payment time: {payment.TransactionDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
 
             await this.SendEmail(user.Email, subject, sbBody.ToString());
         }
@@ -80,7 +80,6 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                     includeProperties: new Expression<Func<SessionOrder, object>>[]
                         {
                             i => i.ServiceItems,
-                            i => i.SessionPackage,
                             i => i.Booth,
                         }
                 ))
@@ -111,11 +110,6 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             sbBody.AppendLine($"<p><strong>Booth Name:</strong> {sessionOrder.Booth.BoothName}</p>");
 
             sbBody.AppendLine("<h3>Package Information</h3>");
-            sbBody.AppendLine($"<p style='text-indent: 30px;'><strong>Package Name:</strong> {sessionOrder.SessionPackage.SessionPackageName}</p>");
-            sbBody.AppendLine($"<p style='text-indent: 30px;'><strong>Email Send Count:</strong> {sessionOrder.SessionPackage.EmailSendCount} time(s)</p>");
-            sbBody.AppendLine($"<p style='text-indent: 30px;'><strong>Print Count:</strong> {sessionOrder.SessionPackage.PrintCount} time(s)</p>");
-            sbBody.AppendLine($"<p style='text-indent: 30px;'><strong>Duration:</strong> {sessionOrder.SessionPackage.Duration} minutes</p>");
-            sbBody.AppendLine($"<p style='text-indent: 30px;'><strong>Price:</strong> {sessionOrder.SessionPackage.Price:N0} VND</p>");
 
             if (sessionOrder.ServiceItems.Count > 0)
             {

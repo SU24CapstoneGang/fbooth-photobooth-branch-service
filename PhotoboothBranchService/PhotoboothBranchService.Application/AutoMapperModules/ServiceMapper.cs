@@ -9,10 +9,10 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
     {
         public ServiceMapper()
         {
-            CreateMap<CreateServiceRequest, Service>().HandleNullProperty();
-            CreateMap<UpdateServiceRequest, Service>().HandleNullProperty();
-            CreateMap<Service, ServiceResponse>().HandleNullProperty();
-            CreateMap<Service, CreateServiceResponse>().HandleNullProperty();
+            CreateMap<CreateServiceRequest, ServicePackage>().HandleNullProperty();
+            CreateMap<UpdateServiceRequest, ServicePackage>().HandleNullProperty();
+            CreateMap<ServicePackage, ServiceResponse>().HandleNullProperty();
+            CreateMap<ServicePackage, CreateServiceResponse>().HandleNullProperty();
         }
     }
 }

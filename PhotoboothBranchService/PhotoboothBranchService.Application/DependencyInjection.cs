@@ -11,6 +11,7 @@ using PhotoboothBranchService.Application.Services.BackgroundServices;
 using PhotoboothBranchService.Application.Services.BoothBranchServices;
 using PhotoboothBranchService.Application.Services.BoothServices;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
+using PhotoboothBranchService.Application.Services.ConstantServices;
 using PhotoboothBranchService.Application.Services.DashboardServices;
 using PhotoboothBranchService.Application.Services.DeviceServices;
 using PhotoboothBranchService.Application.Services.EmailServices;
@@ -30,7 +31,6 @@ using PhotoboothBranchService.Application.Services.ServiceItemServices;
 using PhotoboothBranchService.Application.Services.ServiceServices;
 using PhotoboothBranchService.Application.Services.ServiceTypeServices;
 using PhotoboothBranchService.Application.Services.SessionOrderServices;
-using PhotoboothBranchService.Application.Services.SessionPackageServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
 using PhotoboothBranchService.Application.Services.VNPayServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
@@ -61,10 +61,11 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<IServiceTypeService, ServiceTypeService>();
             services.AddScoped<ISessionOrderService, SessionOrderService>();
-            services.AddScoped<ISessionPackageService, SessionPackageService>();
             services.AddScoped<IStickerService, StickerService>();
             services.AddScoped<IPhotoBoxService, PhotoBoxService>();
 
+            // Register ConstantService as a singleton
+            services.AddScoped<IConstantService, ConstantService>();
             // cloudinary
             services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
             services.AddScoped<ICloudinaryService, CloudinaryService>();
