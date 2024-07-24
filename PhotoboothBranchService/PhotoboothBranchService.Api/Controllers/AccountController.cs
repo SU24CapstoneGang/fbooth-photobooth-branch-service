@@ -102,6 +102,8 @@ public class AccountController : ControllerBaseApi
     {
         try
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             await _accountService.UpdateAsync(id, updateAccountRequest);
             return Ok();
         }

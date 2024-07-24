@@ -1,5 +1,7 @@
-﻿using PhotoboothBranchService.Application.DTOs;
+﻿using Microsoft.AspNetCore.Http;
+using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Payment;
+using PhotoboothBranchService.Application.DTOs.VNPayPayment;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 
 namespace PhotoboothBranchService.Application.Services.PaymentServices
@@ -10,5 +12,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         Task UpdateAsync(Guid id, UpdatePaymentRequest updateModel);
         Task DeleteAsync(Guid id);
         Task<IEnumerable<PaymentResponse>> GetBySessionOrderAsync(Guid sessionOrderID);
+        Task HandleMomoResponse(IQueryCollection queryString);
+        Task<(VnpayResponse response, string returnContent)> HandleVnpayResponse(IQueryCollection queryString);
     }
 }

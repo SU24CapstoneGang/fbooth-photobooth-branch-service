@@ -5,6 +5,7 @@ using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.MoMoPayment;
+using PhotoboothBranchService.Application.DTOs.Payment;
 using PhotoboothBranchService.Application.DTOs.PhotoSticker;
 using PhotoboothBranchService.Application.DTOs.Refund;
 using PhotoboothBranchService.Application.DTOs.VNPayPayment;
@@ -30,9 +31,9 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
         private readonly IMoMoService _moMoService;
         private readonly IVNPayService _vNPayService;
         private readonly ISessionOrderRepository _sessionOrderRepository;
-        private readonly IPaymentRepository _paymentRepository;
+        private readonly ITransactionRepository _paymentRepository;
 
-        public RefundService(IMapper mapper,IRefundRepository refundRepository, IMoMoService moMoService, IVNPayService vNPayService, ISessionOrderRepository sessionOrderRepository, IPaymentRepository paymentRepository)
+        public RefundService(IMapper mapper,IRefundRepository refundRepository, IMoMoService moMoService, IVNPayService vNPayService, ISessionOrderRepository sessionOrderRepository, ITransactionRepository paymentRepository)
         {
             _mapper = mapper;
             _refundRepository = refundRepository;
@@ -62,17 +63,27 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
         }
 
         //refund 
-        public async Task RefundByOrderId(Guid orderId, bool isFullRefund, string? ipAddress)
+        public async Task<(IEnumerable<RefundResponse> refundResponses, IEnumerable<PaymentResponse> failPayment)> RefundByOrderId(Guid orderId, bool isFullRefund, string? ipAddress)
         {
-            var payments = (await _paymentRepository.GetAsync(i => i.SessionOrderID == orderId)).ToList();
+            var payments = (await _paymentRepository.GetAsync(i => i.SessionOrderID == orderId && i.PaymentStatus == PaymentStatus.Success)).ToList();
+            var responseList = new List<RefundResponse>();
+            var failList = new List<PaymentResponse>();
             foreach (var payment in payments)
             {
-                await this.RefundByPaymentID(payment.PaymentID, isFullRefund, ipAddress);
+                try
+                {
+                    responseList.Add(await this.RefundByPaymentID(payment.TransactionID, isFullRefund, ipAddress));
+                }
+                catch (Exception)
+                {
+                    failList.Add(_mapper.Map<PaymentResponse>(payment));
+                }
             }
+            return (responseList,failList);
         }
-        public async Task RefundByPaymentID(Guid id, bool isFullRefund, string? ipAddress)
+        public async Task<RefundResponse> RefundByPaymentID(Guid paymentId, bool isFullRefund, string? ipAddress)
         {
-            var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == id, i => i.PaymentMethod)).FirstOrDefault();
+            var payment = (await _paymentRepository.GetAsync(i => i.TransactionID == paymentId, i => i.PaymentMethod)).FirstOrDefault();
             if (payment == null)
             {
                 throw new NotFoundException("Not found Payment ID to refund");
@@ -90,6 +101,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                 IPAddress localIp = Dns.GetHostEntry(Dns.GetHostName()).AddressList[0];
                 ipAddress = localIp.ToString();
             }
+            Refund? refund;
             switch (payment.PaymentMethod.PaymentMethodName)
             {
                 case "VNPay":
@@ -97,20 +109,20 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                     VnpayRefundRequest refundRequest = new VnpayRefundRequest
                     {
                         Amount = isFullRefund ? payment.Amount : (payment.Amount / 10 * 5),
-                        PayDate = payment.PaymentDateTime,
+                        PayDate = payment.TransactionDateTime,
                         RefundCategory = isFullRefund ? "02" : "03",
-                        PaymentID = GuidAlphanumericConverter.GuidToAlphanumeric(payment.PaymentID),
-                        TransId = payment.TransactionID,
+                        PaymentID = GuidAlphanumericConverter.GuidToAlphanumeric(payment.TransactionID),
+                        TransId = payment.GatewayTransactionID,
                         User = GuidAlphanumericConverter.GuidToAlphanumeric(order.AccountID.Value),
                     };
                     var responseVNPay = await _vNPayService.RefundTransaction(refundRequest, ipAddress);
 
                     if (responseVNPay.Vnp_ResponseCode == "00")
                     {
-                        Refund refund = new Refund
+                        refund = new Refund
                         {
                             RefundID = Guid.NewGuid(),
-                            PaymentID = payment.PaymentID,
+                            PaymentID = payment.TransactionID,
                             Amount = long.Parse(responseVNPay.Vnp_Amount.Substring(0, responseVNPay.Vnp_Amount.Length - 2)),
                             RefundDateTime = DateTime.ParseExact(responseVNPay.Vnp_PayDate, "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture),
                             TransactionID = responseVNPay.Vnp_TransactionNo,
@@ -131,7 +143,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                         }
                         
                         await _refundRepository.AddAsync(refund);
-                        payment.PaymentStatus = responseVNPay.Vnp_TransactionType.Equals("02") || payment.Amount == await this.TotalRefund(payment.PaymentID) ? PaymentStatus.RefundedFull : PaymentStatus.RefundedPartial;
+                        payment.PaymentStatus = responseVNPay.Vnp_TransactionType.Equals("02") || payment.Amount == await this.TotalRefund(payment.TransactionID) ? PaymentStatus.RefundedFull : PaymentStatus.RefundedPartial;
                     }
                     else
                     {
@@ -139,21 +151,20 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                     }
                     break;
                 case "MoMo":
-                    MoMoRefundResponse responseMoMo = await _moMoService.RefundById(payment.PaymentID, isFullRefund);
+                    MoMoRefundResponse responseMoMo = await _moMoService.RefundById(payment.TransactionID, isFullRefund);
                     if (responseMoMo.Status == 0)
                     {
-                        Refund refund = new Refund
+                        refund = new Refund
                         {
-                            RefundID = Guid.NewGuid(),
-                            PaymentID = payment.PaymentID,
+                            RefundID = responseMoMo.RequestId,
+                            PaymentID = payment.TransactionID,
                             Amount = responseMoMo.Amount,
                             RefundDateTime = DateTime.Now,
                             TransactionID = responseMoMo.Transid,
                             Description = responseMoMo.Message
                         };
                         await _refundRepository.AddAsync(refund);
-                        payment.PaymentStatus = responseMoMo.Amount == payment.Amount || payment.Amount == await this.TotalRefund(payment.PaymentID) ? PaymentStatus.RefundedFull : PaymentStatus.RefundedPartial;
-                        
+                        payment.PaymentStatus = responseMoMo.Amount == payment.Amount || payment.Amount == await this.TotalRefund(payment.TransactionID) ? PaymentStatus.RefundedFull : PaymentStatus.RefundedPartial;
                     }
                     else
                     {
@@ -164,6 +175,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                     throw new BadRequestException("Payment method not availbe to use, please try later");
             }
             await _paymentRepository.UpdateAsync(payment);
+            return _mapper.Map<RefundResponse>(refund);
         }
 
         private async Task<long> TotalRefund(Guid paymentID) {

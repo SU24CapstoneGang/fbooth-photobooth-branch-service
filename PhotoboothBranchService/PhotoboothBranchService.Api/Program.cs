@@ -1,6 +1,7 @@
 ﻿using Microsoft.OpenApi.Models;
 using PhotoboothBranchService.Api.Common.MiddleWares;
 using PhotoboothBranchService.Application;
+using PhotoboothBranchService.Application.Services.ConstantServices;
 using PhotoboothBranchService.Infrastructure;
 using System.Text.Json.Serialization;
 
@@ -58,6 +59,11 @@ builder.Services
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var constantService = scope.ServiceProvider.GetRequiredService<IConstantService>();
+    await constantService.LoadConstantsAsync();
+}
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseMiddleware<ExceptionMiddleware>();

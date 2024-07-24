@@ -10,7 +10,7 @@ namespace PhotoboothBranchService.Application.DTOs.BoothBranch
         public string? Town { get; set; } = default!;
         public string? City { get; set; } = default!;
         public DateTime? CreateDate { get; set; }
-        public ManufactureStatus? Status { get; set; } = default!;
+        public BranchStatus? Status { get; set; } = default!;
         public Guid? ManagerID { get; set; }
     }
 }

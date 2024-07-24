@@ -20,35 +20,25 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<CreatePaymentResponse>> CreatePayment(CreatePaymentRequest createPaymentRequest)
         {
-            try
-            {
-                //get ip from request
-                var clientIpAddress = IpAddressHelper.GetClientIpAddress(HttpContext);
 
-                //sent to service layer
-                var createPaymentResponse = await _paymentService.CreateAsync(createPaymentRequest, clientIpAddress);
+            //get ip from request
+            var clientIpAddress = IpAddressHelper.GetClientIpAddress(HttpContext);
 
-                return Ok(createPaymentResponse);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while creating the payment: {ex.Message}");
-            }
+            //sent to service layer
+            var createPaymentResponse = await _paymentService.CreateAsync(createPaymentRequest, clientIpAddress);
+
+            return Ok(createPaymentResponse);
+
         }
 
         // Read
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PaymentResponse>>> GetAllPayments()
         {
-            try
-            {
-                var payments = await _paymentService.GetAllAsync();
-                return Ok(payments);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving payments: {ex.Message}");
-            }
+
+            var payments = await _paymentService.GetAllAsync();
+            return Ok(payments);
+
         }
 
         // Read with paging and filter
@@ -56,76 +46,116 @@ namespace PhotoboothBranchService.Api.Controllers
         public async Task<ActionResult<IEnumerable<PaymentResponse>>> GetAllPayments(
             [FromQuery] PaymentFilter paymentFilter, [FromQuery] PagingModel pagingModel)
         {
-            try
-            {
-                var payments = await _paymentService.GetAllPagingAsync(paymentFilter, pagingModel);
-                return Ok(payments);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving payments: {ex.Message}");
-            }
+
+            var payments = await _paymentService.GetAllPagingAsync(paymentFilter, pagingModel);
+            return Ok(payments);
+
         }
 
         [HttpGet("transaction/{transactionId}")]
         public async Task<ActionResult<IEnumerable<PaymentResponse>>> GetPaymentsByTransactionId(Guid transactionId)
         {
-            try
-            {
-                var payments = await _paymentService.GetByIdAsync(transactionId);
-                return Ok(payments);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving payments by transaction ID: {ex.Message}");
-            }
+            var payments = await _paymentService.GetByIdAsync(transactionId);
+            return Ok(payments);
+
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<PaymentResponse>> GetPaymentById(Guid id)
         {
-            try
+
+            var payment = await _paymentService.GetByIdAsync(id);
+            if (payment == null)
             {
-                var payment = await _paymentService.GetByIdAsync(id);
-                if (payment == null)
-                {
-                    return NotFound();
-                }
-                return Ok(payment);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving the payment by ID: {ex.Message}");
-            }
+            return Ok(payment);
+
         }
 
         // Update
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdatePayment(Guid id, UpdatePaymentRequest updatePaymentRequest)
         {
-            try
-            {
-                await _paymentService.UpdateAsync(id, updatePaymentRequest);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while updating the payment: {ex.Message}");
-            }
+
+            await _paymentService.UpdateAsync(id, updatePaymentRequest);
+            return Ok();
+
         }
 
         // Delete
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeletePayment(Guid id)
         {
-            try
+
+            await _paymentService.DeleteAsync(id);
+            return Ok();
+
+        }
+
+        //handle return 
+        [HttpGet("vnpay-return")]
+        public async Task<IActionResult> VnpayReturn()
+        {
+            if (Request.QueryString.HasValue)
             {
-                await _paymentService.DeleteAsync(id);
-                return Ok();
+                var response = await _paymentService.HandleVnpayResponse(Request.Query);
+                string returnContent = $@"
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Payment Return</title>
+                        <script>
+                            window.onload = function() {{
+                                setTimeout(function() {{
+                                    window.close();
+                                }}, 3000); // Close after 3 seconds
+                            }}
+                        </script>
+                    </head>
+                    <body>
+                        <h1>Payment Processed</h1>
+                        <p>Your payment has been processed. This tab will close automatically.</p>
+                        <h2>Response Data:</h2>
+                        <pre>{response.returnContent}</pre> <!-- Display JSON response here -->
+                    </body>
+                    </html>";
+
+                return Content(returnContent, "text/html");
             }
-            catch (Exception ex)
+            return BadRequest(new { Message = "No query string found" });
+        }
+
+        [HttpGet("momo-return")]
+        public async Task<IActionResult> PaymentMomoReturn()
+        {
+            if (Request.QueryString.HasValue)
             {
-                return StatusCode(500, $"An error occurred while deleting the payment: {ex.Message}");
+                await _paymentService.HandleMomoResponse(Request.Query);
+                string returnContent = $@"
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Payment Return</title>
+                        <script>
+                            window.onload = function() {{
+                                setTimeout(function() {{
+                                    window.close();
+                                }}, 3000); // Close after 3 seconds
+                            }}
+                        </script>
+                    </head>
+                    <body>
+                        <h1>Payment Processed</h1>
+                        <p>Your payment has been processed. This tab will close automatically.</p>
+                    </body>
+                    </html>";
+
+                return Content(returnContent, "text/html");
+            }
+            else
+            {
+                return BadRequest(new { Message = "No query string found" });
             }
         }
     }

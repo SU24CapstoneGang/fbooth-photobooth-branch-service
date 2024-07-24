@@ -48,6 +48,7 @@ public class BackgroundService : IBackgroundService
                 Width = uploadResult.Width,
                 Height = uploadResult.Height,
                 LayoutID = layoutID
+                CreatedDate = DateTime.UtcNow,
             };
 
             await _backgroundRepository.AddAsync(background);
@@ -110,6 +111,7 @@ public class BackgroundService : IBackgroundService
         }
 
         var updateBackGround = _mapper.Map(updateBackgroundRequest, backGround);
+        updateBackGround.LastModified = DateTime.UtcNow;
         await _backgroundRepository.UpdateAsync(updateBackGround);
         await _cloudinaryService.UpdatePhotoAsync(file, backGround.CouldID);
     }

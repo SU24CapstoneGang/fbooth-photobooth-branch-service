@@ -19,9 +19,9 @@ public class Account
     public AccountStatus Status { get; set; }
     public AccountRole Role { get; set; }
     public virtual ICollection<SessionOrder> SessionOrder { get; set; } = default!;
-    public Guid? PhotoBoothBranchID { get; set; }
-    public virtual BoothBranch BoothBranchManage { get; set; } = default!;
-    public virtual BoothBranch BoothBranchBelong { get; set; } = default!;
+    public Guid? BranchID { get; set; }
+    public virtual Branch BranchManage { get; set; } = default!;
+    public virtual Branch BranchBelong { get; set; } = default!;
     public void SetPassword(string plainTextPassword, IPasswordHasher passwordHasher)
     {
         PasswordSalt = passwordHasher.GenerateSalt();

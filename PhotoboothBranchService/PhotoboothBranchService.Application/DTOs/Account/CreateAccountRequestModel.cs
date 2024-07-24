@@ -14,6 +14,10 @@ public class CreateAccountRequestModel
     [StringLength(100, MinimumLength = 6, ErrorMessage = "Password length must be between 6 and 100 characters")]
     public string Password { get; set; }
 
+    [Required(ErrorMessage = "Confirm password is required")]
+    [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+    public string ConfirmPassword { get; set; }
+
     [Required(ErrorMessage = "DateOfBirth is required")]
     public DateOnly DateOfBirth { get; set; }
 

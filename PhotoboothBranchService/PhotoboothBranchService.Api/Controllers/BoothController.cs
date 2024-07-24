@@ -3,6 +3,7 @@ using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Booth;
 using PhotoboothBranchService.Application.Services.BoothServices;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Api.Controllers;
 
@@ -17,32 +18,18 @@ public class BoothController : ControllerBaseApi
 
     // Create
     [HttpPost]
-    public async Task<ActionResult<CreateBoothResponse>> CreateBooth(CreateBoothRequest createBoothRequest)
+    public async Task<ActionResult<CreateBoothResponse>> CreateBooth([FromBody]CreateBoothRequest createBoothRequest, BoothStatus status )
     {
-        try
-        {
-            var createBoothResponse = await _boothService.CreateAsync(createBoothRequest);
-            return Ok(createBoothResponse);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while creating the booth: {ex.Message}");
-        }
+        var createBoothResponse = await _boothService.CreateAsync(createBoothRequest, status);
+        return Ok(createBoothResponse);
     }
 
     // Read
     [HttpGet]
     public async Task<ActionResult<IEnumerable<BoothResponse>>> GetAllBooths()
     {
-        try
-        {
-            var booths = await _boothService.GetAllAsync();
-            return Ok(booths);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving booths: {ex.Message}");
-        }
+        var booths = await _boothService.GetAllAsync();
+        return Ok(booths);
     }
 
     // Read with paging and filter
@@ -50,76 +37,44 @@ public class BoothController : ControllerBaseApi
     public async Task<ActionResult<IEnumerable<BoothResponse>>> GetAllBooths(
         [FromQuery] BoothFilter boothFilter, [FromQuery] PagingModel pagingModel)
     {
-        try
-        {
-            var booths = await _boothService.GetAllPagingAsync(boothFilter, pagingModel);
-            return Ok(booths);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving booths: {ex.Message}");
-        }
+        var booths = await _boothService.GetAllPagingAsync(boothFilter, pagingModel);
+        return Ok(booths);
     }
 
     [HttpGet("name/{name}")]
     public async Task<ActionResult<IEnumerable<BoothResponse>>> GetBoothsByName(string name)
     {
-        try
-        {
-            var booths = await _boothService.GetByName(name);
-            return Ok(booths);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving booths by name: {ex.Message}");
-        }
+
+        var booths = await _boothService.GetByName(name);
+        return Ok(booths);
+
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<BoothResponse>> GetBoothById(Guid id)
     {
-        try
+        var booth = await _boothService.GetByIdAsync(id);
+        if (booth == null)
         {
-            var booth = await _boothService.GetByIdAsync(id);
-            if (booth == null)
-            {
-                return NotFound();
-            }
-            return Ok(booth);
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving the booth by ID: {ex.Message}");
-        }
+        return Ok(booth);
+
     }
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateBooth(Guid id, UpdateBoothRequest updateBoothRequest)
+    public async Task<ActionResult> UpdateBooth(Guid id, UpdateBoothRequest updateBoothRequest, [FromQuery] BoothStatus? status)
     {
-        try
-        {
-            await _boothService.UpdateAsync(id, updateBoothRequest);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while updating the booth: {ex.Message}");
-        }
+        await _boothService.UpdateAsync(id, updateBoothRequest,status);
+        return Ok();
     }
 
     // Delete
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteBooth(Guid id)
     {
-        try
-        {
-            await _boothService.DeleteAsync(id);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while deleting the booth: {ex.Message}");
-        }
+        await _boothService.DeleteAsync(id);
+        return Ok();
     }
 }

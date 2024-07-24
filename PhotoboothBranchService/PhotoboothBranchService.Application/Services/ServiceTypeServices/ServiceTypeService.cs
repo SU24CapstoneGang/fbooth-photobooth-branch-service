@@ -3,6 +3,7 @@ using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.ServiceType;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.ServiceTypeServices
@@ -19,11 +20,12 @@ namespace PhotoboothBranchService.Application.Services.ServiceTypeServices
         }
 
         // Create
-        public async Task<CreateServiceTypeResponse> CreateAsync(CreateServiceTypeRequest createModel)
+        public async Task<CreateServiceTypeResponse> CreateAsync(CreateServiceTypeRequest createModel, StatusUse status)
         {
             var serviceType = _mapper.Map<ServiceType>(createModel);
+            serviceType.Status = status;
             await _serviceTypeRepository.AddAsync(serviceType);
-            return _mapper.Map<CreateServiceTypeResponse>(createModel);
+            return _mapper.Map<CreateServiceTypeResponse>(serviceType);
         }
 
         // Delete
@@ -74,7 +76,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceTypeServices
         }
 
         // Update
-        public async Task UpdateAsync(Guid id, UpdateServiceTypeRequest updateModel)
+        public async Task UpdateAsync(Guid id, UpdateServiceTypeRequest updateModel, StatusUse? status)
         {
             var serviceType = (await _serviceTypeRepository.GetAsync(s => s.ServiceTypeID == id)).FirstOrDefault();
             if (serviceType == null)
@@ -83,6 +85,10 @@ namespace PhotoboothBranchService.Application.Services.ServiceTypeServices
             }
 
             var updatedServiceType = _mapper.Map(updateModel, serviceType);
+            if (status.HasValue)
+            {
+                updatedServiceType.Status = status.Value;
+            }
             await _serviceTypeRepository.UpdateAsync(updatedServiceType);
         }
     }

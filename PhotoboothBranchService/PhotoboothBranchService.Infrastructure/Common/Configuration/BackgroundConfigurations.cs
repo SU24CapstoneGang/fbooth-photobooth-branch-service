@@ -28,13 +28,16 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(f => f.CreatedDate).IsRequired();
             builder.Property(f => f.Height).IsRequired();
             builder.Property(f => f.Width).IsRequired();
-            builder.Property(f => f.LastModified).IsRequired(false);
 
-            //auto add CreateDate and ignore change after update
-            builder.Property(a => a.CreatedDate)
-              .ValueGeneratedOnAdd()
-              .HasDefaultValueSql("GETDATE()")
-              .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+            //auto add CreateDate
+            builder.Property(c => c.CreatedDate)
+                  .IsRequired()
+                  .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
+
+            builder.Property(c => c.LastModified)
+                   .IsRequired()
+                   .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
+                   .ValueGeneratedOnAddOrUpdate();
 
             // Status enum mapping
             builder.Property(ep => ep.Status)

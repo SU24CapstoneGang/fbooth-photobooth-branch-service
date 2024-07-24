@@ -19,30 +19,20 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<CreateDeviceResponse>> CreateDevice(CreateDeviceRequest createDeviceRequest)
         {
-            try
-            {
-                var createDeviceResponse = await _deviceService.CreateAsync(createDeviceRequest);
-                return Ok(createDeviceResponse);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while creating the device: {ex.Message}");
-            }
+
+            var createDeviceResponse = await _deviceService.CreateAsync(createDeviceRequest);
+            return Ok(createDeviceResponse);
+
         }
 
         // Read
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DeviceResponse>>> GetAllDevices()
         {
-            try
-            {
-                var devices = await _deviceService.GetAllAsync();
-                return Ok(devices);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving devices: {ex.Message}");
-            }
+
+            var devices = await _deviceService.GetAllAsync();
+            return Ok(devices);
+
         }
 
         // Read with paging and filter
@@ -50,63 +40,37 @@ namespace PhotoboothBranchService.Api.Controllers
         public async Task<ActionResult<IEnumerable<DeviceResponse>>> GetAllDevices(
             [FromQuery] DeviceFilter deviceFilter, [FromQuery] PagingModel pagingModel)
         {
-            try
-            {
-                var devices = await _deviceService.GetAllPagingAsync(deviceFilter, pagingModel);
-                return Ok(devices);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving devices: {ex.Message}");
-            }
+            var devices = await _deviceService.GetAllPagingAsync(deviceFilter, pagingModel);
+            return Ok(devices);
+
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<DeviceResponse>> GetDeviceById(Guid id)
         {
-            try
+
+            var device = await _deviceService.GetByIdAsync(id);
+            if (device == null)
             {
-                var device = await _deviceService.GetByIdAsync(id);
-                if (device == null)
-                {
-                    return NotFound();
-                }
-                return Ok(device);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while retrieving the device by ID: {ex.Message}");
-            }
+            return Ok(device);
         }
 
         // Update
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateDevice(Guid id, UpdateDeviceRequest updateDeviceRequest)
         {
-            try
-            {
-                await _deviceService.UpdateAsync(id, updateDeviceRequest);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while updating the device: {ex.Message}");
-            }
+            await _deviceService.UpdateAsync(id, updateDeviceRequest);
+            return Ok();
         }
 
         // Delete
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteDevice(Guid id)
         {
-            try
-            {
-                await _deviceService.DeleteAsync(id);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while deleting the device: {ex.Message}");
-            }
+            await _deviceService.DeleteAsync(id);
+            return Ok();
         }
     }
 }

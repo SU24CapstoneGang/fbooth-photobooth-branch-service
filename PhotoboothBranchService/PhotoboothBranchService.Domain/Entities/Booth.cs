@@ -9,9 +9,10 @@ namespace PhotoboothBranchService.Domain.Entities
         public string BackgroundColor { get; set; } = default!;
         public string Concept { get; set; } = default!;
         public short PeopleInBooth { get; set; }
-        public ManufactureStatus Status { get; set; }
-        public Guid PhotoBoothBranchID { get; set; }
-        public virtual BoothBranch PhotoBoothBranch { get; set; } = default!;
+        public BoothStatus Status { get; set; }
+        public DateTime CreateDate { get; set; }
+        public Guid BranchID { get; set; }
+        public virtual Branch Branch { get; set; } = default!;
         public virtual ICollection<SessionOrder> SessionOrders { get; set; } = default!;
         public virtual ICollection<Device> Devices { get; set; } = default!;
     }

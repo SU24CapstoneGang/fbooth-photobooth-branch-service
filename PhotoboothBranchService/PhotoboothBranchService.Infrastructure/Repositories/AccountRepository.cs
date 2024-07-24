@@ -42,6 +42,11 @@ public class AccountRepository : IAccountRepository
         var existingAccounts = await _dbContext.Accounts.Where(c => c.Email.Equals(email)).ToListAsync();
         return existingAccounts.Count == 0;
     }
+    public async Task<bool> IsPhoneNumberUnique(string phoneNumber)
+    {
+        var existingAccounts = await _dbContext.Accounts.Where(c => c.PhoneNumber.Equals(phoneNumber)).ToListAsync();
+        return existingAccounts.Count == 0;
+    }
 
     //Read
     public async Task<IQueryable<Account>> GetAllAsync()

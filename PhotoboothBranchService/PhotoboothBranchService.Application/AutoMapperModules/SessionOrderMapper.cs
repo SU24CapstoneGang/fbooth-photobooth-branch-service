@@ -9,7 +9,8 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
     {
         public SessionOrderMapper()
         {
-            CreateMap<CreateSessionOrderRequest, SessionOrder>().HandleNullProperty();
+            CreateMap<CreateSessionOrderRequest, SessionOrder>()
+                .HandleNullProperty();
             CreateMap<UpdateSessionOrderRequest, SessionOrder>().ReverseMap().HandleNullProperty();
             CreateMap<SessionOrder, SessionOrderResponse>().HandleNullProperty();
             CreateMap<SessionOrder, CreateSessionOrderResponse>().HandleNullProperty();

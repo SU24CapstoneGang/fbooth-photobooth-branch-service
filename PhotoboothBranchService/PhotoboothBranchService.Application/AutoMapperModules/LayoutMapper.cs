@@ -9,10 +9,11 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
     {
         public LayoutMapper()
         {
-            CreateMap<CreateLayoutRequest, Layout>().ReverseMap().HandleNullProperty();
-            CreateMap<UpdateLayoutRequest, Layout>().ReverseMap().HandleNullProperty();
+            CreateMap<CreateLayoutRequest, Layout>().HandleNullProperty();
+            CreateMap<UpdateLayoutRequest, Layout>().HandleNullProperty();
             CreateMap<Layout, LayoutResponse>().HandleNullProperty();
             CreateMap<Layout, CreateLayoutResponse>().HandleNullProperty();
+            CreateMap<Layout, LayoutSummaryResponse>().HandleNullProperty();
         }
     }
 }

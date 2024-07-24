@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PhotoboothBranchService.Application.Common.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ namespace PhotoboothBranchService.Application.DTOs.ServiceItem
     public class AddListServiceItemRequest
     {
         public Guid BoothID { get; set; }
+        [DictionaryValueGreaterThanZero(ErrorMessage = "Each service quantity must be greater than 0.")]
         public Dictionary<Guid, short> ServiceList { get; set; } = new Dictionary<Guid, short>();
     }
 }

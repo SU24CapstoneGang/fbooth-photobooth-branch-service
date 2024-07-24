@@ -80,12 +80,11 @@ public class SessionOrderRepository : ISessionOrderRepository
     {
         var order = _dbContext.SessionOrders.Where(i => i.SessionOrderID == SessionOrderID)
             .Include(u => u.ServiceItems)
-            .Include(u => u.SessionPackage)
             .FirstOrDefault();
 
         if (order != null)
         {
-            decimal totalPrice = order.SessionPackage.Price;
+            decimal totalPrice = 0;
             foreach (var item in order.ServiceItems)
             {
                 totalPrice += item.UnitPrice * item.Quantity;

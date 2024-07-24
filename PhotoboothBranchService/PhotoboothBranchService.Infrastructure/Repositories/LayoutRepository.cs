@@ -69,7 +69,6 @@ public class LayoutRepository : ILayoutRepository
     //Update
     public async Task UpdateAsync(Layout layout)
     {
-        layout.LastModified = DateTime.UtcNow;
         _dbContext.Update(layout);
         await _dbContext.SaveChangesAsync();
     }

@@ -8,11 +8,11 @@ namespace PhotoboothBranchService.Application.DTOs.Dashboard
 {
     public class BasicDashboardResponse
     {
-        public int TotalBranch {  get; set; }
-        public int TotalBooth { get; set; }
-        public int TotalStaff { get; set; }
-        public int TotalOrder { get; set; }
-        public decimal TotalRevenue { get; set; }
-        public long CountCustomer { get; set; }
+        public int TotalBranch { get; set; } = 0;
+        public BoothDashboardResponse BoothDashboard { get; set; } = new BoothDashboardResponse();
+        public StaffDashboardResponse StaffDashboard { get; set; } = new StaffDashboardResponse();
+        public int TotalOrder { get; set; } = 0;
+        public decimal TotalRevenue { get; set; } = 0;
+        public long CountCustomer { get; set; } = 0;
     }
 }

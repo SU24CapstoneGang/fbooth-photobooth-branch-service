@@ -70,7 +70,6 @@ public class BackgroundRepository : IBackgroundRepository
     //Update
     public async Task UpdateAsync(Background Background)
     {
-        Background.LastModified = DateTime.UtcNow;
         _dbContext.Update(Background);
         await _dbContext.SaveChangesAsync();
     }

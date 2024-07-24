@@ -38,6 +38,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<Guid?>("BranchID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("date");
 
@@ -69,9 +72,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
-                    b.Property<Guid?>("PhotoBoothBranchID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("ResetPasswordToken")
                         .HasColumnType("nvarchar(max)");
 
@@ -85,13 +85,13 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
                     b.HasKey("AccountID");
 
+                    b.HasIndex("BranchID");
+
                     b.HasIndex("Email")
                         .IsUnique();
 
                     b.HasIndex("PhoneNumber")
                         .IsUnique();
-
-                    b.HasIndex("PhotoBoothBranchID");
 
                     b.ToTable("Accounts", (string)null);
                 });
@@ -119,13 +119,16 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
 
                     b.Property<int>("Height")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
 
                     b.Property<Guid>("LayoutID")
                         .HasColumnType("uniqueidentifier");
@@ -160,15 +163,20 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<Guid>("BranchID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Concept")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
                     b.Property<short>("PeopleInBooth")
                         .HasColumnType("smallint");
-
-                    b.Property<Guid>("PhotoBoothBranchID")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -176,17 +184,63 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
                     b.HasKey("BoothID");
 
-                    b.HasIndex("PhotoBoothBranchID");
+                    b.HasIndex("BranchID");
 
                     b.ToTable("Booths", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            BoothID = new Guid("1671ccd8-d367-47c7-9c48-335da54ec34d"),
+                            BackgroundColor = "yellow",
+                            BoothName = "Booth 01",
+                            BranchID = new Guid("b7fb8774-e3ac-4316-862c-23b81869c381"),
+                            Concept = "Hallucination",
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PeopleInBooth = (short)5,
+                            Status = "Active"
+                        },
+                        new
+                        {
+                            BoothID = new Guid("b8b615f3-a04f-4bbf-8ab2-f42dd69a65fd"),
+                            BackgroundColor = "yellow",
+                            BoothName = "Booth 02",
+                            BranchID = new Guid("b7fb8774-e3ac-4316-862c-23b81869c381"),
+                            Concept = "Nightmare",
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PeopleInBooth = (short)6,
+                            Status = "Active"
+                        },
+                        new
+                        {
+                            BoothID = new Guid("bc8c737b-9a92-49b2-b9b1-bd8321c7e594"),
+                            BackgroundColor = "yellow",
+                            BoothName = "Booth 03",
+                            BranchID = new Guid("0a1f2e05-f744-4d9b-937c-bfe7bad52a90"),
+                            Concept = "Nightmare",
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PeopleInBooth = (short)4,
+                            Status = "Active"
+                        },
+                        new
+                        {
+                            BoothID = new Guid("28110b4a-bf04-4c04-a19b-1b91d976ee7c"),
+                            BackgroundColor = "yellow",
+                            BoothName = "Booth 04",
+                            BranchID = new Guid("0a1f2e05-f744-4d9b-937c-bfe7bad52a90"),
+                            Concept = "Hallucination",
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PeopleInBooth = (short)3,
+                            Status = "Active"
+                        });
                 });
 
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.BoothBranch", b =>
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Branch", b =>
                 {
-                    b.Property<Guid>("BoothBranchID")
+                    b.Property<Guid>("BranchID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
-                        .HasColumnName("BoothBranchID");
+                        .HasColumnName("BranchID");
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -207,7 +261,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
-                    b.Property<Guid>("ManagerID")
+                    b.Property<Guid?>("ManagerID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
@@ -218,12 +272,154 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("BoothBranchID");
+                    b.HasKey("BranchID");
 
                     b.HasIndex("ManagerID")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[ManagerID] IS NOT NULL");
 
-                    b.ToTable("BoothBranches", (string)null);
+                    b.ToTable("Branches", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            BranchID = new Guid("b7fb8774-e3ac-4316-862c-23b81869c381"),
+                            Address = "Vincom Le Van Viet q9",
+                            BranchName = "Vincom Le Van Viet q9",
+                            City = "HCMC",
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Status = "Active",
+                            Town = "district 9"
+                        },
+                        new
+                        {
+                            BranchID = new Guid("0a1f2e05-f744-4d9b-937c-bfe7bad52a90"),
+                            Address = "Mega Mall Pham Van Dong",
+                            BranchName = "Mega Mall Pham Van Dong",
+                            City = "Thanh pho Thu Duc",
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Status = "Active",
+                            Town = "Thu Duc"
+                        });
+                });
+
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Constant", b =>
+                {
+                    b.Property<string>("ConstantKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("CanUpdateValue")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ConstantType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConstantValue")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("LastModified")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
+
+                    b.HasKey("ConstantKey");
+
+                    b.ToTable("Constants", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ConstantKey = "DepositPercent",
+                            CanUpdateValue = true,
+                            ConstantType = 1,
+                            ConstantValue = "20",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Percent value of total price when customer choose deposit the session order.",
+                            DisplayName = "Deposit percent",
+                            LastModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            ConstantKey = "RefundPercent",
+                            CanUpdateValue = true,
+                            ConstantType = 1,
+                            ConstantValue = "50",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Percent value of total price when customer cancel the session order.",
+                            DisplayName = "Refund percent",
+                            LastModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            ConstantKey = "BookingDeadline",
+                            CanUpdateValue = true,
+                            ConstantType = 1,
+                            ConstantValue = "45",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "The start time for the session order must be at least \"value\" minutes after now. The value is measured in minutes.",
+                            DisplayName = "Booking deadline",
+                            LastModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            ConstantKey = "CancelDeadlineRefund",
+                            CanUpdateValue = true,
+                            ConstantType = 1,
+                            ConstantValue = "30",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "The time to cancel the session order must before \"value\" minutes start time. The value is measured in minutes. If not meet condition, the cancel will not refund transactions.",
+                            DisplayName = "Cancel deadline to refund",
+                            LastModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            ConstantKey = "BoothReservationHold",
+                            CanUpdateValue = true,
+                            ConstantType = 1,
+                            ConstantValue = "15",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Time to hold the booth if customer not checkin and pay the rest of bill. Then the order will change to Cancel status.",
+                            DisplayName = "Booth reservation hold time",
+                            LastModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            ConstantKey = "OpenTime",
+                            CanUpdateValue = false,
+                            ConstantType = 6,
+                            ConstantValue = "8:00",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Open time in a day of system, using 24-hour format. With form hh:mm.",
+                            DisplayName = "Open time",
+                            LastModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            ConstantKey = "CloseTime",
+                            CanUpdateValue = false,
+                            ConstantType = 6,
+                            ConstantValue = "23:00",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Open time in a day of system, using 24-hour format. With form hh:mm.",
+                            DisplayName = "Close time",
+                            LastModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Device", b =>
@@ -267,13 +463,16 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
 
                     b.Property<int>("Height")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
 
                     b.Property<string>("LayoutCode")
                         .IsRequired()
@@ -296,51 +495,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.HasKey("LayoutID");
 
                     b.ToTable("Layouts", (string)null);
-                });
-
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Payment", b =>
-                {
-                    b.Property<Guid>("PaymentID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("PaymentID");
-
-                    b.Property<long>("Amount")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ClientIpAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("PaymentDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("PaymentMethodID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PaymentStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("SessionOrderID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Signature")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TransactionID")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PaymentID");
-
-                    b.HasIndex("PaymentMethodID");
-
-                    b.HasIndex("SessionOrderID");
-
-                    b.ToTable("Payment", (string)null);
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.PaymentMethod", b =>
@@ -372,14 +526,14 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         new
                         {
                             PaymentMethodID = new Guid("1b4f2a3e-7d94-4119-8b6d-5c15b02848f6"),
-                            CreateDate = new DateTime(2024, 7, 17, 4, 15, 43, 817, DateTimeKind.Utc).AddTicks(7931),
+                            CreateDate = new DateTime(2024, 7, 24, 18, 10, 23, 439, DateTimeKind.Utc).AddTicks(8646),
                             PaymentMethodName = "VNPay",
                             Status = "Active"
                         },
                         new
                         {
                             PaymentMethodID = new Guid("f3b6e6b2-f90e-4f6b-8cd2-68b467afae0f"),
-                            CreateDate = new DateTime(2024, 7, 17, 4, 15, 43, 817, DateTimeKind.Utc).AddTicks(7942),
+                            CreateDate = new DateTime(2024, 7, 24, 18, 10, 23, 439, DateTimeKind.Utc).AddTicks(8654),
                             PaymentMethodName = "MoMo",
                             Status = "Active"
                         });
@@ -469,7 +623,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LayoutID")
+                    b.Property<Guid>("LayoutID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("SessionIndex")
@@ -555,12 +709,11 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.ToTable("Refunds", (string)null);
                 });
 
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Service", b =>
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.ServicePackage", b =>
                 {
                     b.Property<Guid>("ServiceID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("ServiceID");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Measure")
                         .HasColumnType("int");
@@ -578,23 +731,43 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<Guid>("ServiceTypeID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("ServiceID");
 
                     b.HasIndex("ServiceTypeID");
 
-                    b.ToTable("Services", (string)null);
+                    b.ToTable("ServicePackages", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ServiceID = new Guid("6288e0ab-adec-4363-b80f-95abf3053d56"),
+                            Measure = 1,
+                            Price = 100000m,
+                            ServiceDescription = "Make up with Korean stype for 1 people",
+                            ServiceName = "Make up with Korean stype for 1 people",
+                            ServiceTypeID = new Guid("06167451-8b59-4dd2-bb9e-88df025eead6"),
+                            Status = 0
+                        },
+                        new
+                        {
+                            ServiceID = new Guid("13e75fc2-f38b-401e-9cd2-c545b80fd1f0"),
+                            Measure = 2,
+                            Price = 190000m,
+                            ServiceDescription = "Make up with Korean stype for 2 people",
+                            ServiceName = "Combo make up with Korean stype for 2 people",
+                            ServiceTypeID = new Guid("06167451-8b59-4dd2-bb9e-88df025eead6"),
+                            Status = 0
+                        });
                 });
 
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.ServiceItem", b =>
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.ServiceSession", b =>
                 {
                     b.Property<Guid>("ServiceItemID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("ServiceItemID");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<short>("Quantity")
                         .HasColumnType("smallint");
@@ -617,23 +790,59 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
                     b.HasIndex("SessionOrderID");
 
-                    b.ToTable("ServiceItems", (string)null);
+                    b.ToTable("ServiceSessions", (string)null);
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.ServiceType", b =>
                 {
                     b.Property<Guid>("ServiceTypeID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("ServiceTypeID");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ServiceTypeName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Unit")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ServiceTypeID");
 
                     b.ToTable("ServiceTypes", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ServiceTypeID = new Guid("06167451-8b59-4dd2-bb9e-88df025eead6"),
+                            ServiceTypeName = "Make up",
+                            Status = 1,
+                            Unit = "Set"
+                        },
+                        new
+                        {
+                            ServiceTypeID = new Guid("fc34dccb-10a0-4643-84bf-71ac85ca77bb"),
+                            ServiceTypeName = "Send email",
+                            Status = 1,
+                            Unit = "Times"
+                        },
+                        new
+                        {
+                            ServiceTypeID = new Guid("13bd9e6d-3092-496b-8025-530f5f9c43de"),
+                            ServiceTypeName = "Hire booth",
+                            Status = 1,
+                            Unit = "Minutes"
+                        },
+                        new
+                        {
+                            ServiceTypeID = new Guid("70a5a1fd-9c0b-4109-9638-5b6e63e71eca"),
+                            ServiceTypeName = "Print photo",
+                            Status = 1,
+                            Unit = "Times"
+                        });
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.SessionOrder", b =>
@@ -677,43 +886,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
                     b.HasIndex("BoothID");
 
-                    b.HasIndex("SessionPackageID");
-
                     b.ToTable("SessionOrders", (string)null);
-                });
-
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.SessionPackage", b =>
-                {
-                    b.Property<Guid>("SessionPackageID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("SessionPackageID");
-
-                    b.Property<short>("Duration")
-                        .HasColumnType("smallint");
-
-                    b.Property<short>("EmailSendCount")
-                        .HasColumnType("smallint");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<short>("PrintCount")
-                        .HasColumnType("smallint");
-
-                    b.Property<string>("SessionPackageDescription")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("SessionPackageName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("SessionPackageID");
-
-                    b.ToTable("SessionPackages", (string)null);
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Sticker", b =>
@@ -730,10 +903,13 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
 
                     b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -760,13 +936,50 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.ToTable("Stickers", (string)null);
                 });
 
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Transaction", b =>
+                {
+                    b.Property<Guid>("TransactionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("Amount")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GatewayTransactionID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("PaymentMethodID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SessionOrderID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("TransactionDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("TransactionID");
+
+                    b.HasIndex("PaymentMethodID");
+
+                    b.HasIndex("SessionOrderID");
+
+                    b.ToTable("Transactions", (string)null);
+                });
+
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Account", b =>
                 {
-                    b.HasOne("PhotoboothBranchService.Domain.Entities.BoothBranch", "BoothBranchBelong")
+                    b.HasOne("PhotoboothBranchService.Domain.Entities.Branch", "BranchBelong")
                         .WithMany("Staffs")
-                        .HasForeignKey("PhotoBoothBranchID");
+                        .HasForeignKey("BranchID");
 
-                    b.Navigation("BoothBranchBelong");
+                    b.Navigation("BranchBelong");
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Background", b =>
@@ -782,20 +995,20 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Booth", b =>
                 {
-                    b.HasOne("PhotoboothBranchService.Domain.Entities.BoothBranch", "PhotoBoothBranch")
+                    b.HasOne("PhotoboothBranchService.Domain.Entities.Branch", "Branch")
                         .WithMany("Booths")
-                        .HasForeignKey("PhotoBoothBranchID")
+                        .HasForeignKey("BranchID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PhotoBoothBranch");
+                    b.Navigation("Branch");
                 });
 
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.BoothBranch", b =>
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Branch", b =>
                 {
                     b.HasOne("PhotoboothBranchService.Domain.Entities.Account", "Manager")
-                        .WithOne("BoothBranchManage")
-                        .HasForeignKey("PhotoboothBranchService.Domain.Entities.BoothBranch", "ManagerID");
+                        .WithOne("BranchManage")
+                        .HasForeignKey("PhotoboothBranchService.Domain.Entities.Branch", "ManagerID");
 
                     b.Navigation("Manager");
                 });
@@ -809,25 +1022,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Booth");
-                });
-
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Payment", b =>
-                {
-                    b.HasOne("PhotoboothBranchService.Domain.Entities.PaymentMethod", "PaymentMethod")
-                        .WithMany("Payments")
-                        .HasForeignKey("PaymentMethodID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PhotoboothBranchService.Domain.Entities.SessionOrder", "SessionOrder")
-                        .WithMany("Payments")
-                        .HasForeignKey("SessionOrderID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PaymentMethod");
-
-                    b.Navigation("SessionOrder");
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Photo", b =>
@@ -896,7 +1090,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Refund", b =>
                 {
-                    b.HasOne("PhotoboothBranchService.Domain.Entities.Payment", "Payment")
+                    b.HasOne("PhotoboothBranchService.Domain.Entities.Transaction", "Payment")
                         .WithMany("Refunds")
                         .HasForeignKey("PaymentID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -905,7 +1099,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Navigation("Payment");
                 });
 
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Service", b =>
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.ServicePackage", b =>
                 {
                     b.HasOne("PhotoboothBranchService.Domain.Entities.ServiceType", "ServiceType")
                         .WithMany("Services")
@@ -916,9 +1110,9 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Navigation("ServiceType");
                 });
 
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.ServiceItem", b =>
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.ServiceSession", b =>
                 {
-                    b.HasOne("PhotoboothBranchService.Domain.Entities.Service", "Service")
+                    b.HasOne("PhotoboothBranchService.Domain.Entities.ServicePackage", "Service")
                         .WithMany("ServiceItems")
                         .HasForeignKey("ServiceID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -947,22 +1141,33 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PhotoboothBranchService.Domain.Entities.SessionPackage", "SessionPackage")
-                        .WithMany("SessionOrders")
-                        .HasForeignKey("SessionPackageID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Account");
 
                     b.Navigation("Booth");
+                });
 
-                    b.Navigation("SessionPackage");
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Transaction", b =>
+                {
+                    b.HasOne("PhotoboothBranchService.Domain.Entities.PaymentMethod", "PaymentMethod")
+                        .WithMany("Payments")
+                        .HasForeignKey("PaymentMethodID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PhotoboothBranchService.Domain.Entities.SessionOrder", "SessionOrder")
+                        .WithMany("Payments")
+                        .HasForeignKey("SessionOrderID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PaymentMethod");
+
+                    b.Navigation("SessionOrder");
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Account", b =>
                 {
-                    b.Navigation("BoothBranchManage")
+                    b.Navigation("BranchManage")
                         .IsRequired();
 
                     b.Navigation("SessionOrder");
@@ -980,7 +1185,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Navigation("SessionOrders");
                 });
 
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.BoothBranch", b =>
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Branch", b =>
                 {
                     b.Navigation("Booths");
 
@@ -994,11 +1199,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Navigation("PhotoBoxes");
 
                     b.Navigation("PhotoSessions");
-                });
-
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Payment", b =>
-                {
-                    b.Navigation("Refunds");
                 });
 
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.PaymentMethod", b =>
@@ -1016,7 +1216,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Navigation("Photos");
                 });
 
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Service", b =>
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.ServicePackage", b =>
                 {
                     b.Navigation("ServiceItems");
                 });
@@ -1035,14 +1235,14 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                     b.Navigation("ServiceItems");
                 });
 
-            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.SessionPackage", b =>
-                {
-                    b.Navigation("SessionOrders");
-                });
-
             modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Sticker", b =>
                 {
                     b.Navigation("PhotoSticker");
+                });
+
+            modelBuilder.Entity("PhotoboothBranchService.Domain.Entities.Transaction", b =>
+                {
+                    b.Navigation("Refunds");
                 });
 #pragma warning restore 612, 618
         }

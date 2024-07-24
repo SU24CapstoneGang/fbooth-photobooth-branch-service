@@ -20,22 +20,22 @@ namespace PhotoboothBranchService.Infrastructure
             //Repositories
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IBoothRepository, BoothRepository>();
-            services.AddScoped<IBoothBranchRepository, BranchRepository>();
+            services.AddScoped<IBranchRepository, BranchRepository>();
             services.AddScoped<IBackgroundRepository, BackgroundRepository>();
+            services.AddScoped<IConstantRepository, ConstantRepository>();
             services.AddScoped<IDeviceRepository, DeviceRepository>();
             services.AddScoped<ILayoutRepository, LayoutRepository>();
-            services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
             services.AddScoped<IPhotoBoxRepository, PhotoBoxRepository>();
             services.AddScoped<IRefundRepository, RefundRepository>();
             services.AddScoped<IPhotoRepository, PhotoRepository>();
             services.AddScoped<IPhotoSessionRepository, PhotoSessionRepository>();
             services.AddScoped<IPhotoStickerRepository, PhotoStickerRepository>();
-            services.AddScoped<IServiceItemRepository, ServiceItemRepository>();
-            services.AddScoped<IServiceRepository, ServiceRepository>();
+            services.AddScoped<IServiceSessionRepository, ServiceSessionRepository>();
+            services.AddScoped<IServicePackageRepository, ServicePackageRepository>();
             services.AddScoped<IServiceTypeRepository, ServiceTypeRepository>();
             services.AddScoped<ISessionOrderRepository, SessionOrderRepository>();
-            services.AddScoped<ISessionPackageRepository, SessionPackageRepository>();
             services.AddScoped<IStickerRepository, StickerRepository>();
             services.AddScoped<IPhotoBoxRepository, PhotoBoxRepository>();
 

@@ -41,8 +41,8 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                 var orders = (await sessionOrderRepository.GetAsync(o =>
                     (o.Status == SessionOrderStatus.Deposited ||
                      o.Status == SessionOrderStatus.Created) &&
-                     o.StartTime <= now &&
-                     o.EndTime >= now)).ToList();
+                     o.StartTime <= now
+                     )).ToList();
 
                 foreach (var order in orders)
                 {
@@ -53,7 +53,7 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                         var booth = (await boothRepository.GetAsync(i => i.BoothID == order.BoothID)).FirstOrDefault();
                         if (booth != null)
                         {
-                            booth.Status = ManufactureStatus.Active;
+                            booth.Status = BoothStatus.Active;
                             await boothRepository.UpdateAsync(booth);
                         }
                     }
@@ -68,10 +68,10 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                      o.EndTime >= now, i => i.Booth)).ToList();
                 foreach (var order in orders)
                 {
-                    if (order.Booth.Status == ManufactureStatus.Active)
+                    if (order.Booth.Status == BoothStatus.Active)
                     {
                         var booth = order.Booth;
-                        booth.Status = ManufactureStatus.InUse;
+                        booth.Status = BoothStatus.InUse;
                         await boothRepository.UpdateAsync(booth);
                     }
                 }
@@ -83,14 +83,14 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                      o.EndTime <= now)).ToList();
                 foreach (var order in orders)
                 {
-                    if ((now - order.EndTime.Value).TotalMinutes > 3)
+                    if ((now - order.EndTime.Value).TotalMinutes > 5)
                     {
                         order.Status = SessionOrderStatus.Done;
                         await sessionOrderRepository.UpdateAsync(order);
                         var booth = (await boothRepository.GetAsync(i => i.BoothID == order.BoothID)).FirstOrDefault();
                         if (booth != null)
                         {
-                            booth.Status = ManufactureStatus.Active;
+                            booth.Status = BoothStatus.Active;
                             await boothRepository.UpdateAsync(booth);
                         }
                     }
