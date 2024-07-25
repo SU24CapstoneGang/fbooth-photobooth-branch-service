@@ -8,5 +8,11 @@
         Waiting = 0, //waiting for active by code
         Deposited = 4, //
         Created = 5 //session just created
+
+
+        //    Processsing = 0, // session is running
+        //Complete = 1, // the session end in a normal way
+        //Waiting = 2, //waiting for active by code
+        //CodeChecked = 3 // code has been checked, and customer is taking photo
     }
 }

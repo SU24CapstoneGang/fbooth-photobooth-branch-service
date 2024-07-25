@@ -52,12 +52,12 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             {
                 throw new NotFoundException("Not found payment");
             }
-            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
+            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == payment.SessionOrderID)).FirstOrDefault();
             if (sessionOrder == null)
             {
                 throw new NotFoundException("Not found Order of payment");
             }
-            var user = (await _accountRepository.GetAsync(i => i.AccountID == sessionOrder.AccountID)).FirstOrDefault();
+            var user = (await _accountRepository.GetAsync(i => i.AccountID == sessionOrder.CustomerID)).FirstOrDefault();
             if (user == null)
             {
                 throw new NotFoundException("Not found user");
@@ -76,10 +76,10 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
         public async Task SendBookingInformation(Guid sessionOrderId)
         {
             var sessionOrder = (await _sessionOrderRepository
-                .GetAsync(i => i.SessionOrderID == sessionOrderId,
-                    includeProperties: new Expression<Func<SessionOrder, object>>[]
+                .GetAsync(i => i.BookingID == sessionOrderId,
+                    includeProperties: new Expression<Func<Booking, object>>[]
                         {
-                            i => i.ServiceItems,
+                            i => i.BookingServices,
                             i => i.Booth,
                         }
                 ))
@@ -88,7 +88,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             {
                 throw new NotFoundException("Not found Order of payment");
             }
-            var user = (await _accountRepository.GetAsync(i => i.AccountID == sessionOrder.AccountID)).FirstOrDefault();
+            var user = (await _accountRepository.GetAsync(i => i.AccountID == sessionOrder.CustomerID)).FirstOrDefault();
             if (user == null)
             {
                 throw new NotFoundException("Not found user");
@@ -102,7 +102,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             StringBuilder sbBody = new StringBuilder();
             sbBody.AppendLine("<p>Here is your booking's information</p>");
             sbBody.AppendLine("<br>");
-            sbBody.AppendLine($"<p><strong>Session Order ID:</strong> {sessionOrder.SessionOrderID}</p>");
+            sbBody.AppendLine($"<p><strong>Session Order ID:</strong> {sessionOrder.BookingID}</p>");
 
             sbBody.AppendLine("<h3>Branch Details</h3>");
             sbBody.AppendLine($"<p><strong>Branch Name:</strong> {branch.BranchName}</p>");
@@ -111,12 +111,12 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
 
             sbBody.AppendLine("<h3>Package Information</h3>");
 
-            if (sessionOrder.ServiceItems.Count > 0)
+            if (sessionOrder.BookingServices.Count > 0)
             {
                 var serviceItemList = (await _serviceItemRepository
-                    .GetAsync(i => sessionOrder.ServiceItems.Select(i => i.ServiceItemID).ToList().Contains(i.ServiceItemID), i => i.Service)
+                    .GetAsync(i => sessionOrder.BookingServices.Select(i => i.BookingServiceID).ToList().Contains(i.BookingServiceID), i => i.Service)
                     ).ToList();
-                if (serviceItemList != null && serviceItemList.Count == sessionOrder.ServiceItems.Count)
+                if (serviceItemList != null && serviceItemList.Count == sessionOrder.BookingServices.Count)
                 {
                     sbBody.AppendLine("<p>Service(s) in Order:</p>");
                     sbBody.AppendLine("<br>");
@@ -131,16 +131,16 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                     foreach (var serviceItem in serviceItemList)
                     {
                         sbBody.AppendLine("<tr>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.Service.ServiceName}</td>");
+                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.Service.PackageName}</td>");
                         sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.Quantity}</td>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.UnitPrice:N0}</td>");
+                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.Price:N0}</td>");
                         sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.SubTotal:N0}</td>");
                         sbBody.AppendLine("</tr>");
                     }
 
                     sbBody.AppendLine("<tr>");
                     sbBody.AppendLine("<td colspan='3' style='border: 1px solid black; padding: 8px; text-align: right;'><strong>Total Price (With Package's price):</strong></td>");
-                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'><strong>{sessionOrder.TotalPrice:N0}</strong> VND</td>");
+                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'><strong>{sessionOrder.PaymentAmount:N0}</strong> VND</td>");
                     sbBody.AppendLine("</tr>");
 
                     sbBody.AppendLine("</table>");
@@ -150,11 +150,11 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                 }
             }
             else{
-                sbBody.AppendLine($"<p>Total price: {sessionOrder.TotalPrice}</p>");
+                sbBody.AppendLine($"<p>Total price: {sessionOrder.PaymentAmount}</p>");
             }
 
             sbBody.AppendLine($"<p>Start Time: {sessionOrder.StartTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
-            sbBody.AppendLine($"<p>End Time: {sessionOrder.EndTime.Value.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
+            //sbBody.AppendLine($"<p>End Time: {sessionOrder.EndTime.Value.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
             sbBody.AppendLine($"<p>Validate code (Enter this code to booth):<strong> {sessionOrder.ValidateCode.ToString()}</strong> </p>");
             sbBody.AppendLine($"<p>We hope you arrive 5 minutes before the start time to receive instructions from the staff.</p>");
             await this.SendEmail(user.Email, subject, sbBody.ToString());

@@ -33,7 +33,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
         {
             try
             {
-                var services = await _serviceRepository.GetAsync(s => s.ServiceID == id);
+                var services = await _serviceRepository.GetAsync(s => s.ServicePackageID == id);
                 var service = services.FirstOrDefault();
                 if (service != null)
                 {
@@ -64,21 +64,21 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
         // Read by ID
         public async Task<ServiceResponse> GetByIdAsync(Guid id)
         {
-            var services = await _serviceRepository.GetAsync(s => s.ServiceID == id);
+            var services = await _serviceRepository.GetAsync(s => s.ServicePackageID == id);
             var service = services.FirstOrDefault();
             return _mapper.Map<ServiceResponse>(service);
         }
 
         public async Task<IEnumerable<ServiceResponse>> GetByName(string name)
         {
-            var services = await _serviceRepository.GetAsync(s => s.ServiceName.Contains(name));
+            var services = await _serviceRepository.GetAsync(s => s.PackageName.Contains(name));
             return _mapper.Map<IEnumerable<ServiceResponse>>(services.ToList());
         }
 
         // Update
         public async Task UpdateAsync(Guid id, UpdateServiceRequest updateModel, StatusUse? status)
         {
-            var service = (await _serviceRepository.GetAsync(s => s.ServiceID == id)).FirstOrDefault();
+            var service = (await _serviceRepository.GetAsync(s => s.ServicePackageID == id)).FirstOrDefault();
             if (service == null)
             {
                 throw new KeyNotFoundException("Service not found.");

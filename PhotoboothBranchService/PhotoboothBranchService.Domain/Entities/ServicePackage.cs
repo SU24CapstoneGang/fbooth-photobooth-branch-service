@@ -4,14 +4,14 @@ namespace PhotoboothBranchService.Domain.Entities
 {
     public class ServicePackage
     {
-        public Guid ServiceID { get; set; }
-        public string ServiceName { get; set; } = default!;
-        public string ServiceDescription { get; set; } = default!;
-        public decimal Price { get; set; }
+        public Guid ServicePackageID { get; set; }
+        public string PackageName { get; set; } = default!;
+        public string PackageDescription { get; set; } = default!;
+        public decimal PackagePrice { get; set; }
         public int Measure { get; set; }
         public StatusUse Status { get; set; }
-        public Guid ServiceTypeID { get; set; }
-        public ServiceType ServiceType { get; set; } = default!;
-        public virtual ICollection<ServiceSession> ServiceItems { get; set; } = default!;
+        public Guid ServiceID { get; set; }
+        public virtual Service Service { get; set; } = default!;
+        public virtual ICollection<BookingService> BookingServices { get; set; } = default!;
     }
 }

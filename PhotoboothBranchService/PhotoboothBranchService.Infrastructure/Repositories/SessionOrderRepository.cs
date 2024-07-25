@@ -17,7 +17,7 @@ public class SessionOrderRepository : ISessionOrderRepository
     }
 
     // Add a new session
-    public async Task<SessionOrder> AddAsync(SessionOrder session)
+    public async Task<Booking> AddAsync(Booking session)
     {
         var result = await _dbContext.AddAsync(session);
         await _dbContext.SaveChangesAsync();
@@ -25,21 +25,21 @@ public class SessionOrderRepository : ISessionOrderRepository
     }
 
     //Read
-    public async Task<IQueryable<SessionOrder>> GetAllAsync()
+    public async Task<IQueryable<Booking>> GetAllAsync()
     {
         return await Task.FromResult(_dbContext.SessionOrders);
     }
 
-    public async Task<IQueryable<SessionOrder>> GetAsync(
-        Expression<Func<SessionOrder, bool>> predicate = null,
-        params Expression<Func<SessionOrder, object>>[] includeProperties)
+    public async Task<IQueryable<Booking>> GetAsync(
+        Expression<Func<Booking, bool>> predicate = null,
+        params Expression<Func<Booking, object>>[] includeProperties)
     {
         try
         {
             var result = predicate == null ? _dbContext.SessionOrders : _dbContext.SessionOrders.Where(predicate);
             if (!result.Any())
             {
-                return await Task.FromResult(Enumerable.Empty<SessionOrder>().AsQueryable());
+                return await Task.FromResult(Enumerable.Empty<Booking>().AsQueryable());
             }
             else
             {
@@ -63,14 +63,14 @@ public class SessionOrderRepository : ISessionOrderRepository
     }
 
     // Remove a session
-    public async Task RemoveAsync(SessionOrder session)
+    public async Task RemoveAsync(Booking session)
     {
         _dbContext.SessionOrders.Remove(session);
         await _dbContext.SaveChangesAsync();
     }
 
     // Update a session
-    public async Task UpdateAsync(SessionOrder session)
+    public async Task UpdateAsync(Booking session)
     {
         _dbContext.Entry(session).State = EntityState.Modified;
         await _dbContext.SaveChangesAsync();
@@ -78,19 +78,19 @@ public class SessionOrderRepository : ISessionOrderRepository
 
     public async Task updateTotalPrice(Guid SessionOrderID)
     {
-        var order = _dbContext.SessionOrders.Where(i => i.SessionOrderID == SessionOrderID)
-            .Include(u => u.ServiceItems)
+        var order = _dbContext.SessionOrders.Where(i => i.BookingID == SessionOrderID)
+            .Include(u => u.BookingServices)
             .FirstOrDefault();
 
         if (order != null)
         {
             decimal totalPrice = 0;
-            foreach (var item in order.ServiceItems)
+            foreach (var item in order.BookingServices)
             {
-                totalPrice += item.UnitPrice * item.Quantity;
+                totalPrice += item.Price * item.Quantity;
 
             }
-            order.TotalPrice = totalPrice;
+            order.PaymentAmount = totalPrice;
             await UpdateAsync(order);
         }
     }

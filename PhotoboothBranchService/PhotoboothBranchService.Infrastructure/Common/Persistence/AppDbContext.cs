@@ -23,9 +23,9 @@ public class AppDbContext : DbContext
     public DbSet<PhotoSession> PhotoSessions { get; set; }
     public DbSet<PhotoSticker> PhotoStickers { get; set; }
     public DbSet<ServicePackage> ServicePackages { get; set; }
-    public DbSet<ServiceSession> ServiceSessions { get; set; }
-    public DbSet<ServiceType> ServiceTypes { get; set; }
-    public DbSet<SessionOrder> SessionOrders { get; set; }
+    public DbSet<BookingService> ServiceSessions { get; set; }
+    public DbSet<Service> ServiceTypes { get; set; }
+    public DbSet<Booking> SessionOrders { get; set; }
     public DbSet<Sticker> Stickers { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -70,9 +70,9 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new PhotoSessionConfiguration());
         modelBuilder.ApplyConfiguration(new PhotoStickerConfigurations());
         modelBuilder.ApplyConfiguration(new ServicePackageConfiguration());
-        modelBuilder.ApplyConfiguration(new ServiceSessionConfiguration());
-        modelBuilder.ApplyConfiguration(new ServiceTypeConfiguration());
-        modelBuilder.ApplyConfiguration(new SessionOrderConfigurations());
+        modelBuilder.ApplyConfiguration(new BookingServiceConfiguration());
+        modelBuilder.ApplyConfiguration(new ServiceConfiguration());
+        modelBuilder.ApplyConfiguration(new BookingConfigurations());
         modelBuilder.ApplyConfiguration(new StickerConfigurations());
     }
 }

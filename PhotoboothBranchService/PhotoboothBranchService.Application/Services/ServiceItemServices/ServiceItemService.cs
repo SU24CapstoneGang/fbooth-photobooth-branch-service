@@ -32,9 +32,9 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
 
         public async Task<CreateServiceItemResponse> CreateAsync(CreateServiceItemRequest createModel)
         {
-            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == createModel.SessionOrderID)).FirstOrDefault();
+            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == createModel.SessionOrderID)).FirstOrDefault();
 
-            ServiceSession createServiceItemResponse = null;
+            BookingService createServiceItemResponse = null;
             if (sessionOrder != null)
             {
                 this.ValidateOrderToAddServiceItem(sessionOrder);
@@ -43,21 +43,21 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                     {createModel.ServiceID , createModel.Quantity}
                 })).Single();
 
-                ServiceSession? serviceItem = (await _serviceItemRepository.GetAsync(s => s.ServiceID == createModel.ServiceID
-                                            && s.SessionOrderID == sessionOrder.SessionOrderID))
+                BookingService? serviceItem = (await _serviceItemRepository.GetAsync(s => s.ServiceID == createModel.ServiceID
+                                            && s.SessionOrderID == sessionOrder.BookingID))
                                             .FirstOrDefault();
 
                 if (serviceItem == null) // create new item 
                 {
-                    serviceItem = _mapper.Map<ServiceSession>(createModel);
-                    serviceItem.UnitPrice = service.Price;
-                    serviceItem.SubTotal = createModel.Quantity * serviceItem.UnitPrice;
+                    serviceItem = _mapper.Map<BookingService>(createModel);
+                    serviceItem.Price = service.PackagePrice;
+                    serviceItem.SubTotal = createModel.Quantity * serviceItem.Price;
                     createServiceItemResponse = await _serviceItemRepository.AddAsync(serviceItem);
                 }
                 else //update existed item
                 {
                     serviceItem.Quantity += createModel.Quantity;
-                    serviceItem.SubTotal += createModel.Quantity * serviceItem.UnitPrice;
+                    serviceItem.SubTotal += createModel.Quantity * serviceItem.Price;
                     await _serviceItemRepository.UpdateAsync(serviceItem);
                     createServiceItemResponse = serviceItem;
                 }
@@ -68,7 +68,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
             }
             if (createServiceItemResponse != null)
             {
-                await _sessionOrderRepository.updateTotalPrice(sessionOrder.SessionOrderID);
+                await _sessionOrderRepository.updateTotalPrice(sessionOrder.BookingID);
             }
             else
             {
@@ -100,56 +100,56 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
             AddListServiceItemResponse response = new AddListServiceItemResponse
             {
                 BoothID = request.BoothID,
-                SessionOrderID = sessionOrder.SessionOrderID,
+                SessionOrderID = sessionOrder.BookingID,
             };
             foreach (var req in request.ServiceList)
             {
-                var serviceItem = (await _serviceItemRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.ServiceID == req.Key)).FirstOrDefault();
+                var serviceItem = (await _serviceItemRepository.GetAsync(i => i.SessionOrderID == sessionOrder.BookingID && i.ServiceID == req.Key)).FirstOrDefault();
                 if (serviceItem != null)
                 {
                     serviceItem.Quantity += req.Value;
-                    serviceItem.SubTotal = serviceItem.Quantity * serviceItem.UnitPrice;
+                    serviceItem.SubTotal = serviceItem.Quantity * serviceItem.Price;
                     await _serviceItemRepository.UpdateAsync(serviceItem);
                 }
                 else
                 {
-                    serviceItem = new ServiceSession
+                    serviceItem = new BookingService
                     {
                         Quantity = req.Value,
-                        SessionOrderID = sessionOrder.SessionOrderID,
+                        SessionOrderID = sessionOrder.BookingID,
                         ServiceID = req.Key,
-                        UnitPrice = serviceList.Find(i => i.ServiceID == req.Key).Price,
+                        Price = serviceList.Find(i => i.ServicePackageID == req.Key).PackagePrice,
                     };
-                    serviceItem.SubTotal = serviceItem.Quantity * serviceItem.UnitPrice;
+                    serviceItem.SubTotal = serviceItem.Quantity * serviceItem.Price;
                     await _serviceItemRepository.AddAsync(serviceItem);
                 }
                 response.Items.Add(_mapper.Map<ServiceItemResponse>(serviceItem));
             }
-            await _sessionOrderRepository.updateTotalPrice(sessionOrder.SessionOrderID);
+            await _sessionOrderRepository.updateTotalPrice(sessionOrder.BookingID);
             return response;
         }
 
         //validation
-        private void ValidateOrderToAddServiceItem(SessionOrder sessionOrder)
+        private void ValidateOrderToAddServiceItem(Booking sessionOrder)
         {
-            if (sessionOrder.EndTime.HasValue && sessionOrder.EndTime.Value < DateTime.Now)
-            {
-                throw new BadRequestException("Session has end. Please do Payment with our staff and create another Session Order");
-            }
-            else if (sessionOrder.Status == SessionOrderStatus.Done)
-            {
-                throw new BadRequestException("This Session has been ended, please contect our staff to have new booking");
-            } else if (sessionOrder.Status == SessionOrderStatus.Canceled)
-            {
-                throw new BadRequestException("This Session has been canceled, please contect our staff to have new booking");
-            }
+            //if (sessionOrder.EndTime.HasValue && sessionOrder.EndTime.Value < DateTime.Now)
+            //{
+            //    throw new BadRequestException("Session has end. Please do Payment with our staff and create another Session Order");
+            //}
+            //else if (sessionOrder.Status == SessionOrderStatus.Done)
+            //{
+            //    throw new BadRequestException("This Session has been ended, please contect our staff to have new booking");
+            //} else if (sessionOrder.Status == SessionOrderStatus.Canceled)
+            //{
+            //    throw new BadRequestException("This Session has been canceled, please contect our staff to have new booking");
+            //}
         }
 
         private async Task<List<ServicePackage>> ValidateServiceList(Dictionary<Guid, short> serviceItems)
         {
             List<ServicePackage> serviceList = new List<ServicePackage>();
             var serviceIds = serviceItems.Keys.ToList();
-            serviceList = (await _serviceRepository.GetAsync(i => serviceIds.Contains(i.ServiceID), i => i.ServiceType)).ToList();
+            serviceList = (await _serviceRepository.GetAsync(i => serviceIds.Contains(i.ServicePackageID), i => i.Service)).ToList();
             if (serviceItems.Count() != serviceList.Count)
             {
                 throw new NotFoundException("Some service in request are not found");
@@ -160,7 +160,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                 {
                     throw new BadRequestException("Service is not Available to use now");
                 }
-                if (service.ServiceType.Status == StatusUse.Unusable)
+                if (service.Service.Status == StatusUse.Unusable)
                 {
                     throw new BadRequestException("Service is belong to type that not Available to use now");
                 }
@@ -172,7 +172,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
         {
             try
             {
-                var serviceItems = await _serviceItemRepository.GetAsync(s => s.ServiceItemID == id);
+                var serviceItems = await _serviceItemRepository.GetAsync(s => s.BookingServiceID == id);
                 var serviceItem = serviceItems.FirstOrDefault();
                 if (serviceItem != null)
                 {
@@ -203,7 +203,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
         // Read by ID
         public async Task<ServiceItemResponse> GetByIdAsync(Guid id)
         {
-            var serviceItems = await _serviceItemRepository.GetAsync(s => s.ServiceItemID == id);
+            var serviceItems = await _serviceItemRepository.GetAsync(s => s.BookingServiceID == id);
             var serviceItem = serviceItems.FirstOrDefault();
             return _mapper.Map<ServiceItemResponse>(serviceItem);
         }
@@ -211,7 +211,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
         // Update
         public async Task UpdateAsync(Guid id, UpdateServiceItemRequest updateModel)
         {
-            var serviceItem = (await _serviceItemRepository.GetAsync(s => s.ServiceItemID == id)).FirstOrDefault();
+            var serviceItem = (await _serviceItemRepository.GetAsync(s => s.BookingServiceID == id)).FirstOrDefault();
             if (serviceItem == null)
             {
                 throw new NotFoundException("Service item not found.");
@@ -220,7 +220,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
             var updatedServiceItem = _mapper.Map(updateModel, serviceItem);
             if (updateModel.ServiceID.HasValue && updateModel.ServiceID != serviceItem.ServiceID)
             {
-                var service = (await _serviceRepository.GetAsync(i => i.ServiceID == updateModel.ServiceID)).FirstOrDefault();
+                var service = (await _serviceRepository.GetAsync(i => i.ServicePackageID == updateModel.ServiceID)).FirstOrDefault();
                 if (service == null)
                 {
                     throw new NotFoundException("Not found Service From request");
@@ -228,7 +228,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
             }
             if (updateModel.SessionOrderID.HasValue)
             {
-                var order = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == updateModel.SessionOrderID)).FirstOrDefault();
+                var order = (await _sessionOrderRepository.GetAsync(i => i.BookingID == updateModel.SessionOrderID)).FirstOrDefault();
                 if (order == null)
                 {
                     throw new NotFoundException("Not found Service From request");

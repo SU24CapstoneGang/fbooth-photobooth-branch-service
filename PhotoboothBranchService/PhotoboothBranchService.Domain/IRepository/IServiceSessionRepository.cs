@@ -3,7 +3,7 @@ using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Domain.IRepository
 {
-    public interface IServiceSessionRepository : IRepositoryBase<ServiceSession>
+    public interface IServiceSessionRepository : IRepositoryBase<BookingService>
     {
     }
 }

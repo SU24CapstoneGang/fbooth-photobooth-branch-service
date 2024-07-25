@@ -22,7 +22,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceTypeServices
         // Create
         public async Task<CreateServiceTypeResponse> CreateAsync(CreateServiceTypeRequest createModel, StatusUse status)
         {
-            var serviceType = _mapper.Map<ServiceType>(createModel);
+            var serviceType = _mapper.Map<Service>(createModel);
             serviceType.Status = status;
             await _serviceTypeRepository.AddAsync(serviceType);
             return _mapper.Map<CreateServiceTypeResponse>(serviceType);
@@ -33,7 +33,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceTypeServices
         {
             try
             {
-                var serviceTypes = await _serviceTypeRepository.GetAsync(s => s.ServiceTypeID == id);
+                var serviceTypes = await _serviceTypeRepository.GetAsync(s => s.ServiceID == id);
                 var serviceType = serviceTypes.FirstOrDefault();
                 if (serviceType != null)
                 {
@@ -64,21 +64,21 @@ namespace PhotoboothBranchService.Application.Services.ServiceTypeServices
         // Read by ID
         public async Task<ServiceTypeResponse> GetByIdAsync(Guid id)
         {
-            var serviceTypes = await _serviceTypeRepository.GetAsync(s => s.ServiceTypeID == id);
+            var serviceTypes = await _serviceTypeRepository.GetAsync(s => s.ServiceID == id);
             var serviceType = serviceTypes.FirstOrDefault();
             return _mapper.Map<ServiceTypeResponse>(serviceType);
         }
 
         public async Task<IEnumerable<ServiceTypeResponse>> GetByName(string name)
         {
-            var serviceTypes = await _serviceTypeRepository.GetAsync(s => s.ServiceTypeName.Contains(name));
+            var serviceTypes = await _serviceTypeRepository.GetAsync(s => s.ServiceName.Contains(name));
             return _mapper.Map<IEnumerable<ServiceTypeResponse>>(serviceTypes.ToList());
         }
 
         // Update
         public async Task UpdateAsync(Guid id, UpdateServiceTypeRequest updateModel, StatusUse? status)
         {
-            var serviceType = (await _serviceTypeRepository.GetAsync(s => s.ServiceTypeID == id)).FirstOrDefault();
+            var serviceType = (await _serviceTypeRepository.GetAsync(s => s.ServiceID == id)).FirstOrDefault();
             if (serviceType == null)
             {
                 throw new KeyNotFoundException("Service type not found.");

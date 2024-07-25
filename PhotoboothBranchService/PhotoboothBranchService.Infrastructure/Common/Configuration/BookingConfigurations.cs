@@ -5,26 +5,28 @@ using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
-    public class SessionOrderConfigurations : IEntityTypeConfiguration<SessionOrder>
+    public class BookingConfigurations : IEntityTypeConfiguration<Booking>
     {
-        public void Configure(EntityTypeBuilder<SessionOrder> builder)
+        public void Configure(EntityTypeBuilder<Booking> builder)
         {
             // Table name
-            builder.ToTable("SessionOrders");
+            builder.ToTable("Bookings");
 
             // Primary key
-            builder.HasKey(s => s.SessionOrderID);
-            builder.Property(s => s.SessionOrderID).HasColumnName("SessionOrderID")
-                .ValueGeneratedOnAdd();
+            builder.HasKey(s => s.BookingID);
+            builder.Property(s => s.BookingID).ValueGeneratedOnAdd();
 
 
-            builder.Property(s => s.TotalPrice)
+            builder.Property(s => s.PaymentAmount)
                 .IsRequired().HasColumnType("decimal(18, 2)"); ; // Tổng giá
 
-            builder.Property(s => s.EndTime).IsRequired(false);
-            builder.Property(a => a.StartTime)
+            builder.Property(s => s.StartTime).IsRequired(true);
+            builder.Property(s => s.EndTime).IsRequired(true);
+
+            builder.Property(a => a.CreatedDate)
               .ValueGeneratedOnAdd()
               .HasDefaultValueSql("GETDATE()");
+
             builder.Property(u => u.ValidateCode).IsRequired();
             // enum mapping
             builder.Property(pb => pb.Status)
@@ -36,14 +38,14 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             // Mối quan hệ một-nhieu giữa Session và Account
             builder.HasOne(s => s.Account)
                 .WithMany(a => a.SessionOrder)
-                .HasForeignKey(s => s.AccountID)
+                .HasForeignKey(s => s.CustomerID)
                 .IsRequired();
 
             builder.HasMany(s => s.Payments)
                 .WithOne(p => p.SessionOrder)
                 .HasForeignKey(p => p.SessionOrderID)
                 .IsRequired();
-            builder.HasMany(s => s.ServiceItems)
+            builder.HasMany(s => s.BookingServices)
                 .WithOne(a => a.SessionOrder)
                 .HasForeignKey(c => c.SessionOrderID)
                 .IsRequired(false);

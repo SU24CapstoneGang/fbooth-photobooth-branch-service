@@ -18,6 +18,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(b => b.BackgroundColor).IsRequired();
             builder.Property(b => b.Concept).IsRequired();
             builder.Property(b => b.PeopleInBooth).IsRequired();
+            builder.Property(b => b.PricePerHour).IsRequired().HasColumnType("decimal(18, 2)");
+
 
             // ManufactureStatus enum mapping
             builder.Property(pb => pb.Status)
@@ -29,7 +31,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
              .ValueGeneratedOnAdd()
              .HasDefaultValueSql("GETDATE()")
              .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
-            builder.HasMany(s => s.SessionOrders)
+            builder.HasMany(s => s.Bookings)
                 .WithOne(a => a.Booth)
                 .HasForeignKey(c => c.BoothID)
                 .IsRequired();

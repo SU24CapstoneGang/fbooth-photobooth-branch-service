@@ -36,7 +36,7 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
         // Relationship with Sessions
         builder.HasMany(a => a.SessionOrder)
             .WithOne(s => s.Account)
-            .HasForeignKey(s => s.AccountID)
+            .HasForeignKey(s => s.CustomerID)
             .IsRequired();
 
         // Account status enum mapping

@@ -17,7 +17,7 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Create
-        public async Task<ServiceType> AddAsync(ServiceType entity)
+        public async Task<Service> AddAsync(Service entity)
         {
             var result = await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
@@ -25,21 +25,21 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Read
-        public async Task<IQueryable<ServiceType>> GetAllAsync()
+        public async Task<IQueryable<Service>> GetAllAsync()
         {
             return await Task.FromResult(_dbContext.ServiceTypes.AsQueryable());
         }
 
-        public async Task<IQueryable<ServiceType>> GetAsync(
-        Expression<Func<ServiceType, bool>> predicate = null,
-        params Expression<Func<ServiceType, object>>[] includeProperties)
+        public async Task<IQueryable<Service>> GetAsync(
+        Expression<Func<Service, bool>> predicate = null,
+        params Expression<Func<Service, object>>[] includeProperties)
         {
             try
             {
                 var result = predicate == null ? _dbContext.ServiceTypes : _dbContext.ServiceTypes.Where(predicate);
                 if (!result.Any())
                 {
-                    return await Task.FromResult(Enumerable.Empty<ServiceType>().AsQueryable());
+                    return await Task.FromResult(Enumerable.Empty<Service>().AsQueryable());
                 }
                 else
                 {
@@ -63,14 +63,14 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Update
-        public async Task UpdateAsync(ServiceType entity)
+        public async Task UpdateAsync(Service entity)
         {
             _dbContext.Update(entity);
             await _dbContext.SaveChangesAsync();
         }
 
         // Delete
-        public async Task RemoveAsync(ServiceType entity)
+        public async Task RemoveAsync(Service entity)
         {
             _dbContext.Remove(entity);
             await _dbContext.SaveChangesAsync();

@@ -52,7 +52,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         public async Task<CreatePaymentResponse> CreateAsync(CreatePaymentRequest createModel, string ClientIpAddress)
         {
             //validate session and total price
-            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == createModel.SessionOrderID)).FirstOrDefault();
+            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == createModel.SessionOrderID)).FirstOrDefault();
             if (sessionOrder == null)
             {
                 throw new NotFoundException("Not found Session to proceed payment");
@@ -69,8 +69,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             switch (createModel.PayType)
             {
                 case PayType.FullPay:
-                    var payments = await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PaymentStatus == PaymentStatus.Success);
-                    long result = (long)sessionOrder.TotalPrice - payments.Sum(i => i.Amount);
+                    var payments = await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.BookingID && i.PaymentStatus == PaymentStatus.Success);
+                    long result = (long)sessionOrder.PaymentAmount - payments.Sum(i => i.Amount);
                     if (result == 0)
                     {
                         throw new BadRequestException("Already paid all");
@@ -86,7 +86,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                     {
                         throw new BadRequestException("Deposit only apply on Booking");
                     }
-                    payment.Amount = (long)Math.Round(sessionOrder.TotalPrice * 0.2m);
+                    payment.Amount = (long)Math.Round(sessionOrder.PaymentAmount * 0.2m);
                     break;
                 default:
                     // Handle unexpected PayType
@@ -248,21 +248,21 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         }
         private async Task updateAfterSuccessPaymentAsync(Transaction payment)
         {
-            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == payment.SessionOrderID)).FirstOrDefault();
+            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == payment.SessionOrderID)).FirstOrDefault();
             if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Created)
             {
-                if (payment.Amount < sessionOrder.TotalPrice)
+                if (payment.Amount < sessionOrder.PaymentAmount)
                 {
                     sessionOrder.Status = SessionOrderStatus.Deposited;
                 }
-                else if (payment.Amount == sessionOrder.TotalPrice)
+                else if (payment.Amount == sessionOrder.PaymentAmount)
                 {
                     sessionOrder.Status = SessionOrderStatus.Waiting;
                     try
                     {
                         if (sessionOrder.StartTime > DateTime.Now)
                         {
-                            await _emailService.SendBookingInformation(sessionOrder.SessionOrderID);
+                            await _emailService.SendBookingInformation(sessionOrder.BookingID);
                         }
                     }
                     catch (Exception ex)
@@ -274,15 +274,15 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             }
             else if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Deposited)
             {
-                var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.SessionOrderID && i.PaymentStatus == PaymentStatus.Success)).ToList();
-                if (paymentCheck.Sum(i => i.Amount) == sessionOrder.TotalPrice)
+                var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.BookingID && i.PaymentStatus == PaymentStatus.Success)).ToList();
+                if (paymentCheck.Sum(i => i.Amount) == sessionOrder.PaymentAmount)
                 {
                     sessionOrder.Status = SessionOrderStatus.Waiting;
                     try
                     {
                         if (sessionOrder.StartTime > DateTime.Now)
                         {
-                            await _emailService.SendBookingInformation(sessionOrder.SessionOrderID);
+                            await _emailService.SendBookingInformation(sessionOrder.BookingID);
                         }
                     }
                     catch (Exception ex)

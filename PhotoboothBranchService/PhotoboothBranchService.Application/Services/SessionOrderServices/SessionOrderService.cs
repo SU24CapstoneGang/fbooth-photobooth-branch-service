@@ -52,124 +52,125 @@ public class SessionOrderService : ISessionOrderService
     // Create a new session
     public async Task<CreateSessionOrderResponse> CreateAsync(CreateSessionOrderRequest createModel)
     {
-        //validate account
-        Account? account;
+        ////validate account
+        //Account? account;
 
-        if (!string.IsNullOrEmpty(createModel.CustomerPhoneNumber) && !string.IsNullOrEmpty(createModel.CustomerEmail))
-        {
-            account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(createModel.CustomerPhoneNumber) && i.Email.Equals(createModel.CustomerEmail))).FirstOrDefault();
-        }
-        else if (!string.IsNullOrEmpty(createModel.CustomerPhoneNumber))
-        {
-            account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(createModel.CustomerPhoneNumber))).FirstOrDefault();
-        }
-        else if (!string.IsNullOrEmpty(createModel.CustomerEmail))
-        {
-            account = (await _accountRepository.GetAsync(i => i.Email.Equals(createModel.CustomerEmail))).FirstOrDefault();
-        }
-        else
-        {
-            throw new BadRequestException("No customer value input");
-        }
-        if (account == null)
-        {
-            throw new BadRequestException("Account not found");
-        }
-        if (account.Role != AccountRole.Customer)
-        {
-            throw new BadRequestException("Account is not Customer");
-        }
-        if (account.Status != AccountStatus.Active)
-        {
-            throw new BadRequestException("Account is not active to do this function");
-        }
+        //if (!string.IsNullOrEmpty(createModel.CustomerPhoneNumber) && !string.IsNullOrEmpty(createModel.CustomerEmail))
+        //{
+        //    account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(createModel.CustomerPhoneNumber) && i.Email.Equals(createModel.CustomerEmail))).FirstOrDefault();
+        //}
+        //else if (!string.IsNullOrEmpty(createModel.CustomerPhoneNumber))
+        //{
+        //    account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(createModel.CustomerPhoneNumber))).FirstOrDefault();
+        //}
+        //else if (!string.IsNullOrEmpty(createModel.CustomerEmail))
+        //{
+        //    account = (await _accountRepository.GetAsync(i => i.Email.Equals(createModel.CustomerEmail))).FirstOrDefault();
+        //}
+        //else
+        //{
+        //    throw new BadRequestException("No customer value input");
+        //}
+        //if (account == null)
+        //{
+        //    throw new BadRequestException("Account not found");
+        //}
+        //if (account.Role != AccountRole.Customer)
+        //{
+        //    throw new BadRequestException("Account is not Customer");
+        //}
+        //if (account.Status != AccountStatus.Active)
+        //{
+        //    throw new BadRequestException("Account is not active to do this function");
+        //}
 
-        var boothTask = _boothRepository.GetAsync(i => i.BoothID == createModel.BoothID, i => i.Branch);
-        var sessionOrderCheckTask = _sessionOrderRepository.GetAsync(i => i.AccountID == account.AccountID && (i.EndTime > DateTime.Now && DateTime.Now > i.StartTime));
-        await Task.WhenAll(sessionOrderCheckTask, boothTask);
+        //var boothTask = _boothRepository.GetAsync(i => i.BoothID == createModel.BoothID, i => i.Branch);
+        //var sessionOrderCheckTask = _sessionOrderRepository.GetAsync(i => i.CustomerID == account.AccountID && (i.EndTime > DateTime.Now && DateTime.Now > i.StartTime));
+        //await Task.WhenAll(sessionOrderCheckTask, boothTask);
 
-        //booth validate
-        var booth = boothTask.Result.FirstOrDefault();
-        if (booth == null)
-        {
-            throw new NotFoundException("Booth not found on server, try again later");
-        }
-        else if (booth.Status == BoothStatus.InUse || booth.Status == BoothStatus.Maintenance || booth.Status == BoothStatus.Inactive)
-        {
-            throw new BadRequestException("Booth is used by another or is inactive, in maintenance");
-        } else if (booth.Branch.Status == BranchStatus.Inactive)
-        {
-            throw new BadRequestException("Branch of this booth has been closed, plase try another branch");
-        }
+        ////booth validate
+        //var booth = boothTask.Result.FirstOrDefault();
+        //if (booth == null)
+        //{
+        //    throw new NotFoundException("Booth not found on server, try again later");
+        //}
+        //else if (booth.Status == BoothStatus.InUse || booth.Status == BoothStatus.Maintenance || booth.Status == BoothStatus.Inactive)
+        //{
+        //    throw new BadRequestException("Booth is used by another or is inactive, in maintenance");
+        //} else if (booth.Branch.Status == BranchStatus.Inactive)
+        //{
+        //    throw new BadRequestException("Branch of this booth has been closed, plase try another branch");
+        //}
 
-        //validate account's sesion order
-        var sessionOrderCheck = sessionOrderCheckTask.Result.FirstOrDefault();
-        if (sessionOrderCheck != null)
-        {
-            throw new BadRequestException("This Account is using another booth in booking time");
-        }
+        ////validate account's sesion order
+        //var sessionOrderCheck = sessionOrderCheckTask.Result.FirstOrDefault();
+        //if (sessionOrderCheck != null)
+        //{
+        //    throw new BadRequestException("This Account is using another booth in booking time");
+        //}
 
-        //add session with package
-        SessionOrder session = _mapper.Map<SessionOrder>(createModel);
-        session.AccountID = account.AccountID;
-        session.ValidateCode = await this.GenerateValidateCode();
-        if (createModel.StartTime == default(DateTime))
-        {
-            session.StartTime = DateTime.Now;
-            //update booth
-            booth.Status = BoothStatus.InUse;
-        }
-        else if (createModel.StartTime < DateTime.Now)
-        {
-            throw new BadRequestException("Can not booking with start time in past");
-        }
-        //validate service list of create model
-        if (createModel.ServiceList.Count > 0)
-        {
-            var serviceIds = createModel.ServiceList.Keys.ToList();
-            var services = await _serviceRepository.GetAsync(i => serviceIds.Contains(i.ServiceID));
-            //validate number of service
-            if (createModel.ServiceList.Count != services.Count())
-            {
-                throw new BadRequestException("Some service in request are not found");
-            }
-            //validate is there any service about hire booth and update endtime
-            session.EndTime = session.StartTime;
-        }
-        //validate time in a date and in branch's open time
-        if (!ValidateTimeRange(session.StartTime, session.EndTime.Value))
-        {
-            throw new BadRequestException("Not valide time, our Branch open from 8:00 to 23:00 of a day");
-        }
+        ////add session with package
+        //Booking session = _mapper.Map<Booking>(createModel);
+        //session.CustomerID = account.AccountID;
+        //session.ValidateCode = await this.GenerateValidateCode();
+        //if (createModel.StartTime == default(DateTime))
+        //{
+        //    session.StartTime = DateTime.Now;
+        //    //update booth
+        //    booth.Status = BoothStatus.InUse;
+        //}
+        //else if (createModel.StartTime < DateTime.Now)
+        //{
+        //    throw new BadRequestException("Can not booking with start time in past");
+        //}
+        ////validate service list of create model
+        //if (createModel.ServiceList.Count > 0)
+        //{
+        //    var serviceIds = createModel.ServiceList.Keys.ToList();
+        //    var services = await _serviceRepository.GetAsync(i => serviceIds.Contains(i.ServicePackageID));
+        //    //validate number of service
+        //    if (createModel.ServiceList.Count != services.Count())
+        //    {
+        //        throw new BadRequestException("Some service in request are not found");
+        //    }
+        //    //validate is there any service about hire booth and update endtime
+        //    session.EndTime = session.StartTime;
+        //}
+        ////validate time in a date and in branch's open time
+        //if (!ValidateTimeRange(session.StartTime, session.EndTime.Value))
+        //{
+        //    throw new BadRequestException("Not valide time, our Branch open from 8:00 to 23:00 of a day");
+        //}
 
-        session.Status = SessionOrderStatus.Created;
-        //validate time to not conflict with other session
-        if ((await this.ValidateBookingTime(session.BoothID, session.StartTime, session.EndTime.Value)) == false)
-        {
-            throw new BadRequestException("There is another Session on this time, please check time to book again");
-        }
+        //session.Status = SessionOrderStatus.Created;
+        ////validate time to not conflict with other session
+        //if ((await this.ValidateBookingTime(session.BoothID, session.StartTime, session.EndTime.Value)) == false)
+        //{
+        //    throw new BadRequestException("There is another Session on this time, please check time to book again");
+        //}
 
-        if (booth.Status == BoothStatus.InUse)
-        {
-            await _boothRepository.UpdateAsync(booth);
-        }
-        await _sessionOrderRepository.AddAsync(session);
+        //if (booth.Status == BoothStatus.InUse)
+        //{
+        //    await _boothRepository.UpdateAsync(booth);
+        //}
+        //await _sessionOrderRepository.AddAsync(session);
 
-        if (createModel.ServiceList.Count > 0)
-        {
-            foreach (var service in createModel.ServiceList)
-            {
-                CreateServiceItemRequest serviceItem = new CreateServiceItemRequest
-                {
-                    Quantity = service.Value,
-                    ServiceID = service.Key,
-                    SessionOrderID = session.SessionOrderID,
-                };
-                await _serviceItemService.CreateAsync(serviceItem);
-            }
-        }
+        //if (createModel.ServiceList.Count > 0)
+        //{
+        //    foreach (var service in createModel.ServiceList)
+        //    {
+        //        CreateServiceItemRequest serviceItem = new CreateServiceItemRequest
+        //        {
+        //            Quantity = service.Value,
+        //            ServiceID = service.Key,
+        //            SessionOrderID = session.BookingID,
+        //        };
+        //        await _serviceItemService.CreateAsync(serviceItem);
+        //    }
+        //}
 
-        return _mapper.Map<CreateSessionOrderResponse>(session);
+        //return _mapper.Map<CreateSessionOrderResponse>(session);r
+        return null;
     }
 
     public async Task<CreateSessionOrderResponse> CustomerBooking(CustomerBookingSessionOrderRequest request, string email)
@@ -187,9 +188,9 @@ public class SessionOrderService : ISessionOrderService
     {
         var sessionOrders = (await _sessionOrderRepository
             .GetAsync(i => i.BoothID == validateSessionPhotoRequest.BoothID && i.EndTime > DateTime.Now,
-            includeProperties: new Expression<Func<SessionOrder, object>>[]
+            includeProperties: new Expression<Func<Booking, object>>[]
             {
-                i => i.ServiceItems,
+                i => i.BookingServices,
             })).ToList();
         var booth = (await _boothRepository.GetAsync(i => i.BoothID == validateSessionPhotoRequest.BoothID)).FirstOrDefault();
         if (sessionOrders.Count() == 0 && booth != null)
@@ -237,7 +238,7 @@ public class SessionOrderService : ISessionOrderService
     // Delete a session by ID
     public async Task DeleteAsync(Guid id)
     {
-        var session = (await _sessionOrderRepository.GetAsync(s => s.SessionOrderID == id)).FirstOrDefault();
+        var session = (await _sessionOrderRepository.GetAsync(s => s.BookingID == id)).FirstOrDefault();
         if (session != null)
         {
             await _sessionOrderRepository.RemoveAsync(session);
@@ -251,18 +252,18 @@ public class SessionOrderService : ISessionOrderService
     // Get all sessions
     public async Task<IEnumerable<SessionOrderResponse>> GetAllAsync()
     {
-        var sessions = await _sessionOrderRepository.GetAsync(null, includeProperties: new Expression<Func<SessionOrder, object>>[]
+        var sessions = await _sessionOrderRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
             {
-                i => i.ServiceItems,
+                i => i.BookingServices,
             });
         return _mapper.Map<IEnumerable<SessionOrderResponse>>(sessions.ToList());
     }
 
     public async Task<IEnumerable<SessionOrderResponse>> GetAllPagingAsync(SessionOrderFilter filter, PagingModel paging)
     {
-        var sessions = (await _sessionOrderRepository.GetAsync(null, includeProperties: new Expression<Func<SessionOrder, object>>[]
+        var sessions = (await _sessionOrderRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
             {
-                i => i.ServiceItems,
+                i => i.BookingServices,
             })).ToList().AutoFilter(filter);
         var listSessionresponse = _mapper.Map<IEnumerable<SessionOrderResponse>>(sessions);
         return listSessionresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
@@ -271,10 +272,10 @@ public class SessionOrderService : ISessionOrderService
     // Get a session by ID
     public async Task<SessionOrderResponse> GetByIdAsync(Guid id)
     {
-        var session = (await _sessionOrderRepository.GetAsync(s => s.SessionOrderID == id,
-            includeProperties: new Expression<Func<SessionOrder, object>>[]
+        var session = (await _sessionOrderRepository.GetAsync(s => s.BookingID == id,
+            includeProperties: new Expression<Func<Booking, object>>[]
             {
-                i => i.ServiceItems,
+                i => i.BookingServices,
             })).FirstOrDefault();
         if (session == null)
         {
@@ -286,47 +287,47 @@ public class SessionOrderService : ISessionOrderService
     // Update a session
     public async Task UpdateAsync(Guid id, UpdateSessionOrderRequest updateModel)
     {
-        var session = (await _sessionOrderRepository.GetAsync(s => s.SessionOrderID == id)).FirstOrDefault();
-        if (session == null)
-        {
-            throw new KeyNotFoundException("Session not found.");
-        }
-        bool check = true;
+        //var session = (await _sessionOrderRepository.GetAsync(s => s.BookingID == id)).FirstOrDefault();
+        //if (session == null)
+        //{
+        //    throw new KeyNotFoundException("Session not found.");
+        //}
+        //bool check = true;
 
-        DateTime startTime, endTime;
-        if (updateModel.StartTime.HasValue && default(DateTime) != updateModel.StartTime.Value)
-        {
-            startTime = updateModel.StartTime.Value;
-            TimeSpan duration = session.EndTime.Value - session.StartTime;
-            endTime = startTime + duration;
-        }
-        else
-        {
-            startTime = session.StartTime;
-            endTime = session.EndTime.Value;
-        }
-        if (this.ValidateTimeRange(startTime, endTime) == false)
-        {
-            throw new BadRequestException("Not valide time, please check our Branch open and close time");
-        }
-        if (updateModel.BoothID.Value != null && updateModel.BoothID.Value != default(Guid))
-        {
-            check = await this.ValidateBookingTime(updateModel.BoothID.Value, startTime, endTime);
-        }
-        else
-        {
-            check = await this.ValidateBookingTime(session.BoothID, startTime, endTime);
-        }
-        if (!check)
-        {
-            throw new BadRequestException("There is another Session on this time, please check time to update again");
-        }
-        var updatedSession = _mapper.Map(updateModel, session);
-        await _sessionOrderRepository.UpdateAsync(updatedSession);
+        //DateTime startTime, endTime;
+        //if (updateModel.StartTime.HasValue && default(DateTime) != updateModel.StartTime.Value)
+        //{
+        //    startTime = updateModel.StartTime.Value;
+        //    TimeSpan duration = session.EndTime.Value - session.StartTime;
+        //    endTime = startTime + duration;
+        //}
+        //else
+        //{
+        //    startTime = session.StartTime;
+        //    endTime = session.EndTime.Value;
+        //}
+        //if (this.ValidateTimeRange(startTime, endTime) == false)
+        //{
+        //    throw new BadRequestException("Not valide time, please check our Branch open and close time");
+        //}
+        //if (updateModel.BoothID.Value != null && updateModel.BoothID.Value != default(Guid))
+        //{
+        //    check = await this.ValidateBookingTime(updateModel.BoothID.Value, startTime, endTime);
+        //}
+        //else
+        //{
+        //    check = await this.ValidateBookingTime(session.BoothID, startTime, endTime);
+        //}
+        //if (!check)
+        //{
+        //    throw new BadRequestException("There is another Session on this time, please check time to update again");
+        //}
+        //var updatedSession = _mapper.Map(updateModel, session);
+        //await _sessionOrderRepository.UpdateAsync(updatedSession);
     }
     public async Task CancelSessionOrder(Guid sessionOrdeID, string? ipAddress)
     {
-        var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.SessionOrderID == sessionOrdeID)).FirstOrDefault();
+        var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == sessionOrdeID)).FirstOrDefault();
         if (null == sessionOrder)
         {
             throw new NotFoundException("Session Order not found");

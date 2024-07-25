@@ -17,7 +17,7 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Create
-        public async Task<ServiceSession> AddAsync(ServiceSession entity)
+        public async Task<BookingService> AddAsync(BookingService entity)
         {
             var result = await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
@@ -25,21 +25,21 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Read
-        public async Task<IQueryable<ServiceSession>> GetAllAsync()
+        public async Task<IQueryable<BookingService>> GetAllAsync()
         {
             return await Task.FromResult(_dbContext.ServiceSessions.AsQueryable());
         }
 
-        public async Task<IQueryable<ServiceSession>> GetAsync(
-        Expression<Func<ServiceSession, bool>> predicate = null,
-        params Expression<Func<ServiceSession, object>>[] includeProperties)
+        public async Task<IQueryable<BookingService>> GetAsync(
+        Expression<Func<BookingService, bool>> predicate = null,
+        params Expression<Func<BookingService, object>>[] includeProperties)
         {
             try
             {
                 var result = predicate == null ? _dbContext.ServiceSessions : _dbContext.ServiceSessions.Where(predicate);
                 if (!result.Any())
                 {
-                    return await Task.FromResult(Enumerable.Empty<ServiceSession>().AsQueryable());
+                    return await Task.FromResult(Enumerable.Empty<BookingService>().AsQueryable());
                 }
                 else
                 {
@@ -63,14 +63,14 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Update
-        public async Task UpdateAsync(ServiceSession entity)
+        public async Task UpdateAsync(BookingService entity)
         {
             _dbContext.Update(entity);
             await _dbContext.SaveChangesAsync();
         }
 
         // Delete
-        public async Task RemoveAsync(ServiceSession entity)
+        public async Task RemoveAsync(BookingService entity)
         {
             _dbContext.Remove(entity);
             await _dbContext.SaveChangesAsync();

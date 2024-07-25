@@ -6,6 +6,7 @@ namespace PhotoboothBranchService.Domain.Entities
     {
         public Guid BoothID { get; set; }
         public string BoothName { get; set; } = default!;
+        public decimal PricePerHour { get; set; }
         public string BackgroundColor { get; set; } = default!;
         public string Concept { get; set; } = default!;
         public short PeopleInBooth { get; set; }
@@ -13,7 +14,7 @@ namespace PhotoboothBranchService.Domain.Entities
         public DateTime CreateDate { get; set; }
         public Guid BranchID { get; set; }
         public virtual Branch Branch { get; set; } = default!;
-        public virtual ICollection<SessionOrder> SessionOrders { get; set; } = default!;
+        public virtual ICollection<Booking> Bookings { get; set; } = default!;
         public virtual ICollection<Device> Devices { get; set; } = default!;
     }
 }

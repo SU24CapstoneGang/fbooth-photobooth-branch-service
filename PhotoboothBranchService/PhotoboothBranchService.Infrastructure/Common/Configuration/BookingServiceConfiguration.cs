@@ -4,26 +4,26 @@ using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
-    public class ServiceSessionConfiguration : IEntityTypeConfiguration<ServiceSession>
+    public class BookingServiceConfiguration : IEntityTypeConfiguration<BookingService>
     {
-        public void Configure(EntityTypeBuilder<ServiceSession> builder)
+        public void Configure(EntityTypeBuilder<BookingService> builder)
         {
-            builder.ToTable("ServiceSessions");
-            builder.HasKey(s => s.ServiceItemID);
-            builder.Property(s => s.ServiceItemID)
+            builder.ToTable("BookingServices");
+            builder.HasKey(s => s.BookingServiceID);
+            builder.Property(s => s.BookingServiceID)
                 .ValueGeneratedOnAdd();
             builder.Property(s => s.Quantity);
-            builder.Property(s => s.UnitPrice).HasColumnType("decimal(18, 2)"); ;
+            builder.Property(s => s.Price).HasColumnType("decimal(18, 2)"); ;
             builder.Property(s => s.SubTotal).HasColumnType("decimal(18, 2)"); ;
 
 
             builder.HasOne(s => s.Service)
-                .WithMany(a => a.ServiceItems)
+                .WithMany(a => a.BookingServices)
                 .HasForeignKey(s => s.ServiceID)
                 .IsRequired();
 
             builder.HasOne(s => s.SessionOrder)
-                .WithMany(b => b.ServiceItems)
+                .WithMany(b => b.BookingServices)
                 .HasForeignKey(c => c.SessionOrderID)
                 .IsRequired();
         }

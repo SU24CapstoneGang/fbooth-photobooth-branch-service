@@ -18,7 +18,7 @@ public class Account
     public string PhoneNumber { get; set; } = default!;
     public AccountStatus Status { get; set; }
     public AccountRole Role { get; set; }
-    public virtual ICollection<SessionOrder> SessionOrder { get; set; } = default!;
+    public virtual ICollection<Booking> SessionOrder { get; set; } = default!;
     public Guid? BranchID { get; set; }
     public virtual Branch BranchManage { get; set; } = default!;
     public virtual Branch BranchBelong { get; set; } = default!;

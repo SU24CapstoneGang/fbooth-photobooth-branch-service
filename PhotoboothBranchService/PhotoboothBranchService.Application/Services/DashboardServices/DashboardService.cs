@@ -93,8 +93,8 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
                 response.CountCustomer = 0;
                 return response;
             }
-            response.CountCustomer = orders.GroupBy(o => o.AccountID).Count();
-            response.TotalRevenue = orders.Sum(o => o.TotalPrice);
+            response.CountCustomer = orders.GroupBy(o => o.CustomerID).Count();
+            response.TotalRevenue = orders.Sum(o => o.PaymentAmount);
             return response;
         }
         public async Task<BasicDashboardResponse> BasicDashboard()
@@ -120,13 +120,13 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             response.BoothDashboard.BoothInUse = booths.Select(i => i.Status == BoothStatus.InUse).Count();
             var orders = await _sessionOrderRepository.GetAsync(i => i.Status == SessionOrderStatus.Done);
             response.TotalOrder = orders.Count();
-            response.TotalRevenue = response.TotalOrder == 0 ? 0 : orders.Sum(i => i.TotalPrice);
+            response.TotalRevenue = response.TotalOrder == 0 ? 0 : orders.Sum(i => i.PaymentAmount);
             return response;
         }
         public async Task<List<DashboardServiceResponse>> DashboradService(Guid? branchID, DateOnly? startDate, DateOnly? endDate)
         {
             var orders = await this.GetSessionOrders(branchID, startDate, endDate);
-            var serviceItem = await _serviceItemRepository.GetAsync(i => orders.Select(o => o.SessionOrderID).ToList().Contains(i.SessionOrderID), i => i.Service);
+            var serviceItem = await _serviceItemRepository.GetAsync(i => orders.Select(o => o.BookingID).ToList().Contains(i.SessionOrderID), i => i.Service);
             if (serviceItem.Count() == 0)
             {
                 return new List<DashboardServiceResponse>();
@@ -142,7 +142,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             var existedId = ServiceCount.Select(i => i.Service.ServiceID);
             foreach (var item in services)
             {
-                if (!existedId.Contains(item.ServiceID))
+                if (!existedId.Contains(item.ServicePackageID))
                 {
                     ServiceCount.Add(new DashboardServiceResponse {
                         Quantity = 0, 
@@ -266,37 +266,38 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
                 return (await _photoSessionRepository.GetAsync(null, includeProperties)).ToList();
             }
             var orders = await this.GetSessionOrders(branchID, startDate, endDate);
-            return orders.Count() == 0 ? new List<PhotoSession>() : (await _photoSessionRepository.GetAsync(i => orders.Select(o => o.SessionOrderID).ToList().Contains(i.SessionOrderID), includeProperties)).ToList();
+            return orders.Count() == 0 ? new List<PhotoSession>() : (await _photoSessionRepository.GetAsync(i => orders.Select(o => o.BookingID).ToList().Contains(i.SessionOrderID), includeProperties)).ToList();
         }
-        private async Task<List<SessionOrder>> GetSessionOrders(Guid? branchID, DateOnly? startDate, DateOnly? endDate, params Expression<Func<SessionOrder, object>>[] includeProperties)
+        private async Task<List<Booking>> GetSessionOrders(Guid? branchID, DateOnly? startDate, DateOnly? endDate, params Expression<Func<Booking, object>>[] includeProperties)
         {
-            var booths = branchID.HasValue ? await _boothRepository.GetAsync(i => i.BranchID == branchID) : null;
-            if (branchID.HasValue && booths.Count() == 0)
-            {
-                return new List<SessionOrder>();
-            }
-            bool isEnd = false; 
-            bool isStart = false;
-            Expression<Func<SessionOrder, bool>> pre = branchID.HasValue ? i => booths.Select(b => b.BoothID).ToList().Contains(i.BoothID) : i => true;
-            pre = LinQHelper.AndAlso(pre, i => i.Status == SessionOrderStatus.Done);
-            if (endDate != null && endDate != default(DateOnly))
-            {
-                isEnd = true;
-                pre = LinQHelper.AndAlso(pre, so => so.EndTime.Value.Date <= new DateTime(endDate.Value.Year, endDate.Value.Month, endDate.Value.Day));
-            }
-            if (startDate != null && startDate != default(DateOnly))
-            {
-                isStart = true;
-                pre = LinQHelper.AndAlso(pre, so => so.EndTime.Value.Date >= new DateTime(startDate.Value.Year, startDate.Value.Month, startDate.Value.Day));
-            }
+            //var booths = branchID.HasValue ? await _boothRepository.GetAsync(i => i.BranchID == branchID) : null;
+            //if (branchID.HasValue && booths.Count() == 0)
+            //{
+            //    return new List<Booking>();
+            //}
+            //bool isEnd = false; 
+            //bool isStart = false;
+            //Expression<Func<Booking, bool>> pre = branchID.HasValue ? i => booths.Select(b => b.BoothID).ToList().Contains(i.BoothID) : i => true;
+            //pre = LinQHelper.AndAlso(pre, i => i.Status == SessionOrderStatus.Done);
+            //if (endDate != null && endDate != default(DateOnly))
+            //{
+            //    isEnd = true;
+            //    pre = LinQHelper.AndAlso(pre, so => so.EndTime.Value.Date <= new DateTime(endDate.Value.Year, endDate.Value.Month, endDate.Value.Day));
+            //}
+            //if (startDate != null && startDate != default(DateOnly))
+            //{
+            //    isStart = true;
+            //    pre = LinQHelper.AndAlso(pre, so => so.EndTime.Value.Date >= new DateTime(startDate.Value.Year, startDate.Value.Month, startDate.Value.Day));
+            //}
 
-            //make sure endtime after start time
-            if (endDate <= startDate && isStart && isEnd)
-            {
-                throw new BadRequestException("The end date must be later than the start date.");
-            }
+            ////make sure endtime after start time
+            //if (endDate <= startDate && isStart && isEnd)
+            //{
+            //    throw new BadRequestException("The end date must be later than the start date.");
+            //}
 
-            return (await _sessionOrderRepository.GetAsync(pre, includeProperties)).ToList();
+            //return (await _sessionOrderRepository.GetAsync(pre, includeProperties)).ToList();
+            return null;
         }
 
     }
