@@ -24,7 +24,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
         private readonly IBranchRepository _branchRepository;
         private readonly IBoothRepository _boothRepository;
         private readonly IAccountRepository _accountRepository;
-        private readonly ISessionOrderRepository _sessionOrderRepository;
+        private readonly IBookingRepository _sessionOrderRepository;
         private readonly IPhotoSessionRepository _photoSessionRepository;
         private readonly IPhotoStickerRepository _photoStickerRepository;
         private readonly IServiceSessionRepository _serviceItemRepository;
@@ -38,7 +38,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
         public DashboardService(IBranchRepository branchRepository,
             IBoothRepository boothRepository,
             IAccountRepository accountRepository,
-            ISessionOrderRepository sessionOrderRepository,
+            IBookingRepository sessionOrderRepository,
             IPhotoSessionRepository photoSessionRepository,
             IPhotoStickerRepository photoStickerRepository,
             IServiceSessionRepository serviceItemRepository,

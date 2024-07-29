@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Domain.Entities
+namespace PhotoboothBranchService.Application.DTOs.FullPaymentPolicy
 {
-    public class FullPaymentPolicy
+    public class FullPaymentPolicyResponse
     {
         public Guid FullPaymentPolicyID { get; set; }
         public string PolicyName { get; set; } = default!;
@@ -21,6 +21,5 @@ namespace PhotoboothBranchService.Domain.Entities
 
         public bool IsDefaultPolicy { get; set; } //  Ngày bắt đầu áp dụng policy null thì chính sách mặc định luôn được áp dụng
         public bool IsPermanentPolicy { get; set; } // Ngày kết thúc áp dụng policy null thì áp dụng vĩnh viễn
-        public virtual ICollection<Booking> Bookings { get; set; } = default!;
     }
 }

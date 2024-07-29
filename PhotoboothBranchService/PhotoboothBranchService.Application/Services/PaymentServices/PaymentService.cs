@@ -26,14 +26,14 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         private readonly IMapper _mapper;
         private readonly IPaymentMethodRepository _paymentMethodRepository;
         private readonly IVNPayService _vNPayService;
-        private readonly ISessionOrderRepository _sessionOrderRepository;
+        private readonly IBookingRepository _sessionOrderRepository;
         private readonly IMoMoService _moMoService;
         private readonly IEmailService _emailService;
         private readonly IRefundService _refundService;
         public PaymentService(ITransactionRepository paymentRepository, IMapper mapper,
             IPaymentMethodRepository paymentMethodRepository,
             IVNPayService vNPayService,
-            ISessionOrderRepository sessionOrderRepository,
+            IBookingRepository sessionOrderRepository,
             IMoMoService moMoService,
             IEmailService emailService,
             IRefundService refundService)

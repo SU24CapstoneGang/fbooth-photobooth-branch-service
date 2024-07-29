@@ -35,9 +35,10 @@ namespace PhotoboothBranchService.Infrastructure
             services.AddScoped<IServiceSessionRepository, ServiceSessionRepository>();
             services.AddScoped<IServicePackageRepository, ServicePackageRepository>();
             services.AddScoped<IServiceTypeRepository, ServiceTypeRepository>();
-            services.AddScoped<ISessionOrderRepository, SessionOrderRepository>();
+            services.AddScoped<IBookingRepository, BookingRepository>();
             services.AddScoped<IStickerRepository, StickerRepository>();
             services.AddScoped<IPhotoBoxRepository, PhotoBoxRepository>();
+            services.AddScoped<IFullPaymentPolicyRepository, FullPaymentPolicyRepository>();
 
             services.AddScoped<IMapper, Mapper>();
 

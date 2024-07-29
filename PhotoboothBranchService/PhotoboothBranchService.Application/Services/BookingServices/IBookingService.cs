@@ -4,7 +4,7 @@ using PhotoboothBranchService.Domain.Common.Interfaces;
 
 namespace PhotoboothBranchService.Application.Services.SessionOrderServices;
 
-public interface ISessionOrderService : IServiceBase<SessionOrderResponse, SessionOrderFilter, PagingModel>
+public interface IBookingService : IServiceBase<SessionOrderResponse, SessionOrderFilter, PagingModel>
 {
     Task<SessionOrderResponse> ValidateSessionOrder(ValidateSessionOrderRequest validateSessionOrderRequest);
     Task<CreateSessionOrderResponse> CreateAsync(CreateSessionOrderRequest createModel);

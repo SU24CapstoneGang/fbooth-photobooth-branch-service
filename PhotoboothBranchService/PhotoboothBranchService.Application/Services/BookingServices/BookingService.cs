@@ -17,9 +17,9 @@ using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Application.Services.SessionOrderServices;
 
-public class SessionOrderService : ISessionOrderService
+public class BookingService : IBookingService
 {
-    private readonly ISessionOrderRepository _sessionOrderRepository;
+    private readonly IBookingRepository _sessionOrderRepository;
     private readonly IMapper _mapper;
     private readonly IBoothRepository _boothRepository;
     private readonly IPaymentService _paymentService;
@@ -28,7 +28,7 @@ public class SessionOrderService : ISessionOrderService
     private readonly IAccountRepository _accountRepository;
     private readonly IRefundService _refundService;
     private readonly IConstantService _constantService;
-    public SessionOrderService(ISessionOrderRepository sessionOrderRepository,
+    public BookingService(IBookingRepository sessionOrderRepository,
         IMapper mapper,
         IBoothRepository boothRepository,
         IPaymentService paymentService,

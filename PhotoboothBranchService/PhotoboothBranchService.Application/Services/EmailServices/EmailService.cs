@@ -24,13 +24,13 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
 
         private IAccountRepository _accountRepository;
         private ITransactionRepository _paymentRepository;
-        private ISessionOrderRepository _sessionOrderRepository;
+        private IBookingRepository _sessionOrderRepository;
         private IBranchRepository _boothBranchRepository;
         private IServiceSessionRepository _serviceItemRepository;
 
         public EmailService(IAccountRepository accountRepository, 
             ITransactionRepository paymentRepository, 
-            ISessionOrderRepository sessionOrderRepository, 
+            IBookingRepository sessionOrderRepository, 
             IBranchRepository boothBranchRepository, 
             IServiceSessionRepository serviceItemRepository)
         {

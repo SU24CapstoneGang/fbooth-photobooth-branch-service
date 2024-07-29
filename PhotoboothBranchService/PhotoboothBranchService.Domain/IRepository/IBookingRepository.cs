@@ -3,7 +3,7 @@ using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Domain.IRepository;
 
-public interface ISessionOrderRepository : IRepositoryBase<Booking>
+public interface IBookingRepository : IRepositoryBase<Booking>
 {
     Task updateTotalPrice(Guid SessionOrderID);
 }

@@ -14,12 +14,12 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
     {
         private readonly IServiceSessionRepository _serviceItemRepository;
         private readonly IMapper _mapper;
-        private readonly ISessionOrderRepository _sessionOrderRepository;
+        private readonly IBookingRepository _sessionOrderRepository;
         private readonly IServicePackageRepository _serviceRepository;
         private readonly IServiceTypeRepository _serviceTypeRepository;
         private readonly IBoothRepository _boothRepository;
         public ServiceItemService(IServiceSessionRepository serviceItemRepository, IMapper mapper
-            , ISessionOrderRepository sessionOrderRepository
+            , IBookingRepository sessionOrderRepository
             , IServicePackageRepository serviceRepository, IServiceTypeRepository serviceTypeRepository, IBoothRepository boothRepository)
         {
             _serviceItemRepository = serviceItemRepository;

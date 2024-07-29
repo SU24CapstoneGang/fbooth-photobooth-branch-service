@@ -10,6 +10,8 @@ public class Branch
     public string Town { get; set; } = default!;
     public string City { get; set; } = default!;
     public DateTime CreateDate { get; set; }
+    public TimeSpan OpeningTime { get; set; } // Thêm giờ mở cửa
+    public TimeSpan ClosingTime { get; set; } // Thêm giờ đóng cửa
     public BranchStatus Status { get; set; } = default!;
     public Guid? ManagerID { get; set; }
     public virtual Account Manager { get; set; } = default!;

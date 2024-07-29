@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PhotoboothBranchService.Infrastructure.Common.Persistence;
 
@@ -11,9 +12,11 @@ using PhotoboothBranchService.Infrastructure.Common.Persistence;
 namespace PhotoboothBranchService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240729112727_PhotoBoothVerD24UpdatePolicyField")]
+    partial class PhotoBoothVerD24UpdatePolicyField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -356,9 +359,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<TimeSpan>("ClosingTime")
-                        .HasColumnType("time");
-
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -366,9 +366,6 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
 
                     b.Property<Guid?>("ManagerID")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<TimeSpan>("OpeningTime")
-                        .HasColumnType("time");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -393,9 +390,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                             Address = "Vincom Le Van Viet q9",
                             BranchName = "Vincom Le Van Viet q9",
                             City = "HCMC",
-                            ClosingTime = new TimeSpan(0, 0, 0, 0, 0),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            OpeningTime = new TimeSpan(0, 0, 0, 0, 0),
                             Status = "Active",
                             Town = "district 9"
                         },
@@ -405,9 +400,7 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                             Address = "Mega Mall Pham Van Dong",
                             BranchName = "Mega Mall Pham Van Dong",
                             City = "Thanh pho Thu Duc",
-                            ClosingTime = new TimeSpan(0, 0, 0, 0, 0),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            OpeningTime = new TimeSpan(0, 0, 0, 0, 0),
                             Status = "Active",
                             Town = "Thu Duc"
                         });
@@ -683,14 +676,14 @@ namespace PhotoboothBranchService.Infrastructure.Migrations
                         new
                         {
                             PaymentMethodID = new Guid("1b4f2a3e-7d94-4119-8b6d-5c15b02848f6"),
-                            CreateDate = new DateTime(2024, 7, 29, 17, 54, 25, 24, DateTimeKind.Utc).AddTicks(794),
+                            CreateDate = new DateTime(2024, 7, 29, 11, 27, 27, 554, DateTimeKind.Utc).AddTicks(4248),
                             PaymentMethodName = "VNPay",
                             Status = "Active"
                         },
                         new
                         {
                             PaymentMethodID = new Guid("f3b6e6b2-f90e-4f6b-8cd2-68b467afae0f"),
-                            CreateDate = new DateTime(2024, 7, 29, 17, 54, 25, 24, DateTimeKind.Utc).AddTicks(796),
+                            CreateDate = new DateTime(2024, 7, 29, 11, 27, 27, 554, DateTimeKind.Utc).AddTicks(4251),
                             PaymentMethodName = "MoMo",
                             Status = "Active"
                         });

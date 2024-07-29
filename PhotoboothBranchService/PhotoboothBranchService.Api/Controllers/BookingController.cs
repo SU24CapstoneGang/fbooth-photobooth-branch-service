@@ -9,11 +9,11 @@ namespace PhotoboothBranchService.Api.Controllers
 {
 
     [Route("api/session-order")]
-    public class SessionOrderController : ControllerBaseApi
+    public class BookingController : ControllerBaseApi
     {
-        private readonly ISessionOrderService _sessionService;
+        private readonly IBookingService _sessionService;
 
-        public SessionOrderController(ISessionOrderService sessionService)
+        public BookingController(IBookingService sessionService)
         {
             _sessionService = sessionService;
         }
@@ -56,14 +56,14 @@ namespace PhotoboothBranchService.Api.Controllers
         }
         //get all with filter and paging
         [HttpGet("paging")]
-        public async Task<ActionResult<IEnumerable<SessionOrderResponse>>> GetAllSessions(
+        public async Task<ActionResult<IEnumerable<SessionOrderResponse>>> GetAllBooking(
             [FromQuery] SessionOrderFilter sessionFilter, [FromQuery] PagingModel pagingModel)
         {
             var sessions = await _sessionService.GetAllPagingAsync(sessionFilter, pagingModel);
             return Ok(sessions);
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<SessionOrderResponse>> GetSessionById(Guid id)
+        public async Task<ActionResult<SessionOrderResponse>> GetBookingById(Guid id)
         {
             var session = await _sessionService.GetByIdAsync(id);
             if (session == null)
@@ -75,13 +75,13 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateSession(Guid id, UpdateSessionOrderRequest updateSessionRequest)
+        public async Task<ActionResult> UpdateBooking(Guid id, UpdateSessionOrderRequest updateSessionRequest)
         {
             await _sessionService.UpdateAsync(id, updateSessionRequest);
             return Ok();
         }
         [HttpPost("cancel")]
-        public async Task<ActionResult> CancelSession(Guid sessionOrderID)
+        public async Task<ActionResult> CancelBooking(Guid sessionOrderID)
         {
             var clientIp = IpAddressHelper.GetClientIpAddress(HttpContext);
             await _sessionService.CancelSessionOrder(sessionOrderID, clientIp);
@@ -90,7 +90,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Delete
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteSession(Guid id)
+        public async Task<ActionResult> DeleteBooking(Guid id)
         {
             await _sessionService.DeleteAsync(id);
             return Ok();

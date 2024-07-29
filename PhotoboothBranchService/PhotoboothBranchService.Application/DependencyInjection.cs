@@ -16,6 +16,7 @@ using PhotoboothBranchService.Application.Services.DashboardServices;
 using PhotoboothBranchService.Application.Services.DeviceServices;
 using PhotoboothBranchService.Application.Services.EmailServices;
 using PhotoboothBranchService.Application.Services.FirebaseServices;
+using PhotoboothBranchService.Application.Services.FullPaymentPolicyServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Application.Services.LayoutServices;
 using PhotoboothBranchService.Application.Services.MoMoServices;
@@ -60,9 +61,10 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IServiceItemService, ServiceItemService>();
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<IServiceTypeService, ServiceTypeService>();
-            services.AddScoped<ISessionOrderService, SessionOrderService>();
+            services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IStickerService, StickerService>();
             services.AddScoped<IPhotoBoxService, PhotoBoxService>();
+            services.AddScoped<IFullPaymentPolicyServices, FullPaymentPolicyServices>();
 
             // Register ConstantService as a singleton
             services.AddScoped<IConstantService, ConstantService>();

@@ -30,10 +30,10 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
         private readonly IRefundRepository _refundRepository;
         private readonly IMoMoService _moMoService;
         private readonly IVNPayService _vNPayService;
-        private readonly ISessionOrderRepository _sessionOrderRepository;
+        private readonly IBookingRepository _sessionOrderRepository;
         private readonly ITransactionRepository _paymentRepository;
 
-        public RefundService(IMapper mapper,IRefundRepository refundRepository, IMoMoService moMoService, IVNPayService vNPayService, ISessionOrderRepository sessionOrderRepository, ITransactionRepository paymentRepository)
+        public RefundService(IMapper mapper,IRefundRepository refundRepository, IMoMoService moMoService, IVNPayService vNPayService, IBookingRepository sessionOrderRepository, ITransactionRepository paymentRepository)
         {
             _mapper = mapper;
             _refundRepository = refundRepository;

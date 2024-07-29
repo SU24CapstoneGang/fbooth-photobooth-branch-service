@@ -14,8 +14,8 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         private readonly IPhotoSessionRepository _photoSessionRepository;
         private readonly IMapper _mapper;
         private readonly ILayoutRepository _layoutRepository;
-        private readonly ISessionOrderRepository _sessionOrderRepository;
-        public PhotoSessionService(IPhotoSessionRepository photoSessionRepository, IMapper mapper, ILayoutRepository layoutRepository, ISessionOrderRepository sessionOrderRepository)
+        private readonly IBookingRepository _sessionOrderRepository;
+        public PhotoSessionService(IPhotoSessionRepository photoSessionRepository, IMapper mapper, ILayoutRepository layoutRepository, IBookingRepository sessionOrderRepository)
         {
             _photoSessionRepository = photoSessionRepository;
             _mapper = mapper;

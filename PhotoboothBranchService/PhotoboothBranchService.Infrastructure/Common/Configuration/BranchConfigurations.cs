@@ -28,6 +28,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasMaxLength(255);
             builder.Property(pb => pb.Town).IsRequired();
             builder.Property(pb => pb.City).IsRequired();
+            builder.Property(pb => pb.OpeningTime).IsRequired();
+            builder.Property(pb => pb.ClosingTime).IsRequired();
 
             builder.Property(pb => pb.CreateDate)
             .IsRequired();

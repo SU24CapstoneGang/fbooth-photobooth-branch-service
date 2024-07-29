@@ -40,6 +40,12 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(p => p.CreatedDate)
                 .HasDefaultValueSql("GETDATE()");
 
+            builder.Property(p => p.IsPermanentPolicy)
+                .IsRequired();
+
+            builder.Property(p => p.IsDefaultPolicy)
+                .IsRequired();
+
             // Configuring relationships (if any)
             builder.HasMany(p => p.Bookings)
                 .WithOne(b => b.FullPaymentPolicy)
