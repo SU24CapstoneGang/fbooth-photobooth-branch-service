@@ -10,7 +10,8 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
         public BoothBranchMapper()
         {
             CreateMap<CreateBranchRequest, Branch>().ReverseMap().HandleNullProperty();
-            CreateMap<UpdateBranchRequest, Branch>().ReverseMap().HandleNullProperty();
+            CreateMap<UpdateBranchRequest, Branch>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Branch, BranchResponse>()
                 //.ForMember(des => des.AccountName, opt => opt.MapFrom<FullNameResolver>())
                 .ReverseMap()

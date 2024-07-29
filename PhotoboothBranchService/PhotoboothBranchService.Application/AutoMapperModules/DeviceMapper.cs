@@ -10,7 +10,8 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
         public DeviceMapper()
         {
             CreateMap<CreateDeviceRequest, Device>().HandleNullProperty();
-            CreateMap<UpdateDeviceRequest, Device>().HandleNullProperty();
+            CreateMap<UpdateDeviceRequest, Device>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Device, DeviceResponse>().HandleNullProperty();
             CreateMap<Device, CreateDeviceResponse>().HandleNullProperty();
         }

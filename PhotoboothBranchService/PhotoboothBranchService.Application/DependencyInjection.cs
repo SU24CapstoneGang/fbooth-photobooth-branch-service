@@ -83,7 +83,6 @@ namespace PhotoboothBranchService.Application
 
             //Mapper config
             services.AddAutoMapper(cfg => cfg.Internal().MethodMappingEnabled = false, Assembly.GetExecutingAssembly());
-
             //firebase authen config
             FirebaseApp.Create(new AppOptions
             {

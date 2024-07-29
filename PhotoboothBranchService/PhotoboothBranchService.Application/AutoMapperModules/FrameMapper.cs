@@ -10,7 +10,8 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
         public BackgroundMapper()
         {
             CreateMap<CreateBackgroundRequest, Background>().ReverseMap().HandleNullProperty();
-            CreateMap<UpdateBackgroundRequest, Background>().ReverseMap().HandleNullProperty();
+            CreateMap<UpdateBackgroundRequest, Background>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<BackgroundResponse, Background>().ReverseMap().HandleNullProperty();
             CreateMap<Background, CreateBackgroundResponse>().HandleNullProperty();
         }

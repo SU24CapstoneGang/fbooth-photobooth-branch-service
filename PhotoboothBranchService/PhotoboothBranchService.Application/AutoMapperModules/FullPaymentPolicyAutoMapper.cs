@@ -16,7 +16,8 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
         {
             CreateMap<FullPaymentPolicy, FullPaymentPolicyResponse>().ReverseMap();
             CreateMap<CreatePolicyRequestModel, FullPaymentPolicy>().ReverseMap();
-            CreateMap<UpdatePolicyRequestModel, FullPaymentPolicy>().ReverseMap().HandleNullProperty();
+            CreateMap<UpdatePolicyRequestModel, FullPaymentPolicy>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }

@@ -10,7 +10,8 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
         public PhotoSessionMapper()
         {
             CreateMap<CreatePhotoSessionRequest, PhotoSession>().HandleNullProperty();
-            CreateMap<UpdatePhotoSessionRequest, PhotoSession>().HandleNullProperty();
+            CreateMap<UpdatePhotoSessionRequest, PhotoSession>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<PhotoSession, PhotoSessionResponse>().HandleNullProperty();
             CreateMap<PhotoSession, CreatePhotoSessionResponse>().HandleNullProperty();
         }

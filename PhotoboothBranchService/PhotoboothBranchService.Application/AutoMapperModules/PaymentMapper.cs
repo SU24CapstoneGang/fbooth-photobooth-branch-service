@@ -10,7 +10,8 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
         public PaymentMapper()
         {
             CreateMap<CreatePaymentRequest, Transaction>().HandleNullProperty();
-            CreateMap<UpdatePaymentRequest, Transaction>().HandleNullProperty();
+            CreateMap<UpdatePaymentRequest, Transaction>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Transaction, PaymentResponse>().HandleNullProperty();
         }
     }

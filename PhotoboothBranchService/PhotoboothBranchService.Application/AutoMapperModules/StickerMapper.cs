@@ -10,7 +10,8 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
         public StickerMapper()
         {
             CreateMap<CreateStickerRequest, Sticker>().ReverseMap().HandleNullProperty();
-            CreateMap<UpdateStickerRequest, Sticker>().ReverseMap().HandleNullProperty();
+            CreateMap<UpdateStickerRequest, Sticker>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Sticker, StickerResponse>().HandleNullProperty();
             CreateMap<Sticker, CreateStickerResponse>().HandleNullProperty();
         }

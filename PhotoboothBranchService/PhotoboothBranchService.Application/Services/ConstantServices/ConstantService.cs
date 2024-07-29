@@ -48,14 +48,14 @@ namespace PhotoboothBranchService.Application.Services.ConstantServices
             {
                 throw new NotFoundException("Not found Constant");
             }
-            if (request.ConstantValue  != null)
+            if (request.ConstantValue != null)
             {
                 if (!ValidateConstantValue(request.ConstantValue, constant.ConstantType))
                 {
                     throw new BadRequestException("Invalid value for the specified constant type.");
                 }
             }
-            
+
             var updateConstant = _mapper.Map(request, constant);
             await _constantRepository.UpdateAsync(updateConstant);
             await LoadConstantsAsync();
