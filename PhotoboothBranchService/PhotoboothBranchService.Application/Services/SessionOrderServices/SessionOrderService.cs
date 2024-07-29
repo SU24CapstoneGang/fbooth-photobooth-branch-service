@@ -205,7 +205,7 @@ public class SessionOrderService : ISessionOrderService
                 throw new BadRequestException("The time for your Session not come yet, please check with our staff and try again later");
             }
 
-            if (sessionOrder.Status == SessionOrderStatus.Waiting)
+            if (sessionOrder.Status == BookingStatus.Waiting)
             {
                 TimeSpan difference = DateTime.Now - sessionOrder.StartTime;
                 if (difference.TotalMinutes < 5)
@@ -217,7 +217,7 @@ public class SessionOrderService : ISessionOrderService
                 {
                     sessionOrder.StartTime += difference;
                 }
-                sessionOrder.Status = SessionOrderStatus.Processsing;
+                sessionOrder.Status = BookingStatus.Processsing;
                 await _sessionOrderRepository.UpdateAsync(sessionOrder);
 
                 //update booth
@@ -335,19 +335,19 @@ public class SessionOrderService : ISessionOrderService
         else
         {
             if (DateTime.Now > sessionOrder.StartTime
-                && (sessionOrder.Status == SessionOrderStatus.Waiting
-                    || sessionOrder.Status == SessionOrderStatus.Created
-                    || sessionOrder.Status == SessionOrderStatus.Deposited))
+                && (sessionOrder.Status == BookingStatus.Waiting
+                    || sessionOrder.Status == BookingStatus.Created
+                    || sessionOrder.Status == BookingStatus.Deposited))
             {
                 throw new BadRequestException("Can not cancel anymore, the session already start");
             }
 
-            if (sessionOrder.Status == SessionOrderStatus.Waiting)
+            if (sessionOrder.Status == BookingStatus.Waiting)
             {
                 //doing refund
                 await _refundService.RefundByOrderId(sessionOrdeID, false, ipAddress);
             }
-            sessionOrder.Status = SessionOrderStatus.Canceled;
+            sessionOrder.Status = BookingStatus.Canceled;
             await _sessionOrderRepository.UpdateAsync(sessionOrder);
         }
     }
@@ -372,14 +372,14 @@ public class SessionOrderService : ISessionOrderService
     {
         var validateTime = (await _sessionOrderRepository.GetAsync(i => i.BoothID == boothId
                                  && ((startTime < i.StartTime && i.StartTime < endTime.AddMinutes(5)) || (endTime.AddMinutes(5) > i.EndTime && i.EndTime > startTime))
-                                 && (i.Status != SessionOrderStatus.Done && i.Status == SessionOrderStatus.Canceled)
+                                 && (i.Status != BookingStatus.Done && i.Status == BookingStatus.Canceled)
                                  )).FirstOrDefault();
         return validateTime == null;
     }
     private async Task<long> GenerateValidateCode()
     {
         long code = 0;
-        var existedCodes = (await _sessionOrderRepository.GetAsync(i => i.Status != SessionOrderStatus.Canceled || i.Status != SessionOrderStatus.Done)).ToList().Select(i => i.ValidateCode);
+        var existedCodes = (await _sessionOrderRepository.GetAsync(i => i.Status != BookingStatus.Canceled || i.Status != BookingStatus.Done)).ToList().Select(i => i.ValidateCode);
         while (code == 0)
         {
             code = new Random().Next(100000, 1000000);

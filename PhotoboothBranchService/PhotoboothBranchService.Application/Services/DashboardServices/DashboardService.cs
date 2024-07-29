@@ -118,7 +118,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             response.BoothDashboard.BoothActive = booths.Select(i => i.Status == BoothStatus.Active).Count();
             response.BoothDashboard.BoothInactive = booths.Select(i => i.Status == BoothStatus.Inactive).Count();
             response.BoothDashboard.BoothInUse = booths.Select(i => i.Status == BoothStatus.InUse).Count();
-            var orders = await _sessionOrderRepository.GetAsync(i => i.Status == SessionOrderStatus.Done);
+            var orders = await _sessionOrderRepository.GetAsync(i => i.Status == BookingStatus.Done);
             response.TotalOrder = orders.Count();
             response.TotalRevenue = response.TotalOrder == 0 ? 0 : orders.Sum(i => i.PaymentAmount);
             return response;

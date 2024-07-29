@@ -27,7 +27,7 @@ public class SessionOrderRepository : ISessionOrderRepository
     //Read
     public async Task<IQueryable<Booking>> GetAllAsync()
     {
-        return await Task.FromResult(_dbContext.SessionOrders);
+        return await Task.FromResult(_dbContext.Bookings);
     }
 
     public async Task<IQueryable<Booking>> GetAsync(
@@ -36,7 +36,7 @@ public class SessionOrderRepository : ISessionOrderRepository
     {
         try
         {
-            var result = predicate == null ? _dbContext.SessionOrders : _dbContext.SessionOrders.Where(predicate);
+            var result = predicate == null ? _dbContext.Bookings : _dbContext.Bookings.Where(predicate);
             if (!result.Any())
             {
                 return await Task.FromResult(Enumerable.Empty<Booking>().AsQueryable());
@@ -65,7 +65,7 @@ public class SessionOrderRepository : ISessionOrderRepository
     // Remove a session
     public async Task RemoveAsync(Booking session)
     {
-        _dbContext.SessionOrders.Remove(session);
+        _dbContext.Bookings.Remove(session);
         await _dbContext.SaveChangesAsync();
     }
 
@@ -78,7 +78,7 @@ public class SessionOrderRepository : ISessionOrderRepository
 
     public async Task updateTotalPrice(Guid SessionOrderID)
     {
-        var order = _dbContext.SessionOrders.Where(i => i.BookingID == SessionOrderID)
+        var order = _dbContext.Bookings.Where(i => i.BookingID == SessionOrderID)
             .Include(u => u.BookingServices)
             .FirstOrDefault();
 

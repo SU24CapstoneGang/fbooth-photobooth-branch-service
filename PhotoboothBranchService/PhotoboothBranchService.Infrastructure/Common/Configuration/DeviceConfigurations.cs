@@ -4,7 +4,7 @@ using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
-    public class DeviceConfiguration : IEntityTypeConfiguration<Device>
+    public class DeviceConfigurations : IEntityTypeConfiguration<Device>
     {
         public void Configure(EntityTypeBuilder<Device> builder)
         {

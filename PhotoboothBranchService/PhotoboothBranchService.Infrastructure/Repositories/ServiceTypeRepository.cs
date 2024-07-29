@@ -27,7 +27,7 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         // Read
         public async Task<IQueryable<Service>> GetAllAsync()
         {
-            return await Task.FromResult(_dbContext.ServiceTypes.AsQueryable());
+            return await Task.FromResult(_dbContext.Services.AsQueryable());
         }
 
         public async Task<IQueryable<Service>> GetAsync(
@@ -36,7 +36,7 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         {
             try
             {
-                var result = predicate == null ? _dbContext.ServiceTypes : _dbContext.ServiceTypes.Where(predicate);
+                var result = predicate == null ? _dbContext.Services : _dbContext.Services.Where(predicate);
                 if (!result.Any())
                 {
                     return await Task.FromResult(Enumerable.Empty<Service>().AsQueryable());

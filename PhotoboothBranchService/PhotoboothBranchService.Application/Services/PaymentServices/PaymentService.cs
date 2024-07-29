@@ -57,7 +57,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             {
                 throw new NotFoundException("Not found Session to proceed payment");
             }
-            if (sessionOrder.Status == SessionOrderStatus.Canceled || sessionOrder.Status == SessionOrderStatus.Done)
+            if (sessionOrder.Status == BookingStatus.Canceled || sessionOrder.Status == BookingStatus.Done)
             {
                 throw new BadRequestException("The Order has been ended or cancelled");
             }
@@ -82,7 +82,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                     payment.Amount = result;
                     break;
                 case PayType.Deposit:
-                    if (sessionOrder.Status != SessionOrderStatus.Created)
+                    if (sessionOrder.Status != BookingStatus.Created)
                     {
                         throw new BadRequestException("Deposit only apply on Booking");
                     }
@@ -249,15 +249,15 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         private async Task updateAfterSuccessPaymentAsync(Transaction payment)
         {
             var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == payment.SessionOrderID)).FirstOrDefault();
-            if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Created)
+            if (sessionOrder != null && sessionOrder.Status == BookingStatus.Created)
             {
                 if (payment.Amount < sessionOrder.PaymentAmount)
                 {
-                    sessionOrder.Status = SessionOrderStatus.Deposited;
+                    sessionOrder.Status = BookingStatus.Deposited;
                 }
                 else if (payment.Amount == sessionOrder.PaymentAmount)
                 {
-                    sessionOrder.Status = SessionOrderStatus.Waiting;
+                    sessionOrder.Status = BookingStatus.Waiting;
                     try
                     {
                         if (sessionOrder.StartTime > DateTime.Now)
@@ -272,12 +272,12 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                 }
                 await _sessionOrderRepository.UpdateAsync(sessionOrder);
             }
-            else if (sessionOrder != null && sessionOrder.Status == SessionOrderStatus.Deposited)
+            else if (sessionOrder != null && sessionOrder.Status == BookingStatus.Deposited)
             {
                 var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.BookingID && i.PaymentStatus == PaymentStatus.Success)).ToList();
                 if (paymentCheck.Sum(i => i.Amount) == sessionOrder.PaymentAmount)
                 {
-                    sessionOrder.Status = SessionOrderStatus.Waiting;
+                    sessionOrder.Status = BookingStatus.Waiting;
                     try
                     {
                         if (sessionOrder.StartTime > DateTime.Now)

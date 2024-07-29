@@ -4,7 +4,7 @@ using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
-    public class PhotoBoxConfiguration : IEntityTypeConfiguration<PhotoBox>
+    public class PhotoBoxConfigurations : IEntityTypeConfiguration<PhotoBox>
     {
         public void Configure(EntityTypeBuilder<PhotoBox> builder)
         {

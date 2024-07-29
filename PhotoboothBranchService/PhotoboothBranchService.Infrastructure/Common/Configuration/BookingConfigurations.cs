@@ -33,7 +33,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired()
                 .HasConversion(
                     v => v.ToString(),
-                    v => (SessionOrderStatus)Enum.Parse(typeof(SessionOrderStatus), v));
+                    v => (BookingStatus)Enum.Parse(typeof(BookingStatus), v));
 
             // Mối quan hệ một-nhieu giữa Session và Account
             builder.HasOne(s => s.Account)

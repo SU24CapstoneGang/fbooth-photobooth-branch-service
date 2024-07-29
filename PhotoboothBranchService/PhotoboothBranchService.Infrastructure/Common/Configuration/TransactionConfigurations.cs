@@ -5,7 +5,7 @@ using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
-    public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
+    public class TransactionConfigurations : IEntityTypeConfiguration<Transaction>
     {
         public void Configure(EntityTypeBuilder<Transaction> builder)
         {

@@ -4,7 +4,7 @@ using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
-    public class BookingServiceConfiguration : IEntityTypeConfiguration<BookingService>
+    public class BookingServiceConfigurations : IEntityTypeConfiguration<BookingService>
     {
         public void Configure(EntityTypeBuilder<BookingService> builder)
         {

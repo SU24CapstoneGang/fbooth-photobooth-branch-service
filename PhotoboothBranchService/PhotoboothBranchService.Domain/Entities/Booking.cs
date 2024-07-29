@@ -12,12 +12,15 @@ namespace PhotoboothBranchService.Domain.Entities
 
         public BookingType BookingType { get; set; } = default!;
         public PaymentStatus PaymentStatus { get; set; }
-        public SessionOrderStatus Status { get; set; }
+        public BookingStatus Status { get; set; }
 
         public bool IsCancelled { get; set; }
         public DateTime? CancelledDate { get; set; }
         public decimal? RefundAmount { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
+        public Guid? FullPaymentPolicyID { get; set; }
+        public virtual FullPaymentPolicy FullPaymentPolicy { get; set; } = default!;
 
         public Guid BoothID { get; set; }
         public virtual Booth Booth { get; set; } = default!;

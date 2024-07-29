@@ -1,6 +1,6 @@
 ﻿namespace PhotoboothBranchService.Domain.Enum
 {
-    public enum SessionOrderStatus
+    public enum BookingStatus
     {
         Processsing = 1, // session is running
         Done = 3, // the session end in a normal way

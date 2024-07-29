@@ -80,7 +80,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
         public async Task<AddListServiceItemResponse> AddListServiceItem(AddListServiceItemRequest request)
         {
             //find now session order of request booth
-            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BoothID == request.BoothID && i.Status == SessionOrderStatus.Processsing && (i.EndTime > DateTime.Now && DateTime.Now > i.StartTime))).FirstOrDefault();
+            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BoothID == request.BoothID && i.Status == BookingStatus.Processsing && (i.EndTime > DateTime.Now && DateTime.Now > i.StartTime))).FirstOrDefault();
             if (sessionOrder == null)
             {
                 throw new NotFoundException("Not found Session Order running in this booth");
@@ -233,7 +233,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceItemServices
                 {
                     throw new NotFoundException("Not found Service From request");
                 }
-                if (order.Status == SessionOrderStatus.Canceled || order.Status == SessionOrderStatus.Done)
+                if (order.Status == BookingStatus.Canceled || order.Status == BookingStatus.Done)
                 {
                     throw new BadRequestException("Session has ended or canceled, can not update");
                 }

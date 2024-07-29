@@ -23,10 +23,12 @@ public class AppDbContext : DbContext
     public DbSet<PhotoSession> PhotoSessions { get; set; }
     public DbSet<PhotoSticker> PhotoStickers { get; set; }
     public DbSet<ServicePackage> ServicePackages { get; set; }
-    public DbSet<BookingService> ServiceSessions { get; set; }
-    public DbSet<Service> ServiceTypes { get; set; }
-    public DbSet<Booking> SessionOrders { get; set; }
+    public DbSet<BookingService> BookingServices { get; set; }
+    public DbSet<Service> Services { get; set; }
+    public DbSet<Booking> Bookings { get; set; }
     public DbSet<Sticker> Stickers { get; set; }
+    public DbSet<FullPaymentPolicy> FullPaymentPolicies { get; set; }
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -56,23 +58,24 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new AccountConfigurations());
-        modelBuilder.ApplyConfiguration(new BoothConfiguration());
+        modelBuilder.ApplyConfiguration(new BoothConfigurations());
         modelBuilder.ApplyConfiguration(new BackgroundConfigurations());
-        modelBuilder.ApplyConfiguration(new ConstantConfiguration());
-        modelBuilder.ApplyConfiguration(new DeviceConfiguration());
+        modelBuilder.ApplyConfiguration(new ConstantConfigurations());
+        modelBuilder.ApplyConfiguration(new DeviceConfigurations());
         modelBuilder.ApplyConfiguration(new LayoutConfigurations());
-        modelBuilder.ApplyConfiguration(new TransactionConfiguration());
+        modelBuilder.ApplyConfiguration(new TransactionConfigurations());
         modelBuilder.ApplyConfiguration(new PaymentMethodConfigurations());
         modelBuilder.ApplyConfiguration(new BranchConfigurations());
-        modelBuilder.ApplyConfiguration(new PhotoBoxConfiguration());
-        modelBuilder.ApplyConfiguration(new RefundConfiguration());
-        modelBuilder.ApplyConfiguration(new PhotoConfiguration());
-        modelBuilder.ApplyConfiguration(new PhotoSessionConfiguration());
+        modelBuilder.ApplyConfiguration(new PhotoBoxConfigurations());
+        modelBuilder.ApplyConfiguration(new RefundConfigurations());
+        modelBuilder.ApplyConfiguration(new PhotoConfigurations());
+        modelBuilder.ApplyConfiguration(new PhotoSessionConfigurations());
         modelBuilder.ApplyConfiguration(new PhotoStickerConfigurations());
-        modelBuilder.ApplyConfiguration(new ServicePackageConfiguration());
-        modelBuilder.ApplyConfiguration(new BookingServiceConfiguration());
-        modelBuilder.ApplyConfiguration(new ServiceConfiguration());
+        modelBuilder.ApplyConfiguration(new ServicePackageConfigurations());
+        modelBuilder.ApplyConfiguration(new BookingServiceConfigurations());
+        modelBuilder.ApplyConfiguration(new ServiceConfigurations());
         modelBuilder.ApplyConfiguration(new BookingConfigurations());
         modelBuilder.ApplyConfiguration(new StickerConfigurations());
+        modelBuilder.ApplyConfiguration(new FullPaymentPolicyConfigurations());
     }
 }

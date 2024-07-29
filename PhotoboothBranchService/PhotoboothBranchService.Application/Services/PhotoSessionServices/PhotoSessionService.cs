@@ -29,7 +29,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
             var validateSessionOrder = (await _sessionOrderRepository
                 .GetAsync(i => i.BookingID == createModel.SessionOrderID
                 && (i.EndTime > DateTime.Now && i.StartTime < DateTime.Now)
-                && i.Status == SessionOrderStatus.Processsing)) == null;
+                && i.Status == BookingStatus.Processsing)) == null;
             if (validateSessionOrder)
             {
                 throw new Exception("Session Order are not going, it expired or not coming");

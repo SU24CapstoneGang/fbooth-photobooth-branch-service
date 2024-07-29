@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
-    public class ConstantConfiguration : IEntityTypeConfiguration<Constant>
+    public class ConstantConfigurations : IEntityTypeConfiguration<Constant>
     {
         public void Configure(EntityTypeBuilder<Constant> builder)
         {

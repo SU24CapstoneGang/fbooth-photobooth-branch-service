@@ -6,7 +6,7 @@ using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
-    public class PhotoConfiguration : IEntityTypeConfiguration<Photo>
+    public class PhotoConfigurations : IEntityTypeConfiguration<Photo>
     {
         public void Configure(EntityTypeBuilder<Photo> builder)
         {

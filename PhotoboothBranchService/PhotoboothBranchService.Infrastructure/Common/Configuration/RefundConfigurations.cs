@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
-    public class RefundConfiguration : IEntityTypeConfiguration<Refund>
+    public class RefundConfigurations : IEntityTypeConfiguration<Refund>
     {
         public void Configure(EntityTypeBuilder<Refund> builder)
         {
