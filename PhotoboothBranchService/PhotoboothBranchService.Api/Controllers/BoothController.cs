@@ -64,7 +64,7 @@ public class BoothController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateBooth(Guid id, UpdateBoothRequest updateBoothRequest, [FromQuery] BoothStatus? status)
+    public async Task<ActionResult> UpdateBooth(Guid id, [FromQuery] UpdateBoothRequest updateBoothRequest, [FromQuery] BoothStatus? status)
     {
         await _boothService.UpdateAsync(id, updateBoothRequest,status);
         return Ok();

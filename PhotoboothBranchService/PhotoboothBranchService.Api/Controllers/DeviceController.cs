@@ -59,7 +59,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateDevice(Guid id, UpdateDeviceRequest updateDeviceRequest)
+        public async Task<ActionResult> UpdateDevice(Guid id, [FromQuery] UpdateDeviceRequest updateDeviceRequest)
         {
             await _deviceService.UpdateAsync(id, updateDeviceRequest);
             return Ok();

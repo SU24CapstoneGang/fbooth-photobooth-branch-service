@@ -98,7 +98,7 @@ public class AccountController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateAccount(Guid id, UpdateAccountRequestModel updateAccountRequest)
+    public async Task<ActionResult> UpdateAccount(Guid id, [FromQuery] UpdateAccountRequestModel updateAccountRequest)
     {
         try
         {

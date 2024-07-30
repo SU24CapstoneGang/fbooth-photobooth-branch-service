@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.Common.Helpers;
-using PhotoboothBranchService.Application.DTOs.Service;
+using PhotoboothBranchService.Application.DTOs.ServiceType;
 using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Application.AutoMapperModules
@@ -9,11 +9,11 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
     {
         public ServiceMapper()
         {
-            CreateMap<CreateServiceRequest, ServicePackage>().HandleNullProperty();
-            CreateMap<UpdateServiceRequest, ServicePackage>()
+            CreateMap<CreateServiceTypeRequest, Service>().HandleNullProperty();
+            CreateMap<UpdateServiceTypeRequest, Service>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<ServicePackage, ServiceResponse>().HandleNullProperty();
-            CreateMap<ServicePackage, CreateServiceResponse>().HandleNullProperty();
+            CreateMap<Service, ServiceTypeResponse>().HandleNullProperty();
+            CreateMap<Service, CreateServiceTypeResponse>().HandleNullProperty();
         }
     }
 }

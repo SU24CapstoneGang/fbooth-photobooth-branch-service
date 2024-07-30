@@ -51,7 +51,7 @@ public class StickerController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateSticker(IFormFile file, Guid id, UpdateStickerRequest updateStickerRequest)
+    public async Task<ActionResult> UpdateSticker(IFormFile file, Guid id, [FromQuery] UpdateStickerRequest updateStickerRequest)
     {
         await _stickerService.UpdateStickerAsync(file, id, updateStickerRequest);
         return Ok();

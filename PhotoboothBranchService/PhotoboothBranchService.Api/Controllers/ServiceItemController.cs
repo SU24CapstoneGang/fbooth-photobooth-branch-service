@@ -70,7 +70,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateServiceItem(Guid id, UpdateServiceItemRequest updateServiceItemRequest)
+        public async Task<ActionResult> UpdateServiceItem(Guid id, [FromQuery] UpdateServiceItemRequest updateServiceItemRequest)
         {
             if (!ModelState.IsValid)
             {

@@ -5,17 +5,17 @@ using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Application.AutoMapperModules
 {
-    public class SessionOrderMapper : Profile
+    public class BookingMapper : Profile
     {
-        public SessionOrderMapper()
+        public BookingMapper()
         {
-            CreateMap<CreateSessionOrderRequest, Booking>()
+            CreateMap<CreateBookingRequest, Booking>()
                 .HandleNullProperty();
             CreateMap<UpdateSessionOrderRequest, Booking>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Booking, SessionOrderResponse>().HandleNullProperty();
-            CreateMap<Booking, CreateSessionOrderResponse>().HandleNullProperty();
-            CreateMap<CustomerBookingSessionOrderRequest, CreateSessionOrderRequest>().HandleNullProperty();
+            CreateMap<Booking, CreateBookingResponse>().HandleNullProperty();
+            CreateMap<CustomerBookingSessionOrderRequest, CreateBookingRequest>().HandleNullProperty();
         }
     }
 }

@@ -62,7 +62,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateServiceType(Guid id, UpdateServiceTypeRequest updateServiceTypeRequest, [FromQuery] StatusUse status)
+        public async Task<ActionResult> UpdateServiceType(Guid id, [FromQuery] UpdateServiceTypeRequest updateServiceTypeRequest, [FromQuery] StatusUse status)
         {
             await _serviceTypeService.UpdateAsync(id, updateServiceTypeRequest, status);
             return Ok();

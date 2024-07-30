@@ -101,7 +101,7 @@ namespace PhotoboothBranchService.Api.Controllers
                     return BadRequest(ModelState);
 
                 await _policyServices.UpdatePolicyAsync(id, request);
-                return NoContent();
+                return Ok();
             }
             catch (KeyNotFoundException ex)
             {

@@ -76,7 +76,7 @@ public class BranchController : ControllerBaseApi
 
     //Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateBranch(Guid id, UpdateBranchRequest updatePhotoBoothBranchRequest, [FromQuery] BranchStatus? status)
+    public async Task<ActionResult> UpdateBranch(Guid id, [FromQuery] UpdateBranchRequest updatePhotoBoothBranchRequest, [FromQuery] BranchStatus? status)
     {
         await _branchService.UpdateAsync(id, updatePhotoBoothBranchRequest, status);
         return Ok();

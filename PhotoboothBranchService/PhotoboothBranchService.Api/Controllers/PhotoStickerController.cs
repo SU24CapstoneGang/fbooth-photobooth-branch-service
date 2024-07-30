@@ -63,7 +63,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateMapSticker(Guid id, UpdatePhotoStickerRequest updateMapStickerRequest)
+        public async Task<ActionResult> UpdateMapSticker(Guid id, [FromQuery] UpdatePhotoStickerRequest updateMapStickerRequest)
         {
             await _mapStickerService.UpdateAsync(id, updateMapStickerRequest);
             return Ok();
