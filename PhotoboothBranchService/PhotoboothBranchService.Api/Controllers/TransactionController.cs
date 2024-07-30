@@ -10,18 +10,18 @@ using PhotoboothBranchService.Application.Services.PaymentServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
-    public class PaymentController : ControllerBaseApi
+    public class TransactionController : ControllerBaseApi
     {
-        private readonly IPaymentService _paymentService;
+        private readonly ITransactionService _paymentService;
 
-        public PaymentController(IPaymentService paymentService)
+        public TransactionController(ITransactionService paymentService)
         {
             _paymentService = paymentService;
         }
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<CreatePaymentResponse>> CreatePayment(CreatePaymentRequest createPaymentRequest)
+        public async Task<ActionResult<CreatePaymentResponse>> CreatePayment(CreateTransactionRequest createPaymentRequest)
         {
 
             //get ip from request
@@ -36,7 +36,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Read
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PaymentResponse>>> GetAllPayments()
+        public async Task<ActionResult<IEnumerable<TransactionResponse>>> GetAllPayments()
         {
 
             var payments = await _paymentService.GetAllAsync();
@@ -46,7 +46,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Read with paging and filter
         [HttpGet("paging")]
-        public async Task<ActionResult<IEnumerable<PaymentResponse>>> GetAllPayments(
+        public async Task<ActionResult<IEnumerable<TransactionResponse>>> GetAllPayments(
             [FromQuery] PaymentFilter paymentFilter, [FromQuery] PagingModel pagingModel)
         {
 
@@ -56,7 +56,7 @@ namespace PhotoboothBranchService.Api.Controllers
         }
 
         [HttpGet("transaction/{transactionId}")]
-        public async Task<ActionResult<IEnumerable<PaymentResponse>>> GetPaymentsByTransactionId(Guid transactionId)
+        public async Task<ActionResult<IEnumerable<TransactionResponse>>> GetPaymentsByTransactionId(Guid transactionId)
         {
             var payments = await _paymentService.GetByIdAsync(transactionId);
             return Ok(payments);
@@ -64,7 +64,7 @@ namespace PhotoboothBranchService.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PaymentResponse>> GetPaymentById(Guid id)
+        public async Task<ActionResult<TransactionResponse>> GetPaymentById(Guid id)
         {
 
             var payment = await _paymentService.GetByIdAsync(id);
@@ -78,7 +78,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdatePayment(Guid id, UpdatePaymentRequest updatePaymentRequest)
+        public async Task<ActionResult> UpdatePayment(Guid id, UpdateTransactiontRequest updatePaymentRequest)
         {
 
             await _paymentService.UpdateAsync(id, updatePaymentRequest);

@@ -130,7 +130,7 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                 bool checkSignature = moMoLibrary.ValidateSignature(rawHash, secretKey, momoResponse.signature);
                 if (checkSignature && momoResponse.resultCode == 0)
                 {
-                    payment.TransactionStatus = PaymentStatus.Success;
+                    payment.TransactionStatus = TransactionStatus.Success;
                     payment.GatewayTransactionID = momoResponse.transId.ToString();
                 }
                 else

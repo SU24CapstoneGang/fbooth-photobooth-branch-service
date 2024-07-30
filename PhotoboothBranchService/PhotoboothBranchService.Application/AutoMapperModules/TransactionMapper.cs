@@ -5,14 +5,14 @@ using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Application.AutoMapperModules
 {
-    public class PaymentMapper : Profile
+    public class TransactionMapper : Profile
     {
-        public PaymentMapper()
+        public TransactionMapper()
         {
-            CreateMap<CreatePaymentRequest, Transaction>().HandleNullProperty();
-            CreateMap<UpdatePaymentRequest, Transaction>()
+            CreateMap<CreateTransactionRequest, Transaction>().HandleNullProperty();
+            CreateMap<UpdateTransactiontRequest, Transaction>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<Transaction, PaymentResponse>().HandleNullProperty();
+            CreateMap<Transaction, TransactionResponse>().HandleNullProperty();
         }
     }
 }

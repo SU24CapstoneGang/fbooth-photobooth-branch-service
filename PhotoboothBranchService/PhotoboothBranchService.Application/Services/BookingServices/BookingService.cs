@@ -21,14 +21,14 @@ public class BookingService : IBookingService
     private readonly IBookingRepository _bookingRepository;
     private readonly IMapper _mapper;
     private readonly IBoothRepository _boothRepository;
-    private readonly IPaymentService _paymentService;
+    private readonly ITransactionService _paymentService;
     private readonly IBookingServiceService _bookingServiceService;
     private readonly IAccountRepository _accountRepository;
     private readonly IRefundService _refundService;
     public BookingService(IBookingRepository sessionOrderRepository,
         IMapper mapper,
         IBoothRepository boothRepository,
-        IPaymentService paymentService,
+        ITransactionService paymentService,
         IBookingServiceService servicePackageService,
         IAccountRepository accountRepository,
         IRefundService refundService)

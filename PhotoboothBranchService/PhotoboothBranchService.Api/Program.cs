@@ -1,7 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 using PhotoboothBranchService.Api.Common.MiddleWares;
 using PhotoboothBranchService.Application;
-using PhotoboothBranchService.Application.Services.ConstantServices;
 using PhotoboothBranchService.Infrastructure;
 using System.Text.Json.Serialization;
 

@@ -28,7 +28,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         public async Task<CreateBoothResponse> CreateAsync(CreateBoothRequest createModel, BoothStatus status)
         {
             Booth booth = _mapper.Map<Booth>(createModel);
-            var branch = (await _branchRepository.GetAsync(i => i.BranchID == )).SingleOrDefault();
+            var branch = (await _branchRepository.GetAsync(i => i.BranchID == createModel.BranchID)).SingleOrDefault();
             if (branch == null)
             {
                 throw new NotFoundException("Not found Branch to create booth");

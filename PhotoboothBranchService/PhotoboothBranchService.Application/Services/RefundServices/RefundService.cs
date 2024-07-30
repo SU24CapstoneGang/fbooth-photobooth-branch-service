@@ -63,11 +63,11 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
         }
 
         //refund 
-        public async Task<(IEnumerable<RefundResponse> refundResponses, IEnumerable<PaymentResponse> failPayment)> RefundByOrderId(Guid orderId, bool isFullRefund, string? ipAddress)
+        public async Task<(IEnumerable<RefundResponse> refundResponses, IEnumerable<TransactionResponse> failPayment)> RefundByOrderId(Guid orderId, bool isFullRefund, string? ipAddress)
         {
-            var payments = (await _paymentRepository.GetAsync(i => i.BookingID == orderId && i.TransactionStatus == PaymentStatus.Success)).ToList();
+            var payments = (await _paymentRepository.GetAsync(i => i.BookingID == orderId && i.TransactionStatus == TransactionStatus.Success)).ToList();
             var responseList = new List<RefundResponse>();
-            var failList = new List<PaymentResponse>();
+            var failList = new List<TransactionResponse>();
             foreach (var payment in payments)
             {
                 try
@@ -76,7 +76,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                 }
                 catch (Exception)
                 {
-                    failList.Add(_mapper.Map<PaymentResponse>(payment));
+                    failList.Add(_mapper.Map<TransactionResponse>(payment));
                 }
             }
             return (responseList,failList);

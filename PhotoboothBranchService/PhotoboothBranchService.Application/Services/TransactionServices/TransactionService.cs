@@ -20,7 +20,7 @@ using System.Net;
 
 namespace PhotoboothBranchService.Application.Services.PaymentServices
 {
-    public class PaymentService : IPaymentService
+    public class TransactionService : ITransactionService
     {
         private readonly ITransactionRepository _paymentRepository;
         private readonly IMapper _mapper;
@@ -30,7 +30,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         private readonly IMoMoService _moMoService;
         private readonly IEmailService _emailService;
         private readonly IRefundService _refundService;
-        public PaymentService(ITransactionRepository paymentRepository, IMapper mapper,
+        public TransactionService(ITransactionRepository paymentRepository, IMapper mapper,
             IPaymentMethodRepository paymentMethodRepository,
             IVNPayService vNPayService,
             IBookingRepository sessionOrderRepository,
@@ -49,7 +49,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         }
 
         // Create
-        public async Task<CreatePaymentResponse> CreateAsync(CreatePaymentRequest createModel, string ClientIpAddress)
+        public async Task<CreatePaymentResponse> CreateAsync(CreateTransactionRequest createModel, string ClientIpAddress)
         {
             //validate session and total price
             var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == createModel.SessionOrderID)).FirstOrDefault();
@@ -57,10 +57,15 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             {
                 throw new NotFoundException("Not found Session to proceed payment");
             }
-            if (sessionOrder.Status == BookingStatus.Canceled || sessionOrder.Status == BookingStatus.Done)
+            if (sessionOrder.Status == BookingStatus.Canceled)
             {
                 throw new BadRequestException("The Order has been ended or cancelled");
             }
+            //add check endtime later
+
+
+
+
             //create payment object
             var payment = _mapper.Map<Transaction>(createModel);
             payment.TransactionID = Guid.NewGuid();
@@ -69,7 +74,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             switch (createModel.PayType)
             {
                 case PayType.FullPay:
-                    var payments = await _paymentRepository.GetAsync(i => i.BookingID == sessionOrder.BookingID && i.TransactionStatus == PaymentStatus.Success);
+                    var payments = await _paymentRepository.GetAsync(i => i.BookingID == sessionOrder.BookingID && i.TransactionStatus == TransactionStatus.Success);
                     long result = (long)sessionOrder.PaymentAmount - payments.Sum(i => i.Amount);
                     if (result == 0)
                     {
@@ -81,12 +86,12 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                     }
                     payment.Amount = result;
                     break;
-                case PayType.Deposit:
-                    if (sessionOrder.Status != BookingStatus.Created)
-                    {
-                        throw new BadRequestException("Deposit only apply on Booking");
-                    }
-                    payment.Amount = (long)Math.Round(sessionOrder.PaymentAmount * 0.2m);
+                //case PayType.Deposit:
+                //    if (sessionOrder.Status != BookingStatus.Created)
+                //    {
+                //        throw new BadRequestException("Deposit only apply on Booking");
+                //    }
+                //    payment.Amount = (long)Math.Round(sessionOrder.PaymentAmount * 0.2m);
                     break;
                 default:
                     // Handle unexpected PayType
@@ -173,7 +178,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         public async Task HandleMomoResponse(IQueryCollection queryString)
         {
             var response = await _moMoService.Return(queryString);
-            if (response.TransactionStatus == PaymentStatus.Success)
+            if (response.TransactionStatus == TransactionStatus.Success)
             {
                 try
                 {
@@ -208,37 +213,37 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             }
         }
         // Read all
-        public async Task<IEnumerable<PaymentResponse>> GetAllAsync()
+        public async Task<IEnumerable<TransactionResponse>> GetAllAsync()
         {
             var payments = await _paymentRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<PaymentResponse>>(payments.ToList());
+            return _mapper.Map<IEnumerable<TransactionResponse>>(payments.ToList());
         }
         // Read all with paging and filter
-        public async Task<IEnumerable<PaymentResponse>> GetAllPagingAsync(PaymentFilter filter, PagingModel paging)
+        public async Task<IEnumerable<TransactionResponse>> GetAllPagingAsync(PaymentFilter filter, PagingModel paging)
         {
             var payments = (await _paymentRepository.GetAllAsync()).ToList().AutoFilter(filter);
-            var listPaymentResponse = _mapper.Map<IEnumerable<PaymentResponse>>(payments);
+            var listPaymentResponse = _mapper.Map<IEnumerable<TransactionResponse>>(payments);
             return listPaymentResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         }
-        public async Task<IEnumerable<PaymentResponse>> GetBySessionOrderAsync(Guid sessionOrderID)
+        public async Task<IEnumerable<TransactionResponse>> GetBySessionOrderAsync(Guid sessionOrderID)
         {
             var payments = await _paymentRepository.GetAsync(i => i.BookingID == sessionOrderID);
-            return _mapper.Map<IEnumerable<PaymentResponse>>(payments.ToList());
+            return _mapper.Map<IEnumerable<TransactionResponse>>(payments.ToList());
         }
-        public async Task<IEnumerable<PaymentResponse>> GetByOrderIdAsync(Guid id)
+        public async Task<IEnumerable<TransactionResponse>> GetByOrderIdAsync(Guid id)
         {
             var payments = await _paymentRepository.GetAsync(p => p.BookingID == id);
-            return _mapper.Map<IEnumerable<PaymentResponse>>(payments);
+            return _mapper.Map<IEnumerable<TransactionResponse>>(payments);
         }
         // Read by ID
-        public async Task<PaymentResponse> GetByIdAsync(Guid id)
+        public async Task<TransactionResponse> GetByIdAsync(Guid id)
         {
             var payments = await _paymentRepository.GetAsync(p => p.TransactionID == id);
             var payment = payments.FirstOrDefault();
-            return _mapper.Map<PaymentResponse>(payment);
+            return _mapper.Map<TransactionResponse>(payment);
         }
         // Update
-        public async Task UpdateAsync(Guid id, UpdatePaymentRequest updateModel)
+        public async Task UpdateAsync(Guid id, UpdateTransactiontRequest updateModel)
         {
             var payment = (await _paymentRepository.GetAsync(p => p.TransactionID == id)).FirstOrDefault();
             if (payment == null)
@@ -251,50 +256,50 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         }
         private async Task updateAfterSuccessPaymentAsync(Transaction payment)
         {
-            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == payment.BookingID)).FirstOrDefault();
-            if (sessionOrder != null && sessionOrder.Status == BookingStatus.Created)
-            {
-                if (payment.Amount < sessionOrder.PaymentAmount)
-                {
-                    sessionOrder.Status = BookingStatus.Deposited;
-                }
-                else if (payment.Amount == sessionOrder.PaymentAmount)
-                {
-                    sessionOrder.Status = BookingStatus.Waiting;
-                    try
-                    {
-                        if (sessionOrder.StartTime > DateTime.Now)
-                        {
-                            await _emailService.SendBookingInformation(sessionOrder.BookingID);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
-                }
-                await _sessionOrderRepository.UpdateAsync(sessionOrder);
-            }
-            else if (sessionOrder != null && sessionOrder.Status == BookingStatus.Deposited)
-            {
-                var paymentCheck = (await _paymentRepository.GetAsync(i => i.BookingID == sessionOrder.BookingID && i.TransactionStatus == PaymentStatus.Success)).ToList();
-                if (paymentCheck.Sum(i => i.Amount) == sessionOrder.PaymentAmount)
-                {
-                    sessionOrder.Status = BookingStatus.Waiting;
-                    try
-                    {
-                        if (sessionOrder.StartTime > DateTime.Now)
-                        {
-                            await _emailService.SendBookingInformation(sessionOrder.BookingID);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
-                    await _sessionOrderRepository.UpdateAsync(sessionOrder);
-                }
-            }
+            //var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == payment.BookingID)).FirstOrDefault();
+            //if (sessionOrder != null && sessionOrder.Status == BookingStatus.Created)
+            //{
+            //    if (payment.Amount < sessionOrder.PaymentAmount)
+            //    {
+            //        sessionOrder.Status = BookingStatus.Deposited;
+            //    }
+            //    else if (payment.Amount == sessionOrder.PaymentAmount)
+            //    {
+            //        sessionOrder.Status = BookingStatus.Waiting;
+            //        try
+            //        {
+            //            if (sessionOrder.StartTime > DateTime.Now)
+            //            {
+            //                await _emailService.SendBookingInformation(sessionOrder.BookingID);
+            //            }
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            Console.WriteLine(ex.Message);
+            //        }
+            //    }
+            //    await _sessionOrderRepository.UpdateAsync(sessionOrder);
+            //}
+            //else if (sessionOrder != null && sessionOrder.Status == BookingStatus.Deposited)
+            //{
+            //    var paymentCheck = (await _paymentRepository.GetAsync(i => i.BookingID == sessionOrder.BookingID && i.TransactionStatus == PaymentStatus.Success)).ToList();
+            //    if (paymentCheck.Sum(i => i.Amount) == sessionOrder.PaymentAmount)
+            //    {
+            //        sessionOrder.Status = BookingStatus.Waiting;
+            //        try
+            //        {
+            //            if (sessionOrder.StartTime > DateTime.Now)
+            //            {
+            //                await _emailService.SendBookingInformation(sessionOrder.BookingID);
+            //            }
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            Console.WriteLine(ex.Message);
+            //        }
+            //        await _sessionOrderRepository.UpdateAsync(sessionOrder);
+            //    }
+            //}
         }
     }
 }

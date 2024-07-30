@@ -131,7 +131,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                     foreach (var serviceItem in serviceItemList)
                     {
                         sbBody.AppendLine("<tr>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.Service.PackageName}</td>");
+                       // sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.Service.PackageName}</td>");
                         sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.Quantity}</td>");
                         sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.Price:N0}</td>");
                         sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.SubTotal:N0}</td>");

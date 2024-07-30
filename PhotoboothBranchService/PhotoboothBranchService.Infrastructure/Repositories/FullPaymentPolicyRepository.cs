@@ -71,7 +71,7 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        async Task<FullPaymentPolicy> IRepositoryBase<FullPaymentPolicy>.AddAsync(FullPaymentPolicy entity)
+        public async Task<FullPaymentPolicy> AddAsync(FullPaymentPolicy entity)
         {
             var result = await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
