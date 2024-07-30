@@ -47,7 +47,7 @@ public class LayoutController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateLayout(IFormFile file, Guid id, UpdateLayoutRequest updateLayoutRequest)
+    public async Task<ActionResult> UpdateLayout(IFormFile? file, Guid id, UpdateLayoutRequest updateLayoutRequest)
     {
         await _layoutService.UpdateLayoutAsync(file, id, updateLayoutRequest);
         return Ok();

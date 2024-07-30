@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Api.Common.Helper;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.MoMoPayment;
 using PhotoboothBranchService.Application.DTOs.Payment;
+using PhotoboothBranchService.Application.Services.MoMoServices;
 using PhotoboothBranchService.Application.Services.PaymentServices;
 
 namespace PhotoboothBranchService.Api.Controllers
@@ -94,7 +97,7 @@ namespace PhotoboothBranchService.Api.Controllers
         }
 
         //handle return 
-        [HttpGet("vnpay-return")]
+        [HttpGet("vnpay/return")]
         public async Task<IActionResult> VnpayReturn()
         {
             if (Request.QueryString.HasValue)
@@ -126,7 +129,7 @@ namespace PhotoboothBranchService.Api.Controllers
             return BadRequest(new { Message = "No query string found" });
         }
 
-        [HttpGet("momo-return")]
+        [HttpGet("momo/return")]
         public async Task<IActionResult> PaymentMomoReturn()
         {
             if (Request.QueryString.HasValue)
@@ -157,6 +160,22 @@ namespace PhotoboothBranchService.Api.Controllers
             {
                 return BadRequest(new { Message = "No query string found" });
             }
+        }
+
+        [HttpGet("vnpay/ipn")]
+        public async Task<IActionResult> HandleVnpayIPN()
+        {
+            if (Request.QueryString.HasValue)
+            {
+                var response = await _paymentService.HandleVnpayResponse(Request.Query);
+                return Ok(response.returnContent);
+            }
+            return BadRequest(new { Message = "No query string found" });
+        }
+        [HttpPost("momo/ipn")]
+        public async Task<ActionResult<MomoIPNResponse>> HandleMomoIPN(MoMoResponse moMoResponse)
+        {
+            return Ok(await _paymentService.HandleMomoIPN(moMoResponse));
         }
     }
 }

@@ -29,6 +29,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
              .ValueGeneratedOnAdd()
              .HasDefaultValueSql("GETDATE()")
              .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
             builder.HasMany(s => s.SessionOrders)
                 .WithOne(a => a.Booth)
                 .HasForeignKey(c => c.BoothID)

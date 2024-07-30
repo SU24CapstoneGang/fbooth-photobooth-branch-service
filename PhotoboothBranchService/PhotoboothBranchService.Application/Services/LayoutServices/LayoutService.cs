@@ -20,19 +20,39 @@ public class LayoutService : ILayoutService
     private readonly ILayoutRepository _layoutRepository;
     private readonly IMapper _mapper;
     private readonly ICloudinaryService _cloudinaryService;
+    private readonly IPhotoBoxRepository _photoBoxRepository;
 
-    public LayoutService(ILayoutRepository layoutRepository, IMapper mapper, ICloudinaryService cloudinaryService)
+    public LayoutService(ILayoutRepository layoutRepository, IMapper mapper, ICloudinaryService cloudinaryService, IPhotoBoxRepository photoBoxRepository)
     {
         _layoutRepository = layoutRepository;
         _mapper = mapper;
         _cloudinaryService = cloudinaryService;
+        _photoBoxRepository = photoBoxRepository;
     }
 
 
     //[HttpPost("add-layout-auto")]
     public async Task<LayoutResponse> CreateLayoutAuto(IFormFile file)
     {
-        // Load the image from the file
+        var layout = await this.DefineLayoutDetail(file);
+            layout.Status = StatusUse.Available;
+
+        // Upload lên Cloudinary
+        var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-Layout");
+        if (uploadResult.Error != null)
+        {
+            throw new Exception(uploadResult.Error.Message);
+        }
+
+        layout.LayoutURL = uploadResult.SecureUrl.AbsoluteUri;
+        layout.CouldID = uploadResult.PublicId;
+
+        await _layoutRepository.AddAsync(layout);
+        return _mapper.Map<LayoutResponse>(layout);
+    }
+
+    private async Task<Layout> DefineLayoutDetail(IFormFile file)
+    {
         using (var ms = new MemoryStream())
         {
             await file.CopyToAsync(ms);
@@ -73,19 +93,9 @@ public class LayoutService : ILayoutService
                     throw new Exception("Hình ảnh không phải là layout hợp lệ (không có ô trống).");
                 }
 
-                // Upload lên Cloudinary
-                var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-Layout");
-                if (uploadResult.Error != null)
-                {
-                    throw new Exception(uploadResult.Error.Message);
-                }
-
                 var layout = new Layout
                 {
                     LayoutCode = Path.GetFileNameWithoutExtension(file.FileName),
-                    LayoutURL = uploadResult.SecureUrl.AbsoluteUri,
-                    CouldID = uploadResult.PublicId,
-                    Status = StatusUse.Available,
                     PhotoBoxes = new List<PhotoBox>()
                 };
 
@@ -122,15 +132,10 @@ public class LayoutService : ILayoutService
                 layout.Width = srcImage.Width;
                 layout.PhotoSlot = boxCount;
 
-                await _layoutRepository.AddAsync(layout);
-
-                return _mapper.Map<LayoutResponse>(layout);
+                return layout;
             }
         }
     }
-
-
-
 
     // Delete
     public async Task DeleteAsync(Guid id)
@@ -174,15 +179,32 @@ public class LayoutService : ILayoutService
         return _mapper.Map<LayoutResponse>(layout);
     }
 
-    public async Task UpdateLayoutAsync(IFormFile file, Guid BackGroundID, UpdateLayoutRequest updateLayoutRequest)
+    public async Task UpdateLayoutAsync(IFormFile? file, Guid LayoutID, UpdateLayoutRequest updateLayoutRequest)
     {
-        var layout = (await _layoutRepository.GetAsync(l => l.LayoutID == BackGroundID)).FirstOrDefault();
+        var layout = (await _layoutRepository.GetAsync(l => l.LayoutID == LayoutID, l => l.PhotoBoxes)).FirstOrDefault();
         if (layout == null)
         {
             throw new KeyNotFoundException("Layout not found.");
         }
-
         var updateLayout = _mapper.Map(updateLayoutRequest, layout);
+        if (file != null)
+        {
+            var templayout = await this.DefineLayoutDetail(file);
+            foreach (var box in layout.PhotoBoxes)
+            {
+                await _photoBoxRepository.RemoveAsync(box);
+            }
+            foreach (var box in templayout.PhotoBoxes)
+            {
+                box.LayoutID = LayoutID;
+                await _photoBoxRepository.AddAsync(box);
+            }
+            updateLayout.LayoutCode = templayout.LayoutCode;
+            updateLayout.Height = templayout.Height;
+            updateLayout.Width = templayout.Width;
+            updateLayout.PhotoSlot = templayout.PhotoSlot;
+
+        }
         await _layoutRepository.UpdateAsync(updateLayout);
         await _cloudinaryService.UpdatePhotoAsync(file, layout.CouldID);
     }

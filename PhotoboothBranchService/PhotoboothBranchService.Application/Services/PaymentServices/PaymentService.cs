@@ -186,7 +186,10 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                 await this.updateAfterSuccessPaymentAsync(response);
             }
         }
-
+        public async Task<MomoIPNResponse> HandleMomoIPN(MoMoResponse moMoResponse)
+        {
+            return (await _moMoService.HandlePaymentResponeIPN(moMoResponse)).iPNResponse;
+        }
         // Delete
         public async Task DeleteAsync(Guid id)
         {

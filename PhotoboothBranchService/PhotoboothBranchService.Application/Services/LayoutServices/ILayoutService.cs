@@ -10,6 +10,5 @@ public interface ILayoutService : IServiceBase<LayoutResponse, LayoutFilter, Pag
 {
     Task<LayoutResponse> CreateLayoutAuto(IFormFile file);
     Task DeleteAsync(Guid id);
-    Task UpdateLayoutAsync(IFormFile file, Guid BackGroundID, UpdateLayoutRequest updateLayoutRequest);
-
+    Task UpdateLayoutAsync(IFormFile? file, Guid LayoutID, UpdateLayoutRequest updateLayoutRequest);
 }
