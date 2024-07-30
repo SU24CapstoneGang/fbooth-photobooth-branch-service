@@ -69,7 +69,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 BranchName = "Vincom Le Van Viet q9",
                 Status = BranchStatus.Active,
                 City = "HCMC",
-                Town = "district 9"
+                Town = "district 9",
+                OpeningTime = new TimeSpan(8, 0, 0),
+                ClosingTime = new TimeSpan(23, 0, 0)
             },
             new Branch
             {
@@ -78,7 +80,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 BranchName = "Mega Mall Pham Van Dong",
                 Status = BranchStatus.Active,
                 City = "Thanh pho Thu Duc",
-                Town = "Thu Duc"
+                Town = "Thu Duc",
+                OpeningTime = new TimeSpan(8, 0, 0),
+                ClosingTime = new TimeSpan(23, 0, 0)
             });
         }
     }

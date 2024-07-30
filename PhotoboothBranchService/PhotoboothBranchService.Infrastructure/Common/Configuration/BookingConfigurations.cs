@@ -28,30 +28,26 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
               .HasDefaultValueSql("GETDATE()");
 
             builder.Property(u => u.ValidateCode).IsRequired();
-            // enum mapping
             builder.Property(pb => pb.Status)
-                .IsRequired()
-                .HasConversion(
-                    v => v.ToString(),
-                    v => (BookingStatus)Enum.Parse(typeof(BookingStatus), v));
+                .IsRequired();
 
             // Mối quan hệ một-nhieu giữa Session và Account
             builder.HasOne(s => s.Account)
-                .WithMany(a => a.SessionOrder)
+                .WithMany(a => a.Bookings)
                 .HasForeignKey(s => s.CustomerID)
                 .IsRequired();
 
             builder.HasMany(s => s.Payments)
-                .WithOne(p => p.SessionOrder)
-                .HasForeignKey(p => p.SessionOrderID)
+                .WithOne(p => p.Booking)
+                .HasForeignKey(p => p.BookingID)
                 .IsRequired();
             builder.HasMany(s => s.BookingServices)
-                .WithOne(a => a.SessionOrder)
-                .HasForeignKey(c => c.SessionOrderID)
+                .WithOne(a => a.Booking)
+                .HasForeignKey(c => c.BookingID)
                 .IsRequired(false);
             builder.HasMany(s => s.PhotoSessions)
-                .WithOne(ps => ps.SessionOrder)
-                .HasForeignKey(ps => ps.SessionOrderID)
+                .WithOne(ps => ps.Booking)
+                .HasForeignKey(ps => ps.BookingID)
                 .IsRequired();
         }
     }

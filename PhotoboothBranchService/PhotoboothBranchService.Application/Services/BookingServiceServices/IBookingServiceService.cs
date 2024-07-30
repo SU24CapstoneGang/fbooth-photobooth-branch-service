@@ -2,13 +2,13 @@
 using PhotoboothBranchService.Application.DTOs.ServiceItem;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 
-namespace PhotoboothBranchService.Application.Services.ServiceItemServices
+namespace PhotoboothBranchService.Application.Services.BookingServiceServices
 {
-    public interface IServiceItemService : IServiceBase<ServiceItemResponse, ServiceItemFilter, PagingModel>
+    public interface IBookingServiceService : IServiceBase<BookingServiceResponse, BookingServiceFilter, PagingModel>
     {
-        Task<AddListServiceItemResponse> AddListServiceItem(AddListServiceItemRequest request);
-        Task<CreateServiceItemResponse> CreateAsync(CreateServiceItemRequest createModel);
-        Task UpdateAsync(Guid id, UpdateServiceItemRequest updateModel);
+        Task<AddListBookingServiceResponse> AddListServiceItem(AddListBookingServiceRequest request);
+        Task<CreateBookingServiceResponse> CreateAsync(CreateBookingServiceRequest createModel);
+        Task UpdateAsync(Guid id, UpdateBookingServiceRequest updateModel);
         Task DeleteAsync(Guid id);
     }
 }

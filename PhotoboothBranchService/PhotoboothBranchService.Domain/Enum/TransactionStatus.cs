@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Domain.Enum
 {
-    public enum PaymentStatus
+    public enum TransactionStatus
     {
+        Success = 1,
         Fail = 0,
-        Processing = 1,
-        Refunded = 2,
-        Paid = 3,
+        Processing = 2,
+        RefundedFull = 3,
+        RefundedPartial = 4,
     }
 }

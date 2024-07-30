@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.DTOs.ServiceItem
 {
-    public class AddListServiceItemResponse
+    public class AddListBookingServiceResponse
     {
         public Guid SessionOrderID { get; set; }
         public Guid BoothID { get; set; }
-        public List<ServiceItemResponse> Items { get; set; } = new List<ServiceItemResponse>();
+        public List<BookingServiceResponse> Items { get; set; } = new List<BookingServiceResponse>();
     }
 }

@@ -7,8 +7,8 @@
         public decimal Price { get; set; }
         public decimal SubTotal { get; set; }
         public Guid ServiceID { get; set; }
-        public virtual ServicePackage Service { get; set; } = default!;
-        public Guid SessionOrderID { get; set; }
-        public virtual Booking SessionOrder { get; set; } = default!;
+        public virtual Service Service { get; set; }
+        public Guid BookingID { get; set; }
+        public virtual Booking Booking { get; set; } = default!;
     }
 }

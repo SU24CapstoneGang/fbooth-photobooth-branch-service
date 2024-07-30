@@ -10,6 +10,7 @@ namespace PhotoboothBranchService.Domain.Entities
         public string BackgroundColor { get; set; } = default!;
         public string Concept { get; set; } = default!;
         public short PeopleInBooth { get; set; }
+        public bool isBooked { get; set; }
         public BoothStatus Status { get; set; }
         public DateTime CreateDate { get; set; }
         public Guid BranchID { get; set; }

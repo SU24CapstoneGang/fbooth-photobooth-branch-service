@@ -34,7 +34,7 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
                 v => (AccountRole)Enum.Parse(typeof(AccountRole), v));
 
         // Relationship with Sessions
-        builder.HasMany(a => a.SessionOrder)
+        builder.HasMany(a => a.Bookings)
             .WithOne(s => s.Account)
             .HasForeignKey(s => s.CustomerID)
             .IsRequired();

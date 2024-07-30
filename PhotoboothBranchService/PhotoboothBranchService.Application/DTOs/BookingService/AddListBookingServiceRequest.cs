@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.DTOs.ServiceItem
 {
-    public class AddListServiceItemRequest
+    public class AddListBookingServiceRequest
     {
         public Guid BoothID { get; set; }
         [DictionaryValueGreaterThanZero(ErrorMessage = "Each service quantity must be greater than 0.")]

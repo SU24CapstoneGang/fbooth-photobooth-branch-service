@@ -38,10 +38,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             // Status enum mapping
             builder.Property(s => s.Status)
-                .IsRequired()
-                .HasConversion(
-                    v => v.ToString(),
-                    v => (StatusUse)Enum.Parse(typeof(StatusUse), v));
+                .IsRequired();
 
             // Relationship with MapSticker
             builder.HasMany(s => s.PhotoSticker)

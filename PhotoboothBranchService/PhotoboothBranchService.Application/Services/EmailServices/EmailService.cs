@@ -26,13 +26,13 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
         private ITransactionRepository _paymentRepository;
         private IBookingRepository _sessionOrderRepository;
         private IBranchRepository _boothBranchRepository;
-        private IServiceSessionRepository _serviceItemRepository;
+        private IBookingServiceRepository _serviceItemRepository;
 
         public EmailService(IAccountRepository accountRepository, 
             ITransactionRepository paymentRepository, 
             IBookingRepository sessionOrderRepository, 
             IBranchRepository boothBranchRepository, 
-            IServiceSessionRepository serviceItemRepository)
+            IBookingServiceRepository serviceItemRepository)
         {
             this.smtpServerName = JsonHelper.GetFromAppSettings("EmailConfig:SmtpServerName");
             this.smtpPortNumber = JsonHelper.GetFromAppSettings("EmailConfig:SmtpPortNumber");
@@ -52,7 +52,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             {
                 throw new NotFoundException("Not found payment");
             }
-            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == payment.SessionOrderID)).FirstOrDefault();
+            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == payment.BookingID)).FirstOrDefault();
             if (sessionOrder == null)
             {
                 throw new NotFoundException("Not found Order of payment");

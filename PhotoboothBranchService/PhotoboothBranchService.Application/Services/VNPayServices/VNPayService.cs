@@ -207,7 +207,7 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
                 {
                     if (payment.Amount == vnp_Amount)
                     {
-                        if (payment.PaymentStatus == PaymentStatus.Processing)
+                        if (payment.TransactionStatus == TransactionStatus.Processing)
                         {
                             if (vnp_ResponseCode == "00" && vnp_TransactionStatus == "00")
                             {
@@ -255,7 +255,7 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
                             Message = "Có lỗi xảy ra trong quá trình xử lý",
                             Success = false,
                         };
-                        payment.PaymentStatus = PaymentStatus.Fail;
+                        payment.TransactionStatus = TransactionStatus.Fail;
                         returnContent = "{\"RspCode\":\"04\",\"Message\":\"invalid amount\"}";
                     }
                 }

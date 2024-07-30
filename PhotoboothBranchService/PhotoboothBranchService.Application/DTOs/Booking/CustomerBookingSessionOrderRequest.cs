@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.DTOs.SessionOrder
+namespace PhotoboothBranchService.Application.DTOs.Booking
 {
     public class CustomerBookingSessionOrderRequest
     {

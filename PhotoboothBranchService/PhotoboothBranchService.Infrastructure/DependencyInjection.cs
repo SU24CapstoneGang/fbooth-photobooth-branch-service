@@ -22,7 +22,6 @@ namespace PhotoboothBranchService.Infrastructure
             services.AddScoped<IBoothRepository, BoothRepository>();
             services.AddScoped<IBranchRepository, BranchRepository>();
             services.AddScoped<IBackgroundRepository, BackgroundRepository>();
-            services.AddScoped<IConstantRepository, ConstantRepository>();
             services.AddScoped<IDeviceRepository, DeviceRepository>();
             services.AddScoped<ILayoutRepository, LayoutRepository>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
@@ -32,9 +31,8 @@ namespace PhotoboothBranchService.Infrastructure
             services.AddScoped<IPhotoRepository, PhotoRepository>();
             services.AddScoped<IPhotoSessionRepository, PhotoSessionRepository>();
             services.AddScoped<IPhotoStickerRepository, PhotoStickerRepository>();
-            services.AddScoped<IServiceSessionRepository, ServiceSessionRepository>();
-            services.AddScoped<IServicePackageRepository, ServicePackageRepository>();
-            services.AddScoped<IServiceTypeRepository, ServiceTypeRepository>();
+            services.AddScoped<IBookingServiceRepository, BookingServiceRepository>();
+            services.AddScoped<IServiceRepository, ServiceRepository>();
             services.AddScoped<IBookingRepository, BookingRepository>();
             services.AddScoped<IStickerRepository, StickerRepository>();
             services.AddScoped<IPhotoBoxRepository, PhotoBoxRepository>();

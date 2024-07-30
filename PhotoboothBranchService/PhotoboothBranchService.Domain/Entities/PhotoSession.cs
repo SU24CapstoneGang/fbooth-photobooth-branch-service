@@ -12,8 +12,8 @@ namespace PhotoboothBranchService.Domain.Entities
         public Guid LayoutID { get; set; }
         public PhotoSessionStatus Status { get; set; }
         public virtual Layout Layout { get; set; } = default!;
-        public Guid SessionOrderID { get; set; }
-        public virtual Booking SessionOrder { get; set; } = default!;
+        public Guid BookingID { get; set; }
+        public virtual Booking Booking { get; set; } = default!;
         public virtual ICollection<Photo> Photos { get; set; } = default!;
     }
 }

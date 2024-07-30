@@ -1,7 +1,7 @@
 ﻿using PhotoboothBranchService.Application.DTOs.Booth;
 using PhotoboothBranchService.Domain.Enum;
 
-namespace PhotoboothBranchService.Application.DTOs.BoothBranch
+namespace PhotoboothBranchService.Application.DTOs.Branch
 {
     public class BranchFilter
     {

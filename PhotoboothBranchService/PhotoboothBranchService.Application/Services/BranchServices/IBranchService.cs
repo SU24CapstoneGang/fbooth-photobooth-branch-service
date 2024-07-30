@@ -1,10 +1,9 @@
 ﻿using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.BoothBranch;
 using PhotoboothBranchService.Application.DTOs.Branch;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Enum;
 
-namespace PhotoboothBranchService.Application.Services.BoothBranchServices;
+namespace PhotoboothBranchService.Application.Services.BranchServices;
 
 public interface IBranchService : IServiceBase<BranchResponse, BranchFilter, PagingModel>
 {

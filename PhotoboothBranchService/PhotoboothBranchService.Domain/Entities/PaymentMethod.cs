@@ -8,6 +8,6 @@ namespace PhotoboothBranchService.Domain.Entities
         public string PaymentMethodName { get; set; } = default!;
         public DateTime CreateDate { get; set; }
         public PaymentMethodStatus Status { get; set; }
-        public virtual ICollection<Transaction> Payments { get; set; } = default!;
+        public virtual ICollection<Transaction> Transactions { get; set; } = default!;
     }
 }

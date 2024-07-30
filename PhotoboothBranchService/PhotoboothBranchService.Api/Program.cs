@@ -59,11 +59,6 @@ builder.Services
 
 var app = builder.Build();
 
-//using (var scope = app.Services.CreateScope())
-//{
-//    var constantService = scope.ServiceProvider.GetRequiredService<IConstantService>();
-//    await constantService.LoadConstantsAsync();
-//}
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseMiddleware<ExceptionMiddleware>();

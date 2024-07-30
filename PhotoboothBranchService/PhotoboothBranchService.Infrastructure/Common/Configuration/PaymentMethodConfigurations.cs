@@ -38,7 +38,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
               .HasDefaultValueSql("GETDATE()")
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
-            builder.HasMany(i => i.Payments)
+            builder.HasMany(i => i.Transactions)
                 .WithOne(w => w.PaymentMethod)
                 .HasForeignKey(i => i.PaymentMethodID)
                 .IsRequired();

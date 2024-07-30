@@ -1,6 +1,6 @@
 ﻿namespace PhotoboothBranchService.Application.DTOs.ServiceItem
 {
-    public class ServiceItemFilter
+    public class BookingServiceFilter
     {
         public short? Quantity { get; set; }
         public decimal? Price { get; set; }

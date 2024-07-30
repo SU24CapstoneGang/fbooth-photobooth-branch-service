@@ -85,76 +85,76 @@ namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
 
         public async Task DeleteAsync(Guid id)
         {
-                var policy = (await _repository.GetAsync(p => p.FullPaymentPolicyID == id)).FirstOrDefault();
-                if (policy == null)
-                {
-                    throw new KeyNotFoundException("Policy not found.");
-                }
-                await _repository.RemoveAsync(policy);
+            var policy = (await _repository.GetAsync(p => p.FullPaymentPolicyID == id)).FirstOrDefault();
+            if (policy == null)
+            {
+                throw new KeyNotFoundException("Policy not found.");
+            }
+            await _repository.RemoveAsync(policy);
         }
 
         public async Task<IEnumerable<FullPaymentPolicyResponse>> GetAllAsync()
         {
-                var policy = await _repository.GetAllAsync();
-                return _mapper.Map<IEnumerable<FullPaymentPolicyResponse>>(policy.ToList());
+            var policy = await _repository.GetAllAsync();
+            return _mapper.Map<IEnumerable<FullPaymentPolicyResponse>>(policy.ToList());
         }
 
         public async Task<IEnumerable<FullPaymentPolicyResponse>> GetAllPagingAsync(FullPaymentPolicyFilter filter, PagingModel paging)
         {
-                var policy = (await _repository.GetAllAsync()).ToList().AutoFilter(filter);
-                var listPolicyresponse = _mapper.Map<IEnumerable<FullPaymentPolicyResponse>>(policy);
-                return listPolicyresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+            var policy = (await _repository.GetAllAsync()).ToList().AutoFilter(filter);
+            var listPolicyresponse = _mapper.Map<IEnumerable<FullPaymentPolicyResponse>>(policy);
+            return listPolicyresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         }
 
         public async Task<FullPaymentPolicyResponse> GetByIdAsync(Guid id)
         {
-                var policy = (await _repository.GetAsync(p => p.FullPaymentPolicyID == id)).FirstOrDefault();
-                return _mapper.Map<FullPaymentPolicyResponse>(policy);
+            var policy = (await _repository.GetAsync(p => p.FullPaymentPolicyID == id)).FirstOrDefault();
+            return _mapper.Map<FullPaymentPolicyResponse>(policy);
         }
 
         public async Task UpdatePolicyAsync(Guid id, UpdatePolicyRequestModel policyRequest)
         {
-                var policy = (await _repository.GetAsync(p => p.FullPaymentPolicyID == id)).FirstOrDefault();
-                if (policy == null)
-                {
-                    throw new KeyNotFoundException("Policy not found.");
-                }
+            var policy = (await _repository.GetAsync(p => p.FullPaymentPolicyID == id)).FirstOrDefault();
+            if (policy == null)
+            {
+                throw new KeyNotFoundException("Policy not found.");
+            }
 
-                // Kiểm tra các giá trị đầu vào
-                //if (string.IsNullOrEmpty(policyRequest.PolicyName))
-                //{
-                //    throw new ArgumentException("Policy name is required.");
-                //}
+            // Kiểm tra các giá trị đầu vào
+            //if (string.IsNullOrEmpty(policyRequest.PolicyName))
+            //{
+            //    throw new ArgumentException("Policy name is required.");
+            //}
 
-                if (policyRequest.RefundDaysBefore < 0)
-                {
-                    throw new ArgumentException("Refund days before cannot be negative.");
-                }
+            if (policyRequest.RefundDaysBefore < 0)
+            {
+                throw new ArgumentException("Refund days before cannot be negative.");
+            }
 
-                // Kiểm tra ngày bắt đầu và ngày kết thúc
-                if (policyRequest.StartDate.HasValue && policyRequest.StartDate.Value.ToDateTime(TimeOnly.MinValue) < DateTime.Now)
-                {
-                    throw new ArgumentException("Start date cannot be in the past.");
-                }
+            // Kiểm tra ngày bắt đầu và ngày kết thúc
+            if (policyRequest.StartDate.HasValue && policyRequest.StartDate.Value.ToDateTime(TimeOnly.MinValue) < DateTime.Now)
+            {
+                throw new ArgumentException("Start date cannot be in the past.");
+            }
 
-                if (policyRequest.EndDate.HasValue && policyRequest.EndDate.Value.ToDateTime(TimeOnly.MinValue) < DateTime.Now)
-                {
-                    throw new ArgumentException("End date cannot be in the past.");
-                }
+            if (policyRequest.EndDate.HasValue && policyRequest.EndDate.Value.ToDateTime(TimeOnly.MinValue) < DateTime.Now)
+            {
+                throw new ArgumentException("End date cannot be in the past.");
+            }
 
-                //// Kiểm tra trùng lặp chính sách dựa trên thời gian hiệu lực
-                //var existingPolicies = await _repository.GetAsync(
-                //    p => p.FullPaymentPolicyID != id &&
-                //         (policyRequest.StartDate == null || p.EndDate == null || policyRequest.StartDate <= p.EndDate) &&
-                //         (policyRequest.EndDate == null || p.StartDate == null || policyRequest.EndDate >= p.StartDate));
+            //// Kiểm tra trùng lặp chính sách dựa trên thời gian hiệu lực
+            //var existingPolicies = await _repository.GetAsync(
+            //    p => p.FullPaymentPolicyID != id &&
+            //         (policyRequest.StartDate == null || p.EndDate == null || policyRequest.StartDate <= p.EndDate) &&
+            //         (policyRequest.EndDate == null || p.StartDate == null || policyRequest.EndDate >= p.StartDate));
 
-                //if (existingPolicies.Any())
-                //{
-                //    throw new InvalidOperationException("A policy with overlapping effective dates already exists.");
-                //}
+            //if (existingPolicies.Any())
+            //{
+            //    throw new InvalidOperationException("A policy with overlapping effective dates already exists.");
+            //}
 
-                var updatePolicy = _mapper.Map(policyRequest, policy);
-                await _repository.UpdateAsync(updatePolicy);
+            var updatePolicy = _mapper.Map(policyRequest, policy);
+            await _repository.UpdateAsync(updatePolicy);
         }
     }
 }

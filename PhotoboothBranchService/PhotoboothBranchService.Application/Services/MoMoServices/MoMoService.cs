@@ -119,13 +119,13 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                 bool checkSignature = moMoLibrary.ValidateSignature(rawHash, secretKey, momoResponse.signature);
                 if (checkSignature && momoResponse.resultCode == 0)
                 {
-                    payment.PaymentStatus = PaymentStatus.Success;
+                    payment.TransactionStatus = PaymentStatus.Success;
                     payment.GatewayTransactionID = momoResponse.transId.ToString();
                 }
                 else
                 {
                     payment.GatewayTransactionID = momoResponse.transId.ToString();
-                    payment.PaymentStatus = PaymentStatus.Fail;
+                    payment.TransactionStatus = TransactionStatus.Fail;
                 }
             }
             await _paymentRepository.UpdateAsync(payment);

@@ -8,10 +8,11 @@ using PhotoboothBranchService.Application.BackgroundServices;
 using PhotoboothBranchService.Application.Common;
 using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Application.Services.BackgroundServices;
-using PhotoboothBranchService.Application.Services.BoothBranchServices;
+using PhotoboothBranchService.Application.Services.BookingServices;
+using PhotoboothBranchService.Application.Services.BookingServiceServices;
 using PhotoboothBranchService.Application.Services.BoothServices;
+using PhotoboothBranchService.Application.Services.BranchServices;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
-using PhotoboothBranchService.Application.Services.ConstantServices;
 using PhotoboothBranchService.Application.Services.DashboardServices;
 using PhotoboothBranchService.Application.Services.DeviceServices;
 using PhotoboothBranchService.Application.Services.EmailServices;
@@ -28,10 +29,7 @@ using PhotoboothBranchService.Application.Services.PhotoServices;
 using PhotoboothBranchService.Application.Services.PhotoSessionServices;
 using PhotoboothBranchService.Application.Services.PhotoStickerServices;
 using PhotoboothBranchService.Application.Services.RefundServices;
-using PhotoboothBranchService.Application.Services.ServiceItemServices;
 using PhotoboothBranchService.Application.Services.ServiceServices;
-using PhotoboothBranchService.Application.Services.ServiceTypeServices;
-using PhotoboothBranchService.Application.Services.SessionOrderServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
 using PhotoboothBranchService.Application.Services.VNPayServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
@@ -48,7 +46,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IBoothService, BoothService>();
             services.AddScoped<IBranchService, BranchService>();
             services.AddScoped<IBackgroundService, BackgroundService>();
-            services.AddScoped<IDashboardService, DashboardService>();
+            //services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IDeviceService, DeviceService>();
             services.AddScoped<ILayoutService, LayoutService>();
             services.AddScoped<IPaymentService, PaymentService>();
@@ -58,16 +56,13 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IPhotoSessionService, PhotoSessionService>();
             services.AddScoped<IPhotoStickerService, PhotoStickerService>();
             services.AddScoped<IRefundService, RefundService>();
-            services.AddScoped<IServiceItemService, ServiceItemService>();
+            services.AddScoped<IBookingServiceService, BookingServiceService>();
             services.AddScoped<IServiceService, ServiceService>();
-            services.AddScoped<IServiceTypeService, ServiceTypeService>();
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IStickerService, StickerService>();
             services.AddScoped<IPhotoBoxService, PhotoBoxService>();
             services.AddScoped<IFullPaymentPolicyServices, FullPaymentPolicyServices>();
 
-            // Register ConstantService as a singleton
-            services.AddScoped<IConstantService, ConstantService>();
             // cloudinary
             services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
             services.AddScoped<ICloudinaryService, CloudinaryService>();

@@ -12,7 +12,6 @@ public class AppDbContext : DbContext
     public DbSet<Booth> Booths { get; set; }
     public DbSet<Branch> Branches { get; set; }
     public DbSet<Background> Backgrounds { get; set; }
-    public DbSet<Constant> Constants { get; set; }
     public DbSet<Device> Devices { get; set; }
     public DbSet<Layout> Layouts { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
@@ -22,7 +21,6 @@ public class AppDbContext : DbContext
     public DbSet<Refund> Refunds { get; set; }
     public DbSet<PhotoSession> PhotoSessions { get; set; }
     public DbSet<PhotoSticker> PhotoStickers { get; set; }
-    public DbSet<ServicePackage> ServicePackages { get; set; }
     public DbSet<BookingService> BookingServices { get; set; }
     public DbSet<Service> Services { get; set; }
     public DbSet<Booking> Bookings { get; set; }
@@ -60,7 +58,6 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new AccountConfigurations());
         modelBuilder.ApplyConfiguration(new BoothConfigurations());
         modelBuilder.ApplyConfiguration(new BackgroundConfigurations());
-        modelBuilder.ApplyConfiguration(new ConstantConfigurations());
         modelBuilder.ApplyConfiguration(new DeviceConfigurations());
         modelBuilder.ApplyConfiguration(new LayoutConfigurations());
         modelBuilder.ApplyConfiguration(new TransactionConfigurations());
@@ -71,7 +68,6 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new PhotoConfigurations());
         modelBuilder.ApplyConfiguration(new PhotoSessionConfigurations());
         modelBuilder.ApplyConfiguration(new PhotoStickerConfigurations());
-        modelBuilder.ApplyConfiguration(new ServicePackageConfigurations());
         modelBuilder.ApplyConfiguration(new BookingServiceConfigurations());
         modelBuilder.ApplyConfiguration(new ServiceConfigurations());
         modelBuilder.ApplyConfiguration(new BookingConfigurations());

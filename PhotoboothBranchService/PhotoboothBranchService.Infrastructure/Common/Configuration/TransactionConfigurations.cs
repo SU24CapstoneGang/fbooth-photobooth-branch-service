@@ -19,21 +19,18 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(s => s.Amount).IsRequired();
 
             // Status enum mapping
-            builder.Property(ep => ep.PaymentStatus)
-                .IsRequired()
-                .HasConversion(
-                    v => v.ToString(),
-                    v => (PaymentStatus)Enum.Parse(typeof(PaymentStatus), v));
+            builder.Property(ep => ep.TransactionStatus)
+                .IsRequired();
             builder.HasOne(s => s.PaymentMethod)
-                .WithMany(a => a.Payments)
+                .WithMany(a => a.Transactions)
                 .HasForeignKey(s => s.PaymentMethodID)
                 .IsRequired();
-            builder.HasOne(a => a.SessionOrder)
+            builder.HasOne(a => a.Booking)
                 .WithMany(b => b.Payments)
-                .HasForeignKey(a => a.SessionOrderID)
+                .HasForeignKey(a => a.BookingID)
                 .IsRequired();
             builder.HasMany(p => p.Refunds)
-                .WithOne(i => i.Payment)
+                .WithOne(i => i.Transaction)
                 .HasForeignKey(u => u.PaymentID)
                 .IsRequired();
         }

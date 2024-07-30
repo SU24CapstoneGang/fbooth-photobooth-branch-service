@@ -1,6 +1,6 @@
 ﻿using PhotoboothBranchService.Domain.Enum;
 
-namespace PhotoboothBranchService.Application.DTOs.SessionOrder
+namespace PhotoboothBranchService.Application.DTOs.Booking
 {
     public class SessionOrderFilter
     {

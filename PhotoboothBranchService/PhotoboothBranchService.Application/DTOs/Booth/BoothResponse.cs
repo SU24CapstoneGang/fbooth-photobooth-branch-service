@@ -1,5 +1,4 @@
-﻿using PhotoboothBranchService.Application.DTOs.BoothBranch;
-using PhotoboothBranchService.Domain.Enum;
+﻿using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Application.DTOs.Booth
 {

@@ -5,15 +5,15 @@ using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Application.AutoMapperModules
 {
-    public class ServiceItemMapper : Profile
+    public class BookingServiceMapper : Profile
     {
-        public ServiceItemMapper()
+        public BookingServiceMapper()
         {
-            CreateMap<CreateServiceItemRequest, BookingService>().HandleNullProperty();
-            CreateMap<UpdateServiceItemRequest, BookingService>()
+            CreateMap<CreateBookingServiceRequest, BookingService>().HandleNullProperty();
+            CreateMap<UpdateBookingServiceRequest, BookingService>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<BookingService, ServiceItemResponse>().HandleNullProperty();
-            CreateMap<BookingService, CreateServiceItemResponse>().HandleNullProperty();
+            CreateMap<BookingService, BookingServiceResponse>().HandleNullProperty();
+            CreateMap<BookingService, CreateBookingServiceResponse>().HandleNullProperty();
         }
     }
 }

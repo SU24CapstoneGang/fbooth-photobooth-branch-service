@@ -2,7 +2,6 @@
 using CloudinaryDotNet;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.BoothBranch;
 using PhotoboothBranchService.Application.DTOs.Branch;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
@@ -10,7 +9,7 @@ using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 using System.Security.AccessControl;
 
-namespace PhotoboothBranchService.Application.Services.BoothBranchServices;
+namespace PhotoboothBranchService.Application.Services.BranchServices;
 
 public class BranchService : IBranchService
 {
@@ -32,7 +31,7 @@ public class BranchService : IBranchService
             //validate input
             if (createModel.ManagerID.HasValue)
             {
-               await this.ValideManagerForBranch(createModel.ManagerID.Value);
+                await ValideManagerForBranch(createModel.ManagerID.Value);
             }
             Branch branch = _mapper.Map<Branch>(createModel);
             branch.Status = status;
@@ -108,11 +107,11 @@ public class BranchService : IBranchService
         {
             throw new NotFoundException("Branch not found.");
         }
-       
+
         var updateBranch = _mapper.Map(updateModel, branch);
         if (updateModel.ManagerID.HasValue)
         {
-            await this.ValideManagerForBranch(id);
+            await ValideManagerForBranch(id);
         }
         if (status.HasValue)
         {
@@ -123,7 +122,7 @@ public class BranchService : IBranchService
 
     public async Task AssignManager(Guid branchId, AssignManagerRequest request)
     {
-        await this.UpdateAsync(branchId, new UpdateBranchRequest { ManagerID = request.ManagerID }, null);
+        await UpdateAsync(branchId, new UpdateBranchRequest { ManagerID = request.ManagerID }, null);
     }
 
     private async Task ValideManagerForBranch(Guid managerId)

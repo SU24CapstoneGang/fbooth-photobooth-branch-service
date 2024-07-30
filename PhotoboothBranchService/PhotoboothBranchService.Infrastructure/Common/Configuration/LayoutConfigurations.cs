@@ -26,12 +26,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(l => l.Width).IsRequired();
             builder.Property(l => l.PhotoSlot).IsRequired();
 
-            // ManufactureStatus enum mapping
             builder.Property(l => l.Status)
-                .IsRequired()
-                .HasConversion(
-                    v => v.ToString(),
-                    v => (StatusUse)Enum.Parse(typeof(StatusUse), v));
+                .IsRequired();
 
             builder.Property(l => l.LastModified);
 

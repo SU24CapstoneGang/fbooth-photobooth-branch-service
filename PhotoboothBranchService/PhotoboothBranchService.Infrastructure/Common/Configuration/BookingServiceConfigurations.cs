@@ -16,15 +16,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(s => s.Price).HasColumnType("decimal(18, 2)"); ;
             builder.Property(s => s.SubTotal).HasColumnType("decimal(18, 2)"); ;
 
-
-            builder.HasOne(s => s.Service)
-                .WithMany(a => a.BookingServices)
-                .HasForeignKey(s => s.ServiceID)
-                .IsRequired();
-
-            builder.HasOne(s => s.SessionOrder)
+            builder.HasOne(s => s.Booking)
                 .WithMany(b => b.BookingServices)
-                .HasForeignKey(c => c.SessionOrderID)
+                .HasForeignKey(c => c.BookingID)
                 .IsRequired();
         }
     }

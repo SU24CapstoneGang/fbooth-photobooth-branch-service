@@ -29,7 +29,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
             var validateSessionOrder = (await _sessionOrderRepository
                 .GetAsync(i => i.BookingID == createModel.SessionOrderID
                 && (i.EndTime > DateTime.Now && i.StartTime < DateTime.Now)
-                && i.Status == BookingStatus.Processsing)) == null;
+                && i.Status == BookingStatus.Completed)) == null;
             if (validateSessionOrder)
             {
                 throw new Exception("Session Order are not going, it expired or not coming");
@@ -45,7 +45,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
             }
             var photoSession = _mapper.Map<PhotoSession>(createModel);
             photoSession.TotalPhotoTaken = layout.PhotoSlot;
-            photoSession.SessionIndex = (await _photoSessionRepository.GetAsync(i => i.SessionOrderID == createModel.SessionOrderID)).Count() + 1;
+            photoSession.SessionIndex = (await _photoSessionRepository.GetAsync(i => i.BookingID == createModel.SessionOrderID)).Count() + 1;
             await _photoSessionRepository.AddAsync(photoSession);
             return _mapper.Map<CreatePhotoSessionResponse>(photoSession);
         }

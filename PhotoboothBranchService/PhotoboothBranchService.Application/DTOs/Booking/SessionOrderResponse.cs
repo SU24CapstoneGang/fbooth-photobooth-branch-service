@@ -1,7 +1,7 @@
 ﻿using PhotoboothBranchService.Application.DTOs.ServiceItem;
 using PhotoboothBranchService.Domain.Enum;
 
-namespace PhotoboothBranchService.Application.DTOs.SessionOrder
+namespace PhotoboothBranchService.Application.DTOs.Booking
 {
     public class SessionOrderResponse
     {
@@ -13,6 +13,6 @@ namespace PhotoboothBranchService.Application.DTOs.SessionOrder
         public BookingStatus Status { get; set; }
         public Guid AccountID { get; set; }
         public Guid BoothID { get; set; }
-        public List<ServiceItemResponse> ServiceItems { get; set; }
+        public List<BookingServiceResponse> ServiceItems { get; set; }
     }
 }

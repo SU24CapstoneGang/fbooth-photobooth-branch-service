@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.Common.Helpers;
-using PhotoboothBranchService.Application.DTOs.BoothBranch;
+using PhotoboothBranchService.Application.DTOs.Branch;
 using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Application.AutoMapperModules
 {
-    public class BoothBranchMapper : Profile
+    public class BranchMapper : Profile
     {
-        public BoothBranchMapper()
+        public BranchMapper()
         {
             CreateMap<CreateBranchRequest, Branch>().ReverseMap().HandleNullProperty();
             CreateMap<UpdateBranchRequest, Branch>()

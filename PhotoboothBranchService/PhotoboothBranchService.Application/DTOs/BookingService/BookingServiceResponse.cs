@@ -1,6 +1,6 @@
 ﻿namespace PhotoboothBranchService.Application.DTOs.ServiceItem
 {
-    public class CreateServiceItemResponse
+    public class BookingServiceResponse
     {
         public Guid ServiceItemID { get; set; }
         public short Quantity { get; set; }

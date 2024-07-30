@@ -64,12 +64,12 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             //create payment object
             var payment = _mapper.Map<Transaction>(createModel);
             payment.TransactionID = Guid.NewGuid();
-            payment.PaymentStatus = PaymentStatus.Processing;
+            payment.TransactionStatus = TransactionStatus.Processing;
             payment.TransactionDateTime = DateTime.Now;
             switch (createModel.PayType)
             {
                 case PayType.FullPay:
-                    var payments = await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.BookingID && i.PaymentStatus == PaymentStatus.Success);
+                    var payments = await _paymentRepository.GetAsync(i => i.BookingID == sessionOrder.BookingID && i.TransactionStatus == PaymentStatus.Success);
                     long result = (long)sessionOrder.PaymentAmount - payments.Sum(i => i.Amount);
                     if (result == 0)
                     {
@@ -173,7 +173,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         public async Task HandleMomoResponse(IQueryCollection queryString)
         {
             var response = await _moMoService.Return(queryString);
-            if (response.PaymentStatus == PaymentStatus.Success)
+            if (response.TransactionStatus == PaymentStatus.Success)
             {
                 try
                 {
@@ -219,12 +219,12 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         }
         public async Task<IEnumerable<PaymentResponse>> GetBySessionOrderAsync(Guid sessionOrderID)
         {
-            var payments = await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrderID);
+            var payments = await _paymentRepository.GetAsync(i => i.BookingID == sessionOrderID);
             return _mapper.Map<IEnumerable<PaymentResponse>>(payments.ToList());
         }
         public async Task<IEnumerable<PaymentResponse>> GetByOrderIdAsync(Guid id)
         {
-            var payments = await _paymentRepository.GetAsync(p => p.SessionOrderID == id);
+            var payments = await _paymentRepository.GetAsync(p => p.BookingID == id);
             return _mapper.Map<IEnumerable<PaymentResponse>>(payments);
         }
         // Read by ID
@@ -248,7 +248,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         }
         private async Task updateAfterSuccessPaymentAsync(Transaction payment)
         {
-            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == payment.SessionOrderID)).FirstOrDefault();
+            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == payment.BookingID)).FirstOrDefault();
             if (sessionOrder != null && sessionOrder.Status == BookingStatus.Created)
             {
                 if (payment.Amount < sessionOrder.PaymentAmount)
@@ -274,7 +274,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             }
             else if (sessionOrder != null && sessionOrder.Status == BookingStatus.Deposited)
             {
-                var paymentCheck = (await _paymentRepository.GetAsync(i => i.SessionOrderID == sessionOrder.BookingID && i.PaymentStatus == PaymentStatus.Success)).ToList();
+                var paymentCheck = (await _paymentRepository.GetAsync(i => i.BookingID == sessionOrder.BookingID && i.TransactionStatus == PaymentStatus.Success)).ToList();
                 if (paymentCheck.Sum(i => i.Amount) == sessionOrder.PaymentAmount)
                 {
                     sessionOrder.Status = BookingStatus.Waiting;

@@ -1,7 +1,7 @@
 ﻿using PhotoboothBranchService.Application.Common.Helpers;
 using System.ComponentModel.DataAnnotations;
 
-namespace PhotoboothBranchService.Application.DTOs.SessionOrder
+namespace PhotoboothBranchService.Application.DTOs.Booking
 {
     public class BookingRequest
     {
@@ -19,6 +19,6 @@ namespace PhotoboothBranchService.Application.DTOs.SessionOrder
         [Required]
         public DateTime StartTime { get; set; }
         [Required]
-        public DateTime EndTime { get; set; } 
+        public DateTime EndTime { get; set; }
     }
 }

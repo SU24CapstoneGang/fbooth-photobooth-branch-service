@@ -2,13 +2,12 @@
 using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Api.Common.Helper;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.SessionOrder;
-using PhotoboothBranchService.Application.Services.SessionOrderServices;
+using PhotoboothBranchService.Application.DTOs.Booking;
+using PhotoboothBranchService.Application.Services.BookingServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
 
-    [Route("api/session-order")]
     public class BookingController : ControllerBaseApi
     {
         private readonly IBookingService _sessionService;
@@ -20,31 +19,31 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost("staff-create")]
-        public async Task<ActionResult<CreateSessionOrderResponse>> StaffCreateSession(CreateSessionOrderRequest createSessionRequest)
+        public async Task<ActionResult<CreateBookingResponse>> StaffCreateSession(BookingRequest bookingRequest)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var createSessionOrderResponse = await _sessionService.CreateAsync(createSessionRequest);
-            return Ok(createSessionOrderResponse);
+            var createBookingResponse = await _sessionService.CreateAsync(bookingRequest);
+            return Ok(createBookingResponse);
         }
         [HttpPost("customer-booking")]
-        public async Task<ActionResult<CreateSessionOrderResponse>> CustomerCreateSession(CustomerBookingSessionOrderRequest customerBookingSessionOrderRequest)
+        public async Task<ActionResult<CreateBookingResponse>> CustomerCreateSession(CustomerBookingSessionOrderRequest customerBookingSessionOrderRequest)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             var email = Request.HttpContext.Items["Email"]?.ToString();
-            var createSessionOrderResponse = await _sessionService.CustomerBooking(customerBookingSessionOrderRequest, email);
-            return Ok(createSessionOrderResponse);
+            var createBookingResponse = await _sessionService.CustomerBooking(customerBookingSessionOrderRequest, email);
+            return Ok(createBookingResponse);
         }
         //validate code
         [HttpPost("validate")]
         public async Task<SessionOrderResponse> ValidateSessionOrder(ValidateSessionOrderRequest validateSessionPhotoRequest)
         {
-            return await _sessionService.ValidateSessionOrder(validateSessionPhotoRequest);
+            return await _sessionService.ValidateBookingService(validateSessionPhotoRequest);
         }
 
         // Read

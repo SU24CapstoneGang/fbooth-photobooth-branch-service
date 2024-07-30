@@ -2,12 +2,11 @@
 using Microsoft.IdentityModel.Tokens;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Booking;
 using PhotoboothBranchService.Application.DTOs.ServiceItem;
-using PhotoboothBranchService.Application.DTOs.SessionOrder;
-using PhotoboothBranchService.Application.Services.ConstantServices;
+using PhotoboothBranchService.Application.Services.BookingServiceServices;
 using PhotoboothBranchService.Application.Services.PaymentServices;
 using PhotoboothBranchService.Application.Services.RefundServices;
-using PhotoboothBranchService.Application.Services.ServiceItemServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -15,42 +14,36 @@ using PhotoboothBranchService.Domain.IRepository;
 using System.Globalization;
 using System.Linq.Expressions;
 
-namespace PhotoboothBranchService.Application.Services.SessionOrderServices;
+namespace PhotoboothBranchService.Application.Services.BookingServices;
 
 public class BookingService : IBookingService
 {
-    private readonly IBookingRepository _sessionOrderRepository;
+    private readonly IBookingRepository _bookingRepository;
     private readonly IMapper _mapper;
     private readonly IBoothRepository _boothRepository;
     private readonly IPaymentService _paymentService;
-    private readonly IServiceItemService _servicePackageService;
-    private readonly IServicePackageRepository _serviceRepository;
+    private readonly IBookingServiceService _bookingServiceService;
     private readonly IAccountRepository _accountRepository;
     private readonly IRefundService _refundService;
-    private readonly IConstantService _constantService;
     public BookingService(IBookingRepository sessionOrderRepository,
         IMapper mapper,
         IBoothRepository boothRepository,
         IPaymentService paymentService,
-        IServiceItemService servicePackageService,
-        IServicePackageRepository serviceRepository,
+        IBookingServiceService servicePackageService,
         IAccountRepository accountRepository,
-        IRefundService refundService,
-        IConstantService constantService)
+        IRefundService refundService)
     {
-        _sessionOrderRepository = sessionOrderRepository;
+        _bookingRepository = sessionOrderRepository;
         _mapper = mapper;
         _boothRepository = boothRepository;
         _paymentService = paymentService;
-        _servicePackageService = servicePackageService;
-        _serviceRepository = serviceRepository;
+        _bookingServiceService = servicePackageService;
         _accountRepository = accountRepository;
         _refundService = refundService;
-        _constantService = constantService;
     }
 
     // Create a new session
-    public async Task<CreateSessionOrderResponse> CreateAsync(BookingRequest createModel)
+    public async Task<CreateBookingResponse> CreateAsync(BookingRequest createModel)
     {
         ////validate account
         //Account? account;
@@ -368,7 +361,7 @@ public class BookingService : IBookingService
     //    return policy?.FullPaymentPolicyID;
     //}
 
-    public async Task<CreateSessionOrderResponse> CustomerBooking(CustomerBookingSessionOrderRequest request, string email)
+    public async Task<CreateBookingResponse> CustomerBooking(CustomerBookingSessionOrderRequest request, string email)
     {
         if ((request.StartTime - DateTime.Now).TotalMinutes <= 30)
         {
@@ -376,12 +369,12 @@ public class BookingService : IBookingService
         }
         var createSessionOrderRequest = _mapper.Map<BookingRequest>(request);
         createSessionOrderRequest.CustomerEmail = email;
-        return await this.CreateAsync(createSessionOrderRequest);
+        return await CreateAsync(createSessionOrderRequest);
     }
 
-    public async Task<SessionOrderResponse> ValidateSessionOrder(ValidateSessionOrderRequest validateSessionPhotoRequest)
+    public async Task<SessionOrderResponse> ValidateBookingService(ValidateSessionOrderRequest validateSessionPhotoRequest)
     {
-        var sessionOrders = (await _sessionOrderRepository
+        var sessionOrders = (await _bookingRepository
             .GetAsync(i => i.BoothID == validateSessionPhotoRequest.BoothID && i.EndTime > DateTime.Now,
             includeProperties: new Expression<Func<Booking, object>>[]
             {
@@ -400,30 +393,30 @@ public class BookingService : IBookingService
                 throw new BadRequestException("The time for your Session not come yet, please check with our staff and try again later");
             }
 
-            if (sessionOrder.Status == BookingStatus.Waiting)
-            {
-                TimeSpan difference = DateTime.Now - sessionOrder.StartTime;
-                if (difference.TotalMinutes < 5)
-                {
-                    sessionOrder.StartTime += difference;
-                    sessionOrder.EndTime += difference;
-                }
-                else
-                {
-                    sessionOrder.StartTime += difference;
-                }
-                sessionOrder.Status = BookingStatus.Processsing;
-                await _sessionOrderRepository.UpdateAsync(sessionOrder);
+            //if (sessionOrder.Status == BookingStatus.Waiting)
+            //{
+            //    TimeSpan difference = DateTime.Now - sessionOrder.StartTime;
+            //    if (difference.TotalMinutes < 5)
+            //    {
+            //        sessionOrder.StartTime += difference;
+            //        sessionOrder.EndTime += difference;
+            //    }
+            //    else
+            //    {
+            //        sessionOrder.StartTime += difference;
+            //    }
+            //    sessionOrder.Status = BookingStatus.Processsing;
+            //    await _bookingRepository.UpdateAsync(sessionOrder);
 
-                //update booth
-                booth.Status = BoothStatus.InUse;
-                await _boothRepository.UpdateAsync(booth);
+            //    //update booth
+            //    booth.isBooked = true;
+            //    await _boothRepository.UpdateAsync(booth);
                 return _mapper.Map<SessionOrderResponse>(sessionOrder);
-            }
-            else
-            {
-                throw new BadRequestException("Session has been cancelled or not paid yet to validate");
-            }
+            //}
+            //else
+            //{
+            //    throw new BadRequestException("Session has been cancelled or not paid yet to validate");
+            //}
         }
         else
         {
@@ -433,10 +426,10 @@ public class BookingService : IBookingService
     // Delete a session by ID
     public async Task DeleteAsync(Guid id)
     {
-        var session = (await _sessionOrderRepository.GetAsync(s => s.BookingID == id)).FirstOrDefault();
+        var session = (await _bookingRepository.GetAsync(s => s.BookingID == id)).FirstOrDefault();
         if (session != null)
         {
-            await _sessionOrderRepository.RemoveAsync(session);
+            await _bookingRepository.RemoveAsync(session);
         }
         else
         {
@@ -447,7 +440,7 @@ public class BookingService : IBookingService
     // Get all sessions
     public async Task<IEnumerable<SessionOrderResponse>> GetAllAsync()
     {
-        var sessions = await _sessionOrderRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
+        var sessions = await _bookingRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
             {
                 i => i.BookingServices,
             });
@@ -456,7 +449,7 @@ public class BookingService : IBookingService
 
     public async Task<IEnumerable<SessionOrderResponse>> GetAllPagingAsync(SessionOrderFilter filter, PagingModel paging)
     {
-        var sessions = (await _sessionOrderRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
+        var sessions = (await _bookingRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
             {
                 i => i.BookingServices,
             })).ToList().AutoFilter(filter);
@@ -467,7 +460,7 @@ public class BookingService : IBookingService
     // Get a session by ID
     public async Task<SessionOrderResponse> GetByIdAsync(Guid id)
     {
-        var session = (await _sessionOrderRepository.GetAsync(s => s.BookingID == id,
+        var session = (await _bookingRepository.GetAsync(s => s.BookingID == id,
             includeProperties: new Expression<Func<Booking, object>>[]
             {
                 i => i.BookingServices,
@@ -522,37 +515,32 @@ public class BookingService : IBookingService
     }
     public async Task CancelSessionOrder(Guid sessionOrdeID, string? ipAddress)
     {
-        var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == sessionOrdeID)).FirstOrDefault();
+        var sessionOrder = (await _bookingRepository.GetAsync(i => i.BookingID == sessionOrdeID)).FirstOrDefault();
         if (null == sessionOrder)
         {
             throw new NotFoundException("Session Order not found");
         }
         else
         {
-            if (DateTime.Now > sessionOrder.StartTime
-                && (sessionOrder.Status == BookingStatus.Waiting
-                    || sessionOrder.Status == BookingStatus.Created
-                    || sessionOrder.Status == BookingStatus.Deposited))
-            {
-                throw new BadRequestException("Can not cancel anymore, the session already start");
-            }
+            //if (DateTime.Now > sessionOrder.StartTime
+            //    && (sessionOrder.Status == BookingStatus.Waiting
+            //        || sessionOrder.Status == BookingStatus.Created
+            //        || sessionOrder.Status == BookingStatus.Deposited))
+            //{
+            //    throw new BadRequestException("Can not cancel anymore, the session already start");
+            //}
 
-            if (sessionOrder.Status == BookingStatus.Waiting)
-            {
-                //doing refund
-                await _refundService.RefundByOrderId(sessionOrdeID, false, ipAddress);
-            }
+            //if (sessionOrder.Status == BookingStatus.Waiting)
+            //{
+            //    //doing refund
+            //    await _refundService.RefundByOrderId(sessionOrdeID, false, ipAddress);
+            //}
             sessionOrder.Status = BookingStatus.Canceled;
-            await _sessionOrderRepository.UpdateAsync(sessionOrder);
+            await _bookingRepository.UpdateAsync(sessionOrder);
         }
     }
     private bool ValidateTimeRange(DateTime startTime, DateTime endTime)
     {
-        //DateTime baseDate = startTime.Date;
-        //TimeSpan.TryParseExact(_constantService.GetConstantValue("OpenTime"), "hh\\:mm", CultureInfo.InvariantCulture, out TimeSpan timeSpan);
-        //DateTime lowerBound = baseDate.Add(timeSpan);
-        //TimeSpan.TryParseExact(_constantService.GetConstantValue("CloseTime"), "hh\\:mm", CultureInfo.InvariantCulture, out timeSpan);
-        //DateTime upperBound = baseDate.Add(timeSpan);
 
         DateTime lowerBound = new DateTime(startTime.Year, startTime.Month, startTime.Day, 8, 0, 0); // 8:00 AM
         DateTime upperBound = new DateTime(startTime.Year, startTime.Month, startTime.Day, 23, 0, 0); // 11:00 PM
@@ -565,16 +553,16 @@ public class BookingService : IBookingService
     }
     private async Task<bool> ValidateBookingTime(Guid boothId, DateTime startTime, DateTime endTime)
     {
-        var validateTime = (await _sessionOrderRepository.GetAsync(i => i.BoothID == boothId
-                                 && ((startTime < i.StartTime && i.StartTime < endTime.AddMinutes(5)) || (endTime.AddMinutes(5) > i.EndTime && i.EndTime > startTime))
-                                 && (i.Status != BookingStatus.Done && i.Status == BookingStatus.Canceled)
+        var validateTime = (await _bookingRepository.GetAsync(i => i.BoothID == boothId
+                                 && (startTime < i.StartTime && i.StartTime < endTime.AddMinutes(5) || endTime.AddMinutes(5) > i.EndTime && i.EndTime > startTime)
+                                 && i.Status != BookingStatus.Canceled
                                  )).FirstOrDefault();
         return validateTime == null;
     }
     private async Task<long> GenerateValidateCode()
     {
         long code = 0;
-        var existedCodes = (await _sessionOrderRepository.GetAsync(i => i.Status != BookingStatus.Canceled || i.Status != BookingStatus.Done)).ToList().Select(i => i.ValidateCode);
+        var existedCodes = (await _bookingRepository.GetAsync(i => i.Status != BookingStatus.Canceled || i.Status != BookingStatus.Completed)).ToList().Select(i => i.ValidateCode);
         while (code == 0)
         {
             code = new Random().Next(100000, 1000000);

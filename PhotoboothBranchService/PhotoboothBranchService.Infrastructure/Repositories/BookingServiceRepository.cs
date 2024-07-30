@@ -7,11 +7,11 @@ using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories
 {
-    public class ServiceSessionRepository : IServiceSessionRepository
+    public class BookingServiceRepository : IBookingServiceRepository
     {
         private readonly AppDbContext _dbContext;
 
-        public ServiceSessionRepository(AppDbContext dbContext)
+        public BookingServiceRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
         }

@@ -2,23 +2,23 @@
 using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.ServiceItem;
-using PhotoboothBranchService.Application.Services.ServiceItemServices;
+using PhotoboothBranchService.Application.Services.BookingServiceServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
-    [Route("api/service-item")]
-    public class ServiceItemController : ControllerBaseApi
+    [Route("api/booking-service")]
+    public class BookingServiceController : ControllerBaseApi
     {
-        private readonly IServiceItemService _serviceItemService;
+        private readonly IBookingServiceService _serviceItemService;
 
-        public ServiceItemController(IServiceItemService serviceItemService)
+        public BookingServiceController(IBookingServiceService serviceItemService)
         {
             _serviceItemService = serviceItemService;
         }
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<CreateServiceItemResponse>> CreateServiceItem(CreateServiceItemRequest createServiceItemRequest)
+        public async Task<ActionResult<CreateBookingServiceResponse>> CreateServiceItem(CreateBookingServiceRequest createServiceItemRequest)
         {
 
             var createServiceItemResponse = await _serviceItemService.CreateAsync(createServiceItemRequest);
@@ -28,7 +28,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         //add list
         [HttpPost("add-list")]
-        public async Task<ActionResult<AddListServiceItemResponse>> AddListItems(AddListServiceItemRequest request)
+        public async Task<ActionResult<AddListBookingServiceResponse>> AddListItems(AddListBookingServiceRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -40,7 +40,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Read
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ServiceItemResponse>>> GetAllServiceItems()
+        public async Task<ActionResult<IEnumerable<BookingServiceResponse>>> GetAllServiceItems()
         {
 
             var serviceItems = await _serviceItemService.GetAllAsync();
@@ -50,15 +50,15 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Read with paging and filter
         [HttpGet("paging")]
-        public async Task<ActionResult<IEnumerable<ServiceItemResponse>>> GetAllServiceItems(
-            [FromQuery] ServiceItemFilter serviceItemFilter, [FromQuery] PagingModel pagingModel)
+        public async Task<ActionResult<IEnumerable<BookingServiceResponse>>> GetAllServiceItems(
+            [FromQuery] BookingServiceFilter serviceItemFilter, [FromQuery] PagingModel pagingModel)
         {
             var serviceItems = await _serviceItemService.GetAllPagingAsync(serviceItemFilter, pagingModel);
             return Ok(serviceItems);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ServiceItemResponse>> GetServiceItemById(Guid id)
+        public async Task<ActionResult<BookingServiceResponse>> GetServiceItemById(Guid id)
         {
             var serviceItem = await _serviceItemService.GetByIdAsync(id);
             if (serviceItem == null)
@@ -70,7 +70,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateServiceItem(Guid id, [FromQuery] UpdateServiceItemRequest updateServiceItemRequest)
+        public async Task<ActionResult> UpdateServiceItem(Guid id, [FromQuery] UpdateBookingServiceRequest updateServiceItemRequest)
         {
             if (!ModelState.IsValid)
             {

@@ -1,7 +1,7 @@
 ﻿using PhotoboothBranchService.Domain.Enum;
 using System.ComponentModel.DataAnnotations;
 
-namespace PhotoboothBranchService.Application.DTOs.BoothBranch
+namespace PhotoboothBranchService.Application.DTOs.Branch
 {
     public class UpdateBranchRequest
     {

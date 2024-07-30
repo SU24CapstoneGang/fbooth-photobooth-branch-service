@@ -21,12 +21,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(b => b.PricePerHour).IsRequired().HasColumnType("decimal(18, 2)");
 
 
-            // ManufactureStatus enum mapping
             builder.Property(pb => pb.Status)
-                .IsRequired()
-                .HasConversion(
-                    v => v.ToString(),
-                    v => (BoothStatus)Enum.Parse(typeof(BoothStatus), v));
+                .IsRequired();
             builder.Property(s => s.CreateDate)
              .ValueGeneratedOnAdd()
              .HasDefaultValueSql("GETDATE()")

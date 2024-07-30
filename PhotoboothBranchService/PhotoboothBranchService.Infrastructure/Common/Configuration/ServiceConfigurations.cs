@@ -23,11 +23,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(a => a.Unit).IsRequired();
             builder.Property(s => s.Status).IsRequired();
 
-            builder.HasMany(a => a.ServicePackages)
-                .WithOne(b => b.Service)
-                .HasForeignKey(b => b.ServiceID)
-                .IsRequired();
-
             //builder.HasData(
             //        new Service
             //        {
