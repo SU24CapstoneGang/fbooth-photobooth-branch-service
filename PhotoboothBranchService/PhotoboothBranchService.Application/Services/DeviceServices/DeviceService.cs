@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Device;
 using PhotoboothBranchService.Domain.Common.Helper;
@@ -10,18 +11,25 @@ namespace PhotoboothBranchService.Application.Services.DeviceServices
     public class DeviceService : IDeviceService
     {
         private readonly IDeviceRepository _deviceRepository;
+        private readonly IBoothRepository _boothRepository;
         private readonly IMapper _mapper;
 
-        public DeviceService(IDeviceRepository deviceRepository, IMapper mapper)
+        public DeviceService(IDeviceRepository deviceRepository, IMapper mapper, IBoothRepository boothRepository)
         {
             _deviceRepository = deviceRepository;
             _mapper = mapper;
+            _boothRepository = boothRepository;
         }
 
         // Create
         public async Task<CreateDeviceResponse> CreateAsync(CreateDeviceRequest createModel)
         {
             var device = _mapper.Map<Device>(createModel);
+            var booth = (await _boothRepository.GetAsync(i => i.BoothID == createModel.BoothID)).SingleOrDefault();
+            if (booth == null)
+            {
+                throw new NotFoundException("Booth not found to create device");
+            }
             await _deviceRepository.AddAsync(device);
             return _mapper.Map<CreateDeviceResponse>(device);
         }
@@ -75,7 +83,6 @@ namespace PhotoboothBranchService.Application.Services.DeviceServices
             {
                 throw new KeyNotFoundException("Device not found.");
             }
-
             var updatedDevice = _mapper.Map(updateModel, device);
             await _deviceRepository.UpdateAsync(updatedDevice);
         }

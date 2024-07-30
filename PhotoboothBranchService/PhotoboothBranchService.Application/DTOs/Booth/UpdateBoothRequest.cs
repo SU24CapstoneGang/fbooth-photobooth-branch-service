@@ -13,6 +13,5 @@ namespace PhotoboothBranchService.Application.DTOs.Booth
         [StringLength(50, MinimumLength = 8, ErrorMessage = "Concept color must between 8 to 50 char characters")]
         public string? Concept { get; set; } = default!;
         public short? PeopleInBooth { get; set; }
-        public Guid? BranchID { get; set; }
     }
 }

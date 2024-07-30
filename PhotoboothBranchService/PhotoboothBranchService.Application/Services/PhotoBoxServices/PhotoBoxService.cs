@@ -47,6 +47,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoBoxServices
                 if (photoBox != null)
                 {
                     await _photoBoxRepository.RemoveAsync(photoBox);
+
                 }
                 else
                 {

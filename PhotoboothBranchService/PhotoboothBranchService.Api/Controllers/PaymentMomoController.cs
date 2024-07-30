@@ -14,11 +14,7 @@ namespace PhotoboothBranchService.Api.Controllers
             _moService = moService;
         }
 
-        [HttpPost("ipn")]
-        public async Task PaymentMomoIPN(MoMoResponse moMoResponse)
-        {
-            await _moService.HandlePaymentResponeIPN(moMoResponse);
-        }
+        
 
     }
 }

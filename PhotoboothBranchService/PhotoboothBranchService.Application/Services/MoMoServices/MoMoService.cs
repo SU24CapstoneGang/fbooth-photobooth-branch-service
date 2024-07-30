@@ -92,8 +92,9 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                 return jmessage.GetValue("message").ToString();
             }
         }
-        public async Task<Transaction> HandlePaymentResponeIPN(MoMoResponse momoResponse)
+        public async Task<(Transaction transaction, MomoIPNResponse iPNResponse)> HandlePaymentResponeIPN(MoMoResponse momoResponse)
         {
+            MoMoLibrary moMoLibrary = new MoMoLibrary();
             var rawHash = "accessKey=" + accessKey +
                    "&amount=" + momoResponse.amount +
                    "&extraData=" + momoResponse.extraData +
@@ -108,6 +109,16 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                    "&resultCode=" + momoResponse.resultCode +
                    "&transId=" + momoResponse.transId;
 
+            MomoIPNResponse iPNResponse = new MomoIPNResponse{
+                partnerCode = momoResponse.partnerCode,
+                requestId = momoResponse.requestId.ToString(),
+                orderId = momoResponse.orderId.ToString(),
+                resultCode = momoResponse.resultCode,
+                message = momoResponse.message,
+                responseTime = momoResponse.responseTime,
+                extraData = momoResponse.extraData
+            };
+
             var payment = (await _paymentRepository.GetAsync(i => i.TransactionID == momoResponse.orderId)).FirstOrDefault();
             if (payment == null)
             {
@@ -115,7 +126,7 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
             }
             else
             {
-                MoMoLibrary moMoLibrary = new MoMoLibrary();
+                string signature = moMoLibrary.signSHA256(rawHash, secretKey);
                 bool checkSignature = moMoLibrary.ValidateSignature(rawHash, secretKey, momoResponse.signature);
                 if (checkSignature && momoResponse.resultCode == 0)
                 {
@@ -129,7 +140,17 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                 }
             }
             await _paymentRepository.UpdateAsync(payment);
-            return payment;
+
+            rawHash = "accessKey=" + accessKey +
+                   "&extraData=" + momoResponse.extraData +
+                   "&message=" + momoResponse.message +
+                   "&orderId=" + momoResponse.orderId +
+                   "&partnerCode=" + momoResponse.partnerCode +
+                   "&requestId=" + momoResponse.requestId +
+                   "&responseTime=" + momoResponse.responseTime +
+                   "&resultCode=" + momoResponse.resultCode;
+            iPNResponse.signature = moMoLibrary.signSHA256(rawHash, secretKey);
+            return (payment, iPNResponse);
         }
         public async Task<Transaction> Return(IQueryCollection queryString)
         {
@@ -171,7 +192,7 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                     }
                 }
             }
-            return await HandlePaymentResponeIPN(response);
+            return (await HandlePaymentResponeIPN(response)).transaction;
 
         }
         public async Task<MoMoRefundResponse> RefundById(Guid paymentID, bool isFullRefund)

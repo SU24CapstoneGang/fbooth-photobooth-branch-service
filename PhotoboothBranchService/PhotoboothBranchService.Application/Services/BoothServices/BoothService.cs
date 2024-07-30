@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Booth;
 using PhotoboothBranchService.Domain.Common.Helper;
@@ -11,18 +12,27 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
     public class BoothService : IBoothService
     {
         private readonly IBoothRepository _boothRepository;
+        private readonly IBranchRepository _branchRepository;
+        private readonly IDeviceRepository _deviceRepository;
         private readonly IMapper _mapper;
 
-        public BoothService(IBoothRepository boothRepository, IMapper mapper)
+        public BoothService(IBoothRepository boothRepository, IMapper mapper, IBranchRepository branchRepository, IDeviceRepository deviceRepository)
         {
             _boothRepository = boothRepository;
             _mapper = mapper;
+            _branchRepository = branchRepository;
+            _deviceRepository = deviceRepository;
         }
 
         // Create
         public async Task<CreateBoothResponse> CreateAsync(CreateBoothRequest createModel, BoothStatus status)
         {
             Booth booth = _mapper.Map<Booth>(createModel);
+            var branch = (await _branchRepository.GetAsync(i => i.BranchID == )).SingleOrDefault();
+            if (branch == null)
+            {
+                throw new NotFoundException("Not found Branch to create booth");
+            }
             booth.Status = status;
             booth.CreateDate = DateTime.UtcNow;
             await _boothRepository.AddAsync(booth);
@@ -37,6 +47,11 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
                 Booth? booth = (await _boothRepository.GetAsync(f => f.BoothID == id)).FirstOrDefault();
                 if (booth != null)
                 {
+                    var devices = (await _deviceRepository.GetAsync(i => i.BoothID == id)).ToList();
+                    foreach (var device in devices)
+                    {
+                        await _deviceRepository.RemoveAsync(device);
+                    }
                     await _boothRepository.RemoveAsync(booth);
                 }
             }
