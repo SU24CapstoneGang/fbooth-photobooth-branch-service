@@ -78,7 +78,7 @@ namespace PhotoboothBranchService.Application.Services.BookingServiceServices
         public async Task<AddListBookingServiceResponse> AddListServiceItem(AddListBookingServiceRequest request)
         {
             //find now session order of request booth
-            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BoothID == request.BoothID /*&& i.Status == BookingStatus.Processsing*/ && i.EndTime > DateTime.Now && DateTime.Now > i.StartTime)).FirstOrDefault();
+            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BoothID == request.BoothID /*&& i.Status == BookingStatus.Processsing*/ /*&& i.EndTime > DateTime.Now*/ && DateTime.Now < i.StartTime)).FirstOrDefault();
             if (sessionOrder == null)
             {
                 throw new NotFoundException("Not found Session Order running in this booth");

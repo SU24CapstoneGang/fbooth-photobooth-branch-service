@@ -19,7 +19,7 @@ public class BookingService : IBookingService
     private readonly IMapper _mapper;
     private readonly IBoothRepository _boothRepository;
     private readonly ITransactionService _transactionService;
-    private readonly IBookingServiceService _bookingServiceService;
+    private readonly IBookingServiceRepository _bookingServiceRepository;
     private readonly IAccountRepository _accountRepository;
     private readonly IRefundService _refundService;
     private readonly IServiceRepository _serviceRepository;
@@ -28,7 +28,7 @@ public class BookingService : IBookingService
         IMapper mapper,
         IBoothRepository boothRepository,
         ITransactionService paymentService,
-        IBookingServiceService servicePackageService,
+        IBookingServiceRepository bookingServiceRepository,
         IAccountRepository accountRepository,
         IRefundService refundService,
         IServiceRepository serviceRepository,
@@ -38,7 +38,7 @@ public class BookingService : IBookingService
         _mapper = mapper;
         _boothRepository = boothRepository;
         _transactionService = paymentService;
-        _bookingServiceService = servicePackageService;
+        _bookingServiceRepository = bookingServiceRepository;
         _accountRepository = accountRepository;
         _refundService = refundService;
         _serviceRepository = serviceRepository;
@@ -80,7 +80,8 @@ public class BookingService : IBookingService
         //}
         // Save booking
         await _bookingRepository.AddAsync(booking);
-
+        var list =  await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
+        booking.BookingServices = list.ToList();
         return _mapper.Map<CreateBookingResponse>(booking);
     }
 
@@ -172,11 +173,16 @@ public class BookingService : IBookingService
     // Get all sessions
     public async Task<IEnumerable<BookingResponse>> GetAllAsync()
     {
-        var sessions = await _bookingRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
+        var bookings = (await _bookingRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
             {
                 i => i.BookingServices,
-            });
-        return _mapper.Map<IEnumerable<BookingResponse>>(sessions.ToList());
+            })).ToList();
+        foreach (var booking in bookings)
+        {
+            var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
+            booking.BookingServices = list.ToList();
+        }
+        return _mapper.Map<IEnumerable<BookingResponse>>(bookings.ToList());
     }
 
     public async Task<IEnumerable<BookingResponse>> GetAllPagingAsync(SessionOrderFilter filter, PagingModel paging)
@@ -247,26 +253,26 @@ public class BookingService : IBookingService
     }
     public async Task CancelSessionOrder(Guid sessionOrdeID, string? ipAddress)
     {
-        var booking = (await _bookingRepository.GetAsync(i => i.BookingID == sessionOrdeID)).FirstOrDefault();
+        var booking = (await _bookingRepository.GetAsync(i => i.BookingID == sessionOrdeID, i => i.FullPaymentPolicy)).FirstOrDefault();
         if (null == booking)
         {
             throw new NotFoundException("Session Order not found");
+        } else if (booking.IsCancelled)
+        {
+            throw new BadRequestException("Booking already canceled");
         }
         else
         {
-            //if (DateTime.Now > sessionOrder.StartTime
-            //    && (sessionOrder.Status == BookingStatus.Waiting
-            //        || sessionOrder.Status == BookingStatus.Created
-            //        || sessionOrder.Status == BookingStatus.Deposited))
-            //{
-            //    throw new BadRequestException("Can not cancel anymore, the session already start");
-            //}
+            if (DateTime.Now > booking.StartTime)
+            {
+                throw new BadRequestException("Can not cancel anymore, the session already start");
+            }
 
-            //if (sessionOrder.Status == BookingStatus.Waiting)
-            //{
-            //    //doing refund
-            //    await _refundService.RefundByOrderId(sessionOrdeID, false, ipAddress);
-            //}
+            if (booking.Status == BookingStatus.Completed && (booking.StartTime.Date - DateTime.Now).TotalDays > booking.FullPaymentPolicy.RefundDaysBefore)
+            {
+                //doing refund
+                // await _refundService.RefundByOrderId(sessionOrdeID, false, ipAddress);
+            }
             booking.IsCancelled = true;
             await _bookingRepository.UpdateAsync(booking);
         }
