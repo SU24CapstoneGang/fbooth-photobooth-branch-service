@@ -1,6 +1,6 @@
-﻿using PhotoboothBranchService.Domain.Entities;
+﻿using PhotoboothBranchService.Application.DTOs.Service;
 
-namespace PhotoboothBranchService.Application.DTOs.ServiceItem
+namespace PhotoboothBranchService.Application.DTOs.BookingService
 {
     public class BookingServiceResponse
     {

@@ -1,4 +1,5 @@
-﻿using PhotoboothBranchService.Domain.Enum;
+﻿using PhotoboothBranchService.Application.DTOs.BookingService;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Application.DTOs.Booking
 {
@@ -16,5 +17,6 @@ namespace PhotoboothBranchService.Application.DTOs.Booking
         public DateTime CreatedDate { get; set; }
         public Guid BoothID { get; set; }
         public Guid CustomerID { get; set; }
+        public virtual ICollection<BookingServiceResponse> BookingServices { get; set; } = default!;
     }
 }

@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.MoMoPayment;
-using PhotoboothBranchService.Application.DTOs.Payment;
+using PhotoboothBranchService.Application.DTOs.Transaction;
 using PhotoboothBranchService.Application.DTOs.VNPayPayment;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 
-namespace PhotoboothBranchService.Application.Services.PaymentServices
+namespace PhotoboothBranchService.Application.Services.TransactionServices
 {
     public interface ITransactionService : IServiceBase<TransactionResponse, PaymentFilter, PagingModel>
     {

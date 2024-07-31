@@ -1,6 +1,6 @@
 ﻿using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.Payment;
 using PhotoboothBranchService.Application.DTOs.Refund;
+using PhotoboothBranchService.Application.DTOs.Transaction;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using System;
 using System.Collections.Generic;

@@ -1,5 +1,5 @@
 ﻿using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.ServiceItem;
+using PhotoboothBranchService.Application.DTOs.BookingService;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 
 namespace PhotoboothBranchService.Application.Services.BookingServiceServices

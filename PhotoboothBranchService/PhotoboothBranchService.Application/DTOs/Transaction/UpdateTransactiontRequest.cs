@@ -1,6 +1,6 @@
 ﻿using PhotoboothBranchService.Domain.Enum;
 
-namespace PhotoboothBranchService.Application.DTOs.Payment
+namespace PhotoboothBranchService.Application.DTOs.Transaction
 {
     public class UpdateTransactiontRequest
     {

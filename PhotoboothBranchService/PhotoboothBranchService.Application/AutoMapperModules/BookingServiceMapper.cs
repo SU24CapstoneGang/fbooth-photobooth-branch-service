@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.Common.Helpers;
-using PhotoboothBranchService.Application.DTOs.ServiceItem;
+using PhotoboothBranchService.Application.DTOs.BookingService;
 using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Application.AutoMapperModules

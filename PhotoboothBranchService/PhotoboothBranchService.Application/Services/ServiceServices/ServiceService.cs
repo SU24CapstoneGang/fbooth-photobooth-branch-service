@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.ServiceType;
+using PhotoboothBranchService.Application.DTOs.Service;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;

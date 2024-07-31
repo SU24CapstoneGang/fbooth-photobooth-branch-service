@@ -1,4 +1,4 @@
-﻿using PhotoboothBranchService.Application.DTOs.ServiceItem;
+﻿using PhotoboothBranchService.Application.DTOs.BookingService;
 using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Application.DTOs.Booking

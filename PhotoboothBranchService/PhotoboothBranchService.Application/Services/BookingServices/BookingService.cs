@@ -1,17 +1,14 @@
 ﻿using AutoMapper;
-using Microsoft.IdentityModel.Tokens;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Booking;
-using PhotoboothBranchService.Application.DTOs.ServiceItem;
 using PhotoboothBranchService.Application.Services.BookingServiceServices;
-using PhotoboothBranchService.Application.Services.PaymentServices;
 using PhotoboothBranchService.Application.Services.RefundServices;
+using PhotoboothBranchService.Application.Services.TransactionServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
-using System.Globalization;
 using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Application.Services.BookingServices;
@@ -21,352 +18,88 @@ public class BookingService : IBookingService
     private readonly IBookingRepository _bookingRepository;
     private readonly IMapper _mapper;
     private readonly IBoothRepository _boothRepository;
-    private readonly ITransactionService _paymentService;
-    private readonly IBookingServiceService _bookingServiceService;
+    private readonly ITransactionService _transactionService;
+    private readonly IBookingServiceRepository _bookingServiceRepository;
     private readonly IAccountRepository _accountRepository;
     private readonly IRefundService _refundService;
     private readonly IBookingServiceRepository _bookingServiceRepository;
     private readonly IServiceRepository _serviceRepository;
-
+    private readonly IFullPaymentPolicyRepository _fullPaymentPolicyRepository;
     public BookingService(IBookingRepository sessionOrderRepository,
         IMapper mapper,
         IBoothRepository boothRepository,
         ITransactionService paymentService,
-        IBookingServiceService servicePackageService,
+        IBookingServiceRepository bookingServiceRepository,
         IAccountRepository accountRepository,
-        IRefundService refundService, IBookingServiceRepository bookingServiceRepository, IServiceRepository serviceRepository)
+        IRefundService refundService, 
+        IBookingServiceRepository bookingServiceRepository,
+        IRefundService refundService,
+        IServiceRepository serviceRepository,
+        IFullPaymentPolicyRepository fullPaymentPolicyRepository)
     {
         _bookingRepository = sessionOrderRepository;
         _mapper = mapper;
         _boothRepository = boothRepository;
-        _paymentService = paymentService;
-        _bookingServiceService = servicePackageService;
+        _transactionService = paymentService;
+        _bookingServiceRepository = bookingServiceRepository;
         _accountRepository = accountRepository;
         _refundService = refundService;
         _bookingServiceRepository = bookingServiceRepository;
         _serviceRepository = serviceRepository;
+        _fullPaymentPolicyRepository = fullPaymentPolicyRepository;
     }
 
     // Create a new session
-    public async Task<CreateBookingResponse> CreateAsync(BookingRequest createModel)
+    public async Task<CreateBookingResponse> CreateAsync(BookingRequest createModel, BookingType bookingType)
     {
-        ////validate account
-        //Account? account;
+        // Validate customer
+        var account = await ValidateCustomerAsync(createModel.CustomerPhoneNumber, createModel.CustomerEmail);
 
-        //if (!string.IsNullOrEmpty(createModel.CustomerPhoneNumber) && !string.IsNullOrEmpty(createModel.CustomerEmail))
-        //{
-        //    account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(createModel.CustomerPhoneNumber) && i.Email.Equals(createModel.CustomerEmail))).FirstOrDefault();
-        //}
-        //else if (!string.IsNullOrEmpty(createModel.CustomerPhoneNumber))
-        //{
-        //    account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(createModel.CustomerPhoneNumber))).FirstOrDefault();
-        //}
-        //else if (!string.IsNullOrEmpty(createModel.CustomerEmail))
-        //{
-        //    account = (await _accountRepository.GetAsync(i => i.Email.Equals(createModel.CustomerEmail))).FirstOrDefault();
-        //}
-        //else
-        //{
-        //    throw new BadRequestException("No customer value input");
-        //}
-        //if (account == null)
-        //{
-        //    throw new BadRequestException("Account not found");
-        //}
-        //if (account.Role != AccountRole.Customer)
-        //{
-        //    throw new BadRequestException("Account is not Customer");
-        //}
-        //if (account.Status != AccountStatus.Active)
-        //{
-        //    throw new BadRequestException("Account is not active to do this function");
-        //}
+        // Validate booth
+        var booth = await ValidateBoothAsync(createModel.BoothID);
 
-        //var boothTask = _boothRepository.GetAsync(i => i.BoothID == createModel.BoothID, i => i.Branch);
-        //var sessionOrderCheckTask = _sessionOrderRepository.GetAsync(i => i.CustomerID == account.AccountID && (i.EndTime > DateTime.Now && DateTime.Now > i.StartTime));
-        //await Task.WhenAll(sessionOrderCheckTask, boothTask);
+        // Validate time range
+        ValidateTimeRange(createModel.StartTime, createModel.EndTime, booth.Branch.OpeningTime, booth.Branch.ClosingTime);
 
-        ////booth validate
-        //var booth = boothTask.Result.FirstOrDefault();
-        //if (booth == null)
-        //{
-        //    throw new NotFoundException("Booth not found on server, try again later");
-        //}
-        //else if (booth.Status == BoothStatus.InUse || booth.Status == BoothStatus.Maintenance || booth.Status == BoothStatus.Inactive)
-        //{
-        //    throw new BadRequestException("Booth is used by another or is inactive, in maintenance");
-        //} else if (booth.Branch.Status == BranchStatus.Inactive)
-        //{
-        //    throw new BadRequestException("Branch of this booth has been closed, plase try another branch");
-        //}
+        // Validate booking time conflicts
+        await ValidateBookingTime(createModel.BoothID, createModel.StartTime, createModel.EndTime);
 
-        ////validate account's sesion order
-        //var sessionOrderCheck = sessionOrderCheckTask.Result.FirstOrDefault();
-        //if (sessionOrderCheck != null)
-        //{
-        //    throw new BadRequestException("This Account is using another booth in booking time");
-        //}
+        // Calculate payment amount
+        var ProcessedServices = await ProcessServiceListAsync(booth.PricePerHour, createModel.StartTime, createModel.EndTime, createModel.ServiceList);
 
-        ////add session with package
-        //Booking session = _mapper.Map<Booking>(createModel);
-        //session.CustomerID = account.AccountID;
-        //session.ValidateCode = await this.GenerateValidateCode();
-        //if (createModel.StartTime == default(DateTime))
+        // Map to booking entity
+        var booking = _mapper.Map<Booking>(createModel);
+        booking.CustomerID = account.AccountID;
+        booking.ValidateCode = await GenerateValidateCode();
+        booking.Status = BookingStatus.PendingPayment;
+        booking.IsCancelled = false;
+        booking.CreatedDate = DateTime.UtcNow;
+        booking.PaymentAmount = ProcessedServices.Item1;
+        booking.BookingType = bookingType;
+        booking.BookingServices = ProcessedServices.Item2;
+        // Set payment policy if applicable
+        //if (booking.BookingType == BookingType.Online)
         //{
-        //    session.StartTime = DateTime.Now;
-        //    //update booth
-        //    booth.Status = BoothStatus.InUse;
+        booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(createModel.StartTime);
         //}
-        //else if (createModel.StartTime < DateTime.Now)
-        //{
-        //    throw new BadRequestException("Can not booking with start time in past");
-        //}
-        ////validate service list of create model
-        //if (createModel.ServiceList.Count > 0)
-        //{
-        //    var serviceIds = createModel.ServiceList.Keys.ToList();
-        //    var services = await _serviceRepository.GetAsync(i => serviceIds.Contains(i.ServicePackageID));
-        //    //validate number of service
-        //    if (createModel.ServiceList.Count != services.Count())
-        //    {
-        //        throw new BadRequestException("Some service in request are not found");
-        //    }
-        //    //validate is there any service about hire booth and update endtime
-        //    session.EndTime = session.StartTime;
-        //}
-        ////validate time in a date and in branch's open time
-        //if (!ValidateTimeRange(session.StartTime, session.EndTime.Value))
-        //{
-        //    throw new BadRequestException("Not valide time, our Branch open from 8:00 to 23:00 of a day");
-        //}
-
-        //session.Status = SessionOrderStatus.Created;
-        ////validate time to not conflict with other session
-        //if ((await this.ValidateBookingTime(session.BoothID, session.StartTime, session.EndTime.Value)) == false)
-        //{
-        //    throw new BadRequestException("There is another Session on this time, please check time to book again");
-        //}
-
-        //if (booth.Status == BoothStatus.InUse)
-        //{
-        //    await _boothRepository.UpdateAsync(booth);
-        //}
-        //await _sessionOrderRepository.AddAsync(session);
-
-        //if (createModel.ServiceList.Count > 0)
-        //{
-        //    foreach (var service in createModel.ServiceList)
-        //    {
-        //        CreateServiceItemRequest serviceItem = new CreateServiceItemRequest
-        //        {
-        //            Quantity = service.Value,
-        //            ServiceID = service.Key,
-        //            SessionOrderID = session.BookingID,
-        //        };
-        //        await _serviceItemService.CreateAsync(serviceItem);
-        //    }
-        //}
-
-        //return _mapper.Map<CreateSessionOrderResponse>(session);r
-        return null;
+        // Save booking
+        await _bookingRepository.AddAsync(booking);
+        var list =  await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
+        booking.BookingServices = list.ToList();
+        return _mapper.Map<CreateBookingResponse>(booking);
     }
 
-
-
-    //public async Task<CreateBookingResponse> CreateAsync(CreateBookingRequest createModel)
-    //{
-    //    // Validate customer
-    //    var account = await ValidateCustomerAsync(createModel.CustomerPhoneNumber, createModel.CustomerEmail);
-
-    //    // Validate booth
-    //    var booth = await ValidateBoothAsync(createModel.BoothID);
-
-    //    // Validate time range
-    //    ValidateTimeRange(createModel.StartTime, createModel.EndTime);
-
-    //    // Check if booking time is within business hours
-    //    if (!IsWithinBusinessHours(createModel.StartTime) || !IsWithinBusinessHours(createModel.EndTime))
-    //    {
-    //        throw new BadRequestException("Booking time must be within business hours.");
-    //    }
-
-    //    // Validate booking time conflicts
-    //    await ValidateBookingTimeAsync(createModel.BoothID, createModel.StartTime, createModel.EndTime);
-
-    //    // Calculate payment amount
-    //    var paymentAmount = await CalculatePaymentAmount(createModel.BoothID, createModel.StartTime, createModel.EndTime, createModel.ServiceList);
-
-    //    // Map to booking entity
-    //    var booking = _mapper.Map<Booking>(createModel);
-    //    booking.CustomerID = account.AccountID;
-    //    booking.ValidateCode = await GenerateValidateCode();
-    //    booking.Status = BookingStatus.Created;
-    //    booking.IsCancelled = false;
-    //    booking.CreatedDate = DateTime.UtcNow;
-    //    booking.PaymentAmount = paymentAmount;
-
-    //    // Set payment policy if applicable
-    //    if (createModel.BookingType == BookingType.Online)
-    //    {
-    //        booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(createModel.StartTime);
-    //    }
-
-    //    // Process service list
-    //    await ProcessServiceListAsync(createModel.ServiceList, booking);
-
-    //    // Save booking
-    //    await _bookingRepository.AddAsync(booking);
-
-    //    return _mapper.Map<CreateBookingResponse>(booking);
-    //}
-
-    //private async Task<Account> ValidateCustomerAsync(string phoneNumber, string email)
-    //{
-    //    Account? account;
-
-    //    if (!string.IsNullOrEmpty(phoneNumber) && !string.IsNullOrEmpty(email))
-    //    {
-    //        account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(phoneNumber) && i.Email.Equals(email))).FirstOrDefault();
-    //    }
-    //    else if (!string.IsNullOrEmpty(phoneNumber))
-    //    {
-    //        account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(phoneNumber))).FirstOrDefault();
-    //    }
-    //    else if (!string.IsNullOrEmpty(email))
-    //    {
-    //        account = (await _accountRepository.GetAsync(i => i.Email.Equals(email))).FirstOrDefault();
-    //    }
-    //    else
-    //    {
-    //        throw new BadRequestException("No customer value input");
-    //    }
-    //    if (account == null)
-    //    {
-    //        throw new BadRequestException("Account not found");
-    //    }
-    //    if (account.Role != AccountRole.Customer)
-    //    {
-    //        throw new BadRequestException("Account is not Customer");
-    //    }
-    //    if (account.Status != AccountStatus.Active)
-    //    {
-    //        throw new BadRequestException("Account is not active to do this function");
-    //    }
-
-    //    return account;
-    //}
-
-    //private async Task<Booth> ValidateBoothAsync(Guid boothID)
-    //{
-    //    var booth = (await _boothRepository.GetAsync(i => i.BoothID == boothID, i => i.Branch)).FirstOrDefault();
-    //    if (booth == null)
-    //    {
-    //        throw new NotFoundException("Booth not found on server, try again later");
-    //    }
-    //    else if (booth.Status == BoothStatus.InUse || booth.Status == BoothStatus.Maintenance || booth.Status == BoothStatus.Inactive)
-    //    {
-    //        throw new BadRequestException("Booth is used by another or is inactive, in maintenance");
-    //    }
-    //    else if (booth.Branch.Status == BranchStatus.Inactive)
-    //    {
-    //        throw new BadRequestException("Branch of this booth has been closed, please try another branch");
-    //    }
-
-    //    return booth;
-    //}
-
-    //private void ValidateTimeRange(DateTime startTime, DateTime endTime)
-    //{
-    //    if (startTime >= endTime)
-    //    {
-    //        throw new BadRequestException("Start time must be before end time");
-    //    }
-
-    //    if (startTime < DateTime.Now)
-    //    {
-    //        throw new BadRequestException("Start time cannot be in the past");
-    //    }
-    //}
-
-    //private bool IsWithinBusinessHours(DateTime time)
-    //{
-    //    var openTime = new TimeSpan(8, 0, 0); // 8:00 AM
-    //    var closeTime = new TimeSpan(23, 0, 0); // 11:00 PM
-    //    var timeOfDay = time.TimeOfDay;
-
-    //    return timeOfDay >= openTime && timeOfDay <= closeTime;
-    //}
-
-    //private async Task ValidateBookingTimeAsync(Guid boothID, DateTime startTime, DateTime endTime)
-    //{
-    //    var existingBookings = await _bookingRepository.GetAsync(b => b.BoothID == boothID &&
-    //        ((b.StartTime <= startTime && b.EndTime > startTime) ||
-    //        (b.StartTime < endTime && b.EndTime >= endTime) ||
-    //        (b.StartTime >= startTime && b.EndTime <= endTime)));
-
-    //    if (existingBookings.Any())
-    //    {
-    //        throw new BadRequestException("There is another booking in the selected time range, please choose another time");
-    //    }
-    //}
-    //private async Task<decimal> CalculatePaymentAmount(Guid boothID, DateTime startTime, DateTime endTime, Dictionary<Guid, int> serviceList)
-    //{
-    //    var booth = (await _boothRepository.GetAsync(b => b.BoothID == boothID)).FirstOrDefault();
-    //    if (booth == null)
-    //    {
-    //        throw new NotFoundException("Booth not found.");
-    //    }
-
-    //    var boothPricePerHour = booth.PricePerHour;
-    //    var totalHours = (endTime - startTime).TotalHours;
-    //    var boothAmount = (decimal)totalHours * boothPricePerHour;
-
-    //    var serviceAmount = 0m;
-    //    if (serviceList.Any())
-    //    {
-    //        var serviceIds = serviceList.Keys.ToList();
-    //        var services = await _serviceRepository.GetAsync(s => serviceIds.Contains(s.ServicePackageID));
-    //        foreach (var service in services)
-    //        {
-    //            serviceAmount += service.Price * serviceList[service.ServicePackageID];
-    //        }
-    //    }
-
-    //    return boothAmount + serviceAmount;
-    //}
-
-    //private async Task ProcessServiceListAsync(Dictionary<Guid, int> serviceList, Booking booking)
-    //{
-    //    if (serviceList.Count > 0)
-    //    {
-    //        foreach (var service in serviceList)
-    //        {
-    //            BookingService bookingService = new BookingService
-    //            {
-    //                BookingID = booking.BookingID,
-    //                ServicePackageID = service.Key,
-    //                Quantity = service.Value
-    //            };
-    //            // Save booking service to the database
-    //            await _serviceRepository.AddBookingServiceAsync(bookingService);
-    //        }
-    //    }
-    //}
-
-    //private async Task<long> GenerateValidateCode()
-    //{
-    //    var random = new Random();
-    //    return random.Next(100000, 999999);
-    //}
-
-    //private async Task<Guid?> GetApplicablePolicyIdAsync(DateTime startTime)
-    //{
-    //    var policies = await _fullPaymentPolicyRepository.GetAsync(p => p.IsActive && (p.StartDate == null || p.StartDate <= startTime) && (p.EndDate == null || p.EndDate >= startTime));
-    //    var policy = policies.FirstOrDefault();
-    //    return policy?.FullPaymentPolicyID;
-    //}
-
-    public async Task<CreateBookingResponse> CustomerBooking(CustomerBookingSessionOrderRequest request, string email)
+    private async Task<Guid> GetApplicablePolicyIdAsync(DateTime startTime)
+    {
+        var policies = await _fullPaymentPolicyRepository.GetAsync(p => p.IsActive && (p.StartDate == null || p.StartDate <= DateOnly.FromDateTime(startTime)) && (p.EndDate == null || p.EndDate >= DateOnly.FromDateTime(startTime)));
+        var policy = policies.FirstOrDefault();
+        if (policy == null)
+        {
+            throw new Exception("Not found policy");
+        }
+        return policy.FullPaymentPolicyID;
+    }
+    public async Task<CreateBookingResponse> CustomerBooking(CustomerBookingRequest request, string email)
     {
         if ((request.StartTime - DateTime.Now).TotalMinutes <= 30)
         {
@@ -374,7 +107,7 @@ public class BookingService : IBookingService
         }
         var createSessionOrderRequest = _mapper.Map<BookingRequest>(request);
         createSessionOrderRequest.CustomerEmail = email;
-        return await CreateAsync(createSessionOrderRequest);
+        return await CreateAsync(createSessionOrderRequest, BookingType.Online);
     }
 
     public async Task<BookingResponse> Checkin(CheckinCodeRequest validateSessionPhotoRequest)
@@ -466,11 +199,16 @@ public class BookingService : IBookingService
     // Get all sessions
     public async Task<IEnumerable<BookingResponse>> GetAllAsync()
     {
-        var sessions = await _bookingRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
+        var bookings = (await _bookingRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
             {
                 i => i.BookingServices,
-            });
-        return _mapper.Map<IEnumerable<BookingResponse>>(sessions.ToList());
+            })).ToList();
+        foreach (var booking in bookings)
+        {
+            var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
+            booking.BookingServices = list.ToList();
+        }
+        return _mapper.Map<IEnumerable<BookingResponse>>(bookings.ToList());
     }
 
     public async Task<IEnumerable<BookingResponse>> GetAllPagingAsync(SessionOrderFilter filter, PagingModel paging)
@@ -541,54 +279,73 @@ public class BookingService : IBookingService
     }
     public async Task CancelSessionOrder(Guid sessionOrdeID, string? ipAddress)
     {
-        var sessionOrder = (await _bookingRepository.GetAsync(i => i.BookingID == sessionOrdeID)).FirstOrDefault();
-        if (null == sessionOrder)
+        var booking = (await _bookingRepository.GetAsync(i => i.BookingID == sessionOrdeID, i => i.FullPaymentPolicy)).FirstOrDefault();
+        if (null == booking)
         {
             throw new NotFoundException("Session Order not found");
+        } else if (booking.IsCancelled)
+        {
+            throw new BadRequestException("Booking already canceled");
         }
         else
         {
-            //if (DateTime.Now > sessionOrder.StartTime
-            //    && (sessionOrder.Status == BookingStatus.Waiting
-            //        || sessionOrder.Status == BookingStatus.Created
-            //        || sessionOrder.Status == BookingStatus.Deposited))
-            //{
-            //    throw new BadRequestException("Can not cancel anymore, the session already start");
-            //}
+            if (DateTime.Now > booking.StartTime)
+            {
+                throw new BadRequestException("Can not cancel anymore, the session already start");
+            }
 
-            //if (sessionOrder.Status == BookingStatus.Waiting)
-            //{
-            //    //doing refund
-            //    await _refundService.RefundByOrderId(sessionOrdeID, false, ipAddress);
-            //}
-            sessionOrder.Status = BookingStatus.Canceled;
-            await _bookingRepository.UpdateAsync(sessionOrder);
+            if (booking.Status == BookingStatus.Completed && (booking.StartTime.Date - DateTime.Now).TotalDays > booking.FullPaymentPolicy.RefundDaysBefore)
+            {
+                //doing refund
+                // await _refundService.RefundByOrderId(sessionOrdeID, false, ipAddress);
+            }
+            booking.IsCancelled = true;
+            await _bookingRepository.UpdateAsync(booking);
         }
     }
-    private bool ValidateTimeRange(DateTime startTime, DateTime endTime)
+    //private method
+    private void ValidateTimeRange(DateTime startTime, DateTime endTime, TimeSpan openTime, TimeSpan closeTime)
     {
+        if (startTime >= endTime)
+        {
+            throw new BadRequestException("Start time must be before end time.");
+        }
 
-        DateTime lowerBound = new DateTime(startTime.Year, startTime.Month, startTime.Day, 8, 0, 0); // 8:00 AM
-        DateTime upperBound = new DateTime(startTime.Year, startTime.Month, startTime.Day, 23, 0, 0); // 11:00 PM
+        if (startTime < DateTime.Now)
+        {
+            throw new BadRequestException("Start time cannot be in the past.");
+        }
+        DateTime lowerBound = new DateTime(startTime.Year, startTime.Month, startTime.Day, 0, 0, 0).Add(openTime);
+        DateTime upperBound = new DateTime(startTime.Year, startTime.Month, startTime.Day, 0, 0, 0).Add(closeTime);
 
         bool isSameDate = startTime.Date == endTime.Date;
         bool isStartTimeValid = startTime >= lowerBound && startTime <= upperBound;
         bool isEndTimeValid = endTime >= lowerBound && endTime <= upperBound;
 
-        return isSameDate && isStartTimeValid && isEndTimeValid;
+        if (!isSameDate)
+        {
+            throw new BadRequestException("Start time and End time must in the same date.");
+        }
+        if (isStartTimeValid && isEndTimeValid)
+        {
+            throw new BadRequestException("Booking time must be within business hours.");
+        }
     }
-    private async Task<bool> ValidateBookingTime(Guid boothId, DateTime startTime, DateTime endTime)
+    private async Task ValidateBookingTime(Guid boothId, DateTime startTime, DateTime endTime)
     {
-        var validateTime = (await _bookingRepository.GetAsync(i => i.BoothID == boothId
+        var existingBookings = await _bookingRepository.GetAsync(i => i.BoothID == boothId
                                  && (startTime < i.StartTime && i.StartTime < endTime.AddMinutes(5) || endTime.AddMinutes(5) > i.EndTime && i.EndTime > startTime)
-                                 && i.Status != BookingStatus.Canceled
-                                 )).FirstOrDefault();
-        return validateTime == null;
+                                 && i.IsCancelled == false
+                                 );
+        if (existingBookings.Any())
+        {
+            throw new BadRequestException("There is another booking in the selected time range, please choose another time");
+        }
     }
     private async Task<long> GenerateValidateCode()
     {
         long code = 0;
-        var existedCodes = (await _bookingRepository.GetAsync(i => i.Status != BookingStatus.Canceled || i.Status != BookingStatus.Completed)).ToList().Select(i => i.ValidateCode);
+        var existedCodes = (await _bookingRepository.GetAsync(i => i.IsCancelled == false && (i.StartTime > DateTime.Now || i.EndTime > DateTime.Now))).ToList().Select(i => i.ValidateCode);
         while (code == 0)
         {
             code = new Random().Next(100000, 1000000);
@@ -599,5 +356,92 @@ public class BookingService : IBookingService
         }
         return code;
     }
+    private async Task<Account> ValidateCustomerAsync(string phoneNumber, string email)
+    {
+        Account? account;
+
+        if (!string.IsNullOrEmpty(phoneNumber) && !string.IsNullOrEmpty(email))
+        {
+            account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(phoneNumber) && i.Email.Equals(email))).FirstOrDefault();
+        }
+        else if (!string.IsNullOrEmpty(phoneNumber))
+        {
+            account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(phoneNumber))).FirstOrDefault();
+        }
+        else if (!string.IsNullOrEmpty(email))
+        {
+            account = (await _accountRepository.GetAsync(i => i.Email.Equals(email))).FirstOrDefault();
+        }
+        else
+        {
+            throw new BadRequestException("No customer value input");
+        }
+        if (account == null)
+        {
+            throw new BadRequestException("Account not found");
+        }
+        if (account.Role != AccountRole.Customer)
+        {
+            throw new BadRequestException("Account is not Customer");
+        }
+        if (account.Status != AccountStatus.Active)
+        {
+            throw new BadRequestException("Account is not active to do this function");
+        }
+
+        return account;
+    }
+    private async Task<Booth> ValidateBoothAsync(Guid boothID)
+    {
+        var booth = (await _boothRepository.GetAsync(i => i.BoothID == boothID, i => i.Branch)).FirstOrDefault();
+        if (booth == null)
+        {
+            throw new NotFoundException("Booth not found on server, try again later");
+        }
+        else if (booth.isBooked || booth.Status == BoothStatus.Maintenance || booth.Status == BoothStatus.Inactive)
+        {
+            throw new BadRequestException("Booth is used by another or is inactive, in maintenance");
+        }
+        else if (booth.Branch.Status == BranchStatus.Inactive)
+        {
+            throw new BadRequestException("Branch of this booth has been closed, please try another branch");
+        }
+
+        return booth;
+    }
+    private async Task<(decimal, ICollection<Domain.Entities.BookingService>)> ProcessServiceListAsync(decimal boothPricePerHour, DateTime startTime, DateTime endTime, Dictionary<Guid, short> serviceList)
+    {
+       
+        List<Domain.Entities.BookingService> result = new List<Domain.Entities.BookingService>();
+
+        var totalHours = (endTime - startTime).TotalHours;
+        var bookingAmount = (decimal)totalHours * boothPricePerHour;
+
+        if (serviceList.Any())
+        {
+            var serviceIds = serviceList.Keys.ToList();
+            var services = await _serviceRepository.GetAsync(s => serviceIds.Contains(s.ServiceID));
+            if (serviceList.Count() != services.Count())
+            {
+                throw new BadRequestException("Service(s) from input not found.");
+            }
+            foreach (var service in services)
+            {
+                var subtotal = service.ServicePrice * serviceList[service.ServiceID];
+                Domain.Entities.BookingService bookingService = new Domain.Entities.BookingService
+                {
+                    ServiceID = service.ServiceID,
+                    Quantity = serviceList[service.ServiceID],
+                    SubTotal = subtotal,
+                    Price = service.ServicePrice,
+                };
+                result.Add(bookingService);
+                bookingAmount += subtotal;
+            }
+        }
+
+        return (bookingAmount, result);
+    }
+
 }
 

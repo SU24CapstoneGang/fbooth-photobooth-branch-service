@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.DTOs.Booking
 {
-    public class CustomerBookingSessionOrderRequest
+    public class CustomerBookingRequest
     {
         public Guid BoothID { get; set; }
         public Dictionary<Guid, short> ServiceList { get; set; } = new Dictionary<Guid, short>();

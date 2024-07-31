@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
-namespace PhotoboothBranchService.Application.Services.PaymentServices.QR
+
+namespace PhotoboothBranchService.Application.Services.TransactionServices.QR
 {
     public class QrCodeService : IQrCodeService
     {

@@ -6,6 +6,7 @@ using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Booking;
 using PhotoboothBranchService.Application.Services.BookingServices;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
@@ -27,11 +28,11 @@ namespace PhotoboothBranchService.Api.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var createBookingResponse = await _bookingService.CreateAsync(bookingRequest);
+            var createBookingResponse = await _sessionService.CreateAsync(bookingRequest, BookingType.Staff);
             return Ok(createBookingResponse);
         }
         [HttpPost("customer-booking")]
-        public async Task<ActionResult<CreateBookingResponse>> CustomerCreateSession(CustomerBookingSessionOrderRequest customerBookingSessionOrderRequest)
+        public async Task<ActionResult<CreateBookingResponse>> CustomerCreateSession(CustomerBookingRequest customerBookingSessionOrderRequest)
         {
             if (!ModelState.IsValid)
             {
