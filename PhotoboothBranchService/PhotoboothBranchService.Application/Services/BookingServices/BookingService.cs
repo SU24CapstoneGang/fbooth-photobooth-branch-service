@@ -2,6 +2,7 @@
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Booking;
+using PhotoboothBranchService.Application.DTOs.BookingService;
 using PhotoboothBranchService.Application.Services.BookingServiceServices;
 using PhotoboothBranchService.Application.Services.RefundServices;
 using PhotoboothBranchService.Application.Services.TransactionServices;
@@ -22,7 +23,6 @@ public class BookingService : IBookingService
     private readonly IBookingServiceRepository _bookingServiceRepository;
     private readonly IAccountRepository _accountRepository;
     private readonly IRefundService _refundService;
-    private readonly IBookingServiceRepository _bookingServiceRepository;
     private readonly IServiceRepository _serviceRepository;
     private readonly IFullPaymentPolicyRepository _fullPaymentPolicyRepository;
     public BookingService(IBookingRepository sessionOrderRepository,
@@ -32,8 +32,6 @@ public class BookingService : IBookingService
         IBookingServiceRepository bookingServiceRepository,
         IAccountRepository accountRepository,
         IRefundService refundService, 
-        IBookingServiceRepository bookingServiceRepository,
-        IRefundService refundService,
         IServiceRepository serviceRepository,
         IFullPaymentPolicyRepository fullPaymentPolicyRepository)
     {

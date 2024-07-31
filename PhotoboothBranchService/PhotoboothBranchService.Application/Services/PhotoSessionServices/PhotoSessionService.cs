@@ -26,7 +26,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         // Create
         public async Task<CreatePhotoSessionResponse> CreateAsync(CreatePhotoSessionRequest createModel)
         {
-            var validateBooking = (await _sessionOrderRepository
+            var validateBooking = (await _bookingRepository
                 .GetAsync(i => i.BookingID == createModel.BookingID
                 && (i.EndTime > DateTime.Now && i.StartTime < DateTime.Now)
                 && i.Status == BookingStatus.Completed && !i.IsCancelled)) == null;

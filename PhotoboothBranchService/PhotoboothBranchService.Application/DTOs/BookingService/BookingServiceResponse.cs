@@ -10,6 +10,6 @@ namespace PhotoboothBranchService.Application.DTOs.BookingService
         public decimal Price { get; set; }
         public decimal SubTotal { get; set; }
         public Guid ServiceID { get; set; }
-        public Service Service { get; set; }
+        public ServiceResponse Service { get; set; }
     }
 }

@@ -28,7 +28,7 @@ namespace PhotoboothBranchService.Api.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var createBookingResponse = await _sessionService.CreateAsync(bookingRequest, BookingType.Staff);
+            var createBookingResponse = await _bookingService.CreateAsync(bookingRequest, BookingType.Staff);
             return Ok(createBookingResponse);
         }
         [HttpPost("customer-booking")]
