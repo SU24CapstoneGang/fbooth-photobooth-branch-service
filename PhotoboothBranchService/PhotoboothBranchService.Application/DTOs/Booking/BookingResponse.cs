@@ -1,0 +1,24 @@
+﻿using PhotoboothBranchService.Application.DTOs.ServiceItem;
+using PhotoboothBranchService.Domain.Enum;
+
+namespace PhotoboothBranchService.Application.DTOs.Booking
+{
+    public class BookingResponse
+    {
+        public Guid BookingID { get; set; }
+        public long ValidateCode { get; set; }
+        public decimal PaymentAmount { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public BookingType BookingType { get; set; }
+        public PaymentStatus PaymentStatus { get; set; }
+        public BookingStatus Status { get; set; }
+        public bool IsCancelled { get; set; }
+        public DateTime? CancelledDate { get; set; }
+        public decimal? RefundAmount { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public Guid BoothID { get; set; }
+        public Guid CustomerID { get; set; }
+        public List<BookingServiceResponse> BookingServices { get; set; } = new List<BookingServiceResponse>();
+    }
+}

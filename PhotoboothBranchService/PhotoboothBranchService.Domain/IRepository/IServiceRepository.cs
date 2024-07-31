@@ -5,5 +5,6 @@ namespace PhotoboothBranchService.Domain.IRepository
 {
     public interface IServiceRepository : IRepositoryBase<Service>
     {
+        
     }
 }

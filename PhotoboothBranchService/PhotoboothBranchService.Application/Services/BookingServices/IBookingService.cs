@@ -5,9 +5,9 @@ using PhotoboothBranchService.Domain.Common.Interfaces;
 
 namespace PhotoboothBranchService.Application.Services.BookingServices;
 
-public interface IBookingService : IServiceBase<SessionOrderResponse, SessionOrderFilter, PagingModel>
+public interface IBookingService : IServiceBase<BookingResponse, SessionOrderFilter, PagingModel>
 {
-    Task<SessionOrderResponse> ValidateBookingService(ValidateSessionOrderRequest validateSessionOrderRequest);
+    Task<BookingResponse> Checkin(CheckinCodeRequest validateSessionOrderRequest);
     Task<CreateBookingResponse> CreateAsync(BookingRequest createModel);
     Task<CreateBookingResponse> CustomerBooking(CustomerBookingSessionOrderRequest request, string email);
     Task UpdateAsync(Guid id, UpdateSessionOrderRequest updateModel);

@@ -14,19 +14,19 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         private readonly IPhotoSessionRepository _photoSessionRepository;
         private readonly IMapper _mapper;
         private readonly ILayoutRepository _layoutRepository;
-        private readonly IBookingRepository _sessionOrderRepository;
-        public PhotoSessionService(IPhotoSessionRepository photoSessionRepository, IMapper mapper, ILayoutRepository layoutRepository, IBookingRepository sessionOrderRepository)
+        private readonly IBookingRepository _bookingRepository;
+        public PhotoSessionService(IPhotoSessionRepository photoSessionRepository, IMapper mapper, ILayoutRepository layoutRepository, IBookingRepository bookingRepository)
         {
             _photoSessionRepository = photoSessionRepository;
             _mapper = mapper;
             _layoutRepository = layoutRepository;
-            _sessionOrderRepository = sessionOrderRepository;
+            _bookingRepository = bookingRepository;
         }
 
         // Create
         public async Task<CreatePhotoSessionResponse> CreateAsync(CreatePhotoSessionRequest createModel)
         {
-            var validateSessionOrder = (await _sessionOrderRepository
+            var validateSessionOrder = (await _bookingRepository
                 .GetAsync(i => i.BookingID == createModel.SessionOrderID
                 && (i.EndTime > DateTime.Now && i.StartTime < DateTime.Now)
                 && i.Status == BookingStatus.Completed)) == null;

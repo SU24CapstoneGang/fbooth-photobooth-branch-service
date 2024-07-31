@@ -16,6 +16,15 @@ public class BookingRepository : IBookingRepository
         _dbContext = dbContext;
     }
 
+    public async Task<Booking> GetBookingByValidateCodeAndBoothIdAsync(long validateCode, Guid boothId)
+    {
+        return await _dbContext.Bookings
+            .Include(b => b.BookingServices)
+            .ThenInclude(bs => bs.Service)
+            .FirstOrDefaultAsync(b => b.ValidateCode == validateCode && b.BoothID == boothId);
+    }
+
+
     // Add a new session
     public async Task<Booking> AddAsync(Booking session)
     {

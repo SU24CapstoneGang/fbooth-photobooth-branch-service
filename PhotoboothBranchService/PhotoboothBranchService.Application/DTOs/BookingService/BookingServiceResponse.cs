@@ -1,12 +1,15 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.ServiceItem
+﻿using PhotoboothBranchService.Domain.Entities;
+
+namespace PhotoboothBranchService.Application.DTOs.ServiceItem
 {
     public class BookingServiceResponse
     {
-        public Guid ServiceItemID { get; set; }
+        public Guid BookingServiceID { get; set; }
+        public string ServiceName { get; set; } = default!;
         public short Quantity { get; set; }
-        public decimal UnitPrice { get; set; }
+        public decimal Price { get; set; }
         public decimal SubTotal { get; set; }
         public Guid ServiceID { get; set; }
-        public Guid SessionOrderID { get; set; }
+        public Service Service { get; set; }
     }
 }

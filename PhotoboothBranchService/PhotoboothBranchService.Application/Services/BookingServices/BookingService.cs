@@ -25,13 +25,16 @@ public class BookingService : IBookingService
     private readonly IBookingServiceService _bookingServiceService;
     private readonly IAccountRepository _accountRepository;
     private readonly IRefundService _refundService;
+    private readonly IBookingServiceRepository _bookingServiceRepository;
+    private readonly IServiceRepository _serviceRepository;
+
     public BookingService(IBookingRepository sessionOrderRepository,
         IMapper mapper,
         IBoothRepository boothRepository,
         ITransactionService paymentService,
         IBookingServiceService servicePackageService,
         IAccountRepository accountRepository,
-        IRefundService refundService)
+        IRefundService refundService, IBookingServiceRepository bookingServiceRepository, IServiceRepository serviceRepository)
     {
         _bookingRepository = sessionOrderRepository;
         _mapper = mapper;
@@ -40,6 +43,8 @@ public class BookingService : IBookingService
         _bookingServiceService = servicePackageService;
         _accountRepository = accountRepository;
         _refundService = refundService;
+        _bookingServiceRepository = bookingServiceRepository;
+        _serviceRepository = serviceRepository;
     }
 
     // Create a new session
@@ -372,57 +377,78 @@ public class BookingService : IBookingService
         return await CreateAsync(createSessionOrderRequest);
     }
 
-    public async Task<SessionOrderResponse> ValidateBookingService(ValidateSessionOrderRequest validateSessionPhotoRequest)
+    public async Task<BookingResponse> Checkin(CheckinCodeRequest validateSessionPhotoRequest)
     {
-        var sessionOrders = (await _bookingRepository
-            .GetAsync(i => i.BoothID == validateSessionPhotoRequest.BoothID && i.EndTime > DateTime.Now,
-            includeProperties: new Expression<Func<Booking, object>>[]
-            {
-                i => i.BookingServices,
-            })).ToList();
-        var booth = (await _boothRepository.GetAsync(i => i.BoothID == validateSessionPhotoRequest.BoothID)).FirstOrDefault();
-        if (sessionOrders.Count() == 0 && booth != null)
-        {
-            var sessionOrder = sessionOrders.FirstOrDefault(i => i.ValidateCode == validateSessionPhotoRequest.ValidateCode);
-            if (sessionOrder == null)
-            {
-                throw new BadRequestException("Wrong validate code, please try again");
-            }
-            if (sessionOrder.StartTime > DateTime.Now)
-            {
-                throw new BadRequestException("The time for your Session not come yet, please check with our staff and try again later");
-            }
+        var booking = await _bookingRepository.GetBookingByValidateCodeAndBoothIdAsync(
+            validateSessionPhotoRequest.Code, validateSessionPhotoRequest.BoothID
+        );
 
-            //if (sessionOrder.Status == BookingStatus.Waiting)
-            //{
-            //    TimeSpan difference = DateTime.Now - sessionOrder.StartTime;
-            //    if (difference.TotalMinutes < 5)
-            //    {
-            //        sessionOrder.StartTime += difference;
-            //        sessionOrder.EndTime += difference;
-            //    }
-            //    else
-            //    {
-            //        sessionOrder.StartTime += difference;
-            //    }
-            //    sessionOrder.Status = BookingStatus.Processsing;
-            //    await _bookingRepository.UpdateAsync(sessionOrder);
-
-            //    //update booth
-            //    booth.isBooked = true;
-            //    await _boothRepository.UpdateAsync(booth);
-                return _mapper.Map<SessionOrderResponse>(sessionOrder);
-            //}
-            //else
-            //{
-            //    throw new BadRequestException("Session has been cancelled or not paid yet to validate");
-            //}
-        }
-        else
+        if (booking == null)
         {
-            throw new NotFoundException("No session order found, please resigter session with our staff");
+            throw new BadRequestException("Wrong validate code, please try again");
         }
+
+        if (booking.IsCancelled)
+        {
+            throw new BadRequestException("This booking has been cancelled. Please contact our staff for further assistance.");
+        }
+
+        if (booking.EndTime <= DateTime.Now)
+        {
+            throw new BadRequestException("This booking has already ended. Please contact our staff for further assistance.");
+        }
+
+        if (booking.PaymentStatus != PaymentStatus.Paid)
+        {
+            throw new BadRequestException("This booking has not been paid for. Please complete the payment to proceed.");
+        }
+
+        if (booking.StartTime > DateTime.Now)
+        {
+            throw new BadRequestException("The time for your session has not come yet, please check with our staff and try again later");
+        }
+
+        // Ensure services are loaded correctly
+        if (booking.BookingServices == null || !booking.BookingServices.Any() || booking.BookingServices.Any(bs => bs.Service == null))
+        {
+            throw new InvalidOperationException("Booking services not loaded correctly");
+        }
+
+        // Map services to response
+        var bookingServiceResponses = booking.BookingServices.Select(service => new BookingServiceResponse
+        {
+            ServiceID = service.ServiceID,
+            ServiceName = service.Service.ServiceName,
+            Quantity = service.Quantity,
+            Price = service.Price,
+            SubTotal = service.SubTotal
+        }).ToList();
+
+        // Create the response
+        var response = new BookingResponse
+        {
+            BookingID = booking.BookingID,
+            ValidateCode = booking.ValidateCode,
+            PaymentAmount = booking.PaymentAmount,
+            StartTime = booking.StartTime,
+            EndTime = booking.EndTime,
+            BookingType = booking.BookingType,
+            PaymentStatus = booking.PaymentStatus,
+            Status = booking.Status,
+            IsCancelled = booking.IsCancelled,
+            CancelledDate = booking.CancelledDate,
+            RefundAmount = booking.RefundAmount,
+            CreatedDate = booking.CreatedDate,
+            BoothID = booking.BoothID,
+            CustomerID = booking.CustomerID,
+            BookingServices = bookingServiceResponses
+        };
+
+        return response;
     }
+
+
+
     // Delete a session by ID
     public async Task DeleteAsync(Guid id)
     {
@@ -438,27 +464,27 @@ public class BookingService : IBookingService
     }
 
     // Get all sessions
-    public async Task<IEnumerable<SessionOrderResponse>> GetAllAsync()
+    public async Task<IEnumerable<BookingResponse>> GetAllAsync()
     {
         var sessions = await _bookingRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
             {
                 i => i.BookingServices,
             });
-        return _mapper.Map<IEnumerable<SessionOrderResponse>>(sessions.ToList());
+        return _mapper.Map<IEnumerable<BookingResponse>>(sessions.ToList());
     }
 
-    public async Task<IEnumerable<SessionOrderResponse>> GetAllPagingAsync(SessionOrderFilter filter, PagingModel paging)
+    public async Task<IEnumerable<BookingResponse>> GetAllPagingAsync(SessionOrderFilter filter, PagingModel paging)
     {
         var sessions = (await _bookingRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
             {
                 i => i.BookingServices,
             })).ToList().AutoFilter(filter);
-        var listSessionresponse = _mapper.Map<IEnumerable<SessionOrderResponse>>(sessions);
+        var listSessionresponse = _mapper.Map<IEnumerable<BookingResponse>>(sessions);
         return listSessionresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
     }
 
     // Get a session by ID
-    public async Task<SessionOrderResponse> GetByIdAsync(Guid id)
+    public async Task<BookingResponse> GetByIdAsync(Guid id)
     {
         var session = (await _bookingRepository.GetAsync(s => s.BookingID == id,
             includeProperties: new Expression<Func<Booking, object>>[]
@@ -469,7 +495,7 @@ public class BookingService : IBookingService
         {
             throw new KeyNotFoundException("Session not found.");
         }
-        return _mapper.Map<SessionOrderResponse>(session);
+        return _mapper.Map<BookingResponse>(session);
     }
 
     // Update a session
