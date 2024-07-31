@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PhotoboothBranchService.Application.Services.PaymentServices;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 using System;

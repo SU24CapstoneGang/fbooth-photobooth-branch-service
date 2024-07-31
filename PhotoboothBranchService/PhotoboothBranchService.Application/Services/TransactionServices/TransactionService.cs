@@ -6,7 +6,7 @@ using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.MoMoPayment;
-using PhotoboothBranchService.Application.DTOs.Payment;
+using PhotoboothBranchService.Application.DTOs.Transaction;
 using PhotoboothBranchService.Application.DTOs.VNPayPayment;
 using PhotoboothBranchService.Application.Services.EmailServices;
 using PhotoboothBranchService.Application.Services.MoMoServices;
@@ -18,7 +18,7 @@ using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 using System.Net;
 
-namespace PhotoboothBranchService.Application.Services.PaymentServices
+namespace PhotoboothBranchService.Application.Services.TransactionServices
 {
     public class TransactionService : ITransactionService
     {
@@ -26,7 +26,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         private readonly IMapper _mapper;
         private readonly IPaymentMethodRepository _paymentMethodRepository;
         private readonly IVNPayService _vNPayService;
-        private readonly IBookingRepository _sessionOrderRepository;
+        private readonly IBookingRepository _bookingRepository;
         private readonly IMoMoService _moMoService;
         private readonly IEmailService _emailService;
         private readonly IRefundService _refundService;
@@ -42,7 +42,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             _mapper = mapper;
             _paymentMethodRepository = paymentMethodRepository;
             _vNPayService = vNPayService;
-            _sessionOrderRepository = sessionOrderRepository;
+            _bookingRepository = sessionOrderRepository;
             _moMoService = moMoService;
             _emailService = emailService;
             _refundService = refundService;
@@ -52,12 +52,12 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         public async Task<CreatePaymentResponse> CreateAsync(CreateTransactionRequest createModel, string ClientIpAddress)
         {
             //validate session and total price
-            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == createModel.SessionOrderID)).FirstOrDefault();
-            if (sessionOrder == null)
+            var booking = (await _bookingRepository.GetAsync(i => i.BookingID == createModel.SessionOrderID)).FirstOrDefault();
+            if (booking == null)
             {
                 throw new NotFoundException("Not found Session to proceed payment");
             }
-            if (sessionOrder.Status == BookingStatus.Canceled)
+            if (booking.IsCancelled)
             {
                 throw new BadRequestException("The Order has been ended or cancelled");
             }
@@ -74,8 +74,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             switch (createModel.PayType)
             {
                 case PayType.FullPay:
-                    var payments = await _paymentRepository.GetAsync(i => i.BookingID == sessionOrder.BookingID && i.TransactionStatus == TransactionStatus.Success);
-                    long result = (long)sessionOrder.PaymentAmount - payments.Sum(i => i.Amount);
+                    var payments = await _paymentRepository.GetAsync(i => i.BookingID == booking.BookingID && i.TransactionStatus == TransactionStatus.Success);
+                    long result = (long)booking.PaymentAmount - payments.Sum(i => i.Amount);
                     if (result == 0)
                     {
                         throw new BadRequestException("Already paid all");
@@ -86,12 +86,12 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                     }
                     payment.Amount = result;
                     break;
-                //case PayType.Deposit:
-                //    if (sessionOrder.Status != BookingStatus.Created)
-                //    {
-                //        throw new BadRequestException("Deposit only apply on Booking");
-                //    }
-                //    payment.Amount = (long)Math.Round(sessionOrder.PaymentAmount * 0.2m);
+                    //case PayType.Deposit:
+                    //    if (sessionOrder.Status != BookingStatus.Created)
+                    //    {
+                    //        throw new BadRequestException("Deposit only apply on Booking");
+                    //    }
+                    //    payment.Amount = (long)Math.Round(sessionOrder.PaymentAmount * 0.2m);
                     break;
                 default:
                     // Handle unexpected PayType
@@ -165,7 +165,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                 try
                 {
                     await _emailService.SendBillInformation(responseBody.PaymentID);
-                    await this.updateAfterSuccessPaymentAsync(result.paymentResult);
+                    await updateAfterSuccessPaymentAsync(result.paymentResult);
                 }
                 catch (Exception ex)
                 {
@@ -188,7 +188,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                 {
                     Console.WriteLine(ex.Message);
                 }
-                await this.updateAfterSuccessPaymentAsync(response);
+                await updateAfterSuccessPaymentAsync(response);
             }
         }
         public async Task<MomoIPNResponse> HandleMomoIPN(MoMoResponse moMoResponse)

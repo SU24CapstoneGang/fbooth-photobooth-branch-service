@@ -2,7 +2,7 @@
 {
     public class CreatePhotoSessionRequest
     {
-        public Guid SessionOrderID { get; set; }
+        public Guid BookingID { get; set; }
         public Guid LayoutID { get; set; }
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoboothBranchService.Application.DTOs.ServiceItem
+namespace PhotoboothBranchService.Application.DTOs.BookingService
 {
     public class AddListBookingServiceRequest
     {

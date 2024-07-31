@@ -1,4 +1,4 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.ServiceItem
+﻿namespace PhotoboothBranchService.Application.DTOs.BookingService
 {
     public class BookingServiceFilter
     {
@@ -7,6 +7,6 @@
         public int? Measure { get; set; }
         public string? Unit { get; set; } = default!;
         public Guid? ServiceID { get; set; }
-        public Guid? SessionOrderID { get; set; }
+        public Guid? BookingID { get; set; }
     }
 }

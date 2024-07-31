@@ -4,6 +4,7 @@ using PhotoboothBranchService.Api.Common.Helper;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Booking;
 using PhotoboothBranchService.Application.Services.BookingServices;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
@@ -25,11 +26,11 @@ namespace PhotoboothBranchService.Api.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var createBookingResponse = await _sessionService.CreateAsync(bookingRequest);
+            var createBookingResponse = await _sessionService.CreateAsync(bookingRequest, BookingType.Staff);
             return Ok(createBookingResponse);
         }
         [HttpPost("customer-booking")]
-        public async Task<ActionResult<CreateBookingResponse>> CustomerCreateSession(CustomerBookingSessionOrderRequest customerBookingSessionOrderRequest)
+        public async Task<ActionResult<CreateBookingResponse>> CustomerCreateSession(CustomerBookingRequest customerBookingSessionOrderRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -41,28 +42,28 @@ namespace PhotoboothBranchService.Api.Controllers
         }
         //validate code
         [HttpPost("validate")]
-        public async Task<SessionOrderResponse> ValidateSessionOrder(ValidateSessionOrderRequest validateSessionPhotoRequest)
+        public async Task<BookingResponse> ValidateSessionOrder(ValidateSessionOrderRequest validateSessionPhotoRequest)
         {
             return await _sessionService.ValidateBookingService(validateSessionPhotoRequest);
         }
 
         // Read
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SessionOrderResponse>>> GetAllSessions()
+        public async Task<ActionResult<IEnumerable<BookingResponse>>> GetAllSessions()
         {
             var sessions = await _sessionService.GetAllAsync();
             return Ok(sessions);
         }
         //get all with filter and paging
         [HttpGet("paging")]
-        public async Task<ActionResult<IEnumerable<SessionOrderResponse>>> GetAllBooking(
+        public async Task<ActionResult<IEnumerable<BookingResponse>>> GetAllBooking(
             [FromQuery] SessionOrderFilter sessionFilter, [FromQuery] PagingModel pagingModel)
         {
             var sessions = await _sessionService.GetAllPagingAsync(sessionFilter, pagingModel);
             return Ok(sessions);
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<SessionOrderResponse>> GetBookingById(Guid id)
+        public async Task<ActionResult<BookingResponse>> GetBookingById(Guid id)
         {
             var session = await _sessionService.GetByIdAsync(id);
             if (session == null)

@@ -2,7 +2,7 @@
 using Microsoft.VisualBasic;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.ServiceItem;
+using PhotoboothBranchService.Application.DTOs.BookingService;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -30,7 +30,7 @@ namespace PhotoboothBranchService.Application.Services.BookingServiceServices
 
         public async Task<CreateBookingServiceResponse> CreateAsync(CreateBookingServiceRequest createModel)
         {
-            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == createModel.SessionOrderID)).FirstOrDefault();
+            var sessionOrder = (await _sessionOrderRepository.GetAsync(i => i.BookingID == createModel.BookingID)).FirstOrDefault();
 
             BookingService createServiceItemResponse = null;
             if (sessionOrder != null)
@@ -98,7 +98,7 @@ namespace PhotoboothBranchService.Application.Services.BookingServiceServices
             AddListBookingServiceResponse response = new AddListBookingServiceResponse
             {
                 BoothID = request.BoothID,
-                SessionOrderID = sessionOrder.BookingID,
+                BookingID = sessionOrder.BookingID,
             };
             foreach (var req in request.ServiceList)
             {
@@ -224,9 +224,9 @@ namespace PhotoboothBranchService.Application.Services.BookingServiceServices
                 //    throw new NotFoundException("Not found Service From request");
                 //}
             }
-            if (updateModel.SessionOrderID.HasValue)
+            if (updateModel.BookingID.HasValue)
             {
-                var order = (await _sessionOrderRepository.GetAsync(i => i.BookingID == updateModel.SessionOrderID)).FirstOrDefault();
+                var order = (await _sessionOrderRepository.GetAsync(i => i.BookingID == updateModel.BookingID)).FirstOrDefault();
                 if (order == null)
                 {
                     throw new NotFoundException("Not found Service From request");

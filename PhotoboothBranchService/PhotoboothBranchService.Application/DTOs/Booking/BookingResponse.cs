@@ -3,7 +3,7 @@ using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Application.DTOs.Booking
 {
-    public class CreateBookingResponse
+    public class BookingResponse
     {
         public Guid BookingID { get; set; }
         public long ValidateCode { get; set; }
@@ -17,6 +17,6 @@ namespace PhotoboothBranchService.Application.DTOs.Booking
         public DateTime CreatedDate { get; set; }
         public Guid BoothID { get; set; }
         public Guid CustomerID { get; set; }
-        public virtual ICollection<BookingServiceResponse> BookingServices { get; set; } = default!;
+        public List<BookingServiceResponse> BookingServices { get; set; }
     }
 }

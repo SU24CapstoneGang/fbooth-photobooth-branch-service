@@ -1,5 +1,5 @@
 ﻿using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.ServiceType;
+using PhotoboothBranchService.Application.DTOs.Service;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Enum;
 

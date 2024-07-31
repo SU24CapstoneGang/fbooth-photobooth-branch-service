@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
-using PhotoboothBranchService.Application.DTOs.ServiceType;
+using PhotoboothBranchService.Application.DTOs.Service;
 using PhotoboothBranchService.Application.Services.ServiceServices;
 using PhotoboothBranchService.Domain.Enum;
 
