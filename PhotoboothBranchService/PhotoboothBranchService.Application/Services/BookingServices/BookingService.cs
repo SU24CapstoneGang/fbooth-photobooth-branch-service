@@ -327,9 +327,9 @@ public class BookingService : IBookingService
         {
             throw new BadRequestException("Start time and End time must in the same date.");
         }
-        if (isStartTimeValid && isEndTimeValid)
+        if (!isStartTimeValid || !isEndTimeValid)
         {
-            throw new BadRequestException("Booking time must be within business hours.");
+            throw new BadRequestException($"Booking time must be within business hours. From {openTime} to {closeTime}");
         }
     }
     private async Task ValidateBookingTime(Guid boothId, DateTime startTime, DateTime endTime)
