@@ -35,7 +35,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             //auto add CreateDate and ignore change after update
             builder.Property(a => a.CreateDate)
-              .HasDefaultValueSql("GETDATE()")
+              .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
             builder.HasMany(i => i.Transactions)

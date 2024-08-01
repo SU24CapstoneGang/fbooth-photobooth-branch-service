@@ -15,7 +15,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(b => b.DeviceName).IsRequired().HasMaxLength(50);
             builder.Property(a => a.CreatedDate)
              .ValueGeneratedOnAdd()
-             .HasDefaultValueSql("GETDATE()");
+             .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
         }
     }
 }

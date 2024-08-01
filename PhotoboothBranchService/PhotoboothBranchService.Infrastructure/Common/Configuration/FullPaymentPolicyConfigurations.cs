@@ -38,7 +38,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired(false);
 
             builder.Property(p => p.CreatedDate)
-                .HasDefaultValueSql("GETDATE()");
+                .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
 
             builder.Property(p => p.IsPermanentPolicy)
                 .IsRequired();

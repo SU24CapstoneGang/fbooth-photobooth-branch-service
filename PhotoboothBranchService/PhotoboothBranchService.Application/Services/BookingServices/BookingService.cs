@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.Common.Exceptions;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Booking;
 using PhotoboothBranchService.Application.DTOs.BookingService;
@@ -75,6 +76,7 @@ public class BookingService : IBookingService
         booking.PaymentAmount = ProcessedServices.Item1;
         booking.BookingType = bookingType;
         booking.BookingServices = ProcessedServices.Item2;
+        booking.PaymentStatus = PaymentStatus.Processing;
         // Set payment policy if applicable
         //if (booking.BookingType == BookingType.Online)
         //{
@@ -99,7 +101,7 @@ public class BookingService : IBookingService
     }
     public async Task<CreateBookingResponse> CustomerBooking(CustomerBookingRequest request, string email)
     {
-        if ((request.StartTime - DateTime.Now).TotalMinutes <= 30)
+        if ((request.StartTime - DateTimeHelper.GetVietnamTimeNow()).TotalMinutes <= 30)
         {
             throw new BadRequestException("You must booking a session with start time at least 30 minutes from now");
         }
@@ -123,8 +125,8 @@ public class BookingService : IBookingService
         {
             throw new BadRequestException("This booking has been cancelled. Please contact our staff for further assistance.");
         }
-
-        if (booking.EndTime <= DateTime.Now)
+        var timeNow = DateTimeHelper.GetVietnamTimeNow();
+        if (booking.EndTime <= timeNow)
         {
             throw new BadRequestException("This booking has already ended. Please contact our staff for further assistance.");
         }
@@ -134,7 +136,7 @@ public class BookingService : IBookingService
             throw new BadRequestException("This booking has not been paid for. Please complete the payment to proceed.");
         }
 
-        if (booking.StartTime > DateTime.Now)
+        if (booking.StartTime > timeNow)
         {
             throw new BadRequestException("The time for your session has not come yet, please check with our staff and try again later");
         }
@@ -287,15 +289,16 @@ public class BookingService : IBookingService
         }
         else
         {
-            if (DateTime.Now > booking.StartTime)
+            var timeNow = DateTimeHelper.GetVietnamTimeNow();
+            if (timeNow > booking.StartTime)
             {
                 throw new BadRequestException("Can not cancel anymore, the session already start");
             }
 
-            if (booking.Status == BookingStatus.Completed && (booking.StartTime.Date - DateTime.Now).TotalDays > booking.FullPaymentPolicy.RefundDaysBefore)
+            if (booking.Status == BookingStatus.Completed && (booking.StartTime.Date - timeNow).TotalDays > booking.FullPaymentPolicy.RefundDaysBefore)
             {
                 //doing refund
-                // await _refundService.RefundByOrderId(sessionOrdeID, false, ipAddress);
+                 await _refundService.RefundByBookingID(sessionOrdeID, false, ipAddress);
             }
             booking.IsCancelled = true;
             await _bookingRepository.UpdateAsync(booking);
@@ -309,7 +312,7 @@ public class BookingService : IBookingService
             throw new BadRequestException("Start time must be before end time.");
         }
 
-        if (startTime < DateTime.Now)
+        if (startTime < DateTimeHelper.GetVietnamTimeNow())
         {
             throw new BadRequestException("Start time cannot be in the past.");
         }
@@ -343,7 +346,8 @@ public class BookingService : IBookingService
     private async Task<long> GenerateValidateCode()
     {
         long code = 0;
-        var existedCodes = (await _bookingRepository.GetAsync(i => i.IsCancelled == false && (i.StartTime > DateTime.Now || i.EndTime > DateTime.Now))).ToList().Select(i => i.ValidateCode);
+        var timeNow = DateTimeHelper.GetVietnamTimeNow();
+        var existedCodes = (await _bookingRepository.GetAsync(i => i.IsCancelled == false && (i.StartTime > timeNow || i.EndTime >  timeNow))).ToList().Select(i => i.ValidateCode);
         while (code == 0)
         {
             code = new Random().Next(100000, 1000000);

@@ -24,7 +24,7 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
         private readonly string accessKey;
         private readonly string secretKey;
         private readonly string partnerCode;
-        private readonly string redirectUrl;
+        //private readonly string redirectUrl;
         private readonly string ipnUrl;
         private readonly string public_key;
         private readonly ITransactionRepository _paymentRepository;
@@ -36,7 +36,7 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
             accessKey = JsonHelper.GetFromAppSettings("MoMo:accessKey");
             secretKey = JsonHelper.GetFromAppSettings("MoMo:secretKey");
             partnerCode = JsonHelper.GetFromAppSettings("MoMo:partnerCode");
-            redirectUrl = JsonHelper.GetFromAppSettings("MoMo:redirectUrl");
+            //redirectUrl = JsonHelper.GetFromAppSettings("MoMo:redirectUrl");
             ipnUrl = JsonHelper.GetFromAppSettings("MoMo:ipnUrl");
             public_key = JsonHelper.GetFromAppSettings("MoMo:public_key");
             _paymentRepository = paymentRepository;
@@ -56,7 +56,8 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                 "&orderId=" + request.orderId +
                 "&orderInfo=" + request.orderInfo +
                 "&partnerCode=" + partnerCode +
-                "&redirectUrl=" + redirectUrl +
+                //"&redirectUrl=" + redirectUrl +
+                "&redirectUrl=" + request.ReturnUrl +
                 "&requestId=" + request.requestId +
                 "&requestType=" + requestType
                 ;
@@ -73,7 +74,8 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                 { "amount", request.amount },
                 { "orderId", request.orderId },
                 { "orderInfo", request.orderInfo },
-                { "redirectUrl", redirectUrl },
+                { "redirectUrl", request.ReturnUrl },
+                //{ "redirectUrl", redirectUrl },
                 { "ipnUrl", ipnUrl },
                 { "lang", "en" },
                 { "extraData", request.extraData },

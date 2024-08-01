@@ -21,7 +21,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<CreatePaymentResponse>> CreatePayment(CreateTransactionRequest createPaymentRequest)
+        public async Task<ActionResult<CreateTransactionResponse>> CreateTransaction(CreateTransactionRequest createPaymentRequest)
         {
 
             //get ip from request

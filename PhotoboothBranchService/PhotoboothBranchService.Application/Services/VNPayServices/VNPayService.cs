@@ -15,7 +15,7 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
 {
     public class VNPayService : IVNPayService
     {
-        private readonly string vnp_Returnurl;
+        //private readonly string vnp_Returnurl;
         private readonly string vnp_Url;
         private readonly string vnp_TmnCode;
         private readonly string vnp_HashSecret;
@@ -25,7 +25,7 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
         private readonly ITransactionRepository _paymentRepository;
         public VNPayService(ITransactionRepository paymentRepository, IMapper mapper)
         {
-            vnp_Returnurl = JsonHelper.GetFromAppSettings("VNPay:vnp_Returnurl");//URL nhan ket qua tra ve 
+            //vnp_Returnurl = JsonHelper.GetFromAppSettings("VNPay:vnp_Returnurl");//URL nhan ket qua tra ve 
             vnp_Url = JsonHelper.GetFromAppSettings("VNPay:vnp_Url"); //URL thanh toan cua VNPAY 
             vnp_TmnCode = JsonHelper.GetFromAppSettings("VNPay:vnp_TmnCode"); //Ma định danh merchant kết nối (Terminal Id)
             vnp_HashSecret = JsonHelper.GetFromAppSettings("VNPay:vnp_HashSecret"); //Secret Key
@@ -69,7 +69,8 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
             vnpay.AddRequestData("vnp_Locale", "vn");
             vnpay.AddRequestData("vnp_OrderInfo", paymentRequest.OrderInformation ?? "Thanh toan don hang");
             vnpay.AddRequestData("vnp_OrderType", "other"); //default value: other
-            vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
+            //vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
+            vnpay.AddRequestData("vnp_ReturnUrl", paymentRequest.ReturnUrl);
             vnpay.AddRequestData("vnp_TxnRef", GuidAlphanumericConverter.GuidToAlphanumeric(paymentRequest.PaymentID));
 
             //build request url
@@ -79,13 +80,13 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
 
         public async Task<VnpayQueryResponse> Query(Guid paymentID, string payDate, string clientIp)
         {
-            var vnp_RequestId = DateTime.Now.Ticks.ToString();
+            var vnp_RequestId = DateTimeHelper.GetVietnamTimeNow().Ticks.ToString();
             var vnp_Version = VnPayLibrary.VERSION;
             var vnp_Command = "querydr";
             var vnp_TxnRef = GuidAlphanumericConverter.GuidToAlphanumeric(paymentID);
             var vnp_OrderInfo = "Truy van giao dich:" + paymentID;
             var vnp_TransactionDate = payDate;
-            var vnp_CreateDate = DateTime.Now.ToString("yyyyMMddHHmmss");
+            var vnp_CreateDate = DateTimeHelper.GetVietnamTimeNow().ToString("yyyyMMddHHmmss");
             var vnp_IpAddr = clientIp;
 
             var signData = $"{vnp_RequestId}|{vnp_Version}|{vnp_Command}|{vnp_TmnCode}|{vnp_TxnRef}|{vnp_TransactionDate}|{vnp_CreateDate}|{vnp_IpAddr}|{vnp_OrderInfo}";
@@ -120,7 +121,7 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
 
         public async Task<VnpayRefundResponse> RefundTransaction(VnpayRefundRequest request, string clientIp)
         {
-            var vnp_RequestId = DateTime.Now.Ticks.ToString();
+            var vnp_RequestId = DateTimeHelper.GetVietnamTimeNow().Ticks.ToString();
             var vnp_Version = "2.1.0";
             var vnp_Command = "refund";
             var vnp_TransactionType = request.RefundCategory;
@@ -129,7 +130,7 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
             var vnp_OrderInfo = "Hoan tien giao dich:" + request.PaymentID;
             var vnp_TransactionNo = request.TransId;
             var vnp_TransactionDate = request.PayDate.ToString("yyyyMMddHHmmss");
-            var vnp_CreateDate = DateTime.Now.ToString("yyyyMMddHHmmss");
+            var vnp_CreateDate = DateTimeHelper.GetVietnamTimeNow().ToString("yyyyMMddHHmmss");
             var vnp_CreateBy = request.User;
             var vnp_IpAddr = clientIp;
 

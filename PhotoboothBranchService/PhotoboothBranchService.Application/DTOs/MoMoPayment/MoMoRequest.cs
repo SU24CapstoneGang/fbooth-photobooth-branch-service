@@ -7,5 +7,6 @@
         public string orderId { get; set; } //payment ID in db
         public string requestId { get; set; }
         public string extraData { get; set; }
+        public string ReturnUrl { get; set; }
     }
 }

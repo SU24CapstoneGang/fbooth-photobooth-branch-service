@@ -4,15 +4,13 @@ namespace PhotoboothBranchService.Application.DTOs.Transaction
 {
     public class TransactionResponse
     {
-        public Guid PaymentID { get; set; }
-        public string TransactionID { get; set; } = default!;//Transaction ID third party return
-        public DateTime PaymentDateTime { get; set; }
+        public Guid TransactionID { get; set; }
+        public string GatewayTransactionID { get; set; } = default!;//Transaction ID third party return
+        public DateTime TransactionDateTime { get; set; }
         public long Amount { get; set; }
         public string Description { get; set; } = default!;
-        public string ClientIpAddress { get; set; } = default!;
-        public PaymentStatus PaymentStatus { get; set; }
-        public string Signature { get; set; } = default!;
+        public TransactionStatus TransactionStatus { get; set; }
         public Guid PaymentMethodID { get; set; }
-        public Guid SessionOrderID { get; set; }
+        public Guid BookingID { get; set; }
     }
 }

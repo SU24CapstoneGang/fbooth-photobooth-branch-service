@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.FullPaymentPolicy;
@@ -37,14 +38,14 @@ namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
             {
                 throw new ArgumentException("Refund days before cannot be negative.");
             }
-
+            var timeNow = DateTimeHelper.GetVietnamTimeNow();
             // Kiểm tra ngày bắt đầu và ngày kết thúc
-            if (request.StartDate.HasValue && request.StartDate.Value.ToDateTime(TimeOnly.MinValue) < DateTime.Now)
+            if (request.StartDate.HasValue && request.StartDate.Value.ToDateTime(TimeOnly.MinValue) < timeNow)
             {
                 throw new ArgumentException("Start date cannot be in the past.");
             }
 
-            if (request.EndDate.HasValue && request.EndDate.Value.ToDateTime(TimeOnly.MinValue) < DateTime.Now)
+            if (request.EndDate.HasValue && request.EndDate.Value.ToDateTime(TimeOnly.MinValue) < timeNow)
             {
                 throw new ArgumentException("End date cannot be in the past.");
             }
@@ -61,7 +62,7 @@ namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
             }
 
             // Kiểm tra và đặt trạng thái của chính sách
-            bool isActive = !request.StartDate.HasValue || request.StartDate.Value.ToDateTime(TimeOnly.MinValue) <= DateTime.Now;
+            bool isActive = !request.StartDate.HasValue || request.StartDate.Value.ToDateTime(TimeOnly.MinValue) <= timeNow;
 
             var policy = new FullPaymentPolicy
             {
@@ -73,7 +74,7 @@ namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
                 IsActive = isActive,
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
-                CreatedDate = DateTime.Now,
+                CreatedDate = timeNow,
                 IsDefaultPolicy = !request.StartDate.HasValue,
                 IsPermanentPolicy = !request.EndDate.HasValue
             };

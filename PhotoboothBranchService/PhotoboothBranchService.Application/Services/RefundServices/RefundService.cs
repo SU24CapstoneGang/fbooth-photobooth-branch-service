@@ -63,7 +63,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
         }
 
         //refund 
-        public async Task<(IEnumerable<RefundResponse> refundResponses, IEnumerable<TransactionResponse> failPayment)> RefundByOrderId(Guid orderId, bool isFullRefund, string? ipAddress)
+        public async Task<(IEnumerable<RefundResponse> refundResponses, IEnumerable<TransactionResponse> failPayment)> RefundByBookingID(Guid orderId, bool isFullRefund, string? ipAddress)
         {
             var payments = (await _paymentRepository.GetAsync(i => i.BookingID == orderId && i.TransactionStatus == TransactionStatus.Success)).ToList();
             var responseList = new List<RefundResponse>();
@@ -72,7 +72,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
             {
                 try
                 {
-                    responseList.Add(await this.RefundByPaymentID(payment.TransactionID, isFullRefund, ipAddress));
+                    responseList.Add(await this.RefundByTransID(payment.TransactionID, isFullRefund, ipAddress));
                 }
                 catch (Exception)
                 {
@@ -81,7 +81,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
             }
             return (responseList,failList);
         }
-        public async Task<RefundResponse> RefundByPaymentID(Guid paymentId, bool isFullRefund, string? ipAddress)
+        public async Task<RefundResponse> RefundByTransID(Guid paymentId, bool isFullRefund, string? ipAddress)
         {
             //var payment = (await _paymentRepository.GetAsync(i => i.TransactionID == paymentId, i => i.PaymentMethod)).FirstOrDefault();
             //if (payment == null)

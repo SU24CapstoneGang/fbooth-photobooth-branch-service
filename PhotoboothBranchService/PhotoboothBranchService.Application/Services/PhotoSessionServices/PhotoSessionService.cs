@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.Common.Exceptions;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.PhotoSession;
 using PhotoboothBranchService.Domain.Common.Helper;
@@ -26,9 +27,10 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         // Create
         public async Task<CreatePhotoSessionResponse> CreateAsync(CreatePhotoSessionRequest createModel)
         {
+            var timeNow = DateTimeHelper.GetVietnamTimeNow();
             var validateBooking = (await _bookingRepository
                 .GetAsync(i => i.BookingID == createModel.BookingID
-                && (i.EndTime > DateTime.Now && i.StartTime < DateTime.Now)
+                && (i.EndTime > timeNow && i.StartTime < timeNow)
                 && i.Status == BookingStatus.Completed && !i.IsCancelled)) == null;
             if (validateBooking)
             {
@@ -115,9 +117,9 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
                 }
             }
             //case end session
-            if (updatedPhotoSession.Status == Domain.Enum.PhotoSessionStatus.Ended)
+            if (updatedPhotoSession.Status == PhotoSessionStatus.Ended)
             {
-                updatedPhotoSession.EndTime = DateTime.Now;
+                updatedPhotoSession.EndTime = DateTimeHelper.GetVietnamTimeNow();
             }
 
             await _photoSessionRepository.UpdateAsync(updatedPhotoSession);
