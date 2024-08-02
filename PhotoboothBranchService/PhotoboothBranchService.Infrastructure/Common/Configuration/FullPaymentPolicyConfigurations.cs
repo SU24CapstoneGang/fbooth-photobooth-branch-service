@@ -24,7 +24,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(p => p.RefundDaysBefore)
                 .IsRequired();
-
+            builder.Property(p => p.RefundPercent).IsRequired();
             builder.Property(p => p.NoCheckInTimeLimit)
                 .IsRequired();
 

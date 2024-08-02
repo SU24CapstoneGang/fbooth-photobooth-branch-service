@@ -16,27 +16,27 @@ namespace PhotoboothBranchService.Api.Controllers
             _serviceItemService = serviceItemService;
         }
 
-        // Create
-        [HttpPost]
-        public async Task<ActionResult<CreateBookingServiceResponse>> CreateServiceItem(CreateBookingServiceRequest createServiceItemRequest)
-        {
+        //// Create
+        //[HttpPost]
+        //public async Task<ActionResult<CreateBookingServiceResponse>> CreateServiceItem(CreateBookingServiceRequest createServiceItemRequest)
+        //{
 
-            var createServiceItemResponse = await _serviceItemService.CreateAsync(createServiceItemRequest);
-            return Ok(createServiceItemResponse);
+        //    var createServiceItemResponse = await _serviceItemService.CreateAsync(createServiceItemRequest);
+        //    return Ok(createServiceItemResponse);
 
-        }
+        //}
 
-        //add list
-        [HttpPost("add-list")]
-        public async Task<ActionResult<AddListBookingServiceResponse>> AddListItems(AddListBookingServiceRequest request)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var response = await _serviceItemService.AddListServiceItem(request);
-            return Ok(response);
-        }
+        ////add list
+        //[HttpPost("add-list")]
+        //public async Task<ActionResult<AddListBookingServiceResponse>> AddListItems(AddListBookingServiceRequest request)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+        //    var response = await _serviceItemService.AddListServiceItem(request);
+        //    return Ok(response);
+        //}
 
         // Read
         [HttpGet]
@@ -68,24 +68,24 @@ namespace PhotoboothBranchService.Api.Controllers
             return Ok(serviceItem);
         }
 
-        // Update
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateServiceItem(Guid id, [FromQuery] UpdateBookingServiceRequest updateServiceItemRequest)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            await _serviceItemService.UpdateAsync(id, updateServiceItemRequest);
-            return Ok();
-        }
+        //// Update
+        //[HttpPut("{id}")]
+        //public async Task<ActionResult> UpdateServiceItem(Guid id, [FromQuery] UpdateBookingServiceRequest updateServiceItemRequest)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+        //    await _serviceItemService.UpdateAsync(id, updateServiceItemRequest);
+        //    return Ok();
+        //}
 
-        // Delete
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteServiceItem(Guid id)
-        {
-            await _serviceItemService.DeleteAsync(id);
-            return Ok();
-        }
+        //// Delete
+        //[HttpDelete("{id}")]
+        //public async Task<ActionResult> DeleteServiceItem(Guid id)
+        //{
+        //    await _serviceItemService.DeleteAsync(id);
+        //    return Ok();
+        //}
     }
 }

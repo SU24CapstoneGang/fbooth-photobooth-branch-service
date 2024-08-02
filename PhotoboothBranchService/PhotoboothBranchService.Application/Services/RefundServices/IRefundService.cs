@@ -12,7 +12,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
 {
     public interface IRefundService : IServiceBase<RefundResponse, RefundFilter, PagingModel>
     {
-        Task<RefundResponse> RefundByTransID(Guid paymentId, bool isFullRefund, string ipAddress);
+        Task<RefundResponse> RefundByTransID(Guid transId, bool isFullRefund, string ipAddress);
         Task<(IEnumerable<RefundResponse> refundResponses, IEnumerable<TransactionResponse> failPayment)> RefundByBookingID(Guid orderId, bool isFullRefund, string? ipAddress);
     }
 }

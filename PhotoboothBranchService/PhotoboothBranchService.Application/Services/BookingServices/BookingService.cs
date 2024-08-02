@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Newtonsoft.Json.Linq;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
@@ -64,7 +65,7 @@ public class BookingService : IBookingService
         await ValidateBookingTime(createModel.BoothID, createModel.StartTime, createModel.EndTime);
 
         // Calculate payment amount
-        var ProcessedServices = await ProcessServiceListAsync(booth.PricePerHour, createModel.StartTime, createModel.EndTime, createModel.ServiceList);
+        var processedServices = await ProcessServiceListAsync(booth.PricePerHour, createModel.StartTime, createModel.EndTime, createModel.ServiceList);
 
         // Map to booking entity
         var booking = _mapper.Map<Booking>(createModel);
@@ -72,10 +73,11 @@ public class BookingService : IBookingService
         booking.ValidateCode = await GenerateValidateCode();
         booking.Status = BookingStatus.PendingPayment;
         booking.IsCancelled = false;
-        booking.CreatedDate = DateTime.UtcNow;
-        booking.PaymentAmount = ProcessedServices.Item1;
+        booking.CreatedDate = DateTimeHelper.GetVietnamTimeNow();
+        booking.HireBoothFee = processedServices.Item3;
+        booking.PaymentAmount = processedServices.Item1;
         booking.BookingType = bookingType;
-        booking.BookingServices = ProcessedServices.Item2;
+        booking.BookingServices = processedServices.Item2;
         booking.PaymentStatus = PaymentStatus.Processing;
         // Set payment policy if applicable
         //if (booking.BookingType == BookingType.Online)
@@ -180,8 +182,6 @@ public class BookingService : IBookingService
         return response;
     }
 
-
-
     // Delete a session by ID
     public async Task DeleteAsync(Guid id)
     {
@@ -224,16 +224,19 @@ public class BookingService : IBookingService
     // Get a session by ID
     public async Task<BookingResponse> GetByIdAsync(Guid id)
     {
-        var session = (await _bookingRepository.GetAsync(s => s.BookingID == id,
+        var booking = (await _bookingRepository.GetAsync(s => s.BookingID == id,
             includeProperties: new Expression<Func<Booking, object>>[]
             {
                 i => i.BookingServices,
             })).FirstOrDefault();
-        if (session == null)
+        
+        if (booking == null)
         {
-            throw new KeyNotFoundException("Session not found.");
+            throw new KeyNotFoundException("Booking not found.");
         }
-        return _mapper.Map<BookingResponse>(session);
+        var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
+        booking.BookingServices = list.ToList();
+        return _mapper.Map<BookingResponse>(booking);
     }
 
     // Update a session
@@ -411,14 +414,14 @@ public class BookingService : IBookingService
 
         return booth;
     }
-    private async Task<(decimal, ICollection<Domain.Entities.BookingService>)> ProcessServiceListAsync(decimal boothPricePerHour, DateTime startTime, DateTime endTime, Dictionary<Guid, short> serviceList)
+    private async Task<(decimal, ICollection<Domain.Entities.BookingService>, decimal)> ProcessServiceListAsync(decimal boothPricePerHour, DateTime startTime, DateTime endTime, Dictionary<Guid, short> serviceList)
     {
        
         List<Domain.Entities.BookingService> result = new List<Domain.Entities.BookingService>();
 
         var totalHours = (endTime - startTime).TotalHours;
-        var bookingAmount = (decimal)totalHours * boothPricePerHour;
-
+        var hireBoothFee = Math.Truncate((decimal)totalHours * boothPricePerHour);
+        var bookingAmount = hireBoothFee;
         if (serviceList.Any())
         {
             var serviceIds = serviceList.Keys.ToList();
@@ -442,7 +445,7 @@ public class BookingService : IBookingService
             }
         }
 
-        return (bookingAmount, result);
+        return (bookingAmount, result, hireBoothFee);
     }
 
 }

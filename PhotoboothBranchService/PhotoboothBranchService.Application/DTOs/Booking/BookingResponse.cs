@@ -7,6 +7,7 @@ namespace PhotoboothBranchService.Application.DTOs.Booking
     {
         public Guid BookingID { get; set; }
         public long ValidateCode { get; set; }
+        public decimal HireBoothFee { get; set; }
         public decimal PaymentAmount { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }

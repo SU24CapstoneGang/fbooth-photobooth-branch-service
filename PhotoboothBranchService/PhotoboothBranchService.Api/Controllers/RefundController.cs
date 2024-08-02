@@ -33,7 +33,7 @@ namespace PhotoboothBranchService.Api.Controllers
         public async Task<ActionResult<RefundResponse>> RefundByPaymentID(RefundRequest request)
         {
             var clientIp = IpAddressHelper.GetClientIpAddress(HttpContext);
-            var response = await _refundService.RefundByTransID(request.Id, request.IsFullRefund, clientIp);
+            var response = await _refundService.RefundByTransID(request.transId, request.IsFullRefund, clientIp);
             return Ok(response);
         }
 

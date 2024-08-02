@@ -46,7 +46,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IBoothService, BoothService>();
             services.AddScoped<IBranchService, BranchService>();
             services.AddScoped<IBackgroundService, BackgroundService>();
-            //services.AddScoped<IDashboardService, DashboardService>();
+            services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IDeviceService, DeviceService>();
             services.AddScoped<ILayoutService, LayoutService>();
             services.AddScoped<ITransactionService, TransactionService>();

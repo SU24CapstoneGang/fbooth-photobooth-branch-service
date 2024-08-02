@@ -11,6 +11,6 @@ namespace PhotoboothBranchService.Application.DTOs.Refund
     {
         public string? Description { get; set; }
         public RefundStatus? Status { get; set; }
-        public Guid? PaymentID { get; set; }
+        public Guid? TransactionID { get; set; }
     }
 }

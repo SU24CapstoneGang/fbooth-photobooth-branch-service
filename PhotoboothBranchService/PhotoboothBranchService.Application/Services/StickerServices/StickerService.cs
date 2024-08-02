@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Sticker;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
@@ -101,7 +102,7 @@ public class StickerService : IStickerService
             throw new KeyNotFoundException("Sticker not found.");
         }
         var updatedSticker = _mapper.Map(updateModel, sticker);
-        updatedSticker.LastModified = DateTime.UtcNow;
+        updatedSticker.LastModified = DateTimeHelper.GetVietnamTimeNow();
         await _stickerRepository.UpdateAsync(updatedSticker);
         await _cloudinaryService.UpdatePhotoAsync(file, sticker.CouldID);
     }

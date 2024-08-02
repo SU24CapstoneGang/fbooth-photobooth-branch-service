@@ -31,7 +31,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .IsRequired();
             builder.HasMany(p => p.Refunds)
                 .WithOne(i => i.Transaction)
-                .HasForeignKey(u => u.PaymentID)
+                .HasForeignKey(u => u.TransactionID)
                 .IsRequired();
         }
     }

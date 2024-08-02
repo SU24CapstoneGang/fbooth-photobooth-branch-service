@@ -222,6 +222,8 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
                                     BankCode = bankCode,
                                     Success = true,
                                 };
+                                payment.TransactionStatus = TransactionStatus.Success;
+                                returnContent = "{\"RspCode\":\"00\",\"Message\":\"Confirm Success\"}";
                             }
                             else
                             {
@@ -236,8 +238,9 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
                                     BankCode = bankCode,
                                     Success = false,
                                 };
+                                payment.TransactionStatus = TransactionStatus.Fail;
+                                returnContent = "";
                             }
-                            returnContent = "{\"RspCode\":\"00\",\"Message\":\"Confirm Success\"}";
                         }
                         else
                         {
@@ -267,6 +270,7 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
                         Message = "Có lỗi xảy ra trong quá trình xử lý",
                         Success = false,
                     };
+                    payment.TransactionStatus = TransactionStatus.Fail;
                     returnContent = "{\"RspCode\":\"97\",\"Message\":\"Invalid signature\"}";
                 }
                 await _paymentRepository.UpdateAsync(payment);

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using PhotoboothBranchService.Application.Common.Exceptions;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Background;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
@@ -48,7 +49,7 @@ public class BackgroundService : IBackgroundService
                 Width = uploadResult.Width,
                 Height = uploadResult.Height,
                 LayoutID = layoutID,
-                CreatedDate = DateTime.UtcNow,
+                CreatedDate = DateTimeHelper.GetVietnamTimeNow(),
             };
 
             await _backgroundRepository.AddAsync(background);
@@ -111,7 +112,7 @@ public class BackgroundService : IBackgroundService
         }
 
         var updateBackGround = _mapper.Map(updateBackgroundRequest, backGround);
-        updateBackGround.LastModified = DateTime.UtcNow;
+        updateBackGround.LastModified = DateTimeHelper.GetVietnamTimeNow();
         await _backgroundRepository.UpdateAsync(updateBackGround);
         await _cloudinaryService.UpdatePhotoAsync(file, backGround.CouldID);
     }

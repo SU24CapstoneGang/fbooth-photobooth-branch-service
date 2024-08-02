@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CloudinaryDotNet;
 using PhotoboothBranchService.Application.Common.Exceptions;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Branch;
 using PhotoboothBranchService.Domain.Common.Helper;
@@ -35,7 +36,7 @@ public class BranchService : IBranchService
             }
             Branch branch = _mapper.Map<Branch>(createModel);
             branch.Status = status;
-            branch.CreateDate = DateTime.UtcNow;
+            branch.CreateDate = DateTimeHelper.GetVietnamTimeNow();
             await _branchRepository.AddAsync(branch);
             return _mapper.Map<CreateBranchResponse>(branch);
         }

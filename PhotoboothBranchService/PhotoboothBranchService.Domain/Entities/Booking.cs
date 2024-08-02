@@ -14,8 +14,9 @@ namespace PhotoboothBranchService.Domain.Entities
         public BookingStatus Status { get; set; }
         public bool IsCancelled { get; set; }
         public DateTime? CancelledDate { get; set; }
+        public decimal HireBoothFee { get; set; }
         public decimal? RefundAmount { get; set; }
-        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedDate { get; set; }
         public Guid? FullPaymentPolicyID { get; set; }
         public virtual FullPaymentPolicy FullPaymentPolicy { get; set; } = default!;
         public Guid BoothID { get; set; }
@@ -25,5 +26,10 @@ namespace PhotoboothBranchService.Domain.Entities
         public virtual ICollection<Transaction> Payments { get; set; } = default!;
         public virtual ICollection<BookingService> BookingServices { get; set; } = default!;
         public virtual ICollection<PhotoSession> PhotoSessions { get; set; } = default!;
+
+        //public long GetPriceHire()
+        //{
+        //    return (long)Math.Truncate((decimal)(this.EndTime - this.StartTime).TotalHours*this.Booth.PricePerHour);
+        //}
     }
 }

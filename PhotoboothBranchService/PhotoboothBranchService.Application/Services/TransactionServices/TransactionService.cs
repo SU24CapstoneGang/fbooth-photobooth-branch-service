@@ -62,11 +62,10 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
                 throw new BadRequestException("The Order has been ended or cancelled");
             }
             //add check endtime later
-            //if (booking.StartTime <)
-            //{
-
-            //}
-
+            if (booking.PaymentStatus == PaymentStatus.Paid && booking.Status == BookingStatus.Completed)
+            {
+                throw new BadRequestException("Booking already paid.");
+            }
 
 
             //create payment object
@@ -76,17 +75,16 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
             transaction.TransactionDateTime = DateTimeHelper.GetVietnamTimeNow();
 
             var payments = await _paymentRepository.GetAsync(i => i.BookingID == booking.BookingID && i.TransactionStatus == TransactionStatus.Success);
-            long result = (long)booking.PaymentAmount;
+            long result = (long)booking.PaymentAmount - payments.Sum(i => i.Amount);
             if (result == 0)
             {
-                throw new BadRequestException("Already paid all");
+                throw new BadRequestException("Booking already paid.");
             }
             else if (result < 0)
             {
                 throw new BadRequestException("System revice more than bill, contact manager about the error");
             }
             transaction.Amount = result;
-
 
             //response to return 
             CreateTransactionResponse createPaymentResponse = new CreateTransactionResponse() { TransactionID = transaction.TransactionID };

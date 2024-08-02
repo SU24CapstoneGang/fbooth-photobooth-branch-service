@@ -8,7 +8,7 @@ namespace PhotoboothBranchService.Application.DTOs.Refund
 {
     public class RefundRequest
     {
-        public Guid Id { get; set; }
+        public Guid transId { get; set; }
         public bool IsFullRefund { get; set; }
     }
 }

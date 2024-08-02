@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.Common.Exceptions;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Booth;
 using PhotoboothBranchService.Domain.Common.Helper;
@@ -34,7 +35,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
                 throw new NotFoundException("Not found Branch to create booth");
             }
             booth.Status = status;
-            booth.CreateDate = DateTime.UtcNow;
+            booth.CreateDate = DateTimeHelper.GetVietnamTimeNow();
             await _boothRepository.AddAsync(booth);
             return _mapper.Map<CreateBoothResponse>(booth);
         }
