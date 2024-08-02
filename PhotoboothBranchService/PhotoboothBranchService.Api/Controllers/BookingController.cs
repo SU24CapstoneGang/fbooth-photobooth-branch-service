@@ -99,11 +99,11 @@ namespace PhotoboothBranchService.Api.Controllers
             return Ok();
         }
         [HttpPost("cancel")]
-        public async Task<ActionResult> CancelBooking(Guid sessionOrderID)
+        public async Task<ActionResult<CancelBookingResponse>> CancelBooking(Guid sessionOrderID)
         {
             var clientIp = IpAddressHelper.GetClientIpAddress(HttpContext);
-            await _bookingService.CancelSessionOrder(sessionOrderID, clientIp);
-            return Ok();
+            var response = await _bookingService.CancelSessionOrder(sessionOrderID, clientIp);
+            return Ok(response);
         }
 
         // Delete

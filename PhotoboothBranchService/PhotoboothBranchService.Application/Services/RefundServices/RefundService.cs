@@ -63,23 +63,16 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
         }
 
         //refund 
-        public async Task<(IEnumerable<RefundResponse> refundResponses, IEnumerable<TransactionResponse> failPayment)> RefundByBookingID(Guid orderId, bool isFullRefund, string? ipAddress)
+        public async Task<IEnumerable<RefundResponse>> RefundByBookingID(Guid orderId, bool isFullRefund, string? ipAddress)
         {
             var payments = (await _paymentRepository.GetAsync(i => i.BookingID == orderId && i.TransactionStatus == TransactionStatus.Success)).ToList();
             var responseList = new List<RefundResponse>();
             var failList = new List<TransactionResponse>();
             foreach (var trans in payments)
             {
-                try
-                {
                     responseList.Add(await this.RefundByTransID(trans.TransactionID, isFullRefund, ipAddress));
-                }
-                catch (Exception)
-                {
-                    failList.Add(_mapper.Map<TransactionResponse>(trans));
-                }
             }
-            return (responseList,failList);
+            return (responseList);
         }
         public async Task<RefundResponse> RefundByTransID(Guid paymentId, bool isFullRefund, string? ipAddress)
         {

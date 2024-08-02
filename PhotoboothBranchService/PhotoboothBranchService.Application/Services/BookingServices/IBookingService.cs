@@ -13,5 +13,5 @@ public interface IBookingService : IServiceBase<BookingResponse, SessionOrderFil
     Task<CreateBookingResponse> CustomerBooking(CustomerBookingRequest request, string email);
     Task UpdateAsync(Guid id, UpdateSessionOrderRequest updateModel);
     Task DeleteAsync(Guid id);
-    Task CancelSessionOrder(Guid sessionOrdeID, string? ipAddress);
+    Task<CancelBookingResponse> CancelSessionOrder(Guid sessionOrdeID, string? ipAddress);
 }
