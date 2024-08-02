@@ -102,7 +102,7 @@ namespace PhotoboothBranchService.Api.Controllers
         public async Task<ActionResult<CancelBookingResponse>> CancelBooking(Guid sessionOrderID)
         {
             var clientIp = IpAddressHelper.GetClientIpAddress(HttpContext);
-            var response = await _bookingService.CancelSessionOrder(sessionOrderID, clientIp);
+            var response = await _bookingService.CancelBooking(sessionOrderID, clientIp);
             return Ok(response);
         }
 

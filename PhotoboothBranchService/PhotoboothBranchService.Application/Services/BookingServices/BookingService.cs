@@ -280,7 +280,7 @@ public class BookingService : IBookingService
         //var updatedSession = _mapper.Map(updateModel, session);
         //await _sessionOrderRepository.UpdateAsync(updatedSession);
     }
-    public async Task<CancelBookingResponse> CancelSessionOrder(Guid bookingID, string? ipAddress)
+    public async Task<CancelBookingResponse> CancelBooking(Guid bookingID, string? ipAddress)
     {
         CancelBookingResponse response = new CancelBookingResponse();
         var booking = (await _bookingRepository.GetAsync(i => i.BookingID == bookingID, i => i.FullPaymentPolicy)).FirstOrDefault();
@@ -293,32 +293,41 @@ public class BookingService : IBookingService
         }
         else
         {
-            var timeNow = DateTimeHelper.GetVietnamTimeNow();
-            if (timeNow > booking.StartTime)
+            try
             {
-                throw new BadRequestException("Can not cancel anymore, the session already start");
-            }
-
-            if (booking.Status == BookingStatus.Completed && (booking.StartTime.Date - timeNow).TotalDays > booking.FullPaymentPolicy.RefundDaysBefore)
-            {
-                //doing refund
-                var refundRes = await _refundService.RefundByBookingID(bookingID, false, ipAddress);
-                response.isRefund = true;
-                response.refundList = refundRes.ToList();
-                if (response.refundList.Any(i=>i.Status == RefundStatus.Fail)) 
+                var timeNow = DateTimeHelper.GetVietnamTimeNow();
+                if (timeNow > booking.StartTime)
                 {
-                    response.message = "Success cancel booking but not refund success, please contact our manager.";
-                } else
-                {
-                    response.message = "Cancel booking and the refund successfully";
+                    throw new BadRequestException("Can not cancel anymore, the session already start");
                 }
-            } else
-            {
-                response.message = $"Cancel booking successfully, but the cancel date is not meet our policy (must before {booking.FullPaymentPolicy.RefundDaysBefore}) to refund.";
+
+                if (booking.Status == BookingStatus.Completed && (booking.StartTime.Date - timeNow).TotalDays > booking.FullPaymentPolicy.RefundDaysBefore)
+                {
+                    //doing refund
+                    var refundRes = await _refundService.RefundByBookingID(bookingID, false, ipAddress);
+                    response.isRefund = true;
+                    response.refundList = refundRes.ToList();
+                    if (response.refundList.Any(i => i.Status == RefundStatus.Fail))
+                    {
+                        response.message = "Success cancel booking but not refund success, please contact our manager.";
+                    }
+                    else
+                    {
+                        response.message = "Cancel booking and the refund successfully";
+                    }
+                }
+                else
+                {
+                    response.message = $"Cancel booking successfully, but the cancel date is not meet our policy (must before {booking.FullPaymentPolicy.RefundDaysBefore}) to refund.";
+                }
+                response.isSuccess = true;
+                booking.IsCancelled = true;
+                await _bookingRepository.UpdateAsync(booking);
             }
-            response.isSuccess = true;
-            booking.IsCancelled = true;
-            await _bookingRepository.UpdateAsync(booking);
+            catch (Exception ex)
+            {
+                response.message = ex.Message;
+            }
         }
         return response;
     }
