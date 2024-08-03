@@ -21,6 +21,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using static OpenCvSharp.Stitcher;
 
 namespace PhotoboothBranchService.Application.Services.RefundServices
 {
@@ -67,10 +68,24 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
         {
             var payments = (await _paymentRepository.GetAsync(i => i.BookingID == orderId && i.TransactionStatus == TransactionStatus.Success)).ToList();
             var responseList = new List<RefundResponse>();
-            var failList = new List<TransactionResponse>();
             foreach (var trans in payments)
             {
+                try
+                {
                     responseList.Add(await this.RefundByTransID(trans.TransactionID, isFullRefund, ipAddress));
+                }
+                catch (Exception ex)
+                {
+                    responseList.Add(new RefundResponse
+                    {
+                        TransactionID = new Guid(),
+                        Status = RefundStatus.Fail,
+                        Description = "",
+                        RefundDateTime = DateTimeHelper.GetVietnamTimeNow(),
+                        GatewayTransactionID = trans.GatewayTransactionID,
+                        ResponseMessage = ex.Message,
+                    });
+                }
             }
             return (responseList);
         }
@@ -123,7 +138,8 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                             Amount = long.Parse(responseVNPay.Vnp_Amount.Substring(0, responseVNPay.Vnp_Amount.Length - 2)),
                             RefundDateTime = DateTime.ParseExact(responseVNPay.Vnp_PayDate, "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture),
                             GatewayTransactionID = responseVNPay.Vnp_TransactionNo,
-                            Description = responseVNPay.Vnp_OrderInfo
+                            Description = responseVNPay.Vnp_OrderInfo,
+                            ResponseMessage = responseVNPay.Vnp_Message,
                         };
                         switch (responseVNPay.Vnp_TransactionStatus)
                         {
@@ -149,24 +165,28 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                     break;
                 case "MoMo":
                     var refundAmount = isFullRefund ? transaction.Amount : (transaction.Amount * booking.FullPaymentPolicy.RefundPercent / 100);
-                    MoMoRefundResponse responseMoMo = await _moMoService.RefundById(transaction.TransactionID, refundAmount);
+                    string description = "Hoan tien giao dich" + transaction.TransactionID.ToString();
+                    MoMoRefundResponse responseMoMo = await _moMoService.RefundById(transaction.TransactionID, refundAmount, description);
+                    refund = new Refund
+                    {
+                        RefundID = responseMoMo.RequestId,
+                        TransactionID = transaction.TransactionID,
+                        Amount = responseMoMo.Amount,
+                        RefundDateTime = DateTimeHelper.GetVietnamTimeNow(),
+                        GatewayTransactionID = responseMoMo.Transid,
+                        ResponseMessage = responseMoMo.Message,
+                        Description = description,
+                    };
                     if (responseMoMo.Status == 0)
                     {
-                        refund = new Refund
-                        {
-                            RefundID = responseMoMo.RequestId,
-                            TransactionID = transaction.TransactionID,
-                            Amount = responseMoMo.Amount,
-                            RefundDateTime = DateTimeHelper.GetVietnamTimeNow(),
-                            GatewayTransactionID = responseMoMo.Transid,
-                            Description = responseMoMo.Message
-                        };
+                        refund.Status = RefundStatus.Success;
                         await _refundRepository.AddAsync(refund);
                         transaction.TransactionStatus = responseMoMo.Amount == transaction.Amount || transaction.Amount == await this.TotalRefund(transaction.TransactionID) ? TransactionStatus.RefundedFull : TransactionStatus.RefundedPartial;
                     }
                     else
                     {
-                        throw new Exception(responseMoMo.Message);
+                        refund.Status = RefundStatus.Fail;
+                        await _refundRepository.AddAsync(refund);
                     }
                     break;
                 default:

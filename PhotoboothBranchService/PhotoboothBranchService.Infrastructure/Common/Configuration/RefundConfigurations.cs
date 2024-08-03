@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PhotoboothBranchService.Domain.Entities;
 using System;
@@ -16,10 +17,11 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.ToTable("Refunds");
             builder.HasKey(r => r.RefundID);
             builder.Property(r => r.RefundID).ValueGeneratedOnAdd();
-            builder.Property(r => r.RefundDateTime);
+            builder.Property(r => r.RefundDateTime).IsRequired();
             builder.Property(r => r.Amount);
             builder.Property(r => r.Description);
             builder.Property(r => r.Status);
+            builder.Property(r => r.ResponseMessage).IsRequired(false);
         }
     }
 }

@@ -322,6 +322,7 @@ public class BookingService : IBookingService
                 }
                 response.isSuccess = true;
                 booking.IsCancelled = true;
+                booking.CancelledDate = DateTimeHelper.GetVietnamTimeNow();
                 await _bookingRepository.UpdateAsync(booking);
             }
             catch (Exception ex)

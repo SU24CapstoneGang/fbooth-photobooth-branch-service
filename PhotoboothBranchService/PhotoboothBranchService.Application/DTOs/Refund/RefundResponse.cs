@@ -8,6 +8,7 @@ namespace PhotoboothBranchService.Application.DTOs.Refund
         public string GatewayTransactionID { get; set; }
         public DateTime RefundDateTime { get; set; }
         public string Description { get; set; }
+        public string ResponseMessage { get; set; }
         public RefundStatus Status { get; set; }
         public Guid TransactionID { get; set; }
     }

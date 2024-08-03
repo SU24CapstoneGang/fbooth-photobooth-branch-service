@@ -9,6 +9,6 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
         string CreatePayment(MoMoRequest request);
         Task<(Transaction transaction, MomoIPNResponse iPNResponse)> HandlePaymentResponeIPN(MoMoResponse momoResponse);
         Task<Transaction> Return(IQueryCollection queryString);
-        Task<MoMoRefundResponse> RefundById(Guid paymentID, long refundAmounf);
+        Task<MoMoRefundResponse> RefundById(Guid paymentID, long refundAmounf, string description);
     }
 }

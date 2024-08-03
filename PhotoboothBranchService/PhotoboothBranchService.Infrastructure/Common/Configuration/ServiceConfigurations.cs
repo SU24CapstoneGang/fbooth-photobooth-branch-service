@@ -25,35 +25,34 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasMany(i => i.BookingServices)
                 .WithOne(a => a.Service)
                 .HasForeignKey(b => b.ServiceID);
-            //builder.HasData(
-            //        new Service
-            //        {
-            //            ServiceName = "Make up",
-            //            ServiceID = new Guid("06167451-8b59-4dd2-bb9e-88df025eead6"),
-            //            Unit = "Set",
-            //            Status = StatusUse.Available
-            //        },
-            //        new Service
-            //        {
-            //            ServiceID = new Guid("fc34dccb-10a0-4643-84bf-71ac85ca77bb"),
-            //            ServiceName = "Send email",
-            //            Unit = "Times",
-            //            Status = StatusUse.Available
-            //        },
-            //        new Service
-            //        {
-            //            ServiceID = new Guid("13bd9e6d-3092-496b-8025-530f5f9c43de"),
-            //            ServiceName = "Hire booth",
-            //            Unit = "Minutes",
-            //            Status = StatusUse.Available
-            //        },
-            //        new Service
-            //        {
-            //            ServiceID = new Guid("70a5a1fd-9c0b-4109-9638-5b6e63e71eca"),
-            //            ServiceName = "Print photo",
-            //            Unit = "Times",
-            //            Status = StatusUse.Available
-            //        });
+            builder.HasData(
+                new Service
+                {
+                    ServiceID = new Guid("d1f4e0c1-1f62-4c9e-8c4a-123456789abc"),
+                    ServiceName = "Makeup Kit Rental",
+                    ServiceDescription = "Professional makeup kit rental",
+                    Unit = "Set",
+                    ServicePrice = 300000m, // Price in VND
+                    Status = StatusUse.Available
+                },
+                new Service
+                {
+                    ServiceID = new Guid("f2e3d4c5-b2b7-4bcb-93c8-23456789defa"),
+                    ServiceName = "Send Photos via Email",
+                    ServiceDescription = "Service for sending photos via email",
+                    Unit = "Photo",
+                    ServicePrice = 50000m, // Price in VND
+                    Status = StatusUse.Available
+                },
+                new Service
+                {
+                    ServiceID = new Guid("b3c4d5e6-a3d7-4edf-a3b9-34567890bcde"),
+                    ServiceName = "Photo Printing",
+                    ServiceDescription = "High-quality photo printing service",
+                    Unit = "Piece",
+                    ServicePrice = 150000m, // Price in VND
+                    Status = StatusUse.Available
+                });
         }
     }
 }

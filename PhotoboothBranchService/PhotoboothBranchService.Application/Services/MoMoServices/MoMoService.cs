@@ -197,7 +197,7 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
             return (await HandlePaymentResponeIPN(response)).transaction;
 
         }
-        public async Task<MoMoRefundResponse> RefundById(Guid paymentID, long refundAmounf)
+        public async Task<MoMoRefundResponse> RefundById(Guid paymentID, long refundAmounf, string description)
         {
             var payment = (await _paymentRepository.GetAsync(i => i.TransactionID == paymentID)).FirstOrDefault();
             if (payment != null)
@@ -206,7 +206,6 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                 string momoTransId = payment.GatewayTransactionID;
                 string version = "2.0";
                 string requestId = Guid.NewGuid().ToString();
-                string description = "Hoan tien giao dich" + payment.TransactionID.ToString();
                 long amount = refundAmounf;
                 MoMoLibrary moMoLibrary = new MoMoLibrary();
                 string hash = moMoLibrary.buildRefundHash(partnerCode, merchantRefId, momoTransId, amount,

@@ -220,7 +220,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
                 .GroupBy(i => i.Sticker)
                 .Select(g => new DashboardStickerResponse
                 {
-                    Count = g.Count(),
+                    Count = g.Sum(i=>i.Quantity),
                     Sticker = _mapper.Map<StickerResponse>(g.Key)
                 }).ToList();
             var stickers = await _stickerRepository.GetAsync();
