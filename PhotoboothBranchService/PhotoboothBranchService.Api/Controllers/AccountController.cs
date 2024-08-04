@@ -24,108 +24,71 @@ public class AccountController : ControllerBaseApi
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAllAccount()
     {
-        try
-        {
-            var account = await _accountService.GetAllAsync();
-            return Ok(account);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving accounts: {ex.Message}");
-        }
+        var account = await _accountService.GetAllAsync();
+        return Ok(account);
+
     }
     // Read all with paging and filter
     [HttpGet("paging")]
     public async Task<ActionResult<IEnumerable<AccountResponse>>> GetPagingAccounts(
         [FromQuery] AccountFilter accountFilter, [FromQuery] PagingModel pagingModel)
     {
-        try
-        {
-            var account = await _accountService.GetAllPagingAsync(accountFilter, pagingModel);
-            return Ok(account);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving accounts: {ex.Message}");
-        }
+
+        var account = await _accountService.GetAllPagingAsync(accountFilter, pagingModel);
+        return Ok(account);
+
     }
     // Read by name
     [HttpGet("email/{email}")]
     public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAccountByEmail(string email)
     {
-        try
-        {
-            var account = await _accountService.GetByEmail(email);
-            return Ok(account);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving account by name: {ex.Message}");
-        }
+
+        var account = await _accountService.GetByEmail(email);
+        return Ok(account);
+
     }
     [HttpGet("phone-number/{phone}")]
     public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAccountByPhoneNumber(string phone)
     {
-        try
-        {
-            var account = await _accountService.GetByPhoneNumber(phone);
-            return Ok(account);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving account by name: {ex.Message}");
-        }
+        var account = await _accountService.GetByPhoneNumber(phone);
+        return Ok(account);
+
     }
 
     // Read by ID
     [HttpGet("{id}")]
     public async Task<ActionResult<AccountResponse>> GetAccountById(Guid id)
     {
-        try
+
+        var account = await _accountService.GetByIdAsync(id);
+        if (account == null)
         {
-            var account = await _accountService.GetByIdAsync(id);
-            if (account == null)
-            {
-                return NotFound();
-            }
-            return Ok(account);
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving the account by ID: {ex.Message}");
-        }
+        return Ok(account);
+
     }
 
     // Update
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateAccount(Guid id, [FromQuery] UpdateAccountRequestModel updateAccountRequest)
     {
-        try
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            await _accountService.UpdateAsync(id, updateAccountRequest);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while updating the account: {ex.Message}");
-        }
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        await _accountService.UpdateAsync(id, updateAccountRequest);
+        return Ok();
+
     }
 
     // Delete
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteAccount(Guid id)
     {
-        try
-        {
-            await _accountService.DeleteAsync(id);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while deleting the account: {ex.Message}");
-        }
+
+        await _accountService.DeleteAsync(id);
+        return Ok();
+
     }
 
 
@@ -144,21 +107,15 @@ public class AccountController : ControllerBaseApi
     public async Task<IActionResult> Register([FromBody] CreateAccountRequestModel request, AccountRole userRole)
     {
 
-        try
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
-            var result = await _accountService.Register(request, userRole);
-            if (result != null)
-                return Ok(result);
-            return BadRequest("Registration failed. Please try again.");
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred during login: {ex.Message}");
-        };
+        var result = await _accountService.Register(request, userRole);
+        if (result != null)
+            return Ok(result);
+        return BadRequest("Registration failed. Please try again.");
+
     }
 
     [HttpPost("refresh-token")]
@@ -183,15 +140,8 @@ public class AccountController : ControllerBaseApi
     [HttpGet("firebase-users")]
     public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAllFirebaseUsers()
     {
-        try
-        {
-            var users = await _firebaseService.GetAllUsersAsync();
-            return Ok(users);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while retrieving Firebase users: {ex.Message}");
-        }
+        var users = await _firebaseService.GetAllUsersAsync();
+        return Ok(users);
     }
 
     // Delete
@@ -199,15 +149,10 @@ public class AccountController : ControllerBaseApi
     [HttpDelete("delete-firebase/{firebaseEmail}")]
     public async Task<ActionResult> DeleteFireBase(string firebaseEmail)
     {
-        try
-        {
-            await _firebaseService.DeleteUserAsync(firebaseEmail);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while deleting the account: {ex.Message}");
-        }
+
+        await _firebaseService.DeleteUserAsync(firebaseEmail);
+        return Ok();
+
     }
 }
 

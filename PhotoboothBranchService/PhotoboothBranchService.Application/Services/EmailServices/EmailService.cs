@@ -27,12 +27,14 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
         private IBookingRepository _bookingRepository;
         private IBranchRepository _boothBranchRepository;
         private IBookingServiceRepository _bookingServiceRepository;
+        private IRefundRepository _refundRepository;
 
         public EmailService(IAccountRepository accountRepository, 
             ITransactionRepository paymentRepository, 
             IBookingRepository sessionOrderRepository, 
             IBranchRepository boothBranchRepository, 
-            IBookingServiceRepository serviceItemRepository)
+            IBookingServiceRepository serviceItemRepository,
+            IRefundRepository refundRepository)
         {
             this.smtpServerName = JsonHelper.GetFromAppSettings("EmailConfig:SmtpServerName");
             this.smtpPortNumber = JsonHelper.GetFromAppSettings("EmailConfig:SmtpPortNumber");
@@ -43,37 +45,51 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             _transactionRepository = paymentRepository;
             _boothBranchRepository = boothBranchRepository;
             _bookingServiceRepository = serviceItemRepository;
+            _refundRepository = refundRepository;
         }
 
-        public async Task SendBillInformation(Guid paymentId)
+        public async Task SendRefundBillInformation(Guid refundId)
         {
-            var transaction = (await _transactionRepository.GetAsync(i => i.TransactionID == paymentId, i=>i.PaymentMethod)).FirstOrDefault();
+            var refund = (await _refundRepository.GetAsync(i => i.RefundID == refundId)).FirstOrDefault();
+            if (refund == null)
+            {
+                throw new NotFoundException("Not found refund");
+            }
+            var transaction = (await _transactionRepository.GetAsync(i => i.TransactionID == refund.TransactionID, i=>i.PaymentMethod)).FirstOrDefault();
             if (transaction == null)
             {
-                throw new NotFoundException("Not found payment");
+                throw new NotFoundException("Not found transaction");
             }
             var booking = (await _bookingRepository.GetAsync(i => i.BookingID == transaction.BookingID)).FirstOrDefault();
             if (booking == null)
             {
-                throw new NotFoundException("Not found Order of payment");
+                throw new NotFoundException("Not found Order of transaction");
             }
             var user = (await _accountRepository.GetAsync(i => i.AccountID == booking.CustomerID)).FirstOrDefault();
             if (user == null)
             {
                 throw new NotFoundException("Not found user");
             }
-            string subject = "Payment Information";
+            string subject = "Refund Information";
             StringBuilder sbBody = new StringBuilder();
-            sbBody.AppendLine("<p>Here is your payment's information</p>");
+            sbBody.AppendLine("<p>Here is your transaction's information</p>");
             sbBody.AppendLine("<p></p>");
             sbBody.AppendLine($"<p>Payment method: {transaction.PaymentMethod.PaymentMethodName}</p>");
-            sbBody.AppendLine($"<p>Payment amount: {transaction.Amount.ToString()}</p>");
-            sbBody.AppendLine($"<p>Payment time: {transaction.TransactionDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
+            sbBody.AppendLine($"<p>Transaction amount: {transaction.Amount.ToString()}</p>");
+            sbBody.AppendLine($"<p>Transaction time: {transaction.TransactionDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
+            sbBody.AppendLine($"<p>Transaction code: {transaction.GatewayTransactionID.ToString()}</p>");
+            sbBody.AppendLine("<p></p>");
 
+            sbBody.AppendLine("<p>With refund's information</p>");
+            sbBody.AppendLine($"<p>Refund description: {refund.Description}</p>");
+            sbBody.AppendLine($"<p>Refund amount: {refund.Amount.ToString()}</p>");
+            sbBody.AppendLine($"<p>Refund's status: {refund.Status.ToString()}</p>");
+            sbBody.AppendLine($"<p>Refund's message: {refund.ResponseMessage.ToString()}</p>");
+            sbBody.AppendLine($"<p>Refund time: {refund.RefundDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
             await this.SendEmail(user.Email, subject, sbBody.ToString());
         }
 
-        public async Task SendBookingInformation(Guid bookingID)
+        public async Task SendBookingInformation(Guid bookingID, Guid transactionID)
         {
             var booking = (await _bookingRepository
                 .GetAsync(i => i.BookingID == bookingID,
@@ -84,9 +100,13 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                         }
                 ))
                 .FirstOrDefault();
+            var trans = (await _transactionRepository.GetAsync(i => i.TransactionID == transactionID, i => i.PaymentMethod)).SingleOrDefault();
+            if ( trans == null ) {
+                throw new NotFoundException("Not found transaction");
+            }
             if (booking == null)
             {
-                throw new NotFoundException("Not found Order of payment");
+                throw new NotFoundException("Not found booking of transaction");
             }
             var user = (await _accountRepository.GetAsync(i => i.AccountID == booking.CustomerID)).FirstOrDefault();
             if (user == null)
@@ -102,14 +122,13 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             StringBuilder sbBody = new StringBuilder();
             sbBody.AppendLine("<p>Here is your booking's information</p>");
             sbBody.AppendLine("<br>");
-            sbBody.AppendLine($"<p><strong>Session Order ID:</strong> {booking.BookingID}</p>");
+
+            sbBody.AppendLine($"<p><strong>Booking Code:</strong> {booking.CustomerReferenceID}</p>");
 
             sbBody.AppendLine("<h3>Branch Details</h3>");
             sbBody.AppendLine($"<p><strong>Branch Name:</strong> {branch.BranchName}</p>");
             sbBody.AppendLine($"<p><strong>Branch Address:</strong> {branch.Address}</p>");
             sbBody.AppendLine($"<p><strong>Booth Name:</strong> {booking.Booth.BoothName}</p>");
-
-            sbBody.AppendLine("<h3>Package Information</h3>");
 
             if (booking.BookingServices.Count > 0)
             {
@@ -118,7 +137,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                     ).ToList();
                 if (serviceItemList != null && serviceItemList.Count == booking.BookingServices.Count)
                 {
-                    sbBody.AppendLine("<p>Service(s) in Order:</p>");
+                    sbBody.AppendLine("<p>Service(s) in Booking:</p>");
                     sbBody.AppendLine("<br>");
                     sbBody.AppendLine("<table style='width:100%; border-collapse: collapse;'>");
                     sbBody.AppendLine("<tr>");
@@ -132,7 +151,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                     var duration = (booking.EndTime - booking.StartTime).TotalHours;
                     sbBody.AppendLine("<tr>");
                     sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Hire booth fee</td>");
-                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'{duration:N2}</td>");
+                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{duration:N2}</td>");
                     sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{booking.Booth.PricePerHour:N0}</td>");
                     sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{booking.HireBoothFee:N0}</td>");
                     sbBody.AppendLine("</tr>");
@@ -163,9 +182,12 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                 sbBody.AppendLine($"<p>Total price: {booking.PaymentAmount}</p>");
             }
 
+            sbBody.AppendLine($"<p>This booking was paid thourgh {trans.PaymentMethod.PaymentMethodName} in {trans.TransactionDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
+
+
             sbBody.AppendLine($"<p>Start Time: {booking.StartTime.ToString("dddd, MMMM dd, yyyy h:mm tt")} (UTC +7)</p>");
             sbBody.AppendLine($"<p>End Time: {booking.EndTime.ToString("dddd, MMMM dd, yyyy h:mm tt")} (UTC +7)</p>");
-            sbBody.AppendLine($"<p>Validate code (Enter this code to booth):<strong> {booking.ValidateCode.ToString()}</strong> </p>");
+            sbBody.AppendLine($"<p>Validate code (Enter this code to booth):<strong style='font-size: 1.2em; color: blue; font-weight: bold;'> {booking.ValidateCode}</strong> </p>");
             sbBody.AppendLine($"<p>We hope you arrive 5 minutes before the start time to receive instructions from the staff.</p>");
             await this.SendEmail(user.Email, subject, sbBody.ToString());
         }

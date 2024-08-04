@@ -58,6 +58,13 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     PaymentMethodName = "MoMo",
                     CreateDate = DateTime.UtcNow,
                     Status = PaymentMethodStatus.Active,
+                },
+                new PaymentMethod
+                {
+                    PaymentMethodID = new Guid("0d82e0e5-ca54-4ff0-8750-e5ff77435584"),
+                    PaymentMethodName = "Cash",
+                    CreateDate = DateTime.UtcNow,
+                    Status = PaymentMethodStatus.Active,
                 });
         }
     }

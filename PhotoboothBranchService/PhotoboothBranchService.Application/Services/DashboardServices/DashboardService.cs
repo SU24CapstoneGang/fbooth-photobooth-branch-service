@@ -114,7 +114,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             response.BoothDashboard.BoothActive = booths.Select(i => i.Status == BoothStatus.Active).Count();
             response.BoothDashboard.BoothInactive = booths.Select(i => i.Status == BoothStatus.Inactive).Count();
             response.BoothDashboard.BoothInUse = booths.Select(i => i.isBooked).Count();
-            var orders = await _bookingRepository.GetAsync(i => i.Status == BookingStatus.Completed);
+            var orders = await _bookingRepository.GetAsync(i => i.Status == BookingStatus.PendingChecking);
             response.TotalOrder = orders.Count();
             response.TotalRevenue = response.TotalOrder == 0 ? 0 : orders.Sum(i => i.PaymentAmount);
             return response;
@@ -275,7 +275,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             bool isEnd = false;
             bool isStart = false;
             Expression<Func<Booking, bool>> pre = branchID.HasValue ? i => booths.Select(b => b.BoothID).ToList().Contains(i.BoothID) : i => true;
-            pre = LinQHelper.AndAlso(pre, i => i.Status == BookingStatus.Completed);
+            pre = LinQHelper.AndAlso(pre, i => i.Status == BookingStatus.PendingChecking);
             if (endDate != null && endDate != default(DateOnly))
             {
                 isEnd = true;

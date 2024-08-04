@@ -31,18 +31,23 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PaymentMethodResponse>>> GetAllPaymentMethods()
         {
-
             var paymentMethods = await _paymentMethodService.GetAllAsync();
             return Ok(paymentMethods);
 
         }
+        [HttpGet("customer")]
+        public async Task<ActionResult<IEnumerable<PaymentMethodResponse>>> GetAllPaymentMethodsForCustomer()
+        {
+            var paymentMethods = await _paymentMethodService.GetAllAsync();
+            var filteredPaymentMethods = paymentMethods.Where(pm => pm.PaymentMethodID != new Guid("0d82e0e5-ca54-4ff0-8750-e5ff77435584")).ToList();
+            return Ok(filteredPaymentMethods);
 
+        }
         // Read all with paging and filter
         [HttpGet("paging")]
         public async Task<ActionResult<IEnumerable<PaymentMethodResponse>>> GetPagingPaymentMethods(
             [FromQuery] PaymentMethodFilter paymentMethodFilter, [FromQuery] PagingModel pagingModel)
         {
-
             var paymentMethods = await _paymentMethodService.GetAllPagingAsync(paymentMethodFilter, pagingModel);
             return Ok(paymentMethods);
 
@@ -52,7 +57,6 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpGet("name/{name}")]
         public async Task<ActionResult<IEnumerable<PaymentMethodResponse>>> GetPaymentMethodsByName(string name)
         {
-
             var paymentMethods = await _paymentMethodService.GetByName(name);
             return Ok(paymentMethods);
 

@@ -19,6 +19,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(s => s.PaymentAmount)
                 .IsRequired().HasColumnType("decimal(18, 0)"); ; // Tổng giá
+            builder.Property(s => s.CustomerReferenceID).IsRequired();
             builder.Property(s => s.HireBoothFee).IsRequired().HasColumnType("decimal(18, 0)");
             builder.Property(s => s.StartTime).IsRequired(true);
             builder.Property(s => s.EndTime).IsRequired(true);

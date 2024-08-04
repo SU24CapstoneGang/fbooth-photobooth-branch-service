@@ -33,7 +33,7 @@ public class BookingService : IBookingService
         ITransactionService paymentService,
         IBookingServiceRepository bookingServiceRepository,
         IAccountRepository accountRepository,
-        IRefundService refundService, 
+        IRefundService refundService,
         IServiceRepository serviceRepository,
         IFullPaymentPolicyRepository fullPaymentPolicyRepository)
     {
@@ -79,6 +79,7 @@ public class BookingService : IBookingService
         booking.BookingType = bookingType;
         booking.BookingServices = processedServices.Item2;
         booking.PaymentStatus = PaymentStatus.Processing;
+        booking.CustomerReferenceID = this.GenerateCustomerReferenceID(account.FirstName, account.LastName);
         // Set payment policy if applicable
         //if (booking.BookingType == BookingType.Online)
         //{
@@ -86,7 +87,7 @@ public class BookingService : IBookingService
         //}
         // Save booking
         await _bookingRepository.AddAsync(booking);
-        var list =  await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
+        var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
         booking.BookingServices = list.ToList();
         return _mapper.Map<CreateBookingResponse>(booking);
     }
@@ -202,6 +203,7 @@ public class BookingService : IBookingService
         var bookings = (await _bookingRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
             {
                 i => i.BookingServices,
+                i => i.FullPaymentPolicy
             })).ToList();
         foreach (var booking in bookings)
         {
@@ -228,8 +230,9 @@ public class BookingService : IBookingService
             includeProperties: new Expression<Func<Booking, object>>[]
             {
                 i => i.BookingServices,
+                 i => i.FullPaymentPolicy
             })).FirstOrDefault();
-        
+
         if (booking == null)
         {
             throw new KeyNotFoundException("Booking not found.");
@@ -238,7 +241,23 @@ public class BookingService : IBookingService
         booking.BookingServices = list.ToList();
         return _mapper.Map<BookingResponse>(booking);
     }
+    public async Task<BookingResponse> GetByReferenceIDAsync(string id)
+    {
+        var booking = (await _bookingRepository.GetAsync(s => s.CustomerReferenceID == id,
+            includeProperties: new Expression<Func<Booking, object>>[]
+            {
+                i => i.BookingServices,
+                 i => i.FullPaymentPolicy
+            })).FirstOrDefault();
 
+        if (booking == null)
+        {
+            throw new KeyNotFoundException("Booking not found.");
+        }
+        var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
+        booking.BookingServices = list.ToList();
+        return _mapper.Map<BookingResponse>(booking);
+    }
     // Update a session
     public async Task UpdateAsync(Guid id, UpdateSessionOrderRequest updateModel)
     {
@@ -280,40 +299,53 @@ public class BookingService : IBookingService
         //var updatedSession = _mapper.Map(updateModel, session);
         //await _sessionOrderRepository.UpdateAsync(updatedSession);
     }
-    public async Task<CancelBookingResponse> CancelBooking(Guid bookingID, string? ipAddress)
+    public async Task<CancelBookingResponse> CancelBooking(Guid bookingID, string? ipAddress, string? email)
     {
         CancelBookingResponse response = new CancelBookingResponse();
+        var timeNow = DateTimeHelper.GetVietnamTimeNow();
         var booking = (await _bookingRepository.GetAsync(i => i.BookingID == bookingID, i => i.FullPaymentPolicy)).FirstOrDefault();
         if (null == booking)
         {
-            response.message = "Session Order not found";
-        } else if (booking.IsCancelled)
+            response.message = "Booking not found";
+        }
+        else if (booking.Status == BookingStatus.TakingPhoto)
         {
-            response.message = "Booking already canceled";
+            response.message = "Booking is going, cannot cancel.";
+        }
+        else if (booking.IsCancelled)
+        {
+            response.message = "Booking already canceled.";
+        }
+        else if (booking.EndTime < timeNow || booking.Status == BookingStatus.NoShow)
+        {
+            response.message = "Booking has ended, can not cancel.";
         }
         else
         {
             try
             {
-                var timeNow = DateTimeHelper.GetVietnamTimeNow();
-                if (timeNow > booking.StartTime)
+                if (booking.StartTime > timeNow)
                 {
-                    throw new BadRequestException("Can not cancel anymore, the session already start");
-                }
-
-                if (booking.Status == BookingStatus.Completed && (booking.StartTime.Date - timeNow).TotalDays > booking.FullPaymentPolicy.RefundDaysBefore)
-                {
-                    //doing refund
-                    var refundRes = await _refundService.RefundByBookingID(bookingID, false, ipAddress);
-                    response.isRefund = true;
-                    response.refundList = refundRes.ToList();
-                    if (response.refundList.Any(i => i.Status == RefundStatus.Fail))
+                    if (booking.Status == BookingStatus.PendingChecking && (booking.StartTime.Date - timeNow).TotalDays > booking.FullPaymentPolicy.RefundDaysBefore)
                     {
-                        response.message = "Success cancel booking but not refund success, please contact our manager.";
+                        //doing refund
+                        var refundRes = await _refundService.RefundByBookingID(bookingID, false, ipAddress, email);
+                        response.isRefund = true;
+                        response.refundList = refundRes.ToList();
+                        if (response.refundList.Any(i => i.Status == RefundStatus.Fail))
+                        {
+                            response.message = "Success cancel booking but not refund success, please contact our manager.";
+                        }
+                        else
+                        {
+                            response.message = $"Cancel booking and the refund successfully, with {booking.FullPaymentPolicy.RefundPercent}% value of booking";
+                            booking.PaymentStatus = PaymentStatus.Refunded;
+                            booking.RefundAmount = response.refundList.Sum(i => i.Amount);
+                        }
                     }
                     else
                     {
-                        response.message = "Cancel booking and the refund successfully";
+                        response.message = $"Cancel booking successfully, but the cancel date does not meet our policy (must be more than {booking.FullPaymentPolicy.RefundDaysBefore} days before) to be eligible for a refund.";
                     }
                 }
                 else
@@ -375,7 +407,7 @@ public class BookingService : IBookingService
     {
         long code = 0;
         var timeNow = DateTimeHelper.GetVietnamTimeNow();
-        var existedCodes = (await _bookingRepository.GetAsync(i => i.IsCancelled == false && (i.StartTime > timeNow || i.EndTime >  timeNow))).ToList().Select(i => i.ValidateCode);
+        var existedCodes = (await _bookingRepository.GetAsync(i => i.IsCancelled == false && (i.StartTime > timeNow || i.EndTime > timeNow))).ToList().Select(i => i.ValidateCode);
         while (code == 0)
         {
             code = new Random().Next(100000, 1000000);
@@ -385,6 +417,22 @@ public class BookingService : IBookingService
             }
         }
         return code;
+    }
+    public string GenerateCustomerReferenceID(string firstName, string lastName)
+    {
+        // Combine firstName and lastName
+        string fullName = $"{firstName} {lastName}";
+
+        // Extract the first letter of each word in the full name
+        string initials = string.Concat(fullName.Split(' ')
+            .Where(word => !string.IsNullOrEmpty(word))
+            .Select(word => word[0]))
+            .ToUpper();
+
+        string datePart = DateTimeHelper.GetVietnamTimeNow().ToString("yyyyMMddHHmmss");
+        string randomPart = new Random().Next(10009, 99999).ToString();
+
+        return $"{initials}-{datePart}-{randomPart}";
     }
     private async Task<Account> ValidateCustomerAsync(string phoneNumber, string email)
     {
@@ -441,7 +489,7 @@ public class BookingService : IBookingService
     }
     private async Task<(decimal, ICollection<Domain.Entities.BookingService>, decimal)> ProcessServiceListAsync(decimal boothPricePerHour, DateTime startTime, DateTime endTime, Dictionary<Guid, short> serviceList)
     {
-       
+
         List<Domain.Entities.BookingService> result = new List<Domain.Entities.BookingService>();
 
         var totalHours = (endTime - startTime).TotalHours;

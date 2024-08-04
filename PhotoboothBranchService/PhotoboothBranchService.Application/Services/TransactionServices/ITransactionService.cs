@@ -9,7 +9,7 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
 {
     public interface ITransactionService : IServiceBase<TransactionResponse, PaymentFilter, PagingModel>
     {
-        Task<CreateTransactionResponse> CreateAsync(CreateTransactionRequest createModel, string ClientIpAddress);
+        Task<CreateTransactionResponse> CreateAsync(CreateTransactionRequest createModel, string ClientIpAddress, string? email);
         Task UpdateAsync(Guid id, UpdateTransactiontRequest updateModel);
         Task DeleteAsync(Guid id);
         Task<IEnumerable<TransactionResponse>> GetBySessionOrderAsync(Guid sessionOrderID);

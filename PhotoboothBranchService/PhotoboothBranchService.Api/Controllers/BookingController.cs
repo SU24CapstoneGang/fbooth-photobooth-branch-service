@@ -83,14 +83,23 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<BookingResponse>> GetBookingById(Guid id)
         {
-            var session = await _bookingService.GetByIdAsync(id);
-            if (session == null)
+            var booking = await _bookingService.GetByIdAsync(id);
+            if (booking == null)
             {
                 return NotFound();
             }
-            return Ok(session);
+            return Ok(booking);
         }
-
+        [HttpGet("rid/{id}")]
+        public async Task<ActionResult<BookingResponse>> GetBookingByReferenceID(string id)
+        {
+            var booking = await _bookingService.GetByReferenceIDAsync(id);
+            if (booking == null)
+            {
+                return NotFound();
+            }
+            return Ok(booking);
+        }
         // Update
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateBooking(Guid id, UpdateSessionOrderRequest updateSessionRequest)
@@ -102,7 +111,8 @@ namespace PhotoboothBranchService.Api.Controllers
         public async Task<ActionResult<CancelBookingResponse>> CancelBooking(Guid sessionOrderID)
         {
             var clientIp = IpAddressHelper.GetClientIpAddress(HttpContext);
-            var response = await _bookingService.CancelBooking(sessionOrderID, clientIp);
+            var email = Request.HttpContext.Items["Email"]?.ToString();
+            var response = await _bookingService.CancelBooking(sessionOrderID, clientIp, email);
             return Ok(response);
         }
 

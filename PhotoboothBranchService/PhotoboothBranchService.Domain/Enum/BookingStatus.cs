@@ -2,9 +2,10 @@
 {
     public enum BookingStatus
     {
-        Completed = 3, 
-        NoShow = 1, //customer not come
-        PendingPayment = 4, //waiting pay
-        Refunded = 2 
+        PendingChecking = 2,
+        NoShow = 3, //customer not come
+        PendingPayment = 1, //waiting pay
+        CompleteChecked = 5,
+        TakingPhoto = 4,
     }
 }

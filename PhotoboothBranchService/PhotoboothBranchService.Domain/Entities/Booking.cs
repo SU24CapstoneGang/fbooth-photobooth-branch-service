@@ -5,6 +5,7 @@ namespace PhotoboothBranchService.Domain.Entities
     public class Booking
     {
         public Guid BookingID { get; set; } = default!;
+        public string CustomerReferenceID { get; set; } = default!;
         public long ValidateCode { get; set; }
         public decimal PaymentAmount { get; set; } = default!;
         public DateTime StartTime { get; set; } = default!;

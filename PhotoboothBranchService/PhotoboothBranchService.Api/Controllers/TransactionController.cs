@@ -26,10 +26,9 @@ namespace PhotoboothBranchService.Api.Controllers
 
             //get ip from request
             var clientIpAddress = IpAddressHelper.GetClientIpAddress(HttpContext);
-
+            var email = Request.HttpContext.Items["Email"]?.ToString();
             //sent to service layer
-            var createPaymentResponse = await _paymentService.CreateAsync(createPaymentRequest, clientIpAddress);
-
+            var createPaymentResponse = await _paymentService.CreateAsync(createPaymentRequest, clientIpAddress, email);
             return Ok(createPaymentResponse);
 
         }
@@ -96,71 +95,71 @@ namespace PhotoboothBranchService.Api.Controllers
 
         }
 
-        //handle return 
-        [HttpGet("vnpay/return")]
-        public async Task<IActionResult> VnpayReturn()
-        {
-            if (Request.QueryString.HasValue)
-            {
-                var response = await _paymentService.HandleVnpayResponse(Request.Query);
-                string returnContent = $@"
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Payment Return</title>
-                        <script>
-                            window.onload = function() {{
-                                setTimeout(function() {{
-                                    window.close();
-                                }}, 3000); // Close after 3 seconds
-                            }}
-                        </script>
-                    </head>
-                    <body>
-                        <h1>Payment Processed</h1>
-                        <p>Your payment has been processed. This tab will close automatically.</p>
-                        <h2>Response Data:</h2>
-                        <pre>{response.returnContent}</pre> <!-- Display JSON response here -->
-                    </body>
-                    </html>";
+        ////handle return 
+        //[HttpGet("vnpay/return")]
+        //public async Task<IActionResult> VnpayReturn()
+        //{
+        //    if (Request.QueryString.HasValue)
+        //    {
+        //        var response = await _paymentService.HandleVnpayResponse(Request.Query);
+        //        string returnContent = $@"
+        //            <!DOCTYPE html>
+        //            <html>
+        //            <head>
+        //                <title>Payment Return</title>
+        //                <script>
+        //                    window.onload = function() {{
+        //                        setTimeout(function() {{
+        //                            window.close();
+        //                        }}, 3000); // Close after 3 seconds
+        //                    }}
+        //                </script>
+        //            </head>
+        //            <body>
+        //                <h1>Payment Processed</h1>
+        //                <p>Your payment has been processed. This tab will close automatically.</p>
+        //                <h2>Response Data:</h2>
+        //                <pre>{response.returnContent}</pre> <!-- Display JSON response here -->
+        //            </body>
+        //            </html>";
 
-                return Content(returnContent, "text/html");
-            }
-            return BadRequest(new { Message = "No query string found" });
-        }
+        //        return Content(returnContent, "text/html");
+        //    }
+        //    return BadRequest(new { Message = "No query string found" });
+        //}
 
-        [HttpGet("momo/return")]
-        public async Task<IActionResult> PaymentMomoReturn()
-        {
-            if (Request.QueryString.HasValue)
-            {
-                await _paymentService.HandleMomoResponse(Request.Query);
-                string returnContent = $@"
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Payment Return</title>
-                        <script>
-                            window.onload = function() {{
-                                setTimeout(function() {{
-                                    window.close();
-                                }}, 3000); // Close after 3 seconds
-                            }}
-                        </script>
-                    </head>
-                    <body>
-                        <h1>Payment Processed</h1>
-                        <p>Your payment has been processed. This tab will close automatically.</p>
-                    </body>
-                    </html>";
+        //[HttpGet("momo/return")]
+        //public async Task<IActionResult> PaymentMomoReturn()
+        //{
+        //    if (Request.QueryString.HasValue)
+        //    {
+        //        await _paymentService.HandleMomoResponse(Request.Query);
+        //        string returnContent = $@"
+        //            <!DOCTYPE html>
+        //            <html>
+        //            <head>
+        //                <title>Payment Return</title>
+        //                <script>
+        //                    window.onload = function() {{
+        //                        setTimeout(function() {{
+        //                            window.close();
+        //                        }}, 3000); // Close after 3 seconds
+        //                    }}
+        //                </script>
+        //            </head>
+        //            <body>
+        //                <h1>Payment Processed</h1>
+        //                <p>Your payment has been processed. This tab will close automatically.</p>
+        //            </body>
+        //            </html>";
 
-                return Content(returnContent, "text/html");
-            }
-            else
-            {
-                return BadRequest(new { Message = "No query string found" });
-            }
-        }
+        //        return Content(returnContent, "text/html");
+        //    }
+        //    else
+        //    {
+        //        return BadRequest(new { Message = "No query string found" });
+        //    }
+        //}
 
         [HttpGet("vnpay/ipn")]
         public async Task<IActionResult> HandleVnpayIPN()

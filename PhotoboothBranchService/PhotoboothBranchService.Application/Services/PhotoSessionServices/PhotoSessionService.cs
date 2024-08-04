@@ -27,15 +27,13 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         // Create
         public async Task<CreatePhotoSessionResponse> CreateAsync(CreatePhotoSessionRequest createModel)
         {
-            var timeNow = DateTimeHelper.GetVietnamTimeNow();
-            var validateBooking = (await _bookingRepository
-                .GetAsync(i => i.BookingID == createModel.BookingID
-                && (i.EndTime > timeNow && i.StartTime < timeNow)
-                && i.Status == BookingStatus.Completed && !i.IsCancelled)) == null;
-            if (validateBooking)
+            var booking = (await _bookingRepository
+                .GetAsync(i => i.BookingID == createModel.BookingID)).FirstOrDefault();
+            if (booking == null)
             {
-                throw new Exception("Session Order are not going, it expired or not coming");
+                throw new NotFoundException("Not found Booking");
             }
+            this.ValidateBookingToAdd(booking);
             var layout = (await _layoutRepository.GetAsync(i => i.LayoutID == createModel.LayoutID)).FirstOrDefault();
             if (layout == null)
             {
@@ -48,10 +46,26 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
             var photoSession = _mapper.Map<PhotoSession>(createModel);
             photoSession.TotalPhotoTaken = layout.PhotoSlot;
             photoSession.SessionIndex = (await _photoSessionRepository.GetAsync(i => i.BookingID == createModel.BookingID)).Count() + 1;
+            photoSession.Status = PhotoSessionStatus.Ongoing;
             await _photoSessionRepository.AddAsync(photoSession);
             return _mapper.Map<CreatePhotoSessionResponse>(photoSession);
         }
+        private void ValidateBookingToAdd(Booking booking)
+        {
+            var timeNow = DateTimeHelper.GetVietnamTimeNow();
+            if (booking.IsCancelled)
+            {
+                throw new BadRequestException("Booking is cancelled!");
+            } else if (booking.Status != BookingStatus.CompleteChecked) {
+                throw new BadRequestException("Booking has not Check-in yet");
+            }
 
+            if(!(booking.EndTime > timeNow && booking.StartTime < timeNow))
+            {
+                throw new BadRequestException("Start time not come or passed End time");
+            }
+           
+        }
         // Delete
         public async Task DeleteAsync(Guid id)
         {

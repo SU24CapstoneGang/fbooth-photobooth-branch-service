@@ -22,7 +22,7 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
 {
     public class TransactionService : ITransactionService
     {
-        private readonly ITransactionRepository _paymentRepository;
+        private readonly ITransactionRepository _transactionRepository;
         private readonly IMapper _mapper;
         private readonly IPaymentMethodRepository _paymentMethodRepository;
         private readonly IVNPayService _vNPayService;
@@ -30,15 +30,17 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
         private readonly IMoMoService _moMoService;
         private readonly IEmailService _emailService;
         private readonly IRefundService _refundService;
+        private readonly IAccountRepository _accountRepository;
         public TransactionService(ITransactionRepository paymentRepository, IMapper mapper,
             IPaymentMethodRepository paymentMethodRepository,
             IVNPayService vNPayService,
             IBookingRepository sessionOrderRepository,
             IMoMoService moMoService,
             IEmailService emailService,
-            IRefundService refundService)
+            IRefundService refundService,
+            IAccountRepository accountRepository)
         {
-            _paymentRepository = paymentRepository;
+            _transactionRepository = paymentRepository;
             _mapper = mapper;
             _paymentMethodRepository = paymentMethodRepository;
             _vNPayService = vNPayService;
@@ -46,13 +48,14 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
             _moMoService = moMoService;
             _emailService = emailService;
             _refundService = refundService;
+            _accountRepository = accountRepository;
         }
 
         // Create
-        public async Task<CreateTransactionResponse> CreateAsync(CreateTransactionRequest createModel, string ClientIpAddress)
+        public async Task<CreateTransactionResponse> CreateAsync(CreateTransactionRequest createModel, string ClientIpAddress, string? email)
         {
             //validate session and total price
-            var booking = (await _bookingRepository.GetAsync(i => i.BookingID == createModel.BookingID)).FirstOrDefault();
+            var booking = (await _bookingRepository.GetAsync(i => i.BookingID == createModel.BookingID, i => i.Booth)).FirstOrDefault();
             if (booking == null)
             {
                 throw new NotFoundException("Not found Session to proceed payment");
@@ -62,19 +65,23 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
                 throw new BadRequestException("The Order has been ended or cancelled");
             }
             //add check endtime later
-            if (booking.PaymentStatus == PaymentStatus.Paid && booking.Status == BookingStatus.Completed)
+            if (booking.PaymentStatus == PaymentStatus.Paid && booking.Status == BookingStatus.PendingChecking)
             {
                 throw new BadRequestException("Booking already paid.");
             }
 
-
+            var account = (await _accountRepository.GetAsync(i => i.Email.Equals(email))).FirstOrDefault();
+            if (account == null)
+            {
+                throw new BadRequestException("Account not found.");
+            }
             //create payment object
             var transaction = _mapper.Map<Transaction>(createModel);
             transaction.TransactionID = Guid.NewGuid();
             transaction.TransactionStatus = TransactionStatus.Processing;
             transaction.TransactionDateTime = DateTimeHelper.GetVietnamTimeNow();
 
-            var payments = await _paymentRepository.GetAsync(i => i.BookingID == booking.BookingID && i.TransactionStatus == TransactionStatus.Success);
+            var payments = await _transactionRepository.GetAsync(i => i.BookingID == booking.BookingID && i.TransactionStatus == TransactionStatus.Success);
             long result = (long)booking.PaymentAmount - payments.Sum(i => i.Amount);
             if (result == 0)
             {
@@ -101,6 +108,13 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
                 switch (paymentMethod.PaymentMethodName)
                 {
                     case "VNPay":
+                        if (account.Role == AccountRole.Customer)
+                        {
+                            if (account.AccountID != booking.CustomerID)
+                            {
+                                throw new BadRequestException("Booking is requested transaction not from it's Customer ");
+                            }
+                        }
                         VnpayRequest vnpayRequest = new VnpayRequest
                         {
                             Amount = transaction.Amount,
@@ -119,6 +133,13 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
                         break;
 
                     case "MoMo":
+                        if (account.Role == AccountRole.Customer)
+                        {
+                            if (account.AccountID != booking.CustomerID)
+                            {
+                                throw new BadRequestException("Booking is requested transaction not from it's Customer ");
+                            }
+                        }
                         MoMoRequest moMoRequest = new MoMoRequest
                         {
                             amount = transaction.Amount,
@@ -130,7 +151,26 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
                         };
                         createPaymentResponse.TransactionUlr = _moMoService.CreatePayment(moMoRequest);
                         break;
+                    case "Cash":
+                        if (account.Role == AccountRole.Customer)
+                        {
+                            throw new ForbiddenAccessException("This method can not be use by customer account");
+                        }
+                        if (account.Role != AccountRole.Admin)
+                        {
+                            if (account.BranchID.Value != booking.Booth.BranchID)
+                            {
+                                throw new ForbiddenAccessException("Booking and Staff/Manager are not from same branch to create this transaction");
+                            }
+                        }
 
+                        createPaymentResponse.TransactionID = transaction.TransactionID;
+                        createPaymentResponse.TransactionUlr = "";
+                        transaction.GatewayTransactionID = account.AccountID.ToString();
+                        transaction.TransactionStatus = TransactionStatus.Success;
+                        await _transactionRepository.AddAsync(transaction);
+                        await this.updateAfterSuccessPaymentAsync(transaction);
+                        return createPaymentResponse;
                     default:
                         throw new BadRequestException("Payment method not availbe to use, please try later");
                 }
@@ -141,7 +181,7 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
             }
 
             //add payment to DB and return url
-            await _paymentRepository.AddAsync(transaction);
+            await _transactionRepository.AddAsync(transaction);
 
             return createPaymentResponse;
         }
@@ -154,7 +194,7 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
             {
                 try
                 {
-                    await _emailService.SendBillInformation(responseBody.PaymentID);
+
                     await updateAfterSuccessPaymentAsync(result.paymentResult);
                 }
                 catch (Exception ex)
@@ -170,14 +210,6 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
             var response = await _moMoService.Return(queryString);
             if (response.TransactionStatus == TransactionStatus.Success)
             {
-                try
-                {
-                    await _emailService.SendBillInformation(response.TransactionID);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
                 await updateAfterSuccessPaymentAsync(response);
             }
         }
@@ -186,14 +218,6 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
             var response = (await _moMoService.HandlePaymentResponeIPN(moMoResponse));
             if (response.transaction.TransactionStatus == TransactionStatus.Success)
             {
-                try
-                {
-                    await _emailService.SendBillInformation(response.transaction.TransactionID);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
                 await updateAfterSuccessPaymentAsync(response.transaction);
             }
             return response.iPNResponse;
@@ -203,11 +227,11 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
         {
             try
             {
-                var payments = await _paymentRepository.GetAsync(p => p.TransactionID == id);
+                var payments = await _transactionRepository.GetAsync(p => p.TransactionID == id);
                 var payment = payments.FirstOrDefault();
                 if (payment != null)
                 {
-                    await _paymentRepository.RemoveAsync(payment);
+                    await _transactionRepository.RemoveAsync(payment);
                 }
             }
             catch
@@ -218,44 +242,44 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
         // Read all
         public async Task<IEnumerable<TransactionResponse>> GetAllAsync()
         {
-            var payments = await _paymentRepository.GetAllAsync();
+            var payments = await _transactionRepository.GetAllAsync();
             return _mapper.Map<IEnumerable<TransactionResponse>>(payments.ToList());
         }
         // Read all with paging and filter
         public async Task<IEnumerable<TransactionResponse>> GetAllPagingAsync(PaymentFilter filter, PagingModel paging)
         {
-            var payments = (await _paymentRepository.GetAllAsync()).ToList().AutoFilter(filter);
+            var payments = (await _transactionRepository.GetAllAsync()).ToList().AutoFilter(filter);
             var listPaymentResponse = _mapper.Map<IEnumerable<TransactionResponse>>(payments);
             return listPaymentResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         }
         public async Task<IEnumerable<TransactionResponse>> GetBySessionOrderAsync(Guid sessionOrderID)
         {
-            var payments = await _paymentRepository.GetAsync(i => i.BookingID == sessionOrderID);
+            var payments = await _transactionRepository.GetAsync(i => i.BookingID == sessionOrderID);
             return _mapper.Map<IEnumerable<TransactionResponse>>(payments.ToList());
         }
         public async Task<IEnumerable<TransactionResponse>> GetByOrderIdAsync(Guid id)
         {
-            var payments = await _paymentRepository.GetAsync(p => p.BookingID == id);
+            var payments = await _transactionRepository.GetAsync(p => p.BookingID == id);
             return _mapper.Map<IEnumerable<TransactionResponse>>(payments);
         }
         // Read by ID
         public async Task<TransactionResponse> GetByIdAsync(Guid id)
         {
-            var payments = await _paymentRepository.GetAsync(p => p.TransactionID == id);
+            var payments = await _transactionRepository.GetAsync(p => p.TransactionID == id);
             var payment = payments.FirstOrDefault();
             return _mapper.Map<TransactionResponse>(payment);
         }
         // Update
         public async Task UpdateAsync(Guid id, UpdateTransactiontRequest updateModel)
         {
-            var payment = (await _paymentRepository.GetAsync(p => p.TransactionID == id)).FirstOrDefault();
+            var payment = (await _transactionRepository.GetAsync(p => p.TransactionID == id)).FirstOrDefault();
             if (payment == null)
             {
                 throw new KeyNotFoundException("Payment not found.");
             }
 
             var updatedPayment = _mapper.Map(updateModel, payment);
-            await _paymentRepository.UpdateAsync(updatedPayment);
+            await _transactionRepository.UpdateAsync(updatedPayment);
         }
         private async Task updateAfterSuccessPaymentAsync(Transaction trans)
         {
@@ -269,13 +293,13 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
             {
                 if (trans.Amount == booking.PaymentAmount)
                 {
-                    booking.Status = BookingStatus.Completed;
+                    booking.Status = BookingStatus.PendingChecking;
                     booking.PaymentStatus = PaymentStatus.Paid;
                     try
                     {
                         if (booking.StartTime > DateTimeHelper.GetVietnamTimeNow())
                         {
-                            await _emailService.SendBookingInformation(booking.BookingID);
+                            await _emailService.SendBookingInformation(booking.BookingID, trans.TransactionID);
                         }
                     }
                     catch (Exception ex)
@@ -288,7 +312,7 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
             else
             {
                 //do refund
-                await _refundService.RefundByTransID(trans.TransactionID, true, null);
+                await _refundService.RefundByTransID(trans.TransactionID, true, null, null);
             }
         }
     }

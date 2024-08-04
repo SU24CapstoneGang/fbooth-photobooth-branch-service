@@ -100,7 +100,7 @@ namespace PhotoboothBranchService.Application
             //email sender service
             services.AddScoped<IEmailService, EmailService>();
             //background service
-            services.AddHostedService<SessionOrderStatusService>();
+            services.AddHostedService<BookingStatusService>();
             return services;
         }
     }
