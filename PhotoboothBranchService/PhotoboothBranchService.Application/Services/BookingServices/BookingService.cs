@@ -6,6 +6,7 @@ using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Booking;
 using PhotoboothBranchService.Application.DTOs.BookingService;
 using PhotoboothBranchService.Application.Services.BookingServiceServices;
+using PhotoboothBranchService.Application.Services.EmailServices;
 using PhotoboothBranchService.Application.Services.RefundServices;
 using PhotoboothBranchService.Application.Services.TransactionServices;
 using PhotoboothBranchService.Domain.Common.Helper;
@@ -27,6 +28,7 @@ public class BookingService : IBookingService
     private readonly IRefundService _refundService;
     private readonly IServiceRepository _serviceRepository;
     private readonly IFullPaymentPolicyRepository _fullPaymentPolicyRepository;
+    private readonly IEmailService _emailService;
     public BookingService(IBookingRepository sessionOrderRepository,
         IMapper mapper,
         IBoothRepository boothRepository,
@@ -35,7 +37,8 @@ public class BookingService : IBookingService
         IAccountRepository accountRepository,
         IRefundService refundService,
         IServiceRepository serviceRepository,
-        IFullPaymentPolicyRepository fullPaymentPolicyRepository)
+        IFullPaymentPolicyRepository fullPaymentPolicyRepository,
+        IEmailService emailService)
     {
         _bookingRepository = sessionOrderRepository;
         _mapper = mapper;
@@ -47,6 +50,7 @@ public class BookingService : IBookingService
         _bookingServiceRepository = bookingServiceRepository;
         _serviceRepository = serviceRepository;
         _fullPaymentPolicyRepository = fullPaymentPolicyRepository;
+        _emailService = emailService;
     }
 
     // Create a new session
@@ -356,6 +360,7 @@ public class BookingService : IBookingService
                 booking.IsCancelled = true;
                 booking.CancelledDate = DateTimeHelper.GetVietnamTimeNow();
                 await _bookingRepository.UpdateAsync(booking);
+                await _emailService.SendCancelBookingInformation(bookingID);
             }
             catch (Exception ex)
             {

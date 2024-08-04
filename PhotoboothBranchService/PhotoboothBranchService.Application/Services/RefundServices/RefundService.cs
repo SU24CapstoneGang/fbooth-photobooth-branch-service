@@ -175,7 +175,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                     }
                     break;
                 case "MoMo":
-                    string description = "Refund for transaction" + transaction.TransactionID.ToString();
+                    string description = "Refund for transaction " + transaction.TransactionID.ToString();
                     MoMoRefundResponse responseMoMo = await _moMoService.RefundById(transaction.TransactionID, refundAmount, description);
                     refund = new Refund
                     {

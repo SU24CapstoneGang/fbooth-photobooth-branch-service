@@ -11,5 +11,6 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
     {
         Task SendRefundBillInformation(Guid refundId);
         Task SendBookingInformation(Guid sessionOrderId, Guid transactionID);
+        Task SendCancelBookingInformation(Guid bookingID);
     }
 }

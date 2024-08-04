@@ -27,10 +27,5 @@ namespace PhotoboothBranchService.Domain.Entities
         public virtual ICollection<Transaction> Payments { get; set; } = default!;
         public virtual ICollection<BookingService> BookingServices { get; set; } = default!;
         public virtual ICollection<PhotoSession> PhotoSessions { get; set; } = default!;
-
-        //public long GetPriceHire()
-        //{
-        //    return (long)Math.Truncate((decimal)(this.EndTime - this.StartTime).TotalHours*this.Booth.PricePerHour);
-        //}
     }
 }

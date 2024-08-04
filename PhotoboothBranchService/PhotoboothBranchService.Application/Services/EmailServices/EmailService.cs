@@ -1,4 +1,5 @@
-﻿using PhotoboothBranchService.Application.Common.Exceptions;
+﻿using OpenCvSharp;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.IRepository;
@@ -72,21 +73,32 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             }
             string subject = "Refund Information";
             StringBuilder sbBody = new StringBuilder();
-            sbBody.AppendLine("<p>Here is your transaction's information</p>");
-            sbBody.AppendLine("<p></p>");
-            sbBody.AppendLine($"<p>Payment method: {transaction.PaymentMethod.PaymentMethodName}</p>");
-            sbBody.AppendLine($"<p>Transaction amount: {transaction.Amount.ToString()}</p>");
-            sbBody.AppendLine($"<p>Transaction time: {transaction.TransactionDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
-            sbBody.AppendLine($"<p>Transaction code: {transaction.GatewayTransactionID.ToString()}</p>");
-            sbBody.AppendLine("<p></p>");
+            sbBody.AppendLine("<p>Dear Customer,</p>");
+            sbBody.AppendLine("<p>We are writing to inform you about the details of your recent refund.</p>");
+            sbBody.AppendLine("<hr>");
 
-            sbBody.AppendLine("<p>With refund's information</p>");
-            sbBody.AppendLine($"<p>Refund description: {refund.Description}</p>");
-            sbBody.AppendLine($"<p>Refund amount: {refund.Amount.ToString()}</p>");
-            sbBody.AppendLine($"<p>Refund's status: {refund.Status.ToString()}</p>");
-            sbBody.AppendLine($"<p>Refund's message: {refund.ResponseMessage.ToString()}</p>");
-            sbBody.AppendLine($"<p>Refund time: {refund.RefundDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
-            await this.SendEmail(user.Email, subject, sbBody.ToString());
+            sbBody.AppendLine("<h3>Transaction Information</h3>");
+            sbBody.AppendLine("<ul>");
+            sbBody.AppendLine($"<li><strong>Payment Method:</strong> {transaction.PaymentMethod.PaymentMethodName}</li>");
+            sbBody.AppendLine($"<li><strong>Original Transaction Amount:</strong> {transaction.Amount}</li>");
+            sbBody.AppendLine($"<li><strong>Transaction Date & Time:</strong> {transaction.TransactionDateTime:dddd, MMMM dd, yyyy h:mm tt}</li>");
+            sbBody.AppendLine($"<li><strong>Transaction Code:</strong> {transaction.GatewayTransactionID}</li>");
+            sbBody.AppendLine("</ul>");
+            sbBody.AppendLine("<hr>");
+
+            sbBody.AppendLine("<h3>Refund Information</h3>");
+            sbBody.AppendLine("<ul>");
+            sbBody.AppendLine($"<li><strong>Refund Description:</strong> {refund.Description}</li>");
+            sbBody.AppendLine($"<li><strong>Refund Amount:</strong> {refund.Amount}</li>");
+            sbBody.AppendLine($"<li><strong>Refund Status:</strong> {refund.Status}</li>");
+            sbBody.AppendLine($"<li><strong>Refund Message:</strong> {refund.ResponseMessage}</li>");
+            sbBody.AppendLine($"<li><strong>Refund Date & Time:</strong> {refund.RefundDateTime:dddd, MMMM dd, yyyy h:mm tt}</li>");
+            sbBody.AppendLine("</ul>");
+            sbBody.AppendLine("<hr>");
+
+            sbBody.AppendLine("<p>If you have any questions or need further assistance, please do not hesitate to contact our customer support team.</p>");
+            sbBody.AppendLine("<p>Thank you for your understanding, and we apologize for any inconvenience this may have caused.</p>");
+            await this.SendEmail(user.Email, subject, sbBody.ToString(), $"{user.FirstName}{user.LastName}");
         }
 
         public async Task SendBookingInformation(Guid bookingID, Guid transactionID)
@@ -132,10 +144,10 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
 
             if (booking.BookingServices.Count > 0)
             {
-                var serviceItemList = (await _bookingServiceRepository
+                var bookingServices = (await _bookingServiceRepository
                     .GetAsync(i => booking.BookingServices.Select(i => i.BookingServiceID).ToList().Contains(i.BookingServiceID), i => i.Service)
                     ).ToList();
-                if (serviceItemList != null && serviceItemList.Count == booking.BookingServices.Count)
+                if (bookingServices != null && bookingServices.Count == booking.BookingServices.Count)
                 {
                     sbBody.AppendLine("<p>Service(s) in Booking:</p>");
                     sbBody.AppendLine("<br>");
@@ -143,7 +155,8 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                     sbBody.AppendLine("<tr>");
                     sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Service Name</th>");
                     sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Quantity</th>");
-                    sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Unit Price</th>");
+                    sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Unit</th>");
+                    sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Price</th>");
                     sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Subtotal</th>");
                     sbBody.AppendLine("</tr>");
 
@@ -152,18 +165,20 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                     sbBody.AppendLine("<tr>");
                     sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Hire booth fee</td>");
                     sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{duration:N2}</td>");
+                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Hours</td>");
                     sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{booking.Booth.PricePerHour:N0}</td>");
                     sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{booking.HireBoothFee:N0}</td>");
                     sbBody.AppendLine("</tr>");
 
                     // the rest service
-                    foreach (var serviceItem in serviceItemList)
+                    foreach (var bookingService in bookingServices)
                     {
                         sbBody.AppendLine("<tr>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.Service.ServiceName}</td>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.Quantity}</td>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.Price:N0}</td>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{serviceItem.SubTotal:N0}</td>");
+                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.Service.ServiceName}</td>");
+                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.Quantity}</td>");
+                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.Service.Unit}</td>");
+                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.Price:N0}</td>");
+                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.SubTotal:N0}</td>");
                         sbBody.AppendLine("</tr>");
                     }
 
@@ -185,14 +200,38 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             sbBody.AppendLine($"<p>This booking was paid thourgh {trans.PaymentMethod.PaymentMethodName} in {trans.TransactionDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
 
 
-            sbBody.AppendLine($"<p>Start Time: {booking.StartTime.ToString("dddd, MMMM dd, yyyy h:mm tt")} (UTC +7)</p>");
-            sbBody.AppendLine($"<p>End Time: {booking.EndTime.ToString("dddd, MMMM dd, yyyy h:mm tt")} (UTC +7)</p>");
+            sbBody.AppendLine($"<p><strong>Start Time</strong>: {booking.StartTime.ToString("dddd, MMMM dd, yyyy h:mm tt")} (UTC +7)</p>");
+            sbBody.AppendLine($"<p><strong>End Time: </strong>{booking.EndTime.ToString("dddd, MMMM dd, yyyy h:mm tt")} (UTC +7)</p>");
             sbBody.AppendLine($"<p>Validate code (Enter this code to booth):<strong style='font-size: 1.2em; color: blue; font-weight: bold;'> {booking.ValidateCode}</strong> </p>");
             sbBody.AppendLine($"<p>We hope you arrive 5 minutes before the start time to receive instructions from the staff.</p>");
-            await this.SendEmail(user.Email, subject, sbBody.ToString());
+            await this.SendEmail(user.Email, subject, sbBody.ToString(), $"{user.FirstName}{user.LastName}");
         }
 
-        private async Task SendEmail(string emailClientAddress, string subject, string body)
+        public async Task SendCancelBookingInformation(Guid bookingID)
+        {
+            var booking = (await _bookingRepository
+                .GetAsync(i => i.BookingID == bookingID,
+                    includeProperties: new Expression<Func<Booking, object>>[]
+                        {
+                            i => i.Account,
+                        }
+                ))
+                .FirstOrDefault();
+            if (booking == null)
+            {
+                throw new NotFoundException("Not found booking of transaction");
+            }
+
+            StringBuilder sbBody = new StringBuilder();
+            sbBody.AppendLine($"<p>We regret to inform you that your booking with the reference number <strong>{booking.CustomerReferenceID}</strong> has been successfully canceled.</p>");
+            sbBody.AppendLine("<p>If you have any questions or need further assistance, please feel free to contact our customer support team.</p>");
+            sbBody.AppendLine("<br>");
+            sbBody.AppendLine("<p>We apologize for any inconvenience caused and thank you for your understanding.</p>");
+            sbBody.AppendLine("<br>");
+            await this.SendEmail(booking.Account.Email, "Booking Cancellation Confirmation", sbBody.ToString(), $"{booking.Account.FirstName} {booking.Account.LastName}");
+        }
+
+        private async Task SendEmail(string emailClientAddress, string subject, string body, string customerName)
         {
             try
             {
@@ -239,7 +278,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                 sbBody.AppendLine("</div>");
                 // Greeting message
                 sbBody.AppendLine("<div class=\"content\">");
-                sbBody.AppendLine("<h1>Hi,</h1>");
+                sbBody.AppendLine($"<h1>Hi, {customerName}</h1>");
                 sbBody.AppendLine("<p>Thank you for using our photo booth.</p>");
 
                 //insert body need to send
