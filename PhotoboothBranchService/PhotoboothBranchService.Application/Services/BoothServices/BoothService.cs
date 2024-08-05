@@ -37,6 +37,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
                 throw new NotFoundException("Not found Branch to create booth");
             }
             booth.Status = status;
+            booth.isBooked = false;
             booth.CreateDate = DateTimeHelper.GetVietnamTimeNow();
             await _boothRepository.AddAsync(booth);
             return _mapper.Map<CreateBoothResponse>(booth);

@@ -8,6 +8,8 @@ namespace PhotoboothBranchService.Application.DTOs.Booth
         [Required, StringLength(50 , ErrorMessage = "Booth name must between 8 to 50 char characters.")]
         [RegularExpression(@"^[a-zA-Z0-9\s]*$", ErrorMessage = "Botth name must not having special characters.")]
         public string BoothName { get; set; }
+        [Required, Range(0, 1000000, ErrorMessage = "Price is from 0 to 1 000 000")]
+        public decimal PricePerHour { get; set; }
         [Required, StringLength(50, ErrorMessage = "Background color must between 8 to 50 char characters.")]
         public string BackgroundColor { get; set; } = default!;
         [Required, StringLength(50, ErrorMessage = "Concept color must between 8 to 50 char characters.")]
