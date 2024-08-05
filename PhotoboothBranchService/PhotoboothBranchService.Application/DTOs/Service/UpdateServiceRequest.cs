@@ -12,7 +12,5 @@ namespace PhotoboothBranchService.Application.DTOs.Service
         public string Unit { get; set; } = default!;
         [Required, Range(0, 5000000, ErrorMessage = "Price is from 0 to 5 000 000")]
         public decimal ServicePrice { get; set; }
-        [Required]
-        public StatusUse Status { get; set; }
     }
 }

@@ -12,7 +12,7 @@ public interface IBookingService : IServiceBase<BookingResponse, SessionOrderFil
     Task<CreateBookingResponse> CreateAsync(BookingRequest createModel, BookingType bookingType);
     Task<CreateBookingResponse> CustomerBooking(CustomerBookingRequest request, string email);
     Task<BookingResponse> GetByReferenceIDAsync(string id);
-    Task UpdateAsync(Guid id, UpdateSessionOrderRequest updateModel);
+    Task<CreateBookingResponse> UpdateAsync(Guid id, UpdateBookingRequest updateModel, string? email);
     Task DeleteAsync(Guid id);
     Task<CancelBookingResponse> CancelBooking(Guid sessionOrdeID, string? ipAddress, string? email);
 }

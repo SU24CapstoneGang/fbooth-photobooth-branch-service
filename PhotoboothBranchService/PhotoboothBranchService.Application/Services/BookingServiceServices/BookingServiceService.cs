@@ -66,7 +66,6 @@ namespace PhotoboothBranchService.Application.Services.BookingServiceServices
             }
             if (createServiceItemResponse != null)
             {
-                await _sessionOrderRepository.updateTotalPrice(sessionOrder.BookingID);
             }
             else
             {
@@ -123,7 +122,6 @@ namespace PhotoboothBranchService.Application.Services.BookingServiceServices
                 }
                 response.Items.Add(_mapper.Map<BookingServiceResponse>(serviceItem));
             }
-            await _sessionOrderRepository.updateTotalPrice(sessionOrder.BookingID);
             return response;
         }
 

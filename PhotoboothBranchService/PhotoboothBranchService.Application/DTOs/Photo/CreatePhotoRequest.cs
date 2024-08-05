@@ -1,4 +1,5 @@
-﻿using PhotoboothBranchService.Domain.Enum;
+﻿using PhotoboothBranchService.Application.Common.Helpers;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Application.DTOs.Photo
 {
@@ -7,5 +8,7 @@ namespace PhotoboothBranchService.Application.DTOs.Photo
         public PhotoVersion Version { get; set; }
         public Guid PhotoSessionID { get; set; }
         public Guid? BackgroundID { get; set; }
+        [DictionaryValueGreaterThanZero]
+        public Dictionary<Guid, int> StickerList { get; set; } = new Dictionary<Guid, int>();
     }
 }

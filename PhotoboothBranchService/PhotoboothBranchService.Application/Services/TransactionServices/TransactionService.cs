@@ -306,8 +306,13 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
                     {
                         Console.WriteLine(ex.Message);
                     }
+                    await _bookingRepository.UpdateAsync(booking);
                 }
-                await _bookingRepository.UpdateAsync(booking);
+                else
+                {
+                    //do refund
+                    await _refundService.RefundByTransID(trans.TransactionID, true, null, null);
+                }
             }
             else
             {

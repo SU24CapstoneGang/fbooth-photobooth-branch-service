@@ -17,22 +17,17 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IPhotoSessionRepository _photoSessionRepository;
         private readonly IBackgroundRepository _backgroundRepository;
+        private readonly IStickerRepository _stickerRepository;
         public PhotoService(IPhotoRepository photoRepository, IMapper mapper,
             ICloudinaryService cloudinaryService, IPhotoSessionRepository photoSessionRepository,
-            IBackgroundRepository backgroundRepository)
+            IBackgroundRepository backgroundRepository, IStickerRepository stickerRepository)
         {
             _photoRepository = photoRepository;
             _mapper = mapper;
             _cloudinaryService = cloudinaryService;
             _photoSessionRepository = photoSessionRepository;
             _backgroundRepository = backgroundRepository;
-        }
-
-        public async Task<CreatePhotoResponse> CreateAsync(CreatePhotoRequest createModel)
-        {
-            Photo photo = _mapper.Map<Photo>(createModel);
-            await _photoRepository.AddAsync(photo);
-            return _mapper.Map<CreatePhotoResponse>(photo);
+            _stickerRepository = stickerRepository;
         }
 
         public async Task<PhotoResponse> CreatePhotoAsync(IFormFile file, CreatePhotoRequest createPhotoRequest)
@@ -43,7 +38,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
             {
                 if (createPhotoRequest.Version == Domain.Enum.PhotoVersion.Original)
                 {
-                    throw new Exception("An original photo can not has Background");
+                    throw new Exception("An original photo can not has Background.");
                 }
                 var background = (await _backgroundRepository.GetAsync(f => f.BackgroundID.Equals(createPhotoRequest.BackgroundID))).FirstOrDefault();
                 if (background == null)
@@ -56,9 +51,13 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
             {
                 throw new NotFoundException("Photo Session not found.");
             }
-
+            if (photosession.Status == Domain.Enum.PhotoSessionStatus.Ended)
+            {
+                throw new BadRequestException("Photo session has ended.");
+            }
             //upload to cloudinary
             string folder;
+            List<PhotoSticker> photoStickers = new List<PhotoSticker>();
             if (createPhotoRequest.Version == Domain.Enum.PhotoVersion.Original)
             {
                 folder = "FBooth-OriginalPhoto";
@@ -66,6 +65,26 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
             else
             {
                 folder = "FBooth-FinnalPicture";
+                if (createPhotoRequest.StickerList.Count > 0)
+                {
+                    var stickerList = (await _stickerRepository.GetAsync(i => createPhotoRequest.StickerList.Keys.ToList().Contains(i.StickerID))).ToList();
+                    if (stickerList.Any(i => i.Status == Domain.Enum.StatusUse.Unusable))
+                    {
+                        throw new BadRequestException("There are unable to use sticker in request.");
+                    }
+                    if (stickerList.Count() != createPhotoRequest.StickerList.Count()) 
+                    {
+                        throw new NotFoundException("There is sticker not found in server.");
+                    }
+                    foreach (var sticker in stickerList)
+                    {
+                        photoStickers.Add(new PhotoSticker
+                        {
+                            Quantity = (short)createPhotoRequest.StickerList[sticker.StickerID],
+                            StickerID = sticker.StickerID,
+                        });
+                    }
+                }
             }
             var uploadResult = await _cloudinaryService.AddPhotoAsync(file, folder);
             if (uploadResult.Error != null)
@@ -84,6 +103,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
             if (createPhotoRequest.BackgroundID.HasValue)
             {
                 photo.BackgroundID = createPhotoRequest.BackgroundID.Value;
+                photo.PhotoStickers = photoStickers;
             }
 
             await _photoRepository.AddAsync(photo);

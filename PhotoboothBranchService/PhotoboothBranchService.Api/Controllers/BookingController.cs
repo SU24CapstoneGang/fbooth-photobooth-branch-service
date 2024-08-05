@@ -102,10 +102,11 @@ namespace PhotoboothBranchService.Api.Controllers
         }
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateBooking(Guid id, UpdateSessionOrderRequest updateSessionRequest)
+        public async Task<ActionResult<CreateBookingResponse>> UpdateBooking(Guid id, UpdateBookingRequest updateSessionRequest)
         {
-            await _bookingService.UpdateAsync(id, updateSessionRequest);
-            return Ok();
+            var email = Request.HttpContext.Items["Email"]?.ToString();
+            var response = await _bookingService.UpdateAsync(id, updateSessionRequest, email);
+            return Ok(response);
         }
         [HttpPost("cancel")]
         public async Task<ActionResult<CancelBookingResponse>> CancelBooking(Guid sessionOrderID)

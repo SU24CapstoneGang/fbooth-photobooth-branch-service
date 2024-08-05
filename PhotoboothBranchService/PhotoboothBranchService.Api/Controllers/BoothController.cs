@@ -49,6 +49,12 @@ public class BoothController : ControllerBaseApi
         return Ok(booths);
 
     }
+    [HttpGet("active-booth")]
+    public async Task<ActionResult<IEnumerable<BoothResponse>>> GetAvtiveBoothByTime([FromQuery]GetAvtiveBoothByTimeRequest request)
+    {
+        var booths = await _boothService.GetAvtiveBoothByTime(request);
+        return Ok(booths);
+    }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<BoothResponse>> GetBoothById(Guid id)

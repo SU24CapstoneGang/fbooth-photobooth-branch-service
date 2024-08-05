@@ -16,16 +16,6 @@ namespace PhotoboothBranchService.Api.Controllers
             _photoService = photoService;
         }
 
-        // Create
-        [HttpPost]
-        public async Task<ActionResult<CreatePhotoResponse>> CreatePhoto(CreatePhotoRequest createPhotoRequest)
-        {
-
-            var createPhotoResponse = await _photoService.CreateAsync(createPhotoRequest);
-            return Ok(createPhotoResponse);
-
-        }
-
         // Read all
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PhotoResponse>>> GetAllPhotos()

@@ -36,6 +36,10 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
 
         public string Pay(VnpayRequest paymentRequest)
         {
+            if (paymentRequest.Amount < 10000)
+            {
+                throw new BadRequestException("Request amount must be greater than 10000 to using Vnpay");
+            }
             //create library
             VnPayLibrary vnpay = new VnPayLibrary();
 

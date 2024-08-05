@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
@@ -66,8 +67,11 @@ public class BookingService : IBookingService
         ValidateTimeRange(createModel.StartTime, createModel.EndTime, booth.Branch.OpeningTime, booth.Branch.ClosingTime);
 
         // Validate booking time conflicts
-        await ValidateBookingTime(createModel.BoothID, createModel.StartTime, createModel.EndTime);
-
+        var checkBooking = await ValidateBookingTime(createModel.BoothID, createModel.StartTime, createModel.EndTime);
+        if (checkBooking.Count() != 0)
+        {
+            throw new BadRequestException("There is another booking in the selected time range, please choose another time");
+        }
         // Calculate payment amount
         var processedServices = await ProcessServiceListAsync(booth.PricePerHour, createModel.StartTime, createModel.EndTime, createModel.ServiceList);
 
@@ -84,11 +88,7 @@ public class BookingService : IBookingService
         booking.BookingServices = processedServices.Item2;
         booking.PaymentStatus = PaymentStatus.Processing;
         booking.CustomerReferenceID = this.GenerateCustomerReferenceID(account.FirstName, account.LastName);
-        // Set payment policy if applicable
-        //if (booking.BookingType == BookingType.Online)
-        //{
         booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(createModel.StartTime);
-        //}
         // Save booking
         await _bookingRepository.AddAsync(booking);
         var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
@@ -184,7 +184,10 @@ public class BookingService : IBookingService
             BookingServices = bookingServiceResponses
         };
 
+        booking.Status = BookingStatus.TakingPhoto;
+        await _bookingRepository.UpdateAsync(booking);
         return response;
+
     }
 
     // Delete a session by ID
@@ -239,7 +242,7 @@ public class BookingService : IBookingService
 
         if (booking == null)
         {
-            throw new KeyNotFoundException("Booking not found.");
+            throw new NotFoundException("Booking not found.");
         }
         var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
         booking.BookingServices = list.ToList();
@@ -263,45 +266,67 @@ public class BookingService : IBookingService
         return _mapper.Map<BookingResponse>(booking);
     }
     // Update a session
-    public async Task UpdateAsync(Guid id, UpdateSessionOrderRequest updateModel)
+    public async Task<CreateBookingResponse> UpdateAsync(Guid id, UpdateBookingRequest updateModel, string? email)
     {
-        //var session = (await _sessionOrderRepository.GetAsync(s => s.BookingID == id)).FirstOrDefault();
-        //if (session == null)
-        //{
-        //    throw new KeyNotFoundException("Session not found.");
-        //}
-        //bool check = true;
+        
+        var booking = (await _bookingRepository.GetAsync(i => i.BookingID == id)).FirstOrDefault();
+        if (booking == null)
+        {
+            throw new NotFoundException("Not found Booking");
+        }
+        var account = await ValidateCustomerAsync("", email);
+        if (account.Role == AccountRole.Customer)
+        {
+            if (booking.CustomerID != account.AccountID)
+            {
+                throw new ForbiddenAccessException("Can not update booking on another cusotmer.");
+            }
+        }
+        if (booking.Status != BookingStatus.PendingPayment && !booking.IsCancelled && booking.PaymentStatus != PaymentStatus.Processing)
+        {
+            throw new BadRequestException("Cannot update the booking, it's already pay or has been cancelled");
+        }
+        var booth = await ValidateBoothAsync(updateModel.BoothID);
+        ValidateTimeRange(updateModel.StartTime,updateModel.EndTime, booth.Branch.OpeningTime, booth.Branch.ClosingTime);
+        var checkBooking = await ValidateBookingTime(updateModel.BoothID, updateModel.StartTime, updateModel.EndTime);
+        if (checkBooking.Count() > 1 || checkBooking[0].BookingID != booking.BookingID)
+        {
+            throw new BadRequestException("There is another booking in the selected time range, please choose another time");
+        }
+        var processedServices = await ProcessServiceListAsync(booth.PricePerHour, updateModel.StartTime, updateModel.EndTime, updateModel.ServiceList);
+        
+        // Map to booking entity
+        booking.ValidateCode = await GenerateValidateCode();
+        booking.Status = BookingStatus.PendingPayment;
+        booking.IsCancelled = false;
+        booking.CreatedDate = DateTimeHelper.GetVietnamTimeNow();
+        booking.HireBoothFee = processedServices.Item3;
+        booking.PaymentAmount = processedServices.Item1;
+        account = account.Role == AccountRole.Customer ? account : (await _accountRepository.GetAsync(i => i.AccountID == booking.CustomerID)).First();
+        booking.CustomerReferenceID = this.GenerateCustomerReferenceID(account.FirstName, account.LastName);
+        booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(updateModel.StartTime);
 
-        //DateTime startTime, endTime;
-        //if (updateModel.StartTime.HasValue && default(DateTime) != updateModel.StartTime.Value)
-        //{
-        //    startTime = updateModel.StartTime.Value;
-        //    TimeSpan duration = session.EndTime.Value - session.StartTime;
-        //    endTime = startTime + duration;
-        //}
-        //else
-        //{
-        //    startTime = session.StartTime;
-        //    endTime = session.EndTime.Value;
-        //}
-        //if (this.ValidateTimeRange(startTime, endTime) == false)
-        //{
-        //    throw new BadRequestException("Not valide time, please check our Branch open and close time");
-        //}
-        //if (updateModel.BoothID.Value != null && updateModel.BoothID.Value != default(Guid))
-        //{
-        //    check = await this.ValidateBookingTime(updateModel.BoothID.Value, startTime, endTime);
-        //}
-        //else
-        //{
-        //    check = await this.ValidateBookingTime(session.BoothID, startTime, endTime);
-        //}
-        //if (!check)
-        //{
-        //    throw new BadRequestException("There is another Session on this time, please check time to update again");
-        //}
-        //var updatedSession = _mapper.Map(updateModel, session);
-        //await _sessionOrderRepository.UpdateAsync(updatedSession);
+        //delete old booking service
+        var bookingServices = (await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();
+        var removalTasks = bookingServices.Select(bookingService =>
+            _bookingServiceRepository.RemoveAsync(bookingService)
+        );
+        await Task.WhenAll(removalTasks);
+        // and add new
+        bookingServices = processedServices.Item2.ToList();
+        var addTasks = bookingServices.Select(async bookingService =>
+        {
+            bookingService.BookingID = booking.BookingID;
+            await _bookingServiceRepository.AddAsync(bookingService);
+        });
+        await Task.WhenAll(addTasks);
+
+        // Save booking
+        await _bookingRepository.UpdateAsync(booking);
+
+        var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
+        booking.BookingServices = list.ToList();
+        return _mapper.Map<CreateBookingResponse>(booking);
     }
     public async Task<CancelBookingResponse> CancelBooking(Guid bookingID, string? ipAddress, string? email)
     {
@@ -397,16 +422,12 @@ public class BookingService : IBookingService
             throw new BadRequestException($"Booking time must be within business hours. From {openTime} to {closeTime}");
         }
     }
-    private async Task ValidateBookingTime(Guid boothId, DateTime startTime, DateTime endTime)
+    private async Task<List<Booking>> ValidateBookingTime(Guid boothId, DateTime startTime, DateTime endTime)
     {
-        var existingBookings = await _bookingRepository.GetAsync(i => i.BoothID == boothId
-                                 && (startTime < i.StartTime && i.StartTime < endTime.AddMinutes(5) || endTime.AddMinutes(5) > i.EndTime && i.EndTime > startTime)
-                                 && i.IsCancelled == false
-                                 );
-        if (existingBookings.Any())
-        {
-            throw new BadRequestException("There is another booking in the selected time range, please choose another time");
-        }
+        var bookings = (await _bookingRepository.GetAsync(i => i.BoothID == boothId
+                                 && ((startTime < i.StartTime && i.StartTime < endTime.AddMinutes(5)) || (endTime.AddMinutes(5) > i.EndTime.AddMinutes(5) && i.EndTime.AddMinutes(5) > startTime))
+                                 && i.IsCancelled == false)).ToList();
+        return bookings?.ToList() ?? new List<Booking>();
     }
     private async Task<long> GenerateValidateCode()
     {
@@ -439,7 +460,7 @@ public class BookingService : IBookingService
 
         return $"{initials}-{datePart}-{randomPart}";
     }
-    private async Task<Account> ValidateCustomerAsync(string phoneNumber, string email)
+    private async Task<Account> ValidateCustomerAsync(string? phoneNumber, string? email)
     {
         Account? account;
 
@@ -498,12 +519,20 @@ public class BookingService : IBookingService
         List<Domain.Entities.BookingService> result = new List<Domain.Entities.BookingService>();
 
         var totalHours = (endTime - startTime).TotalHours;
+        if (totalHours < 0.5) {
+            throw new BadRequestException("Please choose duration at least 30 minutes");
+        }
+        totalHours = Math.Round(totalHours, 2);
         var hireBoothFee = Math.Truncate((decimal)totalHours * boothPricePerHour);
         var bookingAmount = hireBoothFee;
         if (serviceList.Any())
         {
             var serviceIds = serviceList.Keys.ToList();
             var services = await _serviceRepository.GetAsync(s => serviceIds.Contains(s.ServiceID));
+            if (!services.Any(i => i.ServiceType == Domain.ServiceType.EmailSending || i.ServiceType == Domain.ServiceType.Printing)) 
+            {
+                throw new BadRequestException("Must have email service or printing service when creating/updating a booking.");
+            }
             if (serviceList.Count() != services.Count())
             {
                 throw new BadRequestException("Service(s) from input not found.");

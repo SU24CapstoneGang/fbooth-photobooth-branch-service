@@ -8,7 +8,6 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
     public interface IPhotoService : IServiceBase<PhotoResponse, PhotoFilter, PagingModel>
     {
         Task<PhotoResponse> CreatePhotoAsync(IFormFile file, CreatePhotoRequest createPhotoRequest);
-        Task<CreatePhotoResponse> CreateAsync(CreatePhotoRequest createModel);
         Task UpdateAsync(Guid id, UpdatePhotoRequest updateModel);
         Task DeleteAsync(Guid id);
     }

@@ -18,7 +18,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(s => s.ServiceName);
             builder.Property(s => s.ServiceDescription);
             builder.Property(s => s.ServicePrice).IsRequired().HasColumnType("decimal(18, 2)");
-
+            builder.Property(s => s.ServiceType).IsRequired();
 
             builder.Property(a => a.Unit).IsRequired();
             builder.Property(s => s.Status).IsRequired();
@@ -33,7 +33,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     ServiceDescription = "Professional makeup kit rental",
                     Unit = "Set",
                     ServicePrice = 300000m, // Price in VND
-                    Status = StatusUse.Available
+                    Status = StatusUse.Available,
+                    ServiceType = Domain.ServiceType.Other
                 },
                 new Service
                 {
@@ -42,7 +43,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     ServiceDescription = "Service for sending photos via email",
                     Unit = "Photo",
                     ServicePrice = 50000m, // Price in VND
-                    Status = StatusUse.Available
+                    Status = StatusUse.Available,
+                    ServiceType = Domain.ServiceType.EmailSending
                 },
                 new Service
                 {
@@ -51,7 +53,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     ServiceDescription = "High-quality photo printing service",
                     Unit = "Piece",
                     ServicePrice = 150000m, // Price in VND
-                    Status = StatusUse.Available
+                    Status = StatusUse.Available,
+                    ServiceType = Domain.ServiceType.Printing
                 });
         }
     }

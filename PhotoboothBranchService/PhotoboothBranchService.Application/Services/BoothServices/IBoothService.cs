@@ -9,6 +9,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
     {
         Task<IEnumerable<BoothResponse>> GetByName(string name);
         Task<CreateBoothResponse> CreateAsync(CreateBoothRequest createModel, BoothStatus status);
+        Task<IEnumerable<BoothResponse>> GetAvtiveBoothByTime(GetAvtiveBoothByTimeRequest request);
         Task UpdateAsync(Guid id, UpdateBoothRequest updateModel, BoothStatus? status);
         Task DeleteAsync(Guid id);
     }

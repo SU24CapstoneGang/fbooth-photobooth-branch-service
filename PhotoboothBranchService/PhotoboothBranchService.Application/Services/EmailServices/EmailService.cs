@@ -162,6 +162,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
 
                     // the booking fee
                     var duration = (booking.EndTime - booking.StartTime).TotalHours;
+                    duration = Math.Round(duration, 2);
                     sbBody.AppendLine("<tr>");
                     sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Hire booth fee</td>");
                     sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{duration:N2}</td>");

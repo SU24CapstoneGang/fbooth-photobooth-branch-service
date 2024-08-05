@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Service;
+using PhotoboothBranchService.Domain;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -22,10 +24,11 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
         // Create
         public async Task<CreateServiceResponse> CreateAsync(CreateServiceRequest createModel, StatusUse status)
         {
-            var serviceType = _mapper.Map<Service>(createModel);
-            serviceType.Status = status;
-            await _serviceRepository.AddAsync(serviceType);
-            return _mapper.Map<CreateServiceResponse>(serviceType);
+            var service = _mapper.Map<Service>(createModel);
+            service.Status = status;
+            service.ServiceType = ServiceType.Other;
+            await _serviceRepository.AddAsync(service);
+            return _mapper.Map<CreateServiceResponse>(service);
         }
 
         // Delete
@@ -50,7 +53,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
         public async Task<IEnumerable<ServiceResponse>> GetAllAsync()
         {
             var serviceTypes = await _serviceRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<ServiceResponse>>(serviceTypes.ToList());
+            return _mapper.Map<IEnumerable<ServiceResponse>>(serviceTypes.ToList().OrderByDescending(i => i.ServiceType));
         }
 
         // Read all with paging and filter
@@ -78,13 +81,30 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
         // Update
         public async Task UpdateAsync(Guid id, UpdateServiceRequest updateModel, StatusUse? status)
         {
-            var serviceType = (await _serviceRepository.GetAsync(s => s.ServiceID == id)).FirstOrDefault();
-            if (serviceType == null)
+            var service = (await _serviceRepository.GetAsync(s => s.ServiceID == id)).FirstOrDefault();
+            if (service == null)
             {
                 throw new KeyNotFoundException("Service type not found.");
             }
+         
+            if (service.ServiceType == ServiceType.Printing || service.ServiceType == ServiceType.EmailSending) {
+                if (status.HasValue && status == StatusUse.Unusable)
+                {
+                    throw new BadRequestException("Cannot set this service is Unuseable");
+                }
+                else
+                {
+                    await Update(id, updateModel, status, service);
+                }
+            } else
+            {
+                await Update(id, updateModel, status, service);
+            }
+        }
 
-            var updatedServiceType = _mapper.Map(updateModel, serviceType);
+        private async Task Update(Guid id, UpdateServiceRequest updateModel, StatusUse? status, Service service)
+        {
+            var updatedServiceType = _mapper.Map(updateModel, service);
             if (status.HasValue)
             {
                 updatedServiceType.Status = status.Value;

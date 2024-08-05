@@ -16,6 +16,7 @@ namespace PhotoboothBranchService.Application.DTOs.Booking
         public BookingStatus Status { get; set; }
         public bool IsCancelled { get; set; }
         public DateTime CreatedDate { get; set; }
+        public DateTime LastModified { get; set; }
         public Guid BoothID { get; set; }
         public Guid CustomerID { get; set; }
         public virtual ICollection<BookingServiceResponse> BookingServices { get; set; } = default!;
