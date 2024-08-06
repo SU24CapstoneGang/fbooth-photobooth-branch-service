@@ -113,10 +113,10 @@ public class LayoutService : ILayoutService
                     boxCount++;
                     var photoBox = new PhotoBox
                     {
-                        BoxHeight = (int)(rect.Height*1.02),
-                        BoxWidth = (int)(rect.Width*1.02),
-                        CoordinatesX = (int)(rect.X*0.98),
-                        CoordinatesY = (int)(rect.Y*0.98),
+                        BoxHeight = rect.Height,
+                        BoxWidth = rect.Width,
+                        CoordinatesX = rect.X,
+                        CoordinatesY = rect.Y,
                         LayoutID = layout.LayoutID
                     };
 
