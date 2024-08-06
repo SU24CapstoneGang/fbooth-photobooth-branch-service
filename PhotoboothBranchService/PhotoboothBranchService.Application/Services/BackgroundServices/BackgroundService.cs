@@ -90,6 +90,12 @@ public class BackgroundService : IBackgroundService
         return listBackGroundresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
     }
 
+    public async Task<IEnumerable<BackgroundResponse>> GetAvailableAsync()
+    {
+        var backGrounds = (await _backgroundRepository.GetAsync(i=>i.Status == StatusUse.Available));
+        return _mapper.Map<IEnumerable<BackgroundResponse>>(backGrounds.ToList());
+    }
+
     public async Task<BackgroundResponse> GetByIdAsync(Guid id)
     {
         var backGround = (await _backgroundRepository.GetAsync(f => f.BackgroundID == id)).FirstOrDefault();

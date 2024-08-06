@@ -90,26 +90,23 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             }
         }
 
-        public async Task UpdateAsync(Guid id, UpdateAccountRequestModel updateModel)
+        public async Task UpdateAsync(Guid id, UpdateAccountRequestModel updateModel, string? email)
         {
-            try
-            {
-                var account = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
-                if (account == null)
-                {
-                    throw new NotFoundException("Account", id, "Account ID not found");
-                }
 
-                var updateAccount = _mapper.Map(updateModel, account);
-                updateAccount.SetPassword(updateModel.Password, _passwordHasher);
-
-                await _firebaseService.UpdatePasswordOnFirebase(account.Email, updateModel.Password);
-                await _accountRepository.UpdateAsync(updateAccount);
-            }
-            catch (Exception ex)
+            var account = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
+            if (account == null)
             {
-                throw new Exception("An error occurred while update the account: " + ex.Message);
+                throw new NotFoundException("Account", id, "Account ID not found");
             }
+            if (string.IsNullOrEmpty(email) || !email.Equals(account.Email)) 
+            {
+                throw new ForbiddenAccessException("Can not update infomation of another account");
+            }
+            var updateAccount = _mapper.Map(updateModel, account);
+            updateAccount.SetPassword(updateModel.Password, _passwordHasher);
+
+            await _firebaseService.UpdatePasswordOnFirebase(account.Email, updateModel.Password);
+            await _accountRepository.UpdateAsync(updateAccount);
         }
 
         public async Task<IEnumerable<AccountResponse>> GetAllPagingAsync(AccountFilter filter, PagingModel paging)

@@ -17,12 +17,18 @@ public class BackgroundController : ControllerBaseApi
 
 
     // Read
-    [HttpGet]
+    [HttpGet("admin")]
     public async Task<ActionResult<IEnumerable<BackgroundResponse>>> GetAllBackgrounds()
     {
+        var background = await _backgroundService.GetAllAsync();
+        return Ok(background);
+    }
 
-        var frames = await _backgroundService.GetAllAsync();
-        return Ok(frames);
+    [HttpGet("customer")]
+    public async Task<ActionResult<IEnumerable<BackgroundResponse>>> GetBackgrounds()
+    {
+        var background = await _backgroundService.GetAvailableAsync();
+        return Ok(background);
     }
 
     // Read with paging and filter

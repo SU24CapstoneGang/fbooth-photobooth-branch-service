@@ -9,6 +9,7 @@ public interface IBackgroundService : IServiceBase<BackgroundResponse, Backgroun
 {
     Task<IEnumerable<BackgroundResponse>> GetByName(string name);
     Task DeleteAsync(Guid id);
+    Task<IEnumerable<BackgroundResponse>> GetAvailableAsync();
     Task<BackgroundResponse> CreateBackgroundAsync(IFormFile file, Guid layoutID);
     Task UpdateBackGroundAsync(IFormFile file, Guid BackGroundID, UpdateBackgroundRequest updateBackgroundRequest);
 

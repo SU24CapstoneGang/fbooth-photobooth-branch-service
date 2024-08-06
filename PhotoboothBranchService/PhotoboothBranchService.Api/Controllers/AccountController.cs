@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Account;
@@ -71,17 +72,19 @@ public class AccountController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<ActionResult> UpdateAccount(Guid id, [FromQuery] UpdateAccountRequestModel updateAccountRequest)
     {
-
+        var email = Request.HttpContext.Items["Email"]?.ToString();
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
-        await _accountService.UpdateAsync(id, updateAccountRequest);
+        await _accountService.UpdateAsync(id, updateAccountRequest, email);
         return Ok();
 
     }
 
     // Delete
+    [AdminAuthorization]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteAccount(Guid id)
     {
@@ -91,9 +94,7 @@ public class AccountController : ControllerBaseApi
 
     }
 
-
-
-
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequestModel request)
     {
@@ -103,11 +104,10 @@ public class AccountController : ControllerBaseApi
         return BadRequest("Login fail!!!");
     }
 
+    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] CreateAccountRequestModel request, AccountRole userRole)
     {
-
-
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
@@ -145,7 +145,7 @@ public class AccountController : ControllerBaseApi
     }
 
     // Delete
-    //[Authorization("ADMIN")]
+    [Authorization("ADMIN")]
     [HttpDelete("delete-firebase/{firebaseEmail}")]
     public async Task<ActionResult> DeleteFireBase(string firebaseEmail)
     {

@@ -34,6 +34,10 @@ public class BranchService : IBranchService
             //{
             //    await ValideManagerForBranch(createModel.ManagerID.Value);
             //}
+            if (createModel.ClosingTime < createModel.OpeningTime)
+            {
+                throw new BadRequestException("Closing time must after the opening time");
+            }
             Branch branch = _mapper.Map<Branch>(createModel);
             branch.Status = status;
             branch.CreateDate = DateTimeHelper.GetVietnamTimeNow();
@@ -114,6 +118,10 @@ public class BranchService : IBranchService
         //{
         //    await ValideManagerForBranch(updateModel.ManagerID.Value);
         //}
+        if (updateBranch.ClosingTime < updateBranch.OpeningTime)
+        {
+            throw new BadRequestException("Closing time must after the opening time");
+        }
         if (status.HasValue)
         {
             updateBranch.Status = status.Value;

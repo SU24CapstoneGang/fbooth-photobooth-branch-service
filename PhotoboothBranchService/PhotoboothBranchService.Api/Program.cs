@@ -1,6 +1,7 @@
 ﻿using Microsoft.OpenApi.Models;
 using PhotoboothBranchService.Api.Common.MiddleWares;
 using PhotoboothBranchService.Application;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Infrastructure;
 using System.Text.Json.Serialization;
 
@@ -10,7 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 //Convert enum - option
 builder.Services.AddControllers()
-    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+    .AddJsonOptions(options => {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.Converters.Add(new TimeSpanConverter());
+    });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

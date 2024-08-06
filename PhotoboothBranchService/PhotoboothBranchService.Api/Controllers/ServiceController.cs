@@ -28,10 +28,15 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ServiceResponse>>> GetAllServiceTypes()
         {
-            var serviceTypes = await _serviceTypeService.GetAllAsync();
-            return Ok(serviceTypes.ToList().OrderBy(i => i.ServiceType));
+            var services = await _serviceTypeService.GetAllAsync();
+            return Ok(services.ToList().OrderBy(i => i.ServiceType));
         }
-
+        [HttpGet("customer")]
+        public async Task<ActionResult<IEnumerable<ServiceResponse>>> GetAllServiceCustomer()
+        {
+            var services = (await _serviceTypeService.GetAllAsync()).ToList().Where(i => i.Status == StatusUse.Available);
+            return Ok(services.OrderBy(i => i.ServiceType));
+        }
         // Read with paging and filter
         [HttpGet("paging")]
         public async Task<ActionResult<IEnumerable<ServiceResponse>>> GetAllServiceTypes(
