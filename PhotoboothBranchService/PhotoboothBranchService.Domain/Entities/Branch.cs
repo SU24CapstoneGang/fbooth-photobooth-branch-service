@@ -13,8 +13,6 @@ public class Branch
     public TimeSpan OpeningTime { get; set; } // Thêm giờ mở cửa
     public TimeSpan ClosingTime { get; set; } // Thêm giờ đóng cửa
     public BranchStatus Status { get; set; } = default!;
-    public Guid? ManagerID { get; set; }
-    public virtual Account Manager { get; set; } = default!;
     public virtual ICollection<Booth> Booths { get; set; } = default!;
     public virtual ICollection<Account> Staffs { get; set; } = default!;
 }

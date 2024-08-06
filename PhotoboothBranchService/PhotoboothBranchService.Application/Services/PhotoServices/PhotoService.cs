@@ -117,7 +117,13 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
             var photoToDelete = Photos.FirstOrDefault();
             if (photoToDelete != null)
             {
-                await _photoRepository.RemoveAsync(photoToDelete);
+                await _cloudinaryService.DeletePhotoAsync(photoToDelete.CouldID);
+                photoToDelete.PhotoURL = "";
+                photoToDelete.CouldID = "";
+                await _photoRepository.UpdateAsync(photoToDelete);
+            } else
+            {
+                throw new NotFoundException("Photo not found.");
             }
         }
 
@@ -145,7 +151,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
             var photo = (await _photoRepository.GetAsync(f => f.PhotoID == id)).FirstOrDefault();
             if (photo == null)
             {
-                throw new KeyNotFoundException("Photo not found.");
+                throw new NotFoundException("Photo not found.");
             }
 
             var updatedFinalPicture = _mapper.Map(updateModel, photo);

@@ -12,6 +12,5 @@ namespace PhotoboothBranchService.Application.DTOs.Branch
         public string City { get; set; } = default!;
         public DateTime CreateDate { get; set; }
         public BranchStatus Status { get; set; } = default!;
-        public Guid? ManagerID { get; set; }
     }
 }

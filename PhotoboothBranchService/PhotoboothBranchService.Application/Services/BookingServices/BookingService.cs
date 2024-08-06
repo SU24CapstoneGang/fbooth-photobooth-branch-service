@@ -157,11 +157,12 @@ public class BookingService : IBookingService
         // Map services to response
         var bookingServiceResponses = booking.BookingServices.Select(service => new BookingServiceResponse
         {
+            BookingServiceID = service.BookingServiceID,
             ServiceID = service.ServiceID,
             ServiceName = service.Service.ServiceName,
             Quantity = service.Quantity,
             Price = service.Price,
-            SubTotal = service.SubTotal
+            SubTotal = service.SubTotal,
         }).ToList();
 
         // Create the response

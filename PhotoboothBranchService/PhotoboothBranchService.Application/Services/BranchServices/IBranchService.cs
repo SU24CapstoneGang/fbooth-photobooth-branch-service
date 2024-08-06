@@ -11,6 +11,6 @@ public interface IBranchService : IServiceBase<BranchResponse, BranchFilter, Pag
     Task<IEnumerable<BranchResponse>> GetByStatus(BranchStatus status);
     Task<CreateBranchResponse> CreateAsync(CreateBranchRequest createModel, BranchStatus status);
     Task UpdateAsync(Guid id, UpdateBranchRequest updateModel, BranchStatus? status);
-    Task AssignManager(Guid branchId, AssignManagerRequest request);
+    //Task AssignManager(Guid branchId, AssignManagerRequest request);
     Task DeleteAsync(Guid id);
 }

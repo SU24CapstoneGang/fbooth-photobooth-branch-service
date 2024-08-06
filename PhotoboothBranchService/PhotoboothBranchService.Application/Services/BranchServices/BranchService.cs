@@ -30,10 +30,10 @@ public class BranchService : IBranchService
         try
         {
             //validate input
-            if (createModel.ManagerID.HasValue)
-            {
-                await ValideManagerForBranch(createModel.ManagerID.Value);
-            }
+            //if (createModel.ManagerID.HasValue)
+            //{
+            //    await ValideManagerForBranch(createModel.ManagerID.Value);
+            //}
             Branch branch = _mapper.Map<Branch>(createModel);
             branch.Status = status;
             branch.CreateDate = DateTimeHelper.GetVietnamTimeNow();
@@ -110,10 +110,10 @@ public class BranchService : IBranchService
         }
 
         var updateBranch = _mapper.Map(updateModel, branch);
-        if (updateModel.ManagerID.HasValue)
-        {
-            await ValideManagerForBranch(id);
-        }
+        //if (updateModel.ManagerID.HasValue)
+        //{
+        //    await ValideManagerForBranch(updateModel.ManagerID.Value);
+        //}
         if (status.HasValue)
         {
             updateBranch.Status = status.Value;
@@ -121,31 +121,31 @@ public class BranchService : IBranchService
         await _branchRepository.UpdateAsync(updateBranch);
     }
 
-    public async Task AssignManager(Guid branchId, AssignManagerRequest request)
-    {
-        await UpdateAsync(branchId, new UpdateBranchRequest { ManagerID = request.ManagerID }, null);
-    }
+    //public async Task AssignManager(Guid branchId, AssignManagerRequest request)
+    //{
+    //    //await UpdateAsync(branchId, new UpdateBranchRequest { ManagerID = request.ManagerID }, null);
+    //}
 
     private async Task ValideManagerForBranch(Guid managerId)
     {
-        var branchCheck = (await _branchRepository.GetAsync(i => i.ManagerID == managerId)).FirstOrDefault();
-        if (branchCheck != null)
-        {
-            throw new BadRequestException("This manager is in another branch");
-        }
-        var account = (await _accountRepository.GetAsync(i => i.AccountID == managerId)).FirstOrDefault();
-        if (account == null)
-        {
-            throw new NotFoundException("Not found Account");
-        }
-        if (account.Role != AccountRole.Manager)
-        {
-            throw new BadRequestException("Account assign is not manager");
-        }
-        if (account.Status != AccountStatus.Active)
-        {
-            throw new BadRequestException("Account is not active in system");
-        }
+        //var branchCheck = (await _branchRepository.GetAsync(i => i.ManagerID == managerId)).FirstOrDefault();
+        //if (branchCheck != null)
+        //{
+        //    throw new BadRequestException("This manager is in another branch");
+        //}
+        //var account = (await _accountRepository.GetAsync(i => i.AccountID == managerId)).FirstOrDefault();
+        //if (account == null)
+        //{
+        //    throw new NotFoundException("Not found Account");
+        //}
+        //if (account.Role != AccountRole.Manager)
+        //{
+        //    throw new BadRequestException("Account assign is not manager");
+        //}
+        //if (account.Status != AccountStatus.Active)
+        //{
+        //    throw new BadRequestException("Account is not active in system");
+        //}
     }
 }
 

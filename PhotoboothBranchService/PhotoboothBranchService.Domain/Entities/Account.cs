@@ -20,7 +20,6 @@ public class Account
     public AccountRole Role { get; set; }
     public virtual ICollection<Booking> Bookings { get; set; } = default!;
     public Guid? BranchID { get; set; }
-    public virtual Branch BranchManage { get; set; } = default!;
     public virtual Branch BranchBelong { get; set; } = default!;
     public void SetPassword(string plainTextPassword, IPasswordHasher passwordHasher)
     {

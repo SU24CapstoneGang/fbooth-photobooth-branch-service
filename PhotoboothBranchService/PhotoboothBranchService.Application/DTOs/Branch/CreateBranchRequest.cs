@@ -14,6 +14,5 @@ namespace PhotoboothBranchService.Application.DTOs.Branch
         public string Town { get; set; } = default!;
         [Required, StringLength(100, MinimumLength = 8, ErrorMessage = "Branch address must between 8 to 100 char characters")]
         public string City { get; set; } = default!;
-        public Guid? ManagerID { get; set; }
     }
 }

@@ -46,11 +46,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     v => v.ToString(),
                     v => (BranchStatus)Enum.Parse(typeof(BranchStatus), v));
 
-            // Relationship with Account - manager
-            builder.HasOne(pb => pb.Manager)
-                .WithOne(a => a.BranchManage)
-                .HasForeignKey<Branch>(pb => pb.ManagerID)
-                .IsRequired(false);
             // Relationship with Account - staff
             builder.HasMany(pb => pb.Staffs)
                 .WithOne(a => a.BranchBelong)
