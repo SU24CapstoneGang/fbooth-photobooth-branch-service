@@ -36,7 +36,7 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                 var bookingRepository = scope.ServiceProvider.GetRequiredService<IBookingRepository>();
                 var bookingServiceRepository = scope.ServiceProvider.GetRequiredService<IBookingServiceRepository>();
                 var boothRepository = scope.ServiceProvider.GetRequiredService<IBoothRepository>();
-
+                var photoSessionRepository = scope.ServiceProvider.GetRequiredService<IPhotoSessionRepository>();
                 //delete service
                 var now = DateTimeHelper.GetVietnamTimeNow();
                 var bookings = (await bookingRepository.GetAsync(o =>
@@ -44,7 +44,7 @@ namespace PhotoboothBranchService.Application.BackgroundServices
 
                 foreach (var booking in bookings)
                 {
-                    if ((now - booking.LastModified).TotalMinutes > 5)
+                    if ((now - booking.LastModified).TotalMinutes > 15)
                     {
                         var bookingServices = (await bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();
                         var removalTasks = bookingServices.Select(bookingService =>
@@ -81,6 +81,16 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                     } else
                     {
                         booking.Status = BookingStatus.CompleteChecked;
+                        var photoSessions = (await photoSessionRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();
+                        if (photoSessions != null && photoSessions.Count > 0)
+                        {
+                            var photoSession = photoSessions.MaxBy(i => i.SessionIndex);
+                            if (photoSession != null && photoSession.Status == PhotoSessionStatus.Ongoing)
+                            {
+                                photoSession.Status = PhotoSessionStatus.Ended;
+                                await photoSessionRepository.UpdateAsync(photoSession);
+                            }
+                        }
                     }
                     await bookingRepository.UpdateAsync(booking);
                     var booth = (await boothRepository.GetAsync(i => i.BoothID == booking.BoothID)).FirstOrDefault();

@@ -34,6 +34,17 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
                 throw new NotFoundException("Not found Booking");
             }
             this.ValidateBookingToAdd(booking);
+
+            var photoSessions = (await _photoSessionRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();
+            if (photoSessions != null && photoSessions.Count > 0)
+            {
+                var photoSessionCheck = photoSessions.MaxBy(i => i.SessionIndex);
+                if (photoSessionCheck != null && photoSessionCheck.Status == PhotoSessionStatus.Ongoing)
+                {
+                    throw new BadRequestException($"Please end the previous Session ({photoSessionCheck.PhotoSessionID}) before create a new session");
+                }
+            }
+
             var layout = (await _layoutRepository.GetAsync(i => i.LayoutID == createModel.LayoutID)).FirstOrDefault();
             if (layout == null)
             {

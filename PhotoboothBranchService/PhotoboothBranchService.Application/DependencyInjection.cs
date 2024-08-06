@@ -30,7 +30,6 @@ using PhotoboothBranchService.Application.Services.RefundServices;
 using PhotoboothBranchService.Application.Services.ServiceServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
 using PhotoboothBranchService.Application.Services.TransactionServices;
-using PhotoboothBranchService.Application.Services.TransactionServices.QR;
 using PhotoboothBranchService.Application.Services.VNPayServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using System.Reflection;
@@ -91,8 +90,6 @@ namespace PhotoboothBranchService.Application
                 options.TokenValidationParameters.ValidIssuer = configuration["FirebaseJwt:Issuer"];
             });
 
-            //qrcode
-            services.AddScoped<IQrCodeService, QrCodeService>();
             //Vnpay Service
             services.AddScoped<IVNPayService, VNPayService>();
             //momo service

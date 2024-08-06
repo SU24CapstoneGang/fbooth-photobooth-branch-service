@@ -89,7 +89,7 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
             }
             else if (result < 0)
             {
-                throw new BadRequestException("System revice more than bill, contact manager about the error");
+                throw new BadRequestException("System revice more than bill, contact our staff about the error");
             }
             transaction.Amount = result;
 

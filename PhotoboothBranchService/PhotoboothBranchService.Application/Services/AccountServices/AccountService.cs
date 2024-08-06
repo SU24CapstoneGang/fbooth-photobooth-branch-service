@@ -128,45 +128,33 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<LoginResponeModel> Login(LoginRequestModel request)
         {
-            try
-            {
-                var account = (await _accountRepository.GetAsync(a => a.Email == request.Email)).FirstOrDefault();
+            var account = (await _accountRepository.GetAsync(a => a.Email == request.Email)).FirstOrDefault();
 
-                var loginViewModel = await _jwtService.GetForCredentialsAsync(request.Email, request.Password);
-                if (loginViewModel != null && account != null)
-                {
-                    if (!string.IsNullOrEmpty(account.ResetPasswordToken))
-                    {
-                        // Clear the password reset token and update the password in the database
-                        account.ResetPasswordToken = null;
-                        account.SetPassword(request.Password, _passwordHasher);
-                        await _accountRepository.UpdateAsync(account);
-                    }
-                    return loginViewModel;
-                }
-                throw new BadRequestException("Login fail!!!");
-            }
-            catch (Exception ex)
+            var loginViewModel = await _jwtService.GetForCredentialsAsync(request.Email, request.Password);
+            if (loginViewModel != null && account != null)
             {
-                throw new Exception("An error occurred while login the account: " + ex.Message);
+                if (!string.IsNullOrEmpty(account.ResetPasswordToken))
+                {
+                    // Clear the password reset token and update the password in the database
+                    account.ResetPasswordToken = null;
+                    account.SetPassword(request.Password, _passwordHasher);
+                    await _accountRepository.UpdateAsync(account);
+                }
+                return loginViewModel;
             }
+            throw new BadRequestException("Login fail!!!");
+
         }
 
         public async Task<LoginResponeModel> RefreshToken(RefreshTokenRequestModel request)
         {
-            try
+            var loginViewModel = await _jwtService.RefreshToken(request.RefreshToken);
+            if (loginViewModel != null)
             {
-                var loginViewModel = await _jwtService.RefreshToken(request.RefreshToken);
-                if (loginViewModel != null)
-                {
-                    return loginViewModel;
-                }
-                throw new BadRequestException("Refresh token fail!!!");
+                return loginViewModel;
             }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while refeshing the account: " + ex.Message);
-            }
+            throw new BadRequestException("Refresh token fail!!!");
+
         }
 
         public async Task<AccountRegisterResponse> Register(CreateAccountRequestModel request, AccountRole role)
@@ -211,6 +199,16 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                 }
                 throw new NotFoundException("Account", role, "User role does not exist in the system.");
             }
+            catch (BadRequestException ex)
+            {
+                await _firebaseService.DeleteUserAsync(request.Email);
+                throw new BadRequestException("An error occurred while register the account: " + ex.Message);
+            }
+            catch (NotFoundException ex)
+            {
+                await _firebaseService.DeleteUserAsync(request.Email);
+                throw new NotFoundException("An error occurred while register the account: " + ex.Message);
+            }
             catch (Exception ex)
             {
                 await _firebaseService.DeleteUserAsync(request.Email);
@@ -220,36 +218,24 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<AccountResponse> GetByEmail(string email)
         {
-            try
+            var account = (await _accountRepository.GetAsync(a => a.Email.Equals(email))).FirstOrDefault();
+            if (account == null)
             {
-                var account = (await _accountRepository.GetAsync(a => a.Email.Equals(email))).FirstOrDefault();
-                if (account == null)
-                {
-                    throw new NotFoundException("Account", email, "Email does not exist in the system.");
-                }
-                return _mapper.Map<AccountResponse>(account);
+                throw new NotFoundException("Account", email, "Email does not exist in the system.");
             }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while getting the account: " + ex.Message);
-            }
+            return _mapper.Map<AccountResponse>(account);
+
         }
 
         public async Task<AccountResponse> GetByPhoneNumber(string phoneNumber)
         {
-            try
+            var account = (await _accountRepository.GetAsync(a => a.PhoneNumber.Equals(phoneNumber))).FirstOrDefault();
+            if (account == null)
             {
-                var account = (await _accountRepository.GetAsync(a => a.PhoneNumber.Equals(phoneNumber))).FirstOrDefault();
-                if (account == null)
-                {
-                    throw new NotFoundException("Account", phoneNumber, "Phone number does not exist in the system.");
-                }
-                return _mapper.Map<AccountResponse>(account);
+                throw new NotFoundException("Account", phoneNumber, "Phone number does not exist in the system.");
             }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while getting the account: " + ex.Message);
-            }
+            return _mapper.Map<AccountResponse>(account);
+
         }
     }
 }

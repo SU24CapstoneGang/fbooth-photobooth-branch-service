@@ -51,15 +51,15 @@ namespace PhotoboothBranchService.Api.Controllers
 
         }
 
-        // Update
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdatePhoto(Guid id, [FromQuery] UpdatePhotoRequest updatePhotoRequest)
-        {
+        //// Update
+        //[HttpPut("{id}")]
+        //public async Task<ActionResult> UpdatePhoto(Guid id, [FromQuery] UpdatePhotoRequest updatePhotoRequest)
+        //{
 
-            await _photoService.UpdateAsync(id, updatePhotoRequest);
-            return Ok();
+        //    await _photoService.UpdateAsync(id, updatePhotoRequest);
+        //    return Ok();
 
-        }
+        //}
 
         // Delete
         [HttpDelete("{id}")]

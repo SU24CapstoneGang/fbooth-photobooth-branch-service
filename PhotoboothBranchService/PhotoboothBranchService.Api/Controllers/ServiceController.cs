@@ -29,7 +29,7 @@ namespace PhotoboothBranchService.Api.Controllers
         public async Task<ActionResult<IEnumerable<ServiceResponse>>> GetAllServiceTypes()
         {
             var serviceTypes = await _serviceTypeService.GetAllAsync();
-            return Ok(serviceTypes);
+            return Ok(serviceTypes.ToList().OrderBy(i => i.ServiceType));
         }
 
         // Read with paging and filter

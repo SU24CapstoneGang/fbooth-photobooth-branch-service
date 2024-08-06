@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace PhotoboothBranchService.Api.Common
 {
-    public class ManagerAuthorizationAttribute : Attribute, IAuthorizationFilter
+    public class StaffAuthorizationAttribute : Attribute, IAuthorizationFilter
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
@@ -12,7 +12,7 @@ namespace PhotoboothBranchService.Api.Common
                 var role = context.HttpContext.Items["Role"];
                 if (role != null)
                 {
-                    if (role.ToString() == "BRANCH MANAGER")
+                    if (role.ToString() == "STAFF")
                         return;
                 }
                 context.Result = new UnauthorizedResult();

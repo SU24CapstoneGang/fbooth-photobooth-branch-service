@@ -364,7 +364,7 @@ public class BookingService : IBookingService
                         response.refundList = refundRes.ToList();
                         if (response.refundList.Any(i => i.Status == RefundStatus.Fail))
                         {
-                            response.message = "Success cancel booking but not refund success, please contact our manager.";
+                            response.message = "Success cancel booking but not refund success, please contact our staff.";
                         }
                         else
                         {

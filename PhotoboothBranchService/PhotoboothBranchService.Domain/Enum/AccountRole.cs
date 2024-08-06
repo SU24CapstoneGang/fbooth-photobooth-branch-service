@@ -3,8 +3,7 @@
     public enum AccountRole
     {
         Admin = 1,
-        Manager = 2,
-        Staff = 3,
-        Customer = 4,
+        Staff = 2,
+        Customer = 3,
     }
 }
