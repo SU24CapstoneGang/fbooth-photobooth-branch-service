@@ -16,6 +16,7 @@ using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
+using System.Formats.Asn1;
 using System.Net;
 
 namespace PhotoboothBranchService.Application.Services.TransactionServices
@@ -243,18 +244,18 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
         public async Task<IEnumerable<TransactionResponse>> GetAllAsync()
         {
             var payments = await _transactionRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<TransactionResponse>>(payments.ToList());
+            return _mapper.Map<IEnumerable<TransactionResponse>>(payments.ToList().OrderByDescending(i => i.TransactionDateTime));
         }
         // Read all with paging and filter
         public async Task<IEnumerable<TransactionResponse>> GetAllPagingAsync(PaymentFilter filter, PagingModel paging)
         {
             var payments = (await _transactionRepository.GetAllAsync()).ToList().AutoFilter(filter);
             var listPaymentResponse = _mapper.Map<IEnumerable<TransactionResponse>>(payments);
-            return listPaymentResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+            return listPaymentResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.TransactionDateTime);
         }
-        public async Task<IEnumerable<TransactionResponse>> GetBySessionOrderAsync(Guid sessionOrderID)
+        public async Task<IEnumerable<TransactionResponse>> GetByBookingAsync(Guid bookingID)
         {
-            var payments = await _transactionRepository.GetAsync(i => i.BookingID == sessionOrderID);
+            var payments = await _transactionRepository.GetAsync(i => i.BookingID == bookingID);
             return _mapper.Map<IEnumerable<TransactionResponse>>(payments.ToList());
         }
         public async Task<IEnumerable<TransactionResponse>> GetByOrderIdAsync(Guid id)
@@ -262,6 +263,36 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
             var payments = await _transactionRepository.GetAsync(p => p.BookingID == id);
             return _mapper.Map<IEnumerable<TransactionResponse>>(payments);
         }
+        public async Task<IEnumerable<TransactionResponse>> GetCustomerTransaction(string? email)
+        {
+            if (email.IsNullOrEmpty())
+            {
+                throw new BadRequestException("");
+            }
+            var acc = (await _accountRepository.GetAsync(i => i.Email.Equals(email))).SingleOrDefault();
+            if (acc == null) 
+            {
+                throw new NotFoundException("Account not found");
+            }
+            if (acc.Role != AccountRole.Customer)
+            {
+                throw new BadRequestException("Account is not Customer");
+            }
+            var bookings = (await _bookingRepository.GetAsync(i => i.CustomerID == acc.AccountID)).Select(i => i.BoothID).ToList();
+            if (!bookings.Any()) 
+            {
+                return new List<TransactionResponse>();
+            }
+            var trans = await _transactionRepository.GetAsync(i => bookings.Contains(i.BookingID));
+            if (trans == null)
+            {
+                return new List<TransactionResponse>();
+            } else
+            {
+                return _mapper.Map<IEnumerable<TransactionResponse>>(trans.ToList());
+            }
+        }
+
         // Read by ID
         public async Task<TransactionResponse> GetByIdAsync(Guid id)
         {

@@ -60,27 +60,24 @@ public class AccountController : ControllerBaseApi
     [HttpGet("{id}")]
     public async Task<ActionResult<AccountResponse>> GetAccountById(Guid id)
     {
-
         var account = await _accountService.GetByIdAsync(id);
         if (account == null)
         {
             return NotFound();
         }
         return Ok(account);
-
     }
 
     // Update
-    [HttpPut("{id}")]
+    [HttpPut]
     [Authorize]
-    public async Task<ActionResult> UpdateAccount(Guid id, [FromQuery] UpdateAccountRequestModel updateAccountRequest)
+    public async Task<ActionResult> UpdateAccount([FromBody] UpdateAccountRequestModel updateAccountRequest)
     {
         var email = Request.HttpContext.Items["Email"]?.ToString();
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
-        await _accountService.UpdateAsync(id, updateAccountRequest, email);
+        await _accountService.UpdateAsync(updateAccountRequest, email);
         return Ok();
-
     }
 
     // Delete
@@ -88,10 +85,8 @@ public class AccountController : ControllerBaseApi
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteAccount(Guid id)
     {
-
         await _accountService.DeleteAsync(id);
         return Ok();
-
     }
 
     [AllowAnonymous]
@@ -149,10 +144,16 @@ public class AccountController : ControllerBaseApi
     [HttpDelete("delete-firebase/{firebaseEmail}")]
     public async Task<ActionResult> DeleteFireBase(string firebaseEmail)
     {
-
         await _firebaseService.DeleteUserAsync(firebaseEmail);
         return Ok();
+    }
 
+    [Authorization("ADMIN")]
+    [HttpPut("assign-branch")]
+    public async Task<ActionResult> AssignBranchForStaff(AssignBranchForStaffRequest request)
+    {
+        await _accountService.AssignBranchForStaff(request);
+        return Ok();
     }
 }
 

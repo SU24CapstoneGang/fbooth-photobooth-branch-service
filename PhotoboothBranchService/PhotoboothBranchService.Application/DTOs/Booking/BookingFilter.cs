@@ -2,11 +2,11 @@
 
 namespace PhotoboothBranchService.Application.DTOs.Booking
 {
-    public class SessionOrderFilter
+    public class BookingFilter
     {
         public double? TotalPrice { get; set; } = default!;
         public BookingStatus? Status { get; set; }
         public Guid? BoothID { get; set; }
-        public Guid? AccountID { get; set; }
+        public Guid? CustomerID { get; set; }
     }
 }

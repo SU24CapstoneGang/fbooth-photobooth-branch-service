@@ -80,20 +80,20 @@ public class BackgroundService : IBackgroundService
     public async Task<IEnumerable<BackgroundResponse>> GetAllAsync()
     {
         var backGrounds = await _backgroundRepository.GetAllAsync();
-        return _mapper.Map<IEnumerable<BackgroundResponse>>(backGrounds.ToList());
+        return _mapper.Map<IEnumerable<BackgroundResponse>>(backGrounds.ToList().OrderByDescending(i => i.LastModified));
     }
 
     public async Task<IEnumerable<BackgroundResponse>> GetAllPagingAsync(BackgroundFilter filter, PagingModel paging)
     {
         var backGrounds = (await _backgroundRepository.GetAllAsync()).ToList().AutoFilter(filter);
         var listBackGroundresponse = _mapper.Map<IEnumerable<BackgroundResponse>>(backGrounds);
-        return listBackGroundresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+        return listBackGroundresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).ToList().OrderByDescending(i => i.LastModified);
     }
 
     public async Task<IEnumerable<BackgroundResponse>> GetAvailableAsync()
     {
         var backGrounds = (await _backgroundRepository.GetAsync(i=>i.Status == StatusUse.Available));
-        return _mapper.Map<IEnumerable<BackgroundResponse>>(backGrounds.ToList());
+        return _mapper.Map<IEnumerable<BackgroundResponse>>(backGrounds.ToList().OrderByDescending(i => i.LastModified));
     }
 
     public async Task<BackgroundResponse> GetByIdAsync(Guid id)
@@ -105,7 +105,7 @@ public class BackgroundService : IBackgroundService
     public async Task<IEnumerable<BackgroundResponse>> GetByName(string name)
     {
         var backGrounds = await _backgroundRepository.GetAsync(f => f.BackgroundCode.Contains(name));
-        return _mapper.Map<IEnumerable<BackgroundResponse>>(backGrounds.ToList());
+        return _mapper.Map<IEnumerable<BackgroundResponse>>(backGrounds.ToList().OrderByDescending(i => i.LastModified));
     }
 
 

@@ -20,16 +20,18 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
         private readonly IPasswordHasher _passwordHasher;
         private readonly IJwtService _jwtService;
         private readonly IFirebaseService _firebaseService;
+        private readonly IBranchRepository _branchRepository;
 
         public AccountService(IAccountRepository accountRepository,
             IMapper mapper, IPasswordHasher passwordHasher,
-            IJwtService jwtService, IFirebaseService firebaseService)
+            IJwtService jwtService, IFirebaseService firebaseService, IBranchRepository branchRepository)
         {
             _accountRepository = accountRepository;
             _mapper = mapper;
             _passwordHasher = passwordHasher;
             _jwtService = jwtService;
             _firebaseService = firebaseService;
+            _branchRepository = branchRepository;
         }
 
         public async Task<string> ResetPassword(string email)
@@ -90,17 +92,16 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             }
         }
 
-        public async Task UpdateAsync(Guid id, UpdateAccountRequestModel updateModel, string? email)
+        public async Task UpdateAsync(UpdateAccountRequestModel updateModel, string? email)
         {
-
-            var account = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
-            if (account == null)
-            {
-                throw new NotFoundException("Account", id, "Account ID not found");
-            }
-            if (string.IsNullOrEmpty(email) || !email.Equals(account.Email)) 
+            if (string.IsNullOrEmpty(email))
             {
                 throw new ForbiddenAccessException("Can not update infomation of another account");
+            }
+            var account = (await _accountRepository.GetAsync(a => a.Email.Equals(email))).FirstOrDefault();
+            if (account == null)
+            {
+                throw new NotFoundException("Account", email, "Account ID not found");
             }
             var updateAccount = _mapper.Map(updateModel, account);
             updateAccount.SetPassword(updateModel.Password, _passwordHasher);
@@ -233,6 +234,26 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             }
             return _mapper.Map<AccountResponse>(account);
 
+        }
+
+        public async Task AssignBranchForStaff(AssignBranchForStaffRequest request)
+        {
+            var acc = (await _accountRepository.GetAsync(i => i.AccountID == request.StaffID)).FirstOrDefault();
+            var branch = (await _branchRepository.GetAsync(i => i.BranchID == request.BranchID)).FirstOrDefault();
+            if (acc == null) 
+            {
+                throw new NotFoundException("Not found account");
+            }
+            if (acc.Role != AccountRole.Staff)
+            {
+                throw new BadRequestException("Account is not staff");
+            }
+            if (branch == null)
+            {
+                throw new NotFoundException("Not found brnach");
+            }
+            acc.BranchID = branch.BranchID;
+            await _accountRepository.UpdateAsync(acc);
         }
     }
 }

@@ -5,7 +5,6 @@ using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Booking;
 using PhotoboothBranchService.Application.Services.BookingServices;
-using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Api.Controllers
@@ -32,14 +31,14 @@ namespace PhotoboothBranchService.Api.Controllers
             return Ok(createBookingResponse);
         }
         [HttpPost("customer-booking")]
-        public async Task<ActionResult<CreateBookingResponse>> CustomerCreateSession(CustomerBookingRequest customerBookingSessionOrderRequest)
+        public async Task<ActionResult<CreateBookingResponse>> CustomerCreateSession(CustomerBookingRequest customerBookingRequest)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             var email = Request.HttpContext.Items["Email"]?.ToString();
-            var createBookingResponse = await _bookingService.CustomerBooking(customerBookingSessionOrderRequest, email);
+            var createBookingResponse = await _bookingService.CustomerBooking(customerBookingRequest, email);
             return Ok(createBookingResponse);
         }
         [HttpPost("checkin-booking")]
@@ -75,7 +74,7 @@ namespace PhotoboothBranchService.Api.Controllers
         //get all with filter and paging
         [HttpGet("paging")]
         public async Task<ActionResult<IEnumerable<BookingResponse>>> GetAllBooking(
-            [FromQuery] SessionOrderFilter sessionFilter, [FromQuery] PagingModel pagingModel)
+            [FromQuery] BookingFilter sessionFilter, [FromQuery] PagingModel pagingModel)
         {
             var sessions = await _bookingService.GetAllPagingAsync(sessionFilter, pagingModel);
             return Ok(sessions);
@@ -102,18 +101,18 @@ namespace PhotoboothBranchService.Api.Controllers
         }
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult<CreateBookingResponse>> UpdateBooking(Guid id, UpdateBookingRequest updateSessionRequest)
+        public async Task<ActionResult<CreateBookingResponse>> UpdateBooking(Guid id, UpdateBookingRequest updateBookingRequest)
         {
             var email = Request.HttpContext.Items["Email"]?.ToString();
-            var response = await _bookingService.UpdateAsync(id, updateSessionRequest, email);
+            var response = await _bookingService.UpdateAsync(id, updateBookingRequest, email);
             return Ok(response);
         }
         [HttpPost("cancel")]
-        public async Task<ActionResult<CancelBookingResponse>> CancelBooking(Guid sessionOrderID)
+        public async Task<ActionResult<CancelBookingResponse>> CancelBooking(Guid BookingID)
         {
             var clientIp = IpAddressHelper.GetClientIpAddress(HttpContext);
             var email = Request.HttpContext.Items["Email"]?.ToString();
-            var response = await _bookingService.CancelBooking(sessionOrderID, clientIp, email);
+            var response = await _bookingService.CancelBooking(BookingID, clientIp, email);
             return Ok(response);
         }
 

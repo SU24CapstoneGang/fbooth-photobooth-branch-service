@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
@@ -16,15 +17,17 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         private readonly IBranchRepository _branchRepository;
         private readonly IDeviceRepository _deviceRepository;
         private readonly IBookingRepository _bookingRepository;
+        private readonly IAccountRepository _accountRepository;
         private readonly IMapper _mapper;
 
-        public BoothService(IBoothRepository boothRepository, IMapper mapper, IBranchRepository branchRepository, IDeviceRepository deviceRepository, IBookingRepository bookingRepository)
+        public BoothService(IBoothRepository boothRepository, IMapper mapper, IBranchRepository branchRepository, IDeviceRepository deviceRepository, IBookingRepository bookingRepository, IAccountRepository accountRepository)
         {
             _boothRepository = boothRepository;
             _mapper = mapper;
             _branchRepository = branchRepository;
             _deviceRepository = deviceRepository;
             _bookingRepository = bookingRepository;
+            _accountRepository = accountRepository;
         }
 
         // Create
@@ -69,14 +72,27 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         public async Task<IEnumerable<BoothResponse>> GetAllAsync()
         {
             var booths = await _boothRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<BoothResponse>>(booths.ToList());
+            return _mapper.Map<IEnumerable<BoothResponse>>(booths.ToList().OrderByDescending(i => i.CreateDate));
         }
-
+        public async Task<IEnumerable<BoothResponse>> StaffGetAllAsync(string? email)
+        {
+            var acc = (await _accountRepository.GetAsync(i => i.Email.Equals(email) && i.Status == AccountStatus.Active)).FirstOrDefault();
+            if (acc == null || acc.Role != AccountRole.Staff)
+            {
+                throw new ForbiddenAccessException();
+            }
+            if (!acc.BranchID.HasValue || acc.BranchID == null) 
+            {
+                throw new ForbiddenAccessException("Staff has not been assign to any branch");
+            }
+            var booths = await _boothRepository.GetAsync(i => i.BranchID == acc.BranchID);
+            return _mapper.Map<IEnumerable<BoothResponse>>(booths.ToList().OrderByDescending(i => i.CreateDate));
+        }
         public async Task<IEnumerable<BoothResponse>> GetAllPagingAsync(BoothFilter filter, PagingModel paging)
         {
             var booths = (await _boothRepository.GetAllAsync()).ToList().AutoFilter(filter);
             var listBoothresponse = _mapper.Map<IEnumerable<BoothResponse>>(booths);
-            return listBoothresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+            return listBoothresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.PricePerHour);
         }
         public async Task<IEnumerable<BoothResponse>> GetAvtiveBoothByTime(GetAvtiveBoothByTimeRequest request)
         {

@@ -99,7 +99,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         public async Task<IEnumerable<PhotoSessionResponse>> GetAllAsync()
         {
             var photoSessions = await _photoSessionRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<PhotoSessionResponse>>(photoSessions.ToList());
+            return _mapper.Map<IEnumerable<PhotoSessionResponse>>(photoSessions.ToList().OrderByDescending(i => i.StartTime));
         }
 
         // Read all with paging and filter
@@ -107,7 +107,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         {
             var photoSessions = (await _photoSessionRepository.GetAllAsync()).ToList().AutoFilter(filter);
             var listPhotoSessionResponse = _mapper.Map<IEnumerable<PhotoSessionResponse>>(photoSessions);
-            return listPhotoSessionResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+            return listPhotoSessionResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.StartTime);
         }
 
         // Read by ID

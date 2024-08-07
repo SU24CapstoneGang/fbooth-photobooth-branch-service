@@ -163,14 +163,14 @@ public class LayoutService : ILayoutService
     public async Task<IEnumerable<LayoutResponse>> GetAllAsync()
     {
         var layouts = await _layoutRepository.GetAllAsync();
-        return _mapper.Map<IEnumerable<LayoutResponse>>(layouts.ToList());
+        return _mapper.Map<IEnumerable<LayoutResponse>>(layouts.ToList().OrderByDescending(i => i.LastModified));
     }
 
     public async Task<IEnumerable<LayoutResponse>> GetAllPagingAsync(LayoutFilter filter, PagingModel paging)
     {
         var layouts = (await _layoutRepository.GetAllAsync()).ToList().AutoFilter(filter);
         var listLayoutresponse = _mapper.Map<IEnumerable<LayoutResponse>>(layouts);
-        return listLayoutresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+        return listLayoutresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.LastModified);
     }
 
     public async Task<LayoutResponse> GetByIdAsync(Guid id)

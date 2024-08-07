@@ -12,7 +12,8 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
         Task<CreateTransactionResponse> CreateAsync(CreateTransactionRequest createModel, string ClientIpAddress, string? email);
         Task UpdateAsync(Guid id, UpdateTransactiontRequest updateModel);
         Task DeleteAsync(Guid id);
-        Task<IEnumerable<TransactionResponse>> GetBySessionOrderAsync(Guid sessionOrderID);
+        Task<IEnumerable<TransactionResponse>> GetByBookingAsync(Guid sessionOrderID);
+        Task<IEnumerable<TransactionResponse>> GetCustomerTransaction(string? email);
         Task HandleMomoResponse(IQueryCollection queryString);
         Task<MomoIPNResponse> HandleMomoIPN(MoMoResponse moMoResponse);
         Task<(VnpayResponse response, string returnContent)> HandleVnpayResponse(IQueryCollection queryString);

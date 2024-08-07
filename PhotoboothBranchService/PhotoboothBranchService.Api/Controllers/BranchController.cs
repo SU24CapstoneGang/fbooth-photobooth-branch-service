@@ -75,17 +75,12 @@ public class BranchController : ControllerBaseApi
 
     //Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateBranch(Guid id, [FromQuery] UpdateBranchRequest updatePhotoBoothBranchRequest, [FromQuery] BranchStatus? status)
+    public async Task<ActionResult> UpdateBranch(Guid id, [FromBody] UpdateBranchRequest updatePhotoBoothBranchRequest, [FromQuery] BranchStatus? status)
     {
         await _branchService.UpdateAsync(id, updatePhotoBoothBranchRequest, status);
         return Ok();
     }
-    //[HttpPut("{branchId}/assign-manager")]
-    //public async Task<ActionResult> AssignManager(Guid branchId, [FromBody] AssignManagerRequest request)
-    //{
-    //    await _branchService.AssignManager(branchId, request);
-    //    return Ok();
-    //}
+
     //Delete
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteBranch(Guid id)

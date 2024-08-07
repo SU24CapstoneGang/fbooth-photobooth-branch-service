@@ -218,17 +218,18 @@ public class BookingService : IBookingService
             var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
             booking.BookingServices = list.ToList();
         }
-        return _mapper.Map<IEnumerable<BookingResponse>>(bookings.ToList());
+        return _mapper.Map<IEnumerable<BookingResponse>>(bookings.ToList().OrderByDescending(i => i.StartTime));
     }
 
-    public async Task<IEnumerable<BookingResponse>> GetAllPagingAsync(SessionOrderFilter filter, PagingModel paging)
+    public async Task<IEnumerable<BookingResponse>> GetAllPagingAsync(BookingFilter filter, PagingModel paging)
     {
         var sessions = (await _bookingRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
             {
                 i => i.BookingServices,
+                i => i.FullPaymentPolicy
             })).ToList().AutoFilter(filter);
         var listSessionresponse = _mapper.Map<IEnumerable<BookingResponse>>(sessions);
-        return listSessionresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+        return listSessionresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).ToList().OrderByDescending(i => i.StartTime);
     }
 
     // Get a session by ID

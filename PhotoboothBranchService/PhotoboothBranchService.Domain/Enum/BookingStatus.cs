@@ -6,6 +6,6 @@
         NoShow = 3, //customer not come
         PendingPayment = 1, //waiting pay
         CompleteChecked = 5,
-        TakingPhoto = 4,
+        TakingPhoto = 4
     }
 }

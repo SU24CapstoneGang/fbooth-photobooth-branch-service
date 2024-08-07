@@ -13,5 +13,6 @@ namespace PhotoboothBranchService.Application.DTOs.Booth
         public bool isBooked { get; set; }
         public BoothStatus Status { get; set; }
         public Guid BranchID { get; set; }
+        public DateTime CreateDate { get; set; }
     }
 }

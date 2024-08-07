@@ -32,6 +32,15 @@ public class BoothController : ControllerBaseApi
         return Ok(booths);
     }
 
+    [HttpGet("staff")]
+    [Authorization("STAFF")]
+    public async Task<ActionResult<IEnumerable<BoothResponse>>> StaffGetAllBooths()
+    {
+        var email = Request.HttpContext.Items["Email"]?.ToString();
+        var booths = await _boothService.StaffGetAllAsync(email);
+        return Ok(booths);
+    }
+
     // Read with paging and filter
     [HttpGet("paging")]
     public async Task<ActionResult<IEnumerable<BoothResponse>>> GetAllBooths(
@@ -70,7 +79,7 @@ public class BoothController : ControllerBaseApi
 
     // Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateBooth(Guid id, [FromQuery] UpdateBoothRequest updateBoothRequest, [FromQuery] BoothStatus? status)
+    public async Task<ActionResult> UpdateBooth(Guid id, [FromBody] UpdateBoothRequest updateBoothRequest, [FromQuery] BoothStatus? status)
     {
         await _boothService.UpdateAsync(id, updateBoothRequest,status);
         return Ok();

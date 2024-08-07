@@ -56,7 +56,7 @@ namespace PhotoboothBranchService.Application.Services.DeviceServices
         public async Task<IEnumerable<DeviceResponse>> GetAllAsync()
         {
             var devices = await _deviceRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<DeviceResponse>>(devices.ToList());
+            return _mapper.Map<IEnumerable<DeviceResponse>>(devices.ToList().OrderByDescending(i => i.CreatedDate));
         }
 
         // Read all with paging and filter
@@ -64,7 +64,7 @@ namespace PhotoboothBranchService.Application.Services.DeviceServices
         {
             var devices = (await _deviceRepository.GetAllAsync()).ToList().AutoFilter(filter);
             var listDeviceResponse = _mapper.Map<IEnumerable<DeviceResponse>>(devices);
-            return listDeviceResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+            return listDeviceResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.CreatedDate);
         }
 
         // Read by ID

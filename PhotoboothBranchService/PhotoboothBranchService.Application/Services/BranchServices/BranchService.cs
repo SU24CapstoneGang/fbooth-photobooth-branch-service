@@ -27,8 +27,6 @@ public class BranchService : IBranchService
     //Create
     public async Task<CreateBranchResponse> CreateAsync(CreateBranchRequest createModel, BranchStatus status)
     {
-        try
-        {
             //validate input
             //if (createModel.ManagerID.HasValue)
             //{
@@ -43,18 +41,6 @@ public class BranchService : IBranchService
             branch.CreateDate = DateTimeHelper.GetVietnamTimeNow();
             await _branchRepository.AddAsync(branch);
             return _mapper.Map<CreateBranchResponse>(branch);
-        }
-        catch (Exception ex)
-        {
-            if (ex.InnerException != null)
-            {
-                throw ex.InnerException;
-            }
-            else
-            {
-                throw new Exception(ex.Message);
-            }
-        }
     }
     //Delete
     public async Task DeleteAsync(Guid id)
@@ -76,14 +62,14 @@ public class BranchService : IBranchService
     public async Task<IEnumerable<BranchResponse>> GetAllAsync()
     {
         var branches = await _branchRepository.GetAsync(null, bth => bth.Booths);
-        return _mapper.Map<IEnumerable<BranchResponse>>(branches.ToList());
+        return _mapper.Map<IEnumerable<BranchResponse>>(branches.ToList().OrderByDescending(i=>i.CreateDate));
     }
 
     public async Task<IEnumerable<BranchResponse>> GetAllPagingAsync(BranchFilter filter, PagingModel paging)
     {
         var branches = (await _branchRepository.GetAllAsync()).ToList().AutoFilter(filter);
         var listBranchresponse = _mapper.Map<IEnumerable<BranchResponse>>(branches);
-        return listBranchresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+        return listBranchresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.CreateDate);
     }
 
     public async Task<BranchResponse> GetByIdAsync(Guid id)
@@ -129,31 +115,5 @@ public class BranchService : IBranchService
         await _branchRepository.UpdateAsync(updateBranch);
     }
 
-    //public async Task AssignManager(Guid branchId, AssignManagerRequest request)
-    //{
-    //    //await UpdateAsync(branchId, new UpdateBranchRequest { ManagerID = request.ManagerID }, null);
-    //}
-
-    private async Task ValideManagerForBranch(Guid managerId)
-    {
-        //var branchCheck = (await _branchRepository.GetAsync(i => i.ManagerID == managerId)).FirstOrDefault();
-        //if (branchCheck != null)
-        //{
-        //    throw new BadRequestException("This manager is in another branch");
-        //}
-        //var account = (await _accountRepository.GetAsync(i => i.AccountID == managerId)).FirstOrDefault();
-        //if (account == null)
-        //{
-        //    throw new NotFoundException("Not found Account");
-        //}
-        //if (account.Role != AccountRole.Manager)
-        //{
-        //    throw new BadRequestException("Account assign is not manager");
-        //}
-        //if (account.Status != AccountStatus.Active)
-        //{
-        //    throw new BadRequestException("Account is not active in system");
-        //}
-    }
 }
 

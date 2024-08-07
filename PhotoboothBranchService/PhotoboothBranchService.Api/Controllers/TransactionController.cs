@@ -61,9 +61,15 @@ namespace PhotoboothBranchService.Api.Controllers
             return Ok(payments);
 
         }
+        [HttpGet("booking/{bookingId}")]
+        public async Task<ActionResult<IEnumerable<TransactionResponse>>> GetPaymentsByBookingId(Guid bookingId)
+        {
+            var payments = await _paymentService.GetByBookingAsync(bookingId);
+            return Ok(payments);
 
+        }
         [HttpGet("{id}")]
-        public async Task<ActionResult<TransactionResponse>> GetPaymentById(Guid id)
+        public async Task<ActionResult<IEnumerable<TransactionResponse>>> GetPaymentById(Guid id)
         {
 
             var payment = await _paymentService.GetByIdAsync(id);
@@ -75,6 +81,19 @@ namespace PhotoboothBranchService.Api.Controllers
 
         }
 
+        [HttpGet("customer")]
+        [Authorization("CUSTOMER")]
+        public async Task<ActionResult<IEnumerable<TransactionResponse>>> GetCustomerTransaction()
+        {
+            var email = Request.HttpContext.Items["Email"]?.ToString();
+            return Ok(await _paymentService.GetCustomerTransaction(email));
+        }
+        [Authorization("STAFF","ADMIN")]
+        [HttpGet("staff/customer/{email}")]
+        public async Task<ActionResult<IEnumerable<TransactionResponse>>> StaffGetCustomerTransaction(string email) 
+        {
+            return Ok(await _paymentService.GetCustomerTransaction(email));
+        }
         // Update
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdatePayment(Guid id, UpdateTransactiontRequest updatePaymentRequest)

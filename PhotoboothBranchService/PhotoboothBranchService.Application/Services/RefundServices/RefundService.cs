@@ -54,14 +54,14 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
         public async Task<IEnumerable<RefundResponse>> GetAllAsync()
         {
             var refunds = await _refundRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<RefundResponse>>(refunds.ToList());
+            return _mapper.Map<IEnumerable<RefundResponse>>(refunds.ToList().OrderByDescending(i => i.RefundDateTime));
         }
 
         public async Task<IEnumerable<RefundResponse>> GetAllPagingAsync(RefundFilter filter, PagingModel paging)
         {
             var refunds = (await _refundRepository.GetAllAsync()).ToList().AutoFilter(filter);
             var listRefundResponse = _mapper.Map<IEnumerable<RefundResponse>>(refunds);
-            return listRefundResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
+            return listRefundResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.RefundDateTime);
         }
 
         public async Task<RefundResponse> GetByIdAsync(Guid id)
