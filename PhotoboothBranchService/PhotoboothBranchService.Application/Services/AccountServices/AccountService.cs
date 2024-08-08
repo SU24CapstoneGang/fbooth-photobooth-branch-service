@@ -104,9 +104,9 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                 throw new NotFoundException("Account", email, "Account ID not found");
             }
             var updateAccount = _mapper.Map(updateModel, account);
-            updateAccount.SetPassword(updateModel.Password, _passwordHasher);
+            //updateAccount.SetPassword(updateModel.Password, _passwordHasher);
 
-            await _firebaseService.UpdatePasswordOnFirebase(account.Email, updateModel.Password);
+            //await _firebaseService.UpdatePasswordOnFirebase(account.Email, updateModel.Password);
             await _accountRepository.UpdateAsync(updateAccount);
         }
 

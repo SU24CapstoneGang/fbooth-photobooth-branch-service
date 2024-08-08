@@ -62,7 +62,8 @@ public class BookingService : IBookingService
 
         // Validate booth
         var booth = await ValidateBoothAsync(createModel.BoothID);
-
+        //createModel.StartTime = DateTimeHelper.ConvertFromUtcPlus2ToVietnamTime(createModel.StartTime);
+        //createModel.EndTime = DateTimeHelper.ConvertFromUtcPlus2ToVietnamTime(createModel.EndTime);
         // Validate time range
         ValidateTimeRange(createModel.StartTime, createModel.EndTime, booth.Branch.OpeningTime, booth.Branch.ClosingTime);
 
@@ -108,10 +109,10 @@ public class BookingService : IBookingService
     }
     public async Task<CreateBookingResponse> CustomerBooking(CustomerBookingRequest request, string email)
     {
-        if ((request.StartTime - DateTimeHelper.GetVietnamTimeNow()).TotalMinutes <= 30)
-        {
-            throw new BadRequestException("You must booking a session with start time at least 30 minutes from now");
-        }
+        //if ((request.StartTime - DateTimeHelper.GetVietnamTimeNow()).TotalMinutes <= 30)
+        //{
+        //    throw new BadRequestException("You must booking a session with start time at least 30 minutes from now");
+        //}
         var createSessionOrderRequest = _mapper.Map<BookingRequest>(request);
         createSessionOrderRequest.CustomerEmail = email;
         return await CreateAsync(createSessionOrderRequest, BookingType.Online);
@@ -175,7 +176,7 @@ public class BookingService : IBookingService
             EndTime = booking.EndTime,
             BookingType = booking.BookingType,
             PaymentStatus = booking.PaymentStatus,
-            Status = booking.Status,
+            Status = BookingStatus.TakingPhoto,
             IsCancelled = booking.IsCancelled,
             CancelledDate = booking.CancelledDate,
             RefundAmount = booking.RefundAmount,
@@ -383,8 +384,15 @@ public class BookingService : IBookingService
                 {
                     response.message = $"Cancel booking successfully, but the cancel date is not meet our policy (must before {booking.FullPaymentPolicy.RefundDaysBefore}) to refund.";
                 }
+                var booth = (await _boothRepository.GetAsync(i => i.BoothID == booking.BoothID)).FirstOrDefault();
+                if (booth != null && booth.isBooked && timeNow > booking.StartTime && timeNow < booking.EndTime) 
+                { 
+                    booth.isBooked = false;
+                    await _boothRepository.UpdateAsync(booth);
+                }
                 response.isSuccess = true;
                 booking.IsCancelled = true;
+                booking.Status = BookingStatus.Canceled;
                 booking.CancelledDate = DateTimeHelper.GetVietnamTimeNow();
                 await _bookingRepository.UpdateAsync(booking);
                 await _emailService.SendCancelBookingInformation(bookingID);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Api.Common.Helper;
@@ -20,17 +21,16 @@ namespace PhotoboothBranchService.Api.Controllers
         }
 
         // Create
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<CreateTransactionResponse>> CreateTransaction(CreateTransactionRequest createPaymentRequest)
         {
-
             //get ip from request
             var clientIpAddress = IpAddressHelper.GetClientIpAddress(HttpContext);
             var email = Request.HttpContext.Items["Email"]?.ToString();
             //sent to service layer
             var createPaymentResponse = await _paymentService.CreateAsync(createPaymentRequest, clientIpAddress, email);
             return Ok(createPaymentResponse);
-
         }
 
         // Read
@@ -88,11 +88,18 @@ namespace PhotoboothBranchService.Api.Controllers
             var email = Request.HttpContext.Items["Email"]?.ToString();
             return Ok(await _paymentService.GetCustomerTransaction(email));
         }
-        [Authorization("STAFF","ADMIN")]
-        [HttpGet("staff/customer/{email}")]
-        public async Task<ActionResult<IEnumerable<TransactionResponse>>> StaffGetCustomerTransaction(string email) 
+        [Authorization("STAFF")]
+        [HttpGet("staff")]
+        public async Task<ActionResult<IEnumerable<TransactionResponse>>> StaffGetBranchTransaction() 
         {
-            return Ok(await _paymentService.GetCustomerTransaction(email));
+            var email = Request.HttpContext.Items["Email"]?.ToString();
+            return Ok(await _paymentService.StaffGetBranchTransaction(email));
+        }
+        [Authorization("ADMIN")]
+        [HttpGet("admin/{BranchID}")]
+        public async Task<ActionResult<IEnumerable<TransactionResponse>>> GetBranchTransaction(Guid BranchID)
+        {
+            return Ok(await _paymentService.GetBranchTransaction(BranchID));
         }
         // Update
         [HttpPut("{id}")]

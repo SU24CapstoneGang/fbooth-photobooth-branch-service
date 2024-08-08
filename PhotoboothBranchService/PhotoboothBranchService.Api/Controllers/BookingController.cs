@@ -42,7 +42,7 @@ namespace PhotoboothBranchService.Api.Controllers
             return Ok(createBookingResponse);
         }
         [HttpPost("checkin-booking")]
-        public async Task<IActionResult> Checkin([FromBody] CheckinCodeRequest request)
+        public async Task<ActionResult<BookingResponse>> Checkin([FromBody] CheckinCodeRequest request)
         {
             try
             {

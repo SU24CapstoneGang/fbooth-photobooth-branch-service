@@ -17,5 +17,7 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
         Task HandleMomoResponse(IQueryCollection queryString);
         Task<MomoIPNResponse> HandleMomoIPN(MoMoResponse moMoResponse);
         Task<(VnpayResponse response, string returnContent)> HandleVnpayResponse(IQueryCollection queryString);
+        Task<IEnumerable<TransactionResponse>> StaffGetBranchTransaction(string? email);
+        Task<IEnumerable<TransactionResponse>> GetBranchTransaction(Guid branchID);
     }
 }

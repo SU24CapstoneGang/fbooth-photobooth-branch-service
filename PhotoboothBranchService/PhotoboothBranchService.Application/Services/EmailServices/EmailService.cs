@@ -184,7 +184,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                     }
 
                     sbBody.AppendLine("<tr>");
-                    sbBody.AppendLine("<td colspan='3' style='border: 1px solid black; padding: 8px; text-align: right;'><strong>Total Price:</strong></td>");
+                    sbBody.AppendLine("<td colspan='4' style='border: 1px solid black; padding: 8px; text-align: right;'><strong>Total Price:</strong></td>");
                     sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'><strong>{booking.PaymentAmount:N0}</strong> VND</td>");
                     sbBody.AppendLine("</tr>");
 

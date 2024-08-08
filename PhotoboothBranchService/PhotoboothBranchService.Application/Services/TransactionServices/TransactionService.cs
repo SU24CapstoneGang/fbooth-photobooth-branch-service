@@ -32,6 +32,7 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
         private readonly IEmailService _emailService;
         private readonly IRefundService _refundService;
         private readonly IAccountRepository _accountRepository;
+        private readonly IBoothRepository _boothRepository;
         public TransactionService(ITransactionRepository paymentRepository, IMapper mapper,
             IPaymentMethodRepository paymentMethodRepository,
             IVNPayService vNPayService,
@@ -39,7 +40,7 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
             IMoMoService moMoService,
             IEmailService emailService,
             IRefundService refundService,
-            IAccountRepository accountRepository)
+            IAccountRepository accountRepository, IBoothRepository boothRepository)
         {
             _transactionRepository = paymentRepository;
             _mapper = mapper;
@@ -50,6 +51,7 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
             _emailService = emailService;
             _refundService = refundService;
             _accountRepository = accountRepository;
+            _boothRepository = boothRepository;
         }
 
         // Create
@@ -166,7 +168,7 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
                         }
 
                         createPaymentResponse.TransactionID = transaction.TransactionID;
-                        createPaymentResponse.TransactionUlr = "";
+                        createPaymentResponse.TransactionUlr = createModel.ReturnUrl;
                         transaction.GatewayTransactionID = account.AccountID.ToString();
                         transaction.TransactionStatus = TransactionStatus.Success;
                         await _transactionRepository.AddAsync(transaction);
@@ -276,9 +278,9 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
             }
             if (acc.Role != AccountRole.Customer)
             {
-                throw new BadRequestException("Account is not Customer");
+                throw new ForbiddenAccessException("Account is not Customer");
             }
-            var bookings = (await _bookingRepository.GetAsync(i => i.CustomerID == acc.AccountID)).Select(i => i.BoothID).ToList();
+            var bookings = (await _bookingRepository.GetAsync(i => i.CustomerID == acc.AccountID)).Select(i => i.BookingID).ToList();
             if (!bookings.Any()) 
             {
                 return new List<TransactionResponse>();
@@ -292,7 +294,47 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
                 return _mapper.Map<IEnumerable<TransactionResponse>>(trans.ToList());
             }
         }
-
+        public async Task<IEnumerable<TransactionResponse>> StaffGetBranchTransaction(string? email)
+        {
+            if (email.IsNullOrEmpty())
+            {
+                throw new BadRequestException("");
+            }
+            var acc = (await _accountRepository.GetAsync(i => i.Email.Equals(email))).SingleOrDefault();
+            if (acc == null)
+            {
+                throw new NotFoundException("Account not found");
+            }
+            if (acc.Role != AccountRole.Staff)
+            {
+                throw new ForbiddenAccessException("Account is not staff");
+            }
+            if (acc.BranchID.HasValue)
+            {
+                return await this.GetBranchTransaction(acc.BranchID.Value);
+            } else
+            {
+                throw new BadRequestException("Staff has not been assigned to any brnach");
+            }
+        }
+        public async Task<IEnumerable<TransactionResponse>> GetBranchTransaction(Guid branchID)
+        {
+            var booths = (await _boothRepository.GetAsync(i => i.BranchID == branchID)).Select(i => i.BoothID).ToList();
+            var bookings = (await _bookingRepository.GetAsync(i => booths.Contains(i.BoothID))).Select(i => i.BookingID).ToList();
+            if (!bookings.Any())
+            {
+                return new List<TransactionResponse>();
+            }
+            var trans = await _transactionRepository.GetAsync(i => bookings.Contains(i.BookingID));
+            if (trans == null)
+            {
+                return new List<TransactionResponse>();
+            }
+            else
+            {
+                return _mapper.Map<IEnumerable<TransactionResponse>>(trans.ToList());
+            }
+        }
         // Read by ID
         public async Task<TransactionResponse> GetByIdAsync(Guid id)
         {
