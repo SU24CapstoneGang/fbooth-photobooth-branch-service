@@ -1,5 +1,8 @@
-﻿using PhotoboothBranchService.Application.DTOs;
+﻿using Microsoft.AspNetCore.Http;
+using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Booth;
 using PhotoboothBranchService.Application.DTOs.Branch;
+using PhotoboothBranchService.Application.DTOs.BranchPhoto;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.Enum;
 
@@ -10,6 +13,8 @@ public interface IBranchService : IServiceBase<BranchResponse, BranchFilter, Pag
     Task<IEnumerable<BranchResponse>> SearchByName(string name);
     Task<IEnumerable<BranchResponse>> GetByStatus(BranchStatus status);
     Task<CreateBranchResponse> CreateAsync(CreateBranchRequest createModel, BranchStatus status);
+    Task<BranchPhotoResponse> AddPhotoForBooth(Guid branchID, IFormFile file);
+
     Task UpdateAsync(Guid id, UpdateBranchRequest updateModel, BranchStatus? status);
     Task DeleteAsync(Guid id);
 }

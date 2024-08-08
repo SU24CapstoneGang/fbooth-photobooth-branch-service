@@ -10,7 +10,9 @@ using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Application.Services.BackgroundServices;
 using PhotoboothBranchService.Application.Services.BookingServices;
 using PhotoboothBranchService.Application.Services.BookingServiceServices;
+using PhotoboothBranchService.Application.Services.BoothPhotoServices;
 using PhotoboothBranchService.Application.Services.BoothServices;
+using PhotoboothBranchService.Application.Services.BranchPhotoServices;
 using PhotoboothBranchService.Application.Services.BranchServices;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Application.Services.DashboardServices;
@@ -32,6 +34,7 @@ using PhotoboothBranchService.Application.Services.StickerServices;
 using PhotoboothBranchService.Application.Services.TransactionServices;
 using PhotoboothBranchService.Application.Services.VNPayServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
+using PhotoboothBranchService.Domain.IRepository;
 using System.Reflection;
 
 namespace PhotoboothBranchService.Application
@@ -60,7 +63,10 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IStickerService, StickerService>();
             services.AddScoped<IPhotoBoxService, PhotoBoxService>();
-            services.AddScoped<IFullPaymentPolicyServices, FullPaymentPolicyServices>();
+            services.AddScoped<IFullPaymentPolicyService, FullPaymentPolicyService>();
+            services.AddScoped<IBoothPhotoService, BoothPhotoService>();
+            services.AddScoped<IBranchPhotoService, BranchPhotoService>();
+
 
             // cloudinary
             services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));

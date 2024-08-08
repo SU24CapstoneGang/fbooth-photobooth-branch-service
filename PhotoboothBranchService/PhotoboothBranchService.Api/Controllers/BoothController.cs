@@ -24,6 +24,29 @@ public class BoothController : ControllerBaseApi
         return Ok(createBoothResponse);
     }
 
+    [HttpPost("{boothID}/photos")]
+    public async Task<IActionResult> AddPhotoForBooth(Guid boothID, IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("No file provided.");
+        }
+
+        try
+        {
+            var response = await _boothService.AddPhotoForBooth(boothID, file);
+            return Ok(response);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
     // Read
     [HttpGet]
     public async Task<ActionResult<IEnumerable<BoothResponse>>> GetAllBooths()

@@ -8,9 +8,9 @@ namespace PhotoboothBranchService.Api.Controllers
 {
     public class PolicyController : ControllerBaseApi
     {
-        private readonly IFullPaymentPolicyServices _policyServices;
+        private readonly IFullPaymentPolicyService _policyServices;
 
-        public PolicyController(IFullPaymentPolicyServices policyServices)
+        public PolicyController(IFullPaymentPolicyService policyServices)
         {
             _policyServices = policyServices;
         }

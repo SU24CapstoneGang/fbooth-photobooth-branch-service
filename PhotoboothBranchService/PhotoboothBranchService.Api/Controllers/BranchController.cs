@@ -25,6 +25,29 @@ public class BranchController : ControllerBaseApi
         return Ok(createBoothBranchResponse);
     }
 
+    [HttpPost("{branchID}/photos")]
+    public async Task<IActionResult> AddPhotoForBranch(Guid branchID, IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("No file provided.");
+        }
+
+        try
+        {
+            var response = await _branchService.AddPhotoForBooth(branchID, file);
+            return Ok(response);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
     //Read
     [HttpGet]
     public async Task<ActionResult<IEnumerable<BranchResponse>>> GetAllBranches()

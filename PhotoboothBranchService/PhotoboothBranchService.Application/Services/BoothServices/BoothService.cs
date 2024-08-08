@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Booth;
+using PhotoboothBranchService.Application.DTOs.Sticker;
+using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -18,9 +21,13 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         private readonly IDeviceRepository _deviceRepository;
         private readonly IBookingRepository _bookingRepository;
         private readonly IAccountRepository _accountRepository;
+        private readonly ICloudinaryService _cloudinaryService;
+        private readonly IBoothPhotoRepository _boothPhotoRepository;
         private readonly IMapper _mapper;
 
-        public BoothService(IBoothRepository boothRepository, IMapper mapper, IBranchRepository branchRepository, IDeviceRepository deviceRepository, IBookingRepository bookingRepository, IAccountRepository accountRepository)
+        public BoothService(IBoothRepository boothRepository, IMapper mapper, IBranchRepository branchRepository, 
+            IDeviceRepository deviceRepository, IBookingRepository bookingRepository, IAccountRepository accountRepository, 
+            ICloudinaryService cloudinaryService, IBoothPhotoRepository boothPhotoRepository)
         {
             _boothRepository = boothRepository;
             _mapper = mapper;
@@ -28,6 +35,8 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
             _deviceRepository = deviceRepository;
             _bookingRepository = bookingRepository;
             _accountRepository = accountRepository;
+            _cloudinaryService = cloudinaryService;
+            _boothPhotoRepository = boothPhotoRepository;
         }
 
         // Create
@@ -70,7 +79,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         // Read
         public async Task<IEnumerable<BoothResponse>> GetAllAsync()
         {
-            var booths = await _boothRepository.GetAllAsync();
+            var booths = await _boothRepository.GetAsync(null, bth => bth.BoothPhotos);
             return _mapper.Map<IEnumerable<BoothResponse>>(booths.ToList().OrderByDescending(i => i.CreateDate));
         }
         public async Task<IEnumerable<BoothResponse>> StaffGetAllAsync(string? email)
@@ -109,7 +118,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         }
         public async Task<BoothResponse> GetByIdAsync(Guid id)
         {
-            var booth = (await _boothRepository.GetAsync(b => b.BoothID == id)).FirstOrDefault();
+            var booth = (await _boothRepository.GetAsync(b => b.BoothID == id, b => b.BoothPhotos)).FirstOrDefault();
             return _mapper.Map<BoothResponse>(booth);
         }
 
@@ -134,6 +143,34 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
                 updatedBooth.Status = status.Value;
             }
             await _boothRepository.UpdateAsync(updatedBooth);
+        }
+
+        public async Task<BoothResponse> AddPhotoForBooth(Guid boothID, IFormFile file)
+        {
+            var booth = GetByIdAsync(boothID);
+            if (booth != null)
+            {
+                //upload to cloudinary
+                var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-BoothPicture");
+                if (uploadResult.Error != null)
+                {
+                    throw new Exception(uploadResult.Error.Message);
+                }
+
+                //create object from cloudinary's return 
+                var boothPhoto = new BoothPhoto
+                {
+                    BoothID = boothID,
+                    BoothPhotoUrl = uploadResult.SecureUrl.AbsoluteUri,
+                    CouldID = uploadResult.PublicId,
+                };
+
+                await _boothPhotoRepository.AddAsync(boothPhoto);
+
+                var updatedBooth = (await _boothRepository.GetAsync(b => b.BoothID == boothID, b => b.BoothPhotos)).FirstOrDefault();
+                return _mapper.Map<BoothResponse>(updatedBooth);
+            }
+            throw new KeyNotFoundException("Booth not found.");
         }
     }
 }

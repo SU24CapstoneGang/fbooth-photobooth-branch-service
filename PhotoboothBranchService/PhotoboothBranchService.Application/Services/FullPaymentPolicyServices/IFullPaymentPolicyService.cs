@@ -6,7 +6,7 @@ using PhotoboothBranchService.Domain.Common.Interfaces;
 
 namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
 {
-    public interface IFullPaymentPolicyServices : IServiceBase<FullPaymentPolicyResponse, FullPaymentPolicyFilter, PagingModel>
+    public interface IFullPaymentPolicyService : IServiceBase<FullPaymentPolicyResponse, FullPaymentPolicyFilter, PagingModel>
     {
         Task<FullPaymentPolicyResponse> CreatePolicy(CreatePolicyRequestModel layoutRequest);
         Task DeleteAsync(Guid id);

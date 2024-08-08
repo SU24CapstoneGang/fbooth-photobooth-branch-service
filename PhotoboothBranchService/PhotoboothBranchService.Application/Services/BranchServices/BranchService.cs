@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
 using CloudinaryDotNet;
+using Microsoft.AspNetCore.Http;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Booth;
 using PhotoboothBranchService.Application.DTOs.Branch;
+using PhotoboothBranchService.Application.DTOs.BranchPhoto;
+using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -16,14 +20,48 @@ public class BranchService : IBranchService
 {
     private readonly IBranchRepository _branchRepository;
     private readonly IAccountRepository _accountRepository;
+    private readonly ICloudinaryService _cloudinaryService;
+    private readonly IBranchPhotoRepository _branchPhotoRepository;
     private readonly IMapper _mapper;
 
-    public BranchService(IBranchRepository branchRepository, IMapper mapper, IAccountRepository accountRepository)
+    public BranchService(IBranchRepository branchRepository, IMapper mapper, IAccountRepository accountRepository, 
+        ICloudinaryService cloudinaryService, IBranchPhotoRepository branchPhotoRepository)
     {
         _branchRepository = branchRepository;
         _mapper = mapper;
         _accountRepository = accountRepository;
+        _cloudinaryService = cloudinaryService;
+        _branchPhotoRepository = branchPhotoRepository;
     }
+
+    public async Task<BranchPhotoResponse> AddPhotoForBooth(Guid branchID, IFormFile file)
+    {
+        var booth = GetByIdAsync(branchID);
+        if (booth != null)
+        {
+            //upload to cloudinary
+            var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-BranchPicture");
+            if (uploadResult.Error != null)
+            {
+                throw new Exception(uploadResult.Error.Message);
+            }
+
+            //create object from cloudinary's return 
+            var Photo = new BranchPhoto
+            {
+                BranchID = branchID,
+                BranchPhotoUrl = uploadResult.SecureUrl.AbsoluteUri,
+                CouldID = uploadResult.PublicId,
+            };
+
+            await _branchPhotoRepository.AddAsync(Photo);
+
+            var updatedBranch = (await _branchRepository.GetAsync(b => b.BranchID == branchID, b => b.BranchPhotos)).FirstOrDefault();
+            return _mapper.Map<BranchPhotoResponse>(updatedBranch);
+        }
+        throw new KeyNotFoundException("Branch not found.");
+    }
+
     //Create
     public async Task<CreateBranchResponse> CreateAsync(CreateBranchRequest createModel, BranchStatus status)
     {
@@ -61,7 +99,7 @@ public class BranchService : IBranchService
     //read
     public async Task<IEnumerable<BranchResponse>> GetAllAsync()
     {
-        var branches = await _branchRepository.GetAsync(null, bth => bth.Booths);
+        var branches = await _branchRepository.GetAsync(null, bth => bth.Booths, bth => bth.BranchPhotos);
         return _mapper.Map<IEnumerable<BranchResponse>>(branches.ToList().OrderByDescending(i=>i.CreateDate));
     }
 
@@ -74,7 +112,7 @@ public class BranchService : IBranchService
 
     public async Task<BranchResponse> GetByIdAsync(Guid id)
     {
-        var photoBoothBranch = (await _branchRepository.GetAsync(p => p.BranchID == id)).FirstOrDefault();
+        var photoBoothBranch = (await _branchRepository.GetAsync(p => p.BranchID == id, p => p.BranchPhotos)).FirstOrDefault();
         return _mapper.Map<BranchResponse>(photoBoothBranch);
     }
 

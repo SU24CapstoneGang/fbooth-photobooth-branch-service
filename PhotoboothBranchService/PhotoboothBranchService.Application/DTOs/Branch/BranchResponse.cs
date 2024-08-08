@@ -1,4 +1,5 @@
 ﻿using PhotoboothBranchService.Application.DTOs.Booth;
+using PhotoboothBranchService.Application.DTOs.BranchPhoto;
 using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Application.DTOs.Branch
@@ -14,6 +15,7 @@ namespace PhotoboothBranchService.Application.DTOs.Branch
         public BranchStatus Status { get; set; } = default!;
         public TimeSpan OpeningTime { get; set; } // Thêm giờ mở cửa
         public TimeSpan ClosingTime { get; set; } // Thêm giờ đóng cửa
-        public List<BoothResponse> Booths { get; set; }
+        public ICollection<BoothResponse> Booths { get; set; } = default!;
+        public ICollection<BranchPhotoResponse> BranchPhotos { get; set; } = default!;
     }
 }

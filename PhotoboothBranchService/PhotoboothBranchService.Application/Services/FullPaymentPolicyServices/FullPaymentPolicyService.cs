@@ -16,12 +16,12 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
 {
-    public class FullPaymentPolicyServices : IFullPaymentPolicyServices
+    public class FullPaymentPolicyService : IFullPaymentPolicyService
     {
         private readonly IFullPaymentPolicyRepository _repository;
         private readonly IMapper _mapper;
 
-        public FullPaymentPolicyServices(IFullPaymentPolicyRepository fullPaymentPolicyRepository, IMapper mapper)
+        public FullPaymentPolicyService(IFullPaymentPolicyRepository fullPaymentPolicyRepository, IMapper mapper)
         {
             _repository = fullPaymentPolicyRepository;
             _mapper = mapper;
