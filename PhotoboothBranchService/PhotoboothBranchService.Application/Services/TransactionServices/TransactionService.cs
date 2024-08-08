@@ -63,12 +63,12 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
             {
                 throw new NotFoundException("Not found Session to proceed payment");
             }
-            if (booking.IsCancelled)
+            if (booking.BookingStatus == BookingStatus.Canceled)
             {
                 throw new BadRequestException("The Order has been ended or cancelled");
             }
             //add check endtime later
-            if (booking.PaymentStatus == PaymentStatus.Paid && booking.Status == BookingStatus.PendingChecking)
+            if (booking.PaymentStatus == PaymentStatus.Paid && booking.BookingStatus == BookingStatus.PendingChecking)
             {
                 throw new BadRequestException("Booking already paid.");
             }
@@ -362,11 +362,11 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
                 //do refund trans
                 throw new Exception("Not found Booking");
             }
-            if (booking.Status == BookingStatus.PendingPayment && booking.PaymentStatus == PaymentStatus.Processing)
+            if (booking.BookingStatus == BookingStatus.PendingPayment && booking.PaymentStatus == PaymentStatus.Processing)
             {
                 if (trans.Amount == booking.PaymentAmount)
                 {
-                    booking.Status = BookingStatus.PendingChecking;
+                    booking.BookingStatus = BookingStatus.PendingChecking;
                     booking.PaymentStatus = PaymentStatus.Paid;
                     try
                     {

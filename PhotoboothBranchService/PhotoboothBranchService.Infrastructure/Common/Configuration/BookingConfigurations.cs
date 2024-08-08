@@ -19,7 +19,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(s => s.PaymentAmount)
                 .IsRequired().HasColumnType("decimal(18, 0)"); ; // Tổng giá
-            builder.Property(s => s.CustomerReferenceID).IsRequired();
+            builder.Property(s => s.CustomerBusinessID).IsRequired();
             builder.Property(s => s.HireBoothFee).IsRequired().HasColumnType("decimal(18, 0)");
             builder.Property(s => s.StartTime).IsRequired(true);
             builder.Property(s => s.EndTime).IsRequired(true);
@@ -32,7 +32,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
                 .ValueGeneratedOnAddOrUpdate();
             builder.Property(u => u.ValidateCode).IsRequired();
-            builder.Property(pb => pb.Status)
+            builder.Property(pb => pb.BookingStatus)
                 .IsRequired();
 
             // Mối quan hệ một-nhieu giữa Session và Account
@@ -50,6 +50,10 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasForeignKey(c => c.BookingID)
                 .IsRequired(false);
             builder.HasMany(s => s.PhotoSessions)
+                .WithOne(ps => ps.Booking)
+                .HasForeignKey(ps => ps.BookingID)
+                .IsRequired();
+            builder.HasMany(s => s.BookingSlots)
                 .WithOne(ps => ps.Booking)
                 .HasForeignKey(ps => ps.BookingID)
                 .IsRequired();

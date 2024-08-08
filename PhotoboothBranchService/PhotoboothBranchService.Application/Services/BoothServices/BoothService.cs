@@ -40,7 +40,6 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
                 throw new NotFoundException("Not found Branch to create booth");
             }
             booth.Status = status;
-            booth.isBooked = false;
             booth.CreateDate = DateTimeHelper.GetVietnamTimeNow();
             await _boothRepository.AddAsync(booth);
             return _mapper.Map<CreateBoothResponse>(booth);
@@ -101,7 +100,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
             var boothid = booths.Select(i => i.BoothID).ToList();//convert to id list 
             var bookingBoothid = (await _bookingRepository.GetAsync(i => boothid.Contains(i.BoothID) //id list used here
                          && ((request.StartTime < i.StartTime && i.StartTime < request.EndTime.AddMinutes(5)) || (request.EndTime.AddMinutes(5) > i.EndTime.AddMinutes(5) && i.EndTime.AddMinutes(5) > request.StartTime))
-                         && i.IsCancelled == false)).Select(i => i.Booth).Distinct().ToList();
+                         && i.BookingStatus != BookingStatus.Canceled)).Select(i => i.Booth).Distinct().ToList();
 
             var result = booths.Except(bookingBoothid); // branch booth's collectiong - findout booth's collection = active booth's collection
 

@@ -40,7 +40,7 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                 //delete service
                 var now = DateTimeHelper.GetVietnamTimeNow();
                 var bookings = (await bookingRepository.GetAsync(o =>
-                    o.Status == BookingStatus.PendingPayment && o.PaymentStatus == PaymentStatus.Processing)).ToList();
+                    o.BookingStatus == BookingStatus.PendingPayment && o.PaymentStatus == PaymentStatus.Processing)).ToList();
 
                 foreach (var booking in bookings)
                 {
@@ -57,7 +57,7 @@ namespace PhotoboothBranchService.Application.BackgroundServices
 
                 //change booth to InUse
                 bookings = (await bookingRepository.GetAsync(o =>
-                    (o.Status == BookingStatus.PendingChecking) &&
+                    (o.BookingStatus == BookingStatus.PendingChecking) &&
                      o.StartTime <= now &&
                      o.EndTime >= now, i => i.Booth)).ToList();
                 foreach (var order in bookings)
@@ -65,22 +65,22 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                     if (order.Booth.Status == BoothStatus.Active)
                     {
                         var booth = order.Booth;
-                        booth.isBooked = true;
+                        booth.Status = BoothStatus.Booked;
                         await boothRepository.UpdateAsync(booth);
                     }
                 }
 
                 //no showing & booking
                 bookings = (await bookingRepository.GetAsync(o =>
-                    (o.Status == BookingStatus.PendingChecking || o.Status == BookingStatus.TakingPhoto) &&
+                    (o.BookingStatus == BookingStatus.PendingChecking || o.BookingStatus == BookingStatus.TakingPhoto) &&
                      o.EndTime <= now)).ToList();
                 foreach (var booking in bookings)
                 {
-                    if (booking.Status == BookingStatus.PendingChecking){
-                        booking.Status = BookingStatus.NoShow;
+                    if (booking.BookingStatus == BookingStatus.PendingChecking){
+                        booking.BookingStatus = BookingStatus.NoShow;
                     } else
                     {
-                        booking.Status = BookingStatus.CompleteChecked;
+                        booking.BookingStatus = BookingStatus.CompleteChecked;
                         var photoSessions = (await photoSessionRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();
                         if (photoSessions != null && photoSessions.Count > 0)
                         {
@@ -96,7 +96,7 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                     var booth = (await boothRepository.GetAsync(i => i.BoothID == booking.BoothID)).FirstOrDefault();
                     if (booth != null)
                     {
-                        booth.isBooked = false;
+                        booth.Status = BoothStatus.Active;
                         await boothRepository.UpdateAsync(booth);
                     }
                 }

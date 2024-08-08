@@ -64,10 +64,10 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         private void ValidateBookingToAdd(Booking booking)
         {
             var timeNow = DateTimeHelper.GetVietnamTimeNow();
-            if (booking.IsCancelled)
+            if (booking.BookingStatus == BookingStatus.Canceled)
             {
                 throw new BadRequestException("Booking is cancelled!");
-            } else if (booking.Status != BookingStatus.CompleteChecked) {
+            } else if (booking.BookingStatus != BookingStatus.CompleteChecked) {
                 throw new BadRequestException("Booking has not Check-in yet");
             }
 

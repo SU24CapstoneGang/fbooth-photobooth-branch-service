@@ -8,5 +8,6 @@
         CompleteChecked = 5,
         TakingPhoto = 4,
         Canceled = 6,
+        ExtraService = 7
     }
 }

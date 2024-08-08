@@ -135,7 +135,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             sbBody.AppendLine("<p>Here is your booking's information</p>");
             sbBody.AppendLine("<br>");
 
-            sbBody.AppendLine($"<p><strong>Booking Code:</strong> {booking.CustomerReferenceID}</p>");
+            sbBody.AppendLine($"<p><strong>Booking Code:</strong> {booking.CustomerBusinessID}</p>");
 
             sbBody.AppendLine("<h3>Branch Details</h3>");
             sbBody.AppendLine($"<p><strong>Branch Name:</strong> {branch.BranchName}</p>");
@@ -167,7 +167,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                     sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Hire booth fee</td>");
                     sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{duration:N2}</td>");
                     sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Hours</td>");
-                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{booking.Booth.PricePerHour:N0}</td>");
+                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{booking.Booth.PricePerSlot:N0}</td>");
                     sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{booking.HireBoothFee:N0}</td>");
                     sbBody.AppendLine("</tr>");
 
@@ -224,7 +224,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             }
 
             StringBuilder sbBody = new StringBuilder();
-            sbBody.AppendLine($"<p>We regret to inform you that your booking with the reference number <strong>{booking.CustomerReferenceID}</strong> has been successfully canceled.</p>");
+            sbBody.AppendLine($"<p>We regret to inform you that your booking with the reference number <strong>{booking.CustomerBusinessID}</strong> has been successfully canceled.</p>");
             sbBody.AppendLine("<p>If you have any questions or need further assistance, please feel free to contact our customer support team.</p>");
             sbBody.AppendLine("<br>");
             sbBody.AppendLine("<p>We apologize for any inconvenience caused and thank you for your understanding.</p>");

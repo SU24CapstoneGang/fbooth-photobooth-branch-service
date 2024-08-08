@@ -74,21 +74,20 @@ public class BookingService : IBookingService
             throw new BadRequestException("There is another booking in the selected time range, please choose another time");
         }
         // Calculate payment amount
-        var processedServices = await ProcessServiceListAsync(booth.PricePerHour, createModel.StartTime, createModel.EndTime, createModel.ServiceList);
+        var processedServices = await ProcessServiceListAsync(booth.PricePerSlot, createModel.StartTime, createModel.EndTime, createModel.ServiceList);
 
         // Map to booking entity
         var booking = _mapper.Map<Booking>(createModel);
         booking.CustomerID = account.AccountID;
         booking.ValidateCode = await GenerateValidateCode();
-        booking.Status = BookingStatus.PendingPayment;
-        booking.IsCancelled = false;
+        booking.BookingStatus = BookingStatus.PendingPayment;
         booking.CreatedDate = DateTimeHelper.GetVietnamTimeNow();
         booking.HireBoothFee = processedServices.Item3;
         booking.PaymentAmount = processedServices.Item1;
         booking.BookingType = bookingType;
         booking.BookingServices = processedServices.Item2;
         booking.PaymentStatus = PaymentStatus.Processing;
-        booking.CustomerReferenceID = this.GenerateCustomerReferenceID(account.FirstName, account.LastName);
+        booking.CustomerBusinessID = this.GenerateCustomerReferenceID(account.FirstName, account.LastName);
         booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(createModel.StartTime);
         // Save booking
         await _bookingRepository.AddAsync(booking);
@@ -129,7 +128,7 @@ public class BookingService : IBookingService
             throw new BadRequestException("Wrong validate code, please try again");
         }
 
-        if (booking.IsCancelled)
+        if (booking.BookingStatus == BookingStatus.Canceled)
         {
             throw new BadRequestException("This booking has been cancelled. Please contact our staff for further assistance.");
         }
@@ -177,7 +176,6 @@ public class BookingService : IBookingService
             BookingType = booking.BookingType,
             PaymentStatus = booking.PaymentStatus,
             Status = BookingStatus.TakingPhoto,
-            IsCancelled = booking.IsCancelled,
             CancelledDate = booking.CancelledDate,
             RefundAmount = booking.RefundAmount,
             CreatedDate = booking.CreatedDate,
@@ -186,7 +184,7 @@ public class BookingService : IBookingService
             BookingServices = bookingServiceResponses
         };
 
-        booking.Status = BookingStatus.TakingPhoto;
+        booking.BookingStatus = BookingStatus.TakingPhoto;
         await _bookingRepository.UpdateAsync(booking);
         return response;
 
@@ -253,7 +251,7 @@ public class BookingService : IBookingService
     }
     public async Task<BookingResponse> GetByReferenceIDAsync(string id)
     {
-        var booking = (await _bookingRepository.GetAsync(s => s.CustomerReferenceID == id,
+        var booking = (await _bookingRepository.GetAsync(s => s.CustomerBusinessID == id,
             includeProperties: new Expression<Func<Booking, object>>[]
             {
                 i => i.BookingServices,
@@ -285,7 +283,7 @@ public class BookingService : IBookingService
                 throw new ForbiddenAccessException("Can not update booking on another cusotmer.");
             }
         }
-        if (booking.Status != BookingStatus.PendingPayment && !booking.IsCancelled && booking.PaymentStatus != PaymentStatus.Processing)
+        if (booking.BookingStatus != BookingStatus.PendingPayment && booking.BookingStatus != BookingStatus.Canceled && booking.PaymentStatus != PaymentStatus.Processing)
         {
             throw new BadRequestException("Cannot update the booking, it's already pay or has been cancelled");
         }
@@ -296,17 +294,16 @@ public class BookingService : IBookingService
         {
             throw new BadRequestException("There is another booking in the selected time range, please choose another time");
         }
-        var processedServices = await ProcessServiceListAsync(booth.PricePerHour, updateModel.StartTime, updateModel.EndTime, updateModel.ServiceList);
+        var processedServices = await ProcessServiceListAsync(booth.PricePerSlot, updateModel.StartTime, updateModel.EndTime, updateModel.ServiceList);
         
         // Map to booking entity
         booking.ValidateCode = await GenerateValidateCode();
-        booking.Status = BookingStatus.PendingPayment;
-        booking.IsCancelled = false;
+        booking.BookingStatus = BookingStatus.PendingPayment;
         booking.CreatedDate = DateTimeHelper.GetVietnamTimeNow();
         booking.HireBoothFee = processedServices.Item3;
         booking.PaymentAmount = processedServices.Item1;
         account = account.Role == AccountRole.Customer ? account : (await _accountRepository.GetAsync(i => i.AccountID == booking.CustomerID)).First();
-        booking.CustomerReferenceID = this.GenerateCustomerReferenceID(account.FirstName, account.LastName);
+        booking.CustomerBusinessID = this.GenerateCustomerReferenceID(account.FirstName, account.LastName);
         booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(updateModel.StartTime);
 
         //delete old booking service
@@ -340,15 +337,15 @@ public class BookingService : IBookingService
         {
             response.message = "Booking not found";
         }
-        else if (booking.Status == BookingStatus.TakingPhoto)
+        else if (booking.BookingStatus == BookingStatus.TakingPhoto)
         {
             response.message = "Booking is going, cannot cancel.";
         }
-        else if (booking.IsCancelled)
+        else if (booking.BookingStatus == BookingStatus.Canceled)
         {
             response.message = "Booking already canceled.";
         }
-        else if (booking.EndTime < timeNow || booking.Status == BookingStatus.NoShow)
+        else if (booking.EndTime < timeNow || booking.BookingStatus == BookingStatus.NoShow)
         {
             response.message = "Booking has ended, can not cancel.";
         }
@@ -358,7 +355,7 @@ public class BookingService : IBookingService
             {
                 if (booking.StartTime > timeNow)
                 {
-                    if (booking.Status == BookingStatus.PendingChecking && (booking.StartTime.Date - timeNow).TotalDays > booking.FullPaymentPolicy.RefundDaysBefore)
+                    if (booking.BookingStatus == BookingStatus.PendingChecking && (booking.StartTime.Date - timeNow).TotalDays > booking.FullPaymentPolicy.RefundDaysBefore)
                     {
                         //doing refund
                         var refundRes = await _refundService.RefundByBookingID(bookingID, false, ipAddress, email);
@@ -385,14 +382,13 @@ public class BookingService : IBookingService
                     response.message = $"Cancel booking successfully, but the cancel date is not meet our policy (must before {booking.FullPaymentPolicy.RefundDaysBefore}) to refund.";
                 }
                 var booth = (await _boothRepository.GetAsync(i => i.BoothID == booking.BoothID)).FirstOrDefault();
-                if (booth != null && booth.isBooked && timeNow > booking.StartTime && timeNow < booking.EndTime) 
+                if (booth != null && booth.Status == BoothStatus.Booked && timeNow > booking.StartTime && timeNow < booking.EndTime) 
                 { 
-                    booth.isBooked = false;
+                    booth.Status = BoothStatus.Active;
                     await _boothRepository.UpdateAsync(booth);
                 }
                 response.isSuccess = true;
-                booking.IsCancelled = true;
-                booking.Status = BookingStatus.Canceled;
+                booking.BookingStatus = BookingStatus.Canceled;
                 booking.CancelledDate = DateTimeHelper.GetVietnamTimeNow();
                 await _bookingRepository.UpdateAsync(booking);
                 await _emailService.SendCancelBookingInformation(bookingID);
@@ -435,15 +431,15 @@ public class BookingService : IBookingService
     private async Task<List<Booking>> ValidateBookingTime(Guid boothId, DateTime startTime, DateTime endTime)
     {
         var bookings = (await _bookingRepository.GetAsync(i => i.BoothID == boothId
-                                 && ((startTime < i.StartTime && i.StartTime < endTime.AddMinutes(5)) || (endTime.AddMinutes(5) > i.EndTime.AddMinutes(5) && i.EndTime.AddMinutes(5) > startTime))
-                                 && i.IsCancelled == false)).ToList();
+                                 && ((startTime < i.StartTime && i.StartTime < endTime) || (endTime > i.EndTime && i.EndTime > startTime))
+                                 && i.BookingStatus != BookingStatus.Canceled)).ToList();
         return bookings?.ToList() ?? new List<Booking>();
     }
     private async Task<long> GenerateValidateCode()
     {
         long code = 0;
         var timeNow = DateTimeHelper.GetVietnamTimeNow();
-        var existedCodes = (await _bookingRepository.GetAsync(i => i.IsCancelled == false && (i.StartTime > timeNow || i.EndTime > timeNow))).ToList().Select(i => i.ValidateCode);
+        var existedCodes = (await _bookingRepository.GetAsync(i => i.BookingStatus != BookingStatus.Canceled && (i.StartTime > timeNow || i.EndTime > timeNow))).ToList().Select(i => i.ValidateCode);
         while (code == 0)
         {
             code = new Random().Next(100000, 1000000);
@@ -512,7 +508,7 @@ public class BookingService : IBookingService
         {
             throw new NotFoundException("Booth not found on server, try again later");
         }
-        else if (booth.isBooked || booth.Status == BoothStatus.Maintenance || booth.Status == BoothStatus.Inactive)
+        else if (booth.Status == BoothStatus.Booked || booth.Status == BoothStatus.Maintenance || booth.Status == BoothStatus.Inactive)
         {
             throw new BadRequestException("Booth is used by another or is inactive, in maintenance");
         }
