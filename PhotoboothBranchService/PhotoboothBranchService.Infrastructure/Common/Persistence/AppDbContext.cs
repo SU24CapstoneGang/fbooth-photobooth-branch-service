@@ -28,6 +28,10 @@ public class AppDbContext : DbContext
     public DbSet<FullPaymentPolicy> FullPaymentPolicies { get; set; }
     public DbSet<BookingSlot> BookingSlots { get; set; }
     public DbSet<Slot> Slots { get; set; }
+    public DbSet<BoothPhoto> BoothPhotos { get; set; }
+    public DbSet<BranchPhoto> BranchPhotos { get; set; }
+
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -76,5 +80,8 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new FullPaymentPolicyConfigurations());
         modelBuilder.ApplyConfiguration(new SlotConfiguration());
         modelBuilder.ApplyConfiguration(new BookingSlotConfiguration());
+        modelBuilder.ApplyConfiguration(new BranchPhotoConfigurations());
+        modelBuilder.ApplyConfiguration(new BranchPhotoConfigurations());
+
     }
 }

@@ -25,7 +25,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(p => p.RefundDaysBefore)
                 .IsRequired();
             builder.Property(p => p.RefundPercent).IsRequired();
-            builder.Property(p => p.NoCheckInTimeLimit)
+            builder.Property(p => p.CheckInTimeLimit)
                 .IsRequired();
 
             builder.Property(p => p.IsActive)
@@ -40,8 +40,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(p => p.CreatedDate)
                 .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
 
-            builder.Property(p => p.IsPermanentPolicy)
-                .IsRequired();
 
             builder.Property(p => p.IsDefaultPolicy)
                 .IsRequired();

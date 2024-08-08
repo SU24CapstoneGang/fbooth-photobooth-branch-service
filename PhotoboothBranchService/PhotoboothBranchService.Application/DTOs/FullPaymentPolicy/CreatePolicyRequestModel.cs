@@ -18,7 +18,7 @@ namespace PhotoboothBranchService.Application.DTOs.FullPaymentPolicy
         [Range(0, int.MaxValue, ErrorMessage = "Refund days before cannot be negative.")]
         public int RefundDaysBefore { get; set; } // Số ngày trước khi đặt phòng để được hoàn tiền
 
-        public bool NoCheckInTimeLimit { get; set; } // Không bị giới hạn thời gian check in
+        public int CheckInTimeLimit { get; set; } // Không bị giới hạn thời gian check in
 
         [DataType(DataType.Date, ErrorMessage = "StartDate must be a valid date.")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]

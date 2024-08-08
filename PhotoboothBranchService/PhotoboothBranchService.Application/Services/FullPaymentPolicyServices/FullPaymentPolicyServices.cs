@@ -70,13 +70,12 @@ namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
                 PolicyName = request.PolicyName,
                 PolicyDescription = request.PolicyDescription,
                 RefundDaysBefore = request.RefundDaysBefore,
-                NoCheckInTimeLimit = request.NoCheckInTimeLimit,
+                CheckInTimeLimit = request.CheckInTimeLimit,
                 IsActive = isActive,
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
                 CreatedDate = timeNow,
                 IsDefaultPolicy = !request.StartDate.HasValue,
-                IsPermanentPolicy = !request.EndDate.HasValue
             };
 
             await _repository.AddAsync(policy);
