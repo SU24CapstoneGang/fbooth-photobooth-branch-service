@@ -15,7 +15,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
         {
             builder.ToTable("BookingSlots");
             builder.HasKey(b => b.BookingSlotID);
-            builder.Property(b => b.BookingSlotID).ValueGeneratedOnAdd();
+            builder.Property(b => b.BookingSlotID).ValueGeneratedOnAdd().IsRequired();
             builder.Property(b => b.BookingDate).IsRequired();
 
         }

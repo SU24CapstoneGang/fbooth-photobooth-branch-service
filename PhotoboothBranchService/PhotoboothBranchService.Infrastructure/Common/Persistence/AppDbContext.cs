@@ -81,7 +81,7 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new SlotConfiguration());
         modelBuilder.ApplyConfiguration(new BookingSlotConfiguration());
         modelBuilder.ApplyConfiguration(new BranchPhotoConfigurations());
-        modelBuilder.ApplyConfiguration(new BranchPhotoConfigurations());
+        modelBuilder.ApplyConfiguration(new BoothPhotoConfigurations());
 
     }
 }

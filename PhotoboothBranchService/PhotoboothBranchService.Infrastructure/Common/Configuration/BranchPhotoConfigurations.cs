@@ -36,10 +36,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .WithMany(b => b.BranchPhotos)
                 .HasForeignKey(bp => bp.BranchID)
                 .OnDelete(DeleteBehavior.Cascade); // Set the delete behavior as required
-
-            // Indexes (Optional, but recommended for better performance)
-            builder.HasIndex(bp => bp.BranchID);
-
         }
     }
 }

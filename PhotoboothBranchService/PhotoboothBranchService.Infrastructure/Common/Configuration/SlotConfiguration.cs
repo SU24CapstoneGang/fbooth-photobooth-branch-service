@@ -15,9 +15,13 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
         {
             builder.ToTable("Slots");
             builder.HasKey(i => i.SlotID);
-            builder.Property(i => i.SlotID).ValueGeneratedOnAdd();
+            builder.Property(i => i.SlotID).ValueGeneratedOnAdd().IsRequired();
             builder.Property(i => i.SlotStartTime).IsRequired();
             builder.Property(i => i.SlotEndTime).IsRequired();
+            builder.Property(i => i.Status).IsRequired();
+            builder.HasMany(i => i.BookingSlots)
+                .WithOne(a => a.Slot)
+                .HasForeignKey(a => a.SlotID).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
