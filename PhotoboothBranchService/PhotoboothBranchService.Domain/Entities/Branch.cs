@@ -15,4 +15,7 @@ public class Branch
     public BranchStatus Status { get; set; } = default!;
     public virtual ICollection<Booth> Booths { get; set; } = default!;
     public virtual ICollection<Account> Staffs { get; set; } = default!;
+    public virtual ICollection<BranchPhoto> BranchPhotos { get; set; } = default!;
+
+
 }

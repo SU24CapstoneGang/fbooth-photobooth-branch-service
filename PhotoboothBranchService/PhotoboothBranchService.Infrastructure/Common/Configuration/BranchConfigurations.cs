@@ -57,6 +57,11 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasForeignKey(a => a.BranchID)
                 .IsRequired();
 
+            builder.HasMany(b => b.BranchPhotos)
+                .WithOne(a => a.Branch)
+                .HasForeignKey(a => a.BranchID)
+                .IsRequired();
+
             builder.HasData(new Branch
             {
                 BranchID = new Guid("b7fb8774-e3ac-4316-862c-23b81869c381"),

@@ -17,5 +17,6 @@ namespace PhotoboothBranchService.Domain.Entities
         public virtual Branch Branch { get; set; } = default!;
         public virtual ICollection<Booking> Bookings { get; set; } = default!;
         public virtual ICollection<Device> Devices { get; set; } = default!;
+        public virtual ICollection<BoothPhoto> BoothPhotos { get; set; } = default!;
     }
 }

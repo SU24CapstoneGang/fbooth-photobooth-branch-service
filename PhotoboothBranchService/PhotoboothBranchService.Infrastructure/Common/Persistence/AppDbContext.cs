@@ -26,6 +26,9 @@ public class AppDbContext : DbContext
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<Sticker> Stickers { get; set; }
     public DbSet<FullPaymentPolicy> FullPaymentPolicies { get; set; }
+    public DbSet<BoothPhoto> BoothPhotos { get; set; }
+    public DbSet<BranchPhoto> BranchPhotos { get; set; }
+
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -73,5 +76,8 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new BookingConfigurations());
         modelBuilder.ApplyConfiguration(new StickerConfigurations());
         modelBuilder.ApplyConfiguration(new FullPaymentPolicyConfigurations());
+        modelBuilder.ApplyConfiguration(new BranchPhotoConfigurations());
+        modelBuilder.ApplyConfiguration(new BranchPhotoConfigurations());
+
     }
 }
