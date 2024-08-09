@@ -98,7 +98,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         }
         public async Task<IEnumerable<BoothResponse>> GetAllPagingAsync(BoothFilter filter, PagingModel paging)
         {
-            var booths = (await _boothRepository.GetAllAsync()).ToList().AutoFilter(filter);
+            var booths = (await _boothRepository.GetAsync(null, bth => bth.BoothPhotos)).ToList().AutoFilter(filter);
             var listBoothresponse = _mapper.Map<IEnumerable<BoothResponse>>(booths);
             return listBoothresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.PricePerHour);
         }

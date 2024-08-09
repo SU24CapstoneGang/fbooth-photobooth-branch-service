@@ -34,9 +34,9 @@ namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
                 throw new ArgumentException("Policy name is required.");
             }
 
-            if (request.RefundDaysBefore < 0)
+            if (request.RefundDaysBefore < 0 || request.CheckInTimeLimit < 0)
             {
-                throw new ArgumentException("Refund days before cannot be negative.");
+                throw new ArgumentException("Refund days before or CheckInTimeLimit cannot be negative.");
             }
             var timeNow = DateTimeHelper.GetVietnamTimeNow();
             // Kiểm tra ngày bắt đầu và ngày kết thúc
@@ -50,32 +50,17 @@ namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
                 throw new ArgumentException("End date cannot be in the past.");
             }
 
-            // Kiểm tra trùng lặp chính sách dựa trên thời gian hiệu lực
-            var existingPolicies = await _repository.GetAsync(
-             p => (!request.StartDate.HasValue || !p.EndDate.HasValue || request.StartDate <= p.EndDate) &&
-                  (!request.EndDate.HasValue || !p.StartDate.HasValue || request.EndDate >= p.StartDate));
-
-
-            if (existingPolicies.Any())
-            {
-                throw new InvalidOperationException("A policy with overlapping effective dates already exists.");
-            }
-
-            // Kiểm tra và đặt trạng thái của chính sách
-            bool isActive = !request.StartDate.HasValue || request.StartDate.Value.ToDateTime(TimeOnly.MinValue) <= timeNow;
-
             var policy = new FullPaymentPolicy
             {
-                FullPaymentPolicyID = Guid.NewGuid(),
                 PolicyName = request.PolicyName,
                 PolicyDescription = request.PolicyDescription,
                 RefundDaysBefore = request.RefundDaysBefore,
                 CheckInTimeLimit = request.CheckInTimeLimit,
-                IsActive = isActive,
+                IsActive = request.IsActive,
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
                 CreatedDate = timeNow,
-                IsDefaultPolicy = !request.StartDate.HasValue,
+                IsDefaultPolicy = request.IsDefaultPolicy
             };
 
             await _repository.AddAsync(policy);
@@ -120,15 +105,9 @@ namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
                 throw new KeyNotFoundException("Policy not found.");
             }
 
-            // Kiểm tra các giá trị đầu vào
-            //if (string.IsNullOrEmpty(policyRequest.PolicyName))
-            //{
-            //    throw new ArgumentException("Policy name is required.");
-            //}
-
-            if (policyRequest.RefundDaysBefore < 0)
+            if (policyRequest.RefundDaysBefore < 0 || policyRequest.CheckInTimeLimit < 0)
             {
-                throw new ArgumentException("Refund days before cannot be negative.");
+                throw new ArgumentException("Refund days before or CheckInTimeLimit cannot be negative.");
             }
 
             // Kiểm tra ngày bắt đầu và ngày kết thúc
@@ -141,17 +120,6 @@ namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
             {
                 throw new ArgumentException("End date cannot be in the past.");
             }
-
-            //// Kiểm tra trùng lặp chính sách dựa trên thời gian hiệu lực
-            //var existingPolicies = await _repository.GetAsync(
-            //    p => p.FullPaymentPolicyID != id &&
-            //         (policyRequest.StartDate == null || p.EndDate == null || policyRequest.StartDate <= p.EndDate) &&
-            //         (policyRequest.EndDate == null || p.StartDate == null || policyRequest.EndDate >= p.StartDate));
-
-            //if (existingPolicies.Any())
-            //{
-            //    throw new InvalidOperationException("A policy with overlapping effective dates already exists.");
-            //}
 
             var updatePolicy = _mapper.Map(policyRequest, policy);
             await _repository.UpdateAsync(updatePolicy);

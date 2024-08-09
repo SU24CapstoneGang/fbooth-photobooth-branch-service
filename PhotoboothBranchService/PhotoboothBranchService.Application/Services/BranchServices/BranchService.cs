@@ -105,14 +105,14 @@ public class BranchService : IBranchService
 
     public async Task<IEnumerable<BranchResponse>> GetAllPagingAsync(BranchFilter filter, PagingModel paging)
     {
-        var branches = (await _branchRepository.GetAllAsync()).ToList().AutoFilter(filter);
+        var branches = (await _branchRepository.GetAsync(null, bth => bth.Booths, bth => bth.BranchPhotos)).ToList().AutoFilter(filter);
         var listBranchresponse = _mapper.Map<IEnumerable<BranchResponse>>(branches);
         return listBranchresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.CreateDate);
     }
 
     public async Task<BranchResponse> GetByIdAsync(Guid id)
     {
-        var photoBoothBranch = (await _branchRepository.GetAsync(p => p.BranchID == id, p => p.BranchPhotos)).FirstOrDefault();
+        var photoBoothBranch = (await _branchRepository.GetAsync(p => p.BranchID == id, p => p.BranchPhotos, p => p.Booths)).FirstOrDefault();
         return _mapper.Map<BranchResponse>(photoBoothBranch);
     }
 
