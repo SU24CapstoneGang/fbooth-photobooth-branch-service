@@ -34,10 +34,10 @@ public class BranchService : IBranchService
         _branchPhotoRepository = branchPhotoRepository;
     }
 
-    public async Task<BranchPhotoResponse> AddPhotoForBooth(Guid branchID, IFormFile file)
+    public async Task<BranchResponse> AddPhotoForBranch(Guid branchID, IFormFile file)
     {
-        var booth = GetByIdAsync(branchID);
-        if (booth != null)
+        var branch = await GetByIdAsync(branchID);
+        if (branch != null)
         {
             //upload to cloudinary
             var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-BranchPicture");
@@ -57,7 +57,7 @@ public class BranchService : IBranchService
             await _branchPhotoRepository.AddAsync(Photo);
 
             var updatedBranch = (await _branchRepository.GetAsync(b => b.BranchID == branchID, b => b.BranchPhotos)).FirstOrDefault();
-            return _mapper.Map<BranchPhotoResponse>(updatedBranch);
+            return _mapper.Map<BranchResponse>(updatedBranch);
         }
         throw new KeyNotFoundException("Branch not found.");
     }

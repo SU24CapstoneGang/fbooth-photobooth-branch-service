@@ -35,7 +35,7 @@ public class BranchController : ControllerBaseApi
 
         try
         {
-            var response = await _branchService.AddPhotoForBooth(branchID, file);
+            var response = await _branchService.AddPhotoForBranch(branchID, file);
             return Ok(response);
         }
         catch (KeyNotFoundException ex)

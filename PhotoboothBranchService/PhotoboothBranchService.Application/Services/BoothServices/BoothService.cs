@@ -147,7 +147,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
 
         public async Task<BoothResponse> AddPhotoForBooth(Guid boothID, IFormFile file)
         {
-            var booth = GetByIdAsync(boothID);
+            var booth = await GetByIdAsync(boothID);
             if (booth != null)
             {
                 //upload to cloudinary

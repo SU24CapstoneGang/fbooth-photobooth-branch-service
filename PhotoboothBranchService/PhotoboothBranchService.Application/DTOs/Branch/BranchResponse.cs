@@ -15,7 +15,7 @@ namespace PhotoboothBranchService.Application.DTOs.Branch
         public BranchStatus Status { get; set; } = default!;
         public TimeSpan OpeningTime { get; set; } // Thêm giờ mở cửa
         public TimeSpan ClosingTime { get; set; } // Thêm giờ đóng cửa
-        public ICollection<BoothResponse> Booths { get; set; } = default!;
         public ICollection<BranchPhotoResponse> BranchPhotos { get; set; } = default!;
+        public ICollection<BoothResponse> Booths { get; set; } = default!;
     }
 }

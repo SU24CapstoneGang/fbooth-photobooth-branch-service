@@ -26,6 +26,9 @@ namespace PhotoboothBranchService.Application.DTOs.FullPaymentPolicy
 
         [DataType(DataType.Date, ErrorMessage = "EndDate must be a valid date.")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
-        public DateOnly? EndDate { get; set; } // Ngày kết thúc áp dụng policy, null nếu áp dụng vĩnh viễn
+        public DateOnly? EndDate { get; set; } 
+        public bool IsActive { get; set; } 
+        public bool IsDefaultPolicy { get; set; } 
+
     }
 }
