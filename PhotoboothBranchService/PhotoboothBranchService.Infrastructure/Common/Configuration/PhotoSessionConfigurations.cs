@@ -13,6 +13,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasKey(u => u.PhotoSessionID);
             builder.Property(u => u.PhotoSessionID).HasColumnName("PhotoSessionID").ValueGeneratedOnAdd();
 
+            builder.Property(u => u.SessionName).IsRequired();
             builder.Property(u => u.SessionIndex).IsRequired();
             builder.Property(u => u.TotalPhotoTaken).IsRequired();
             builder.Property(u => u.Status).IsRequired();

@@ -4,6 +4,7 @@ namespace PhotoboothBranchService.Application.DTOs.PhotoSession
 {
     public class PhotoSessionFilter
     {
+        public string? SessionName { get; set; }
         public Guid? PhotoSessionID { get; set; }
         public int? SessionIndex { get; set; }
         public int? TotalPhotoTaken { get; set; }

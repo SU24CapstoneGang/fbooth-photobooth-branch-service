@@ -27,8 +27,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         // Create
         public async Task<CreatePhotoSessionResponse> CreateAsync(CreatePhotoSessionRequest createModel)
         {
-            var booking = (await _bookingRepository
-                .GetAsync(i => i.BookingID == createModel.BookingID)).FirstOrDefault();
+            var booking = (await _bookingRepository.GetAsync(i => i.BookingID == createModel.BookingID)).FirstOrDefault();
             if (booking == null)
             {
                 throw new NotFoundException("Not found Booking");

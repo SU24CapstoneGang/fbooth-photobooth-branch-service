@@ -5,6 +5,7 @@ namespace PhotoboothBranchService.Application.DTOs.PhotoSession
     public class CreatePhotoSessionResponse
     {
         public Guid PhotoSessionID { get; set; }
+        public string SessionName { get; set; } = default!;
         public int SessionIndex { get; set; }
         public int TotalPhotoTaken { get; set; }
         public DateTime StartTime { get; set; }

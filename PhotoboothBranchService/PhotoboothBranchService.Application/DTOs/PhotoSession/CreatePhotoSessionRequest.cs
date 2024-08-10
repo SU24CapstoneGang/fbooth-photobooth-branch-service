@@ -2,7 +2,11 @@
 {
     public class CreatePhotoSessionRequest
     {
-        public Guid BookingID { get; set; }
+        public string SessionName { get; set; } = default!;
+        public int TotalPhotoTaken { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
         public Guid LayoutID { get; set; }
+        public Guid BookingID { get; set; }
     }
 }
