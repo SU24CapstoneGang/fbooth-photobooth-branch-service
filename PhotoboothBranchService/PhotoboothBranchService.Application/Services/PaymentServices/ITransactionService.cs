@@ -7,17 +7,17 @@ using PhotoboothBranchService.Domain.Common.Interfaces;
 
 namespace PhotoboothBranchService.Application.Services.TransactionServices
 {
-    public interface ITransactionService : IServiceBase<TransactionResponse, PaymentFilter, PagingModel>
+    public interface ITransactionService : IServiceBase<PaymentResponse, PaymentFilter, PagingModel>
     {
-        Task<CreateTransactionResponse> CreateAsync(CreateTransactionRequest createModel, string ClientIpAddress, string? email);
-        Task UpdateAsync(Guid id, UpdateTransactiontRequest updateModel);
+        Task<CreatePaymentResponse> CreateAsync(CreatePaymentRequest createModel, string ClientIpAddress, string? email);
+        Task UpdateAsync(Guid id, UpdatePaymentRequest updateModel);
         Task DeleteAsync(Guid id);
-        Task<IEnumerable<TransactionResponse>> GetByBookingAsync(Guid sessionOrderID);
-        Task<IEnumerable<TransactionResponse>> GetCustomerTransaction(string? email);
+        Task<IEnumerable<PaymentResponse>> GetByBookingAsync(Guid sessionOrderID);
+        Task<IEnumerable<PaymentResponse>> GetCustomerTransaction(string? email);
         Task HandleMomoResponse(IQueryCollection queryString);
         Task<MomoIPNResponse> HandleMomoIPN(MoMoResponse moMoResponse);
         Task<(VnpayResponse response, string returnContent)> HandleVnpayResponse(IQueryCollection queryString);
-        Task<IEnumerable<TransactionResponse>> StaffGetBranchTransaction(string? email);
-        Task<IEnumerable<TransactionResponse>> GetBranchTransaction(Guid branchID);
+        Task<IEnumerable<PaymentResponse>> StaffGetBranchTransaction(string? email);
+        Task<IEnumerable<PaymentResponse>> GetBranchTransaction(Guid branchID);
     }
 }

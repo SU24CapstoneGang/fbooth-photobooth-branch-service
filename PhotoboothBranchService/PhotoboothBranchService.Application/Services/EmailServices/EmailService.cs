@@ -23,19 +23,20 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
         private string emailHostAddress;
         private string emailHostPassword;
 
-        private IAccountRepository _accountRepository;
-        private ITransactionRepository _transactionRepository;
-        private IBookingRepository _bookingRepository;
-        private IBranchRepository _boothBranchRepository;
-        private IBookingServiceRepository _bookingServiceRepository;
-        private IRefundRepository _refundRepository;
+        private readonly IAccountRepository _accountRepository;
+        private readonly ITransactionRepository _transactionRepository;
+        private readonly IBookingRepository _bookingRepository;
+        private readonly IBranchRepository _boothBranchRepository;
+        private readonly IBookingServiceRepository _bookingServiceRepository;
+        private readonly IRefundRepository _refundRepository;
+        private readonly IBookingSlotRepository _bookingSlotRepository;
 
         public EmailService(IAccountRepository accountRepository, 
             ITransactionRepository paymentRepository, 
             IBookingRepository sessionOrderRepository, 
             IBranchRepository boothBranchRepository, 
             IBookingServiceRepository serviceItemRepository,
-            IRefundRepository refundRepository)
+            IRefundRepository refundRepository, IBookingSlotRepository bookingSlotRepository)
         {
             this.smtpServerName = JsonHelper.GetFromAppSettings("EmailConfig:SmtpServerName");
             this.smtpPortNumber = JsonHelper.GetFromAppSettings("EmailConfig:SmtpPortNumber");
@@ -47,6 +48,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             _boothBranchRepository = boothBranchRepository;
             _bookingServiceRepository = serviceItemRepository;
             _refundRepository = refundRepository;
+            _bookingSlotRepository = bookingSlotRepository;
         }
 
         public async Task SendRefundBillInformation(Guid refundId)
@@ -56,7 +58,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             {
                 throw new NotFoundException("Not found refund");
             }
-            var transaction = (await _transactionRepository.GetAsync(i => i.TransactionID == refund.TransactionID, i=>i.PaymentMethod)).FirstOrDefault();
+            var transaction = (await _transactionRepository.GetAsync(i => i.PaymentID == refund.PaymentID, i=>i.PaymentMethod)).FirstOrDefault();
             if (transaction == null)
             {
                 throw new NotFoundException("Not found transaction");
@@ -81,8 +83,8 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             sbBody.AppendLine("<ul>");
             sbBody.AppendLine($"<li><strong>Payment Method:</strong> {transaction.PaymentMethod.PaymentMethodName}</li>");
             sbBody.AppendLine($"<li><strong>Original Transaction Amount:</strong> {transaction.Amount}</li>");
-            sbBody.AppendLine($"<li><strong>Transaction Date & Time:</strong> {transaction.TransactionDateTime:dddd, MMMM dd, yyyy h:mm tt}</li>");
-            sbBody.AppendLine($"<li><strong>Transaction Code:</strong> {transaction.GatewayTransactionID}</li>");
+            sbBody.AppendLine($"<li><strong>Transaction Date & Time:</strong> {transaction.PaymentDateTime:dddd, MMMM dd, yyyy h:mm tt}</li>");
+            sbBody.AppendLine($"<li><strong>Transaction Code:</strong> {transaction.TransactionID}</li>");
             sbBody.AppendLine("</ul>");
             sbBody.AppendLine("<hr>");
 
@@ -112,7 +114,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                         }
                 ))
                 .FirstOrDefault();
-            var trans = (await _transactionRepository.GetAsync(i => i.TransactionID == transactionID, i => i.PaymentMethod)).SingleOrDefault();
+            var trans = (await _transactionRepository.GetAsync(i => i.PaymentID == transactionID, i => i.PaymentMethod)).SingleOrDefault();
             if ( trans == null ) {
                 throw new NotFoundException("Not found transaction");
             }
@@ -161,15 +163,27 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                     sbBody.AppendLine("</tr>");
 
                     // the booking fee
-                    var duration = (booking.EndTime - booking.StartTime).TotalHours;
-                    duration = Math.Round(duration, 2);
-                    sbBody.AppendLine("<tr>");
-                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Hire booth fee</td>");
-                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{duration:N2}</td>");
-                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Hours</td>");
-                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{booking.Booth.PricePerSlot:N0}</td>");
-                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{booking.HireBoothFee:N0}</td>");
-                    sbBody.AppendLine("</tr>");
+                    var slots = (await _bookingSlotRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Slot)).OrderBy(i => i.Slot.SlotStartTime).ToList();
+                    foreach (var slot in slots)
+                    {
+                        sbBody.AppendLine("<tr>");
+                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Slot {slot.Slot.SlotStartTime.ToString(@"hh\:mm")} - {slot.Slot.SlotEndTime.ToString(@"hh\:mm")} </td>");
+                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>1</td>");
+                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>slot</td>");
+                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{slot.Price}</td>");
+                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{slot.Price:N0}</td>");
+                        sbBody.AppendLine("</tr>");
+                    }
+
+                    //var duration = (booking.EndTime - booking.StartTime).TotalHours;
+                    //duration = Math.Round(duration, 2);
+                    //sbBody.AppendLine("<tr>");
+                    //sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Hire booth fee</td>");
+                    //sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{duration:N2}</td>");
+                    //sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Slot</td>");
+                    //sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{booking.Booth.PricePerSlot:N0}</td>");
+                    //sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{booking.HireBoothFee:N0}</td>");
+                    //sbBody.AppendLine("</tr>");
 
                     // the rest service
                     foreach (var bookingService in bookingServices)
@@ -198,7 +212,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                 sbBody.AppendLine($"<p>Total price: {booking.PaymentAmount}</p>");
             }
 
-            sbBody.AppendLine($"<p>This booking was paid thourgh {trans.PaymentMethod.PaymentMethodName} in {trans.TransactionDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
+            sbBody.AppendLine($"<p>This booking was paid thourgh {trans.PaymentMethod.PaymentMethodName} in {trans.PaymentDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
 
 
             sbBody.AppendLine($"<p><strong>Start Time</strong>: {booking.StartTime.ToString("dddd, MMMM dd, yyyy h:mm tt")} (UTC +7)</p>");

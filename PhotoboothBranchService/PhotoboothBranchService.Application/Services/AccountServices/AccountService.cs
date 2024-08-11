@@ -255,5 +255,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             acc.BranchID = branch.BranchID;
             await _accountRepository.UpdateAsync(acc);
         }
+
+
     }
 }

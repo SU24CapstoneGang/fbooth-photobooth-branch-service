@@ -172,7 +172,7 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
             }
         }
 
-        public async Task<(VnpayResponse response, string returnContent, Transaction paymentResult)> Return(IQueryCollection queryString)
+        public async Task<(VnpayResponse response, string returnContent, Payment paymentResult)> Return(IQueryCollection queryString)
         {
             VnPayLibrary vnpay = new VnPayLibrary();
 
@@ -201,18 +201,18 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
 
             //get paymentID and find in db
             Guid paymentIDGUID = GuidAlphanumericConverter.AlphanumericToGuid(paymentID);
-            var payment = (await _paymentRepository.GetAsync(i => i.TransactionID == paymentIDGUID)).FirstOrDefault();
+            var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == paymentIDGUID)).FirstOrDefault();
 
             string returnContent = string.Empty;
             if (payment != null)
             {
-                payment.GatewayTransactionID = vnpayTranId.ToString();
+                payment.TransactionID = vnpayTranId.ToString();
 
                 if (checkSignature)
                 {
                     if (payment.Amount == vnp_Amount)
                     {
-                        if (payment.TransactionStatus == TransactionStatus.Processing)
+                        if (payment.Status == TransactionStatus.Processing)
                         {
                             if (vnp_ResponseCode == "00" && vnp_TransactionStatus == "00")
                             {
@@ -226,7 +226,7 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
                                     BankCode = bankCode,
                                     Success = true,
                                 };
-                                payment.TransactionStatus = TransactionStatus.Success;
+                                payment.Status = TransactionStatus.Success;
                                 returnContent = "{\"RspCode\":\"00\",\"Message\":\"Confirm Success\"}";
                             }
                             else
@@ -242,7 +242,7 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
                                     BankCode = bankCode,
                                     Success = false,
                                 };
-                                payment.TransactionStatus = TransactionStatus.Fail;
+                                payment.Status = TransactionStatus.Fail;
                                 returnContent = "";
                             }
                         }
@@ -263,7 +263,7 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
                             Message = "Có lỗi xảy ra trong quá trình xử lý",
                             Success = false,
                         };
-                        payment.TransactionStatus = TransactionStatus.Fail;
+                        payment.Status = TransactionStatus.Fail;
                         returnContent = "{\"RspCode\":\"04\",\"Message\":\"invalid amount\"}";
                     }
                 }
@@ -274,7 +274,7 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
                         Message = "Có lỗi xảy ra trong quá trình xử lý",
                         Success = false,
                     };
-                    payment.TransactionStatus = TransactionStatus.Fail;
+                    payment.Status = TransactionStatus.Fail;
                     returnContent = "{\"RspCode\":\"97\",\"Message\":\"Invalid signature\"}";
                 }
                 await _paymentRepository.UpdateAsync(payment);

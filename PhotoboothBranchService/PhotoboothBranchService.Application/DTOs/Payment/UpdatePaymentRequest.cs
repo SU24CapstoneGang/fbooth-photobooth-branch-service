@@ -2,7 +2,7 @@
 
 namespace PhotoboothBranchService.Application.DTOs.Transaction
 {
-    public class UpdateTransactiontRequest
+    public class UpdatePaymentRequest
     {
         public string TransactionID { get; set; } = default!;//Transaction ID third party return
         public DateTime PaymentDateTime { get; set; }

@@ -14,7 +14,10 @@ using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
+using System;
 using System.Linq.Expressions;
+using System.Net.WebSockets;
+using System.Runtime.ConstrainedExecution;
 
 namespace PhotoboothBranchService.Application.Services.BookingServices;
 
@@ -30,6 +33,8 @@ public class BookingService : IBookingService
     private readonly IServiceRepository _serviceRepository;
     private readonly IFullPaymentPolicyRepository _fullPaymentPolicyRepository;
     private readonly IEmailService _emailService;
+    private readonly ISlotRepository _slotRepository;
+    private readonly IBookingSlotRepository _bookingSlotRepository;
     public BookingService(IBookingRepository sessionOrderRepository,
         IMapper mapper,
         IBoothRepository boothRepository,
@@ -39,7 +44,9 @@ public class BookingService : IBookingService
         IRefundService refundService,
         IServiceRepository serviceRepository,
         IFullPaymentPolicyRepository fullPaymentPolicyRepository,
-        IEmailService emailService)
+        ISlotRepository slotRepository,
+        IEmailService emailService,
+        IBookingSlotRepository bookingSlotRepository)
     {
         _bookingRepository = sessionOrderRepository;
         _mapper = mapper;
@@ -52,6 +59,8 @@ public class BookingService : IBookingService
         _serviceRepository = serviceRepository;
         _fullPaymentPolicyRepository = fullPaymentPolicyRepository;
         _emailService = emailService;
+        _slotRepository = slotRepository;
+        _bookingSlotRepository = bookingSlotRepository;
     }
 
     // Create a new session
@@ -62,33 +71,33 @@ public class BookingService : IBookingService
 
         // Validate booth
         var booth = await ValidateBoothAsync(createModel.BoothID);
-        //createModel.StartTime = DateTimeHelper.ConvertFromUtcPlus2ToVietnamTime(createModel.StartTime);
-        //createModel.EndTime = DateTimeHelper.ConvertFromUtcPlus2ToVietnamTime(createModel.EndTime);
+        // Map to booking entity
+        var booking = _mapper.Map<Booking>(createModel);
         // Validate time range
-        ValidateTimeRange(createModel.StartTime, createModel.EndTime, booth.Branch.OpeningTime, booth.Branch.ClosingTime);
+        ValidateTimeRange(booking.StartTime, booking.EndTime, booth.Branch.OpeningTime, booth.Branch.ClosingTime);
 
         // Validate booking time conflicts
-        var checkBooking = await ValidateBookingTime(createModel.BoothID, createModel.StartTime, createModel.EndTime);
+        var checkBooking = await ValidateBookingTime(createModel.BoothID, booking.StartTime, booking.EndTime);
         if (checkBooking.Count() != 0)
         {
             throw new BadRequestException("There is another booking in the selected time range, please choose another time");
         }
         // Calculate payment amount
-        var processedServices = await ProcessServiceListAsync(booth.PricePerSlot, createModel.StartTime, createModel.EndTime, createModel.ServiceList);
-
-        // Map to booking entity
-        var booking = _mapper.Map<Booking>(createModel);
+        var processedServices = await ProcessServiceListAsync(createModel.ServiceList);
+        var processSlot = await this.ProcessHireBoothFee(booth.BoothID, createModel.Date, createModel.StartTime, createModel.EndTime);
+       //add the remain field
         booking.CustomerID = account.AccountID;
         booking.ValidateCode = await GenerateValidateCode();
         booking.BookingStatus = BookingStatus.PendingPayment;
         booking.CreatedDate = DateTimeHelper.GetVietnamTimeNow();
-        booking.HireBoothFee = processedServices.Item3;
-        booking.PaymentAmount = processedServices.Item1;
+        booking.HireBoothFee = processSlot.Item1;
+        booking.PaymentAmount = processedServices.Item1 + booking.HireBoothFee;
         booking.BookingType = bookingType;
         booking.BookingServices = processedServices.Item2;
         booking.PaymentStatus = PaymentStatus.Processing;
         booking.CustomerBusinessID = this.GenerateCustomerReferenceID(account.FirstName, account.LastName);
-        booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(createModel.StartTime);
+        booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(booking.StartTime);
+        booking.BookingSlots = processSlot.Item2;
         // Save booking
         await _bookingRepository.AddAsync(booking);
         var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
@@ -269,7 +278,7 @@ public class BookingService : IBookingService
     // Update a session
     public async Task<CreateBookingResponse> UpdateAsync(Guid id, UpdateBookingRequest updateModel, string? email)
     {
-        
+        var updateBooking = _mapper.Map<Booking>(updateModel);
         var booking = (await _bookingRepository.GetAsync(i => i.BookingID == id)).FirstOrDefault();
         if (booking == null)
         {
@@ -283,29 +292,30 @@ public class BookingService : IBookingService
                 throw new ForbiddenAccessException("Can not update booking on another cusotmer.");
             }
         }
-        if (booking.BookingStatus != BookingStatus.PendingPayment && booking.BookingStatus != BookingStatus.Canceled && booking.PaymentStatus != PaymentStatus.Processing)
+        if (booking.BookingStatus != BookingStatus.PendingPayment && booking.PaymentStatus != PaymentStatus.Processing)
         {
             throw new BadRequestException("Cannot update the booking, it's already pay or has been cancelled");
         }
         var booth = await ValidateBoothAsync(updateModel.BoothID);
-        ValidateTimeRange(updateModel.StartTime,updateModel.EndTime, booth.Branch.OpeningTime, booth.Branch.ClosingTime);
-        var checkBooking = await ValidateBookingTime(updateModel.BoothID, updateModel.StartTime, updateModel.EndTime);
+        ValidateTimeRange(updateBooking.StartTime, updateBooking.EndTime, booth.Branch.OpeningTime, booth.Branch.ClosingTime);
+        var checkBooking = await ValidateBookingTime(updateModel.BoothID, updateBooking.StartTime, updateBooking.EndTime);
         if (checkBooking.Count() > 1 || checkBooking[0].BookingID != booking.BookingID)
         {
             throw new BadRequestException("There is another booking in the selected time range, please choose another time");
         }
-        var processedServices = await ProcessServiceListAsync(booth.PricePerSlot, updateModel.StartTime, updateModel.EndTime, updateModel.ServiceList);
-        
+        var processedServices = await ProcessServiceListAsync(updateModel.ServiceList);
+        var processSlot = await this.ProcessHireBoothFee(booth.BoothID, updateModel.Date, updateModel.StartTime, updateModel.EndTime);
         // Map to booking entity
+        booking.StartTime = updateBooking.StartTime;
+        booking.EndTime = updateBooking.EndTime;
         booking.ValidateCode = await GenerateValidateCode();
         booking.BookingStatus = BookingStatus.PendingPayment;
         booking.CreatedDate = DateTimeHelper.GetVietnamTimeNow();
-        booking.HireBoothFee = processedServices.Item3;
-        booking.PaymentAmount = processedServices.Item1;
+        booking.HireBoothFee = processSlot.Item1;
+        booking.PaymentAmount = processedServices.Item1 + booking.HireBoothFee;
         account = account.Role == AccountRole.Customer ? account : (await _accountRepository.GetAsync(i => i.AccountID == booking.CustomerID)).First();
         booking.CustomerBusinessID = this.GenerateCustomerReferenceID(account.FirstName, account.LastName);
-        booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(updateModel.StartTime);
-
+        booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(updateBooking.StartTime);
         //delete old booking service
         var bookingServices = (await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();
         var removalTasks = bookingServices.Select(bookingService =>
@@ -320,6 +330,20 @@ public class BookingService : IBookingService
             await _bookingServiceRepository.AddAsync(bookingService);
         });
         await Task.WhenAll(addTasks);
+
+        //delete booking slot
+        var bookingSlots = (await _bookingSlotRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();
+        removalTasks = bookingSlots.Select(bookingSlot =>
+            _bookingSlotRepository.RemoveAsync(bookingSlot)
+        );
+        await Task.WhenAll(removalTasks);
+        // and add new
+        bookingSlots = processSlot.Item2.ToList();
+        addTasks = bookingSlots.Select(async bookingSlot =>
+        {
+            bookingSlot.BookingID = booking.BookingID;
+            await _bookingSlotRepository.AddAsync(bookingSlot);
+        });
 
         // Save booking
         await _bookingRepository.UpdateAsync(booking);
@@ -364,6 +388,7 @@ public class BookingService : IBookingService
                         if (response.refundList.Any(i => i.Status == RefundStatus.Fail))
                         {
                             response.message = "Success cancel booking but not refund success, please contact our staff.";
+                            booking.PaymentStatus = PaymentStatus.PendingRefund;
                         }
                         else
                         {
@@ -434,6 +459,25 @@ public class BookingService : IBookingService
                                  && ((startTime < i.StartTime && i.StartTime < endTime) || (endTime > i.EndTime && i.EndTime > startTime))
                                  && i.BookingStatus != BookingStatus.Canceled)).ToList();
         return bookings?.ToList() ?? new List<Booking>();
+    }
+    private async Task<(decimal, List<BookingSlot>)> ProcessHireBoothFee(Guid BoothID, DateOnly date, TimeSpan startTime,  TimeSpan endTime)
+    {
+        var slots = (await _slotRepository.GetAsync(i => i.SlotEndTime <= endTime && i.SlotStartTime >= startTime && i.BoothID == BoothID)).OrderBy(i => i.SlotStartTime).ToList();
+        decimal fee = 0;
+        var bookingSlotList = new List<BookingSlot>();
+        TimeSpan checkTime = slots[0].SlotStartTime;
+        foreach (var slot in slots)
+        {
+            fee += slot.Price;
+            checkTime = checkTime == slot.SlotStartTime ? slot.SlotEndTime : throw new BadRequestException("Slot list is not in sequence by time");
+            bookingSlotList.Add(new BookingSlot
+            {
+                Price = slot.Price,
+                SlotID = slot.SlotID,
+                BookingDate = date,
+            });
+        }
+        return (fee, bookingSlotList);
     }
     private async Task<long> GenerateValidateCode()
     {
@@ -519,26 +563,17 @@ public class BookingService : IBookingService
 
         return booth;
     }
-    private async Task<(decimal, ICollection<Domain.Entities.BookingService>, decimal)> ProcessServiceListAsync(decimal boothPricePerHour, DateTime startTime, DateTime endTime, Dictionary<Guid, short> serviceList)
+    private async Task<(decimal, ICollection<Domain.Entities.BookingService>)> ProcessServiceListAsync(Dictionary<Guid, short> serviceList)
     {
 
         List<Domain.Entities.BookingService> result = new List<Domain.Entities.BookingService>();
 
-        var totalHours = (endTime - startTime).TotalHours;
-        if (totalHours < 0.5) {
-            throw new BadRequestException("Please choose duration at least 30 minutes");
-        }
-        totalHours = Math.Round(totalHours, 2);
-        var hireBoothFee = Math.Truncate((decimal)totalHours * boothPricePerHour);
-        var bookingAmount = hireBoothFee;
+        var bookingAmount = 0m;
         if (serviceList.Any())
         {
             var serviceIds = serviceList.Keys.ToList();
             var services = await _serviceRepository.GetAsync(s => serviceIds.Contains(s.ServiceID));
-            if (!services.Any(i => i.ServiceType == Domain.ServiceType.EmailSending || i.ServiceType == Domain.ServiceType.Printing)) 
-            {
-                throw new BadRequestException("Must have email service or printing service when creating/updating a booking.");
-            }
+           
             if (serviceList.Count() != services.Count())
             {
                 throw new BadRequestException("Service(s) from input not found.");
@@ -558,7 +593,7 @@ public class BookingService : IBookingService
             }
         }
 
-        return (bookingAmount, result, hireBoothFee);
+        return (bookingAmount, result);
     }
 
 }

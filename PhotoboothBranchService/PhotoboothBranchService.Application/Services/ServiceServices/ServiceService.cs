@@ -69,6 +69,10 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
         {
             var serviceTypes = await _serviceRepository.GetAsync(s => s.ServiceID == id);
             var serviceType = serviceTypes.FirstOrDefault();
+            if (serviceType == null) 
+            {
+                throw new NotFoundException("Service not found");
+            }
             return _mapper.Map<ServiceResponse>(serviceType);
         }
 

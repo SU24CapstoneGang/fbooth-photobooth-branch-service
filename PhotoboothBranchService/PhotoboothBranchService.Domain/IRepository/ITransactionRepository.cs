@@ -3,7 +3,7 @@ using PhotoboothBranchService.Domain.Entities;
 
 namespace PhotoboothBranchService.Domain.IRepository
 {
-    public interface ITransactionRepository : IRepositoryBase<Transaction>
+    public interface ITransactionRepository : IRepositoryBase<Payment>
     {
     }
 }

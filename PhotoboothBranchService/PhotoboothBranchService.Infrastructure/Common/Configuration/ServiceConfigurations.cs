@@ -22,6 +22,15 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(a => a.Unit).IsRequired();
             builder.Property(s => s.Status).IsRequired();
+            builder.Property(c => c.CreatedDate)
+                .IsRequired()
+                .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
+                .ValueGeneratedOnAdd();
+
+            builder.Property(c => c.LastModified)
+                   .IsRequired()
+                   .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
+                   .ValueGeneratedOnAddOrUpdate();
             builder.HasMany(i => i.BookingServices)
                 .WithOne(a => a.Service)
                 .HasForeignKey(b => b.ServiceID);
@@ -34,7 +43,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     Unit = "Set",
                     ServicePrice = 300000m, // Price in VND
                     Status = StatusUse.Available,
-                    ServiceType = Domain.ServiceType.Other
+                    ServiceType = Domain.ServiceType.Other,
+                    CreatedDate = DateTime.Now,
+                    LastModified = DateTime.Now,
                 },
                 new Service
                 {
@@ -44,7 +55,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     Unit = "Photo",
                     ServicePrice = 50000m, // Price in VND
                     Status = StatusUse.Available,
-                    ServiceType = Domain.ServiceType.EmailSending
+                    ServiceType = Domain.ServiceType.EmailSending,
+                    CreatedDate = DateTime.Now,
+                    LastModified = DateTime.Now,
                 },
                 new Service
                 {
@@ -54,7 +67,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     Unit = "Piece",
                     ServicePrice = 150000m, // Price in VND
                     Status = StatusUse.Available,
-                    ServiceType = Domain.ServiceType.Printing
+                    ServiceType = Domain.ServiceType.Printing,
+                    CreatedDate = DateTime.Now,
+                    LastModified = DateTime.Now,
                 });
         }
     }

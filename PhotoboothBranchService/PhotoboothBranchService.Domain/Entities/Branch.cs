@@ -17,5 +17,4 @@ public class Branch
     public virtual ICollection<Account> Staffs { get; set; } = default!;
     public virtual ICollection<BranchPhoto> BranchPhotos { get; set; } = default!;
 
-
 }

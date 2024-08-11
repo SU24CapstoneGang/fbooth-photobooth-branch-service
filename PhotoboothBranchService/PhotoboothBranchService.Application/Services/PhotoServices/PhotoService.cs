@@ -6,6 +6,7 @@ using PhotoboothBranchService.Application.DTOs.Photo;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 
 namespace PhotoboothBranchService.Application.Services.PhotoServices
@@ -18,6 +19,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
         private readonly IPhotoSessionRepository _photoSessionRepository;
         private readonly IBackgroundRepository _backgroundRepository;
         private readonly IStickerRepository _stickerRepository;
+        private readonly IBookingRepository _bookingRepository;
         public PhotoService(IPhotoRepository photoRepository, IMapper mapper,
             ICloudinaryService cloudinaryService, IPhotoSessionRepository photoSessionRepository,
             IBackgroundRepository backgroundRepository, IStickerRepository stickerRepository)
@@ -156,6 +158,32 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
 
             var updatedFinalPicture = _mapper.Map(updateModel, photo);
             await _photoRepository.UpdateAsync(updatedFinalPicture);
+        }
+
+        public async Task<IEnumerable<PhotoResponse>> GetCustomerPhoto(Guid? CustomerID)
+        {
+            if (CustomerID == null || default(Guid) == CustomerID)
+            {
+                throw new ForbiddenAccessException();
+            }
+            var bookingIds = (await _bookingRepository.GetAsync(i => i.CustomerID == CustomerID && i.BookingStatus == BookingStatus.CompleteChecked)).Select(i => i.BookingID).ToList();
+            if (!bookingIds.Any())
+            {
+                return Enumerable.Empty<PhotoResponse>();
+            }
+            var photoSessionIds = (await _photoSessionRepository.GetAsync(i => bookingIds.Contains(i.BookingID))).Select(i => i.PhotoSessionID).ToList();
+            if (!photoSessionIds.Any())
+            {
+                return Enumerable.Empty<PhotoResponse>();
+            }
+            var photos = await _photoRepository.GetAsync(i => photoSessionIds.Contains(i.PhotoSessionID) && i.Version == PhotoVersion.Edited);
+            if (!photos.Any())
+            {
+                return Enumerable.Empty<PhotoResponse>();
+            } else
+            {
+                return _mapper.Map<IEnumerable<PhotoResponse>>(photos);
+            }
         }
     }
 }

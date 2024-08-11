@@ -11,11 +11,11 @@ using PhotoboothBranchService.Application.Services.TransactionServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
-    public class TransactionController : ControllerBaseApi
+    public class PaymentController : ControllerBaseApi
     {
         private readonly ITransactionService _paymentService;
 
-        public TransactionController(ITransactionService paymentService)
+        public PaymentController(ITransactionService paymentService)
         {
             _paymentService = paymentService;
         }
@@ -23,7 +23,7 @@ namespace PhotoboothBranchService.Api.Controllers
         // Create
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<CreateTransactionResponse>> CreateTransaction(CreateTransactionRequest createPaymentRequest)
+        public async Task<ActionResult<CreatePaymentResponse>> CreatePayment(CreatePaymentRequest createPaymentRequest)
         {
             //get ip from request
             var clientIpAddress = IpAddressHelper.GetClientIpAddress(HttpContext);
@@ -35,7 +35,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Read
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TransactionResponse>>> GetAllPayments()
+        public async Task<ActionResult<IEnumerable<PaymentResponse>>> GetAllPayments()
         {
 
             var payments = await _paymentService.GetAllAsync();
@@ -45,7 +45,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Read with paging and filter
         [HttpGet("paging")]
-        public async Task<ActionResult<IEnumerable<TransactionResponse>>> GetAllPayments(
+        public async Task<ActionResult<IEnumerable<PaymentResponse>>> GetAllPayments(
             [FromQuery] PaymentFilter paymentFilter, [FromQuery] PagingModel pagingModel)
         {
 
@@ -55,21 +55,21 @@ namespace PhotoboothBranchService.Api.Controllers
         }
 
         [HttpGet("transaction/{transactionId}")]
-        public async Task<ActionResult<IEnumerable<TransactionResponse>>> GetPaymentsByTransactionId(Guid transactionId)
+        public async Task<ActionResult<IEnumerable<PaymentResponse>>> GetPaymentsByTransactionId(Guid transactionId)
         {
             var payments = await _paymentService.GetByIdAsync(transactionId);
             return Ok(payments);
 
         }
         [HttpGet("booking/{bookingId}")]
-        public async Task<ActionResult<IEnumerable<TransactionResponse>>> GetPaymentsByBookingId(Guid bookingId)
+        public async Task<ActionResult<IEnumerable<PaymentResponse>>> GetPaymentsByBookingId(Guid bookingId)
         {
             var payments = await _paymentService.GetByBookingAsync(bookingId);
             return Ok(payments);
 
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<TransactionResponse>>> GetPaymentById(Guid id)
+        public async Task<ActionResult<IEnumerable<PaymentResponse>>> GetPaymentById(Guid id)
         {
 
             var payment = await _paymentService.GetByIdAsync(id);
@@ -83,27 +83,27 @@ namespace PhotoboothBranchService.Api.Controllers
 
         [HttpGet("customer")]
         [Authorization("CUSTOMER")]
-        public async Task<ActionResult<IEnumerable<TransactionResponse>>> GetCustomerTransaction()
+        public async Task<ActionResult<IEnumerable<PaymentResponse>>> GetCustomerPayment()
         {
             var email = Request.HttpContext.Items["Email"]?.ToString();
             return Ok(await _paymentService.GetCustomerTransaction(email));
         }
         [Authorization("STAFF")]
         [HttpGet("staff")]
-        public async Task<ActionResult<IEnumerable<TransactionResponse>>> StaffGetBranchTransaction() 
+        public async Task<ActionResult<IEnumerable<PaymentResponse>>> StaffGetBranchTransaction() 
         {
             var email = Request.HttpContext.Items["Email"]?.ToString();
             return Ok(await _paymentService.StaffGetBranchTransaction(email));
         }
         [Authorization("ADMIN")]
         [HttpGet("admin/{BranchID}")]
-        public async Task<ActionResult<IEnumerable<TransactionResponse>>> GetBranchTransaction(Guid BranchID)
+        public async Task<ActionResult<IEnumerable<PaymentResponse>>> GetBranchTransaction(Guid BranchID)
         {
             return Ok(await _paymentService.GetBranchTransaction(BranchID));
         }
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdatePayment(Guid id, UpdateTransactiontRequest updatePaymentRequest)
+        public async Task<ActionResult> UpdatePayment(Guid id, UpdatePaymentRequest updatePaymentRequest)
         {
 
             await _paymentService.UpdateAsync(id, updatePaymentRequest);

@@ -94,7 +94,7 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                 return jmessage.GetValue("message").ToString();
             }
         }
-        public async Task<(Transaction transaction, MomoIPNResponse iPNResponse)> HandlePaymentResponeIPN(MoMoResponse momoResponse)
+        public async Task<(Payment transaction, MomoIPNResponse iPNResponse)> HandlePaymentResponeIPN(MoMoResponse momoResponse)
         {
             MoMoLibrary moMoLibrary = new MoMoLibrary();
             var rawHash = "accessKey=" + accessKey +
@@ -121,7 +121,7 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                 extraData = momoResponse.extraData
             };
 
-            var payment = (await _paymentRepository.GetAsync(i => i.TransactionID == momoResponse.orderId)).FirstOrDefault();
+            var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == momoResponse.orderId)).FirstOrDefault();
             if (payment == null)
             {
                 throw new NotFoundException("No payment found");
@@ -132,13 +132,13 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
                 bool checkSignature = moMoLibrary.ValidateSignature(rawHash, secretKey, momoResponse.signature);
                 if (checkSignature && momoResponse.resultCode == 0)
                 {
-                    payment.TransactionStatus = TransactionStatus.Success;
-                    payment.GatewayTransactionID = momoResponse.transId.ToString();
+                    payment.Status = TransactionStatus.Success;
+                    payment.TransactionID = momoResponse.transId.ToString();
                 }
                 else
                 {
-                    payment.GatewayTransactionID = momoResponse.transId.ToString();
-                    payment.TransactionStatus = TransactionStatus.Fail;
+                    payment.TransactionID = momoResponse.transId.ToString();
+                    payment.Status = TransactionStatus.Fail;
                 }
             }
             await _paymentRepository.UpdateAsync(payment);
@@ -154,7 +154,7 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
             iPNResponse.signature = moMoLibrary.signSHA256(rawHash, secretKey);
             return (payment, iPNResponse);
         }
-        public async Task<Transaction> Return(IQueryCollection queryString)
+        public async Task<Payment> Return(IQueryCollection queryString)
         {
 
             MoMoResponse response = new MoMoResponse();
@@ -199,11 +199,11 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
         }
         public async Task<MoMoRefundResponse> RefundById(Guid paymentID, long refundAmounf, string description)
         {
-            var payment = (await _paymentRepository.GetAsync(i => i.TransactionID == paymentID)).FirstOrDefault();
+            var payment = (await _paymentRepository.GetAsync(i => i.PaymentID == paymentID)).FirstOrDefault();
             if (payment != null)
             {
-                string merchantRefId = payment.TransactionID.ToString();
-                string momoTransId = payment.GatewayTransactionID;
+                string merchantRefId = payment.PaymentID.ToString();
+                string momoTransId = payment.TransactionID;
                 string version = "2.0";
                 string requestId = Guid.NewGuid().ToString();
                 long amount = refundAmounf;

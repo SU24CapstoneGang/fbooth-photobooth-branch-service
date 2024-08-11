@@ -10,6 +10,7 @@ namespace PhotoboothBranchService.Domain.Entities
     {
         public Guid BookingSlotID { get; set; }
         public DateOnly BookingDate { get; set; }
+        public decimal Price { get; set; }
         public Guid BookingID { get; set; }
         public virtual Booking Booking { get; set; }
         public Guid SlotID { get; set; }

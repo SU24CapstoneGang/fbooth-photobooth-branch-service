@@ -8,16 +8,16 @@ namespace PhotoboothBranchService.Application.DTOs.Booking
     {
         [Required]
         public Guid BoothID { get; set; }
-        [EmailAddress(ErrorMessage = "Invalid Email format")]
-        public string? CustomerEmail { get; set; }
-        [RegularExpression(@"^0[1-9]\d{8}$", ErrorMessage = "Invalid PhoneNumber format")]
-        public string? CustomerPhoneNumber { get; set; }
         [Required]
         [DictionaryValueGreaterThanZero(ErrorMessage = "Each service quantity must be greater than 0.")]
         public Dictionary<Guid, short> ServiceList { get; set; } = new Dictionary<Guid, short>();
         [Required]
-        public DateTime StartTime { get; set; }
+        public DateOnly Date { get; set; }
         [Required]
-        public DateTime EndTime { get; set; }
+        [TimeSpanValidation]
+        public TimeSpan StartTime { get; set; }
+        [Required]
+        [TimeSpanValidation]
+        public TimeSpan EndTime { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Photo;
 using PhotoboothBranchService.Application.Services.PhotoServices;
@@ -33,6 +34,16 @@ namespace PhotoboothBranchService.Api.Controllers
         {
 
             var Photos = await _photoService.GetAllPagingAsync(PhotoFilter, pagingModel);
+            return Ok(Photos);
+
+        }
+
+        [HttpGet("customer")]
+        [Authorization("CUSTOMER")]
+        public async Task<ActionResult<IEnumerable<PhotoResponse>>> GetCustomerPhotos()
+        {
+            var customerid = Request.HttpContext.Items["CustomerId"]?.ToString();
+            var Photos = await _photoService.GetCustomerPhoto(Guid.Parse(customerid));
             return Ok(Photos);
 
         }

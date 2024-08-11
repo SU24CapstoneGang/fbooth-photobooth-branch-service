@@ -12,6 +12,7 @@ namespace PhotoboothBranchService.Domain.Enum
         Processing = 1,
         Refunded = 2,
         Paid = 3,
-        PendingPayExtra = 4
+        PendingPayExtra = 4,
+        PendingRefund = 5,
     }
 }

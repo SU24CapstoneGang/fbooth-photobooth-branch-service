@@ -6,7 +6,6 @@ namespace PhotoboothBranchService.Domain.Entities
     {
         public Guid BoothID { get; set; }
         public string BoothName { get; set; } = default!;
-        public decimal PricePerSlot { get; set; }
         public string BackgroundColor { get; set; } = default!;
         public string Concept { get; set; } = default!;
         public short PeopleInBooth { get; set; }

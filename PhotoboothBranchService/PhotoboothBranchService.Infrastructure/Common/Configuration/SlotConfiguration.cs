@@ -19,6 +19,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(i => i.SlotStartTime).IsRequired();
             builder.Property(i => i.SlotEndTime).IsRequired();
             builder.Property(i => i.Status).IsRequired();
+            builder.Property(i => i.Price).IsRequired().HasColumnType("decimal(18, 0)");
             builder.HasMany(i => i.BookingSlots)
                 .WithOne(a => a.Slot)
                 .HasForeignKey(a => a.SlotID).OnDelete(DeleteBehavior.NoAction);

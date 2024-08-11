@@ -73,13 +73,13 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
         //refund 
         public async Task<IEnumerable<RefundResponse>> RefundByBookingID(Guid orderId, bool isFullRefund, string? ipAddress, string? email)
         {
-            var payments = (await _transactionRepository.GetAsync(i => i.BookingID == orderId && i.TransactionStatus == TransactionStatus.Success)).ToList();
+            var payments = (await _transactionRepository.GetAsync(i => i.BookingID == orderId && i.Status == TransactionStatus.Success)).ToList();
             var responseList = new List<RefundResponse>();
             foreach (var trans in payments)
             {
                 try
                 {
-                    responseList.Add(await this.RefundByTransID(trans.TransactionID, isFullRefund, ipAddress, email));
+                    responseList.Add(await this.RefundByTransID(trans.PaymentID, isFullRefund, ipAddress, email));
                 }
                 catch (Exception ex)
                 {
@@ -89,7 +89,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                         Status = RefundStatus.Fail,
                         Description = "",
                         RefundDateTime = DateTimeHelper.GetVietnamTimeNow(),
-                        GatewayTransactionID = trans.GatewayTransactionID,
+                        GatewayTransactionID = trans.TransactionID,
                         ResponseMessage = ex.Message,
                     });
                 }
@@ -98,12 +98,12 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
         }
         public async Task<RefundResponse> RefundByTransID(Guid paymentId, bool isFullRefund, string? ipAddress, string? email)
         {
-            var transaction = (await _transactionRepository.GetAsync(i => i.TransactionID == paymentId, i => i.PaymentMethod)).FirstOrDefault();
+            var transaction = (await _transactionRepository.GetAsync(i => i.PaymentID == paymentId, i => i.PaymentMethod)).FirstOrDefault();
             if (transaction == null)
             {
                 throw new NotFoundException("Not found Payment ID to refund");
             }
-            if (transaction.TransactionStatus == TransactionStatus.RefundedFull)
+            if (transaction.Status == TransactionStatus.RefundedFull)
             {
                 throw new BadRequestException("Already refund this payment, can not refund anymore");
             }
@@ -126,17 +126,17 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
             {
                 throw new BadRequestException("No booking found");
             }
-            var refundAmount = isFullRefund ? transaction.Amount : (transaction.Amount * booking.FullPaymentPolicy.RefundPercent / 100);
+            var refundAmount = isFullRefund ? transaction.Amount - await this.TotalRefund(transaction.PaymentID) : (transaction.Amount * booking.FullPaymentPolicy.RefundPercent / 100);
             switch (transaction.PaymentMethod.PaymentMethodName)
             {
                 case "VNPay":
                     VnpayRefundRequest refundRequest = new VnpayRefundRequest
                     {
                         Amount = refundAmount,
-                        PayDate = transaction.TransactionDateTime,
+                        PayDate = transaction.PaymentDateTime,
                         RefundCategory = isFullRefund ? "02" : "03",
-                        PaymentID = GuidAlphanumericConverter.GuidToAlphanumeric(transaction.TransactionID),
-                        TransId = transaction.GatewayTransactionID,
+                        PaymentID = GuidAlphanumericConverter.GuidToAlphanumeric(transaction.PaymentID),
+                        TransId = transaction.TransactionID,
                         User = GuidAlphanumericConverter.GuidToAlphanumeric(booking.CustomerID),
                     };
                     var responseVNPay = await _vNPayService.RefundTransaction(refundRequest, ipAddress);
@@ -146,10 +146,10 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                         refund = new Refund
                         {
                             RefundID = Guid.NewGuid(),
-                            TransactionID = transaction.TransactionID,
+                            PaymentID = transaction.PaymentID,
                             Amount = long.Parse(responseVNPay.Vnp_Amount.Substring(0, responseVNPay.Vnp_Amount.Length - 2)),
                             RefundDateTime = DateTime.ParseExact(responseVNPay.Vnp_PayDate, "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture),
-                            GatewayTransactionID = responseVNPay.Vnp_TransactionNo,
+                            TransactionID = responseVNPay.Vnp_TransactionNo,
                             Description = responseVNPay.Vnp_OrderInfo,
                             ResponseMessage = responseVNPay.Vnp_Message,
                         };
@@ -167,7 +167,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                                 break;
                         }
 
-                        transaction.TransactionStatus = responseVNPay.Vnp_TransactionType.Equals("02") || transaction.Amount == await this.TotalRefund(transaction.TransactionID) ? TransactionStatus.RefundedFull : TransactionStatus.RefundedPartial;
+                        transaction.Status = responseVNPay.Vnp_TransactionType.Equals("02") || transaction.Amount == await this.TotalRefund(transaction.PaymentID) ? TransactionStatus.RefundedFull : TransactionStatus.RefundedPartial;
                     }
                     else
                     {
@@ -175,22 +175,22 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                     }
                     break;
                 case "MoMo":
-                    string description = "Refund for transaction " + transaction.TransactionID.ToString();
-                    MoMoRefundResponse responseMoMo = await _moMoService.RefundById(transaction.TransactionID, refundAmount, description);
+                    string description = "Refund for transaction " + transaction.PaymentID.ToString();
+                    MoMoRefundResponse responseMoMo = await _moMoService.RefundById(transaction.PaymentID, refundAmount, description);
                     refund = new Refund
                     {
                         RefundID = responseMoMo.RequestId,
-                        TransactionID = transaction.TransactionID,
+                        PaymentID = transaction.PaymentID,
                         Amount = responseMoMo.Amount,
                         RefundDateTime = DateTimeHelper.GetVietnamTimeNow(),
-                        GatewayTransactionID = responseMoMo.Transid,
+                        TransactionID = responseMoMo.Transid,
                         ResponseMessage = responseMoMo.Message,
                         Description = description,
                     };
                     if (responseMoMo.Status == 0)
                     {
                         refund.Status = RefundStatus.Success;
-                        transaction.TransactionStatus = responseMoMo.Amount == transaction.Amount || transaction.Amount == await this.TotalRefund(transaction.TransactionID) ? TransactionStatus.RefundedFull : TransactionStatus.RefundedPartial;
+                        transaction.Status = responseMoMo.Amount == transaction.Amount || transaction.Amount == await this.TotalRefund(transaction.PaymentID) ? TransactionStatus.RefundedFull : TransactionStatus.RefundedPartial;
                     }
                     else
                     {
@@ -215,18 +215,18 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                     {
                         if (account.BranchID.Value != booking.Booth.BranchID)
                         {
-                            throw new ForbiddenAccessException("Booking and Staff/Manager are not from same branch to do this refund");
+                            throw new ForbiddenAccessException("Booking and Staff are not from same branch to do this refund");
                         }
                     }
                     refund = new Refund
                     {
                         RefundID = Guid.NewGuid(),
-                        TransactionID = transaction.TransactionID,
+                        PaymentID = transaction.PaymentID,
                         Amount = refundAmount,
                         RefundDateTime = DateTimeHelper.GetVietnamTimeNow(),
-                        GatewayTransactionID = account.AccountID.ToString(),
+                        TransactionID = account.AccountID.ToString(),
                         ResponseMessage = "Success",
-                        Description = $"Refund for transaction {transaction.TransactionID}",
+                        Description = $"Refund for transaction {transaction.PaymentID}",
                         Status = RefundStatus.Success,
                     };
                     break;
@@ -243,7 +243,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
         }
 
         private async Task<long> TotalRefund(Guid transID) {
-            var refunds = await _refundRepository.GetAsync(i => i.TransactionID == transID && i.Status != RefundStatus.Fail);
+            var refunds = await _refundRepository.GetAsync(i => i.PaymentID == transID && i.Status != RefundStatus.Fail);
             return refunds.Sum(i => i.Amount);
         }
     }

@@ -83,16 +83,6 @@ namespace PhotoboothBranchService.Application.Services.BookingServiceServices
                 throw new NotFoundException("Not found Session Order running in this booth");
             }
             ValidateOrderToAddServiceItem(sessionOrder);
-            //validate list serviceID
-            //List<ServicePackage> serviceList = new List<ServicePackage>();
-            //if (request.ServiceList.Count > 0)
-            //{
-            //    serviceList = await ValidateServiceList(request.ServiceList);
-            //}
-            //else
-            //{
-            //    throw new BadRequestException("No Service to add");
-            //}
 
             AddListBookingServiceResponse response = new AddListBookingServiceResponse
             {

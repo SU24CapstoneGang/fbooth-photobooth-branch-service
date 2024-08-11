@@ -30,6 +30,7 @@ using PhotoboothBranchService.Application.Services.PhotoSessionServices;
 using PhotoboothBranchService.Application.Services.PhotoStickerServices;
 using PhotoboothBranchService.Application.Services.RefundServices;
 using PhotoboothBranchService.Application.Services.ServiceServices;
+using PhotoboothBranchService.Application.Services.SlotServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
 using PhotoboothBranchService.Application.Services.TransactionServices;
 using PhotoboothBranchService.Application.Services.VNPayServices;
@@ -66,6 +67,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IFullPaymentPolicyService, FullPaymentPolicyService>();
             services.AddScoped<IBoothPhotoService, BoothPhotoService>();
             services.AddScoped<IBranchPhotoService, BranchPhotoService>();
+            services.AddScoped<ISlotService, SlotService>();
 
 
             // cloudinary

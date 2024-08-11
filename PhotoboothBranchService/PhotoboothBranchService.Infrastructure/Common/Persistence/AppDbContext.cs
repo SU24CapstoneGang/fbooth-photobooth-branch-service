@@ -14,7 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<Background> Backgrounds { get; set; }
     public DbSet<Device> Devices { get; set; }
     public DbSet<Layout> Layouts { get; set; }
-    public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<Payment> Transactions { get; set; }
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<Photo> Photos { get; set; }
     public DbSet<PhotoBox> PhotoBoxes { get; set; }
@@ -65,7 +65,7 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new BackgroundConfigurations());
         modelBuilder.ApplyConfiguration(new DeviceConfigurations());
         modelBuilder.ApplyConfiguration(new LayoutConfigurations());
-        modelBuilder.ApplyConfiguration(new TransactionConfigurations());
+        modelBuilder.ApplyConfiguration(new PaymentConfigurations());
         modelBuilder.ApplyConfiguration(new PaymentMethodConfigurations());
         modelBuilder.ApplyConfiguration(new BranchConfigurations());
         modelBuilder.ApplyConfiguration(new PhotoBoxConfigurations());

@@ -17,6 +17,5 @@ namespace PhotoboothBranchService.Application.DTOs.Booth
         public Guid BranchID { get; set; }
         public DateTime CreateDate { get; set; }
         public ICollection<BoothPhotoResponse> BoothPhotos { get; set; } = default!;
-
     }
 }

@@ -5,24 +5,24 @@ using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 {
-    public class TransactionConfigurations : IEntityTypeConfiguration<Transaction>
+    public class PaymentConfigurations : IEntityTypeConfiguration<Payment>
     {
-        public void Configure(EntityTypeBuilder<Transaction> builder)
+        public void Configure(EntityTypeBuilder<Payment> builder)
         {
-            builder.ToTable("Transactions");
-            builder.HasKey(s => s.TransactionID);
-            builder.Property(s => s.TransactionID).IsRequired();
+            builder.ToTable("Payments");
+            builder.HasKey(s => s.PaymentID);
+            builder.Property(s => s.PaymentID).IsRequired();
 
-            builder.Property(s => s.GatewayTransactionID).IsRequired(false);
-            builder.Property(s => s.TransactionDateTime).IsRequired();
+            builder.Property(s => s.TransactionID).IsRequired(false);
+            builder.Property(s => s.PaymentDateTime).IsRequired();
             builder.Property(s => s.Description).IsRequired(false);
             builder.Property(s => s.Amount).IsRequired();
 
             // Status enum mapping
-            builder.Property(ep => ep.TransactionStatus)
+            builder.Property(ep => ep.Status)
                 .IsRequired();
             builder.HasOne(s => s.PaymentMethod)
-                .WithMany(a => a.Transactions)
+                .WithMany(a => a.Payments)
                 .HasForeignKey(s => s.PaymentMethodID)
                 .IsRequired();
             builder.HasOne(a => a.Booking)
@@ -30,8 +30,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasForeignKey(a => a.BookingID)
                 .IsRequired();
             builder.HasMany(p => p.Refunds)
-                .WithOne(i => i.Transaction)
-                .HasForeignKey(u => u.TransactionID)
+                .WithOne(i => i.Payment)
+                .HasForeignKey(u => u.PaymentID)
                 .IsRequired();
         }
     }

@@ -7,17 +7,17 @@ using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories
 {
-    public class TransactionRepository : ITransactionRepository
+    public class PaymentRepository : ITransactionRepository
     {
         private readonly AppDbContext _dbContext;
 
-        public TransactionRepository(AppDbContext dbContext)
+        public PaymentRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
         // Create
-        public async Task<Transaction> AddAsync(Transaction entity)
+        public async Task<Payment> AddAsync(Payment entity)
         {
             var result = await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
@@ -25,21 +25,21 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Read
-        public async Task<IQueryable<Transaction>> GetAllAsync()
+        public async Task<IQueryable<Payment>> GetAllAsync()
         {
             return await Task.FromResult(_dbContext.Transactions.AsQueryable());
         }
 
-        public async Task<IQueryable<Transaction>> GetAsync(
-        Expression<Func<Transaction, bool>> predicate = null,
-        params Expression<Func<Transaction, object>>[] includeProperties)
+        public async Task<IQueryable<Payment>> GetAsync(
+        Expression<Func<Payment, bool>> predicate = null,
+        params Expression<Func<Payment, object>>[] includeProperties)
         {
             try
             {
                 var result = predicate == null ? _dbContext.Transactions : _dbContext.Transactions.Where(predicate);
                 if (!result.Any())
                 {
-                    return await Task.FromResult(Enumerable.Empty<Transaction>().AsQueryable());
+                    return await Task.FromResult(Enumerable.Empty<Payment>().AsQueryable());
                 }
                 else
                 {
@@ -63,14 +63,14 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
         }
 
         // Update
-        public async Task UpdateAsync(Transaction entity)
+        public async Task UpdateAsync(Payment entity)
         {
             _dbContext.Update(entity);
             await _dbContext.SaveChangesAsync();
         }
 
         // Delete
-        public async Task RemoveAsync(Transaction entity)
+        public async Task RemoveAsync(Payment entity)
         {
             _dbContext.Remove(entity);
             await _dbContext.SaveChangesAsync();

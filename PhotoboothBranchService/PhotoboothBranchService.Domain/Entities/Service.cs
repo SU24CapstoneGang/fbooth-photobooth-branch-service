@@ -11,6 +11,8 @@ namespace PhotoboothBranchService.Domain.Entities
         public decimal ServicePrice { get; set; }
         public StatusUse Status {  get; set; }
         public ServiceType ServiceType { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime LastModified { get; set; }
         public virtual ICollection<BookingService> BookingServices { get; set; }
     }
 }

@@ -9,6 +9,8 @@
         public int CoordinatesY { get; set; }
         public bool IsLandscape { get; set; }
         public int BoxIndex { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime LastModified { get; set; }
         public Guid LayoutID { get; set; }
         public virtual Layout Layout { get; set; } = default!;
     }

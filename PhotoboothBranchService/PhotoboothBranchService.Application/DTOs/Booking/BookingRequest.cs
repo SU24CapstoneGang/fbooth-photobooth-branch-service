@@ -15,8 +15,12 @@ namespace PhotoboothBranchService.Application.DTOs.Booking
         [DictionaryValueGreaterThanZero(ErrorMessage = "Each service quantity must be greater than 0.")]
         public Dictionary<Guid, short> ServiceList { get; set; } = new Dictionary<Guid, short>();
         [Required]
-        public DateTime StartTime { get; set; }
+        public DateOnly Date { get; set; }
         [Required]
-        public DateTime EndTime { get; set; }
+        [TimeSpanValidation]
+        public TimeSpan StartTime { get; set; }
+        [Required]
+        [TimeSpanValidation]
+        public TimeSpan EndTime { get; set; }
     }
 }

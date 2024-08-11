@@ -38,7 +38,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
               .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
               .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
-            builder.HasMany(i => i.Transactions)
+            builder.HasMany(i => i.Payments)
                 .WithOne(w => w.PaymentMethod)
                 .HasForeignKey(i => i.PaymentMethodID)
                 .IsRequired();

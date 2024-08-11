@@ -17,7 +17,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasKey(b => b.BookingSlotID);
             builder.Property(b => b.BookingSlotID).ValueGeneratedOnAdd().IsRequired();
             builder.Property(b => b.BookingDate).IsRequired();
-
+            builder.Property(b => b.Price).IsRequired().HasColumnType("decimal(18, 0)");
         }
     }
 }

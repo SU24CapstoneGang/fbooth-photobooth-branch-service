@@ -15,7 +15,14 @@ namespace PhotoboothBranchService.Application.Common.Helpers
             {
                 if (timeSpan >= TimeSpan.Zero && timeSpan < TimeSpan.FromDays(1))
                 {
-                    return ValidationResult.Success;
+                    if (timeSpan.Minutes % 15 == 0)
+                    {
+                        return ValidationResult.Success;
+                    }
+                    else
+                    {
+                        return new ValidationResult("The time must be on the hour (xx:00), half-hour (xx:30), or in 15-minute increments (xx:15, xx:45).");
+                    }
                 }
             }
             return new ValidationResult("The time must be a valid TimeSpan in 'hh:mm' format and less than 24 hours.");

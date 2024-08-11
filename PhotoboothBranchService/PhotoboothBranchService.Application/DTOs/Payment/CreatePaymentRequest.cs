@@ -1,6 +1,6 @@
 ﻿namespace PhotoboothBranchService.Application.DTOs.Transaction
 {
-    public class CreateTransactionRequest
+    public class CreatePaymentRequest
     {
         public string Description { get; set; }
         public Guid PaymentMethodID { get; set; }

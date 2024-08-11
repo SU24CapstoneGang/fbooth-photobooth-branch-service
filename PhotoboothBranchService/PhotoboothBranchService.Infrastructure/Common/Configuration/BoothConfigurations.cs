@@ -18,8 +18,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(b => b.BackgroundColor).IsRequired();
             builder.Property(b => b.Concept).IsRequired();
             builder.Property(b => b.PeopleInBooth).IsRequired();
-            builder.Property(b => b.PricePerSlot).IsRequired().HasColumnType("decimal(18, 2)");
-
 
             builder.Property(pb => pb.Status)
                 .IsRequired();
