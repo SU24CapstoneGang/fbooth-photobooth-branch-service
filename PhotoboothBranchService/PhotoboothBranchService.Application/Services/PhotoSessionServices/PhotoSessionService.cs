@@ -72,12 +72,12 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
                 throw new BadRequestException("Booking has not Check-in yet");
             }
 
-        //    if(!(booking.EndTime > timeNow && booking.StartTime < timeNow))
-        //    {
-        //        throw new BadRequestException("Start time not come or passed End time");
-        //    }
+            if (!(booking.EndTime > timeNow && booking.StartTime < timeNow))
+            {
+                throw new BadRequestException("Start time not come or passed End time");
+            }
 
-        //}
+        }
         // Delete
         public async Task DeleteAsync(Guid id)
         {
@@ -127,22 +127,10 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
             {
                 throw new KeyNotFoundException("Photo session not found.");
             }
-
-            //case update layout
+            if (photoSession.Status == PhotoSessionStatus.Ended) {
+                throw new BadRequestException("Session has ended");
+            }
             var updatedPhotoSession = _mapper.Map(updateModel, photoSession);
-            //if (updateModel.LayoutID.HasValue)
-            //{
-            //    var layout = (await _layoutRepository.GetAsync(i => i.LayoutID == updateModel.LayoutID)).FirstOrDefault();
-            //    if (layout != null)
-            //    {
-            //        updatedPhotoSession.TotalPhotoTaken = layout.PhotoSlot;
-            //    }
-            //    else
-            //    {
-            //        throw new NotFoundException("Not found Layout");
-            //    }
-            //}
-            //case end session
             if (updatedPhotoSession.Status == PhotoSessionStatus.Ended)
             {
                 updatedPhotoSession.EndTime = DateTimeHelper.GetVietnamTimeNow();

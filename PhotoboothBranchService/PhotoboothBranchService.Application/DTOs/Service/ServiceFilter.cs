@@ -1,4 +1,5 @@
-﻿using PhotoboothBranchService.Domain.Enum;
+﻿using PhotoboothBranchService.Domain;
+using PhotoboothBranchService.Domain.Enum;
 
 namespace PhotoboothBranchService.Application.DTOs.Service
 {
@@ -9,5 +10,6 @@ namespace PhotoboothBranchService.Application.DTOs.Service
         public string? Unit { get; set; } = default!;
         public decimal? ServicePrice { get; set; }
         public StatusUse? Status { get; set; }
+        public ServiceType? ServiceType { get; set; }
     }
 }

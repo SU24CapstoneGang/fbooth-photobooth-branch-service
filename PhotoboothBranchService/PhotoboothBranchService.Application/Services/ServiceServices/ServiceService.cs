@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet;
+using OpenCvSharp;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Service;
+using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Domain;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
@@ -14,11 +17,13 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
     {
         private readonly IServiceRepository _serviceRepository;
         private readonly IMapper _mapper;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public ServiceService(IServiceRepository serviceRepository, IMapper mapper)
+        public ServiceService(IServiceRepository serviceRepository, IMapper mapper, ICloudinaryService cloudinaryService)
         {
             _serviceRepository = serviceRepository;
             _mapper = mapper;
+            _cloudinaryService = cloudinaryService;
         }
 
         // Create
@@ -27,6 +32,15 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
             var service = _mapper.Map<Service>(createModel);
             service.Status = status;
             service.ServiceType = ServiceType.Other;
+
+            //upload to cloudinary
+            var uploadResult = await _cloudinaryService.AddPhotoAsync(createModel.imgFile, "FBooth-Service");
+            if (uploadResult.Error != null)
+            {
+                throw new Exception(uploadResult.Error.Message);
+            }
+            service.CouldID = uploadResult.PublicId;
+            service.ServiceIamgeURL = uploadResult.SecureUrl.AbsoluteUri;
             await _serviceRepository.AddAsync(service);
             return _mapper.Map<CreateServiceResponse>(service);
         }
@@ -90,7 +104,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
             {
                 throw new KeyNotFoundException("Service type not found.");
             }
-         
+            bool check = false;
             if (service.ServiceType == ServiceType.Printing || service.ServiceType == ServiceType.EmailSending) {
                 if (status.HasValue && status == StatusUse.Unusable)
                 {
@@ -98,10 +112,18 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
                 }
                 else
                 {
-                    await Update(id, updateModel, status, service);
+                    check = true;
                 }
             } else
             {
+                check = true;
+            }
+            if (check)
+            {
+                if (updateModel.imgFile != null && updateModel.imgFile.Length != 0)
+                {
+                    await _cloudinaryService.UpdatePhotoAsync(updateModel.imgFile, service.CouldID);
+                }
                 await Update(id, updateModel, status, service);
             }
         }

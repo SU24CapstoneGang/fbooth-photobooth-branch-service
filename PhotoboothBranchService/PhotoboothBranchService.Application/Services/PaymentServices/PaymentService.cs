@@ -361,16 +361,11 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
                 //do refund trans
                 throw new Exception("Not found Booking");
             }
-            if (booking.BookingStatus == BookingStatus.PendingPayment && booking.PaymentStatus == PaymentStatus.Processing)
+            if (payment.Amount + booking.PaidAmount == booking.TotalPrice)
             {
-                if (payment.Amount + booking.PaidAmount == booking.TotalPrice)
+                if (booking.BookingStatus == BookingStatus.PendingPayment)
                 {
-                    if (booking.BookingStatus == BookingStatus.PendingPayment)
-                    {
-                        booking.BookingStatus = BookingStatus.PendingChecking;
-                    }
-                    booking.PaymentStatus = PaymentStatus.Paid;
-                    booking.PaidAmount += payment.Amount;
+                    booking.BookingStatus = BookingStatus.PendingChecking;
                     try
                     {
                         if (booking.StartTime > DateTimeHelper.GetVietnamTimeNow())
@@ -382,13 +377,10 @@ namespace PhotoboothBranchService.Application.Services.TransactionServices
                     {
                         Console.WriteLine(ex.Message);
                     }
-                    await _bookingRepository.UpdateAsync(booking);
                 }
-                else
-                {
-                    //do refund
-                    await _refundService.RefundByTransID(payment.PaymentID, true, null, null, false);
-                }
+                booking.PaymentStatus = PaymentStatus.Paid;
+                booking.PaidAmount += payment.Amount;
+                await _bookingRepository.UpdateAsync(booking);
             }
             else
             {

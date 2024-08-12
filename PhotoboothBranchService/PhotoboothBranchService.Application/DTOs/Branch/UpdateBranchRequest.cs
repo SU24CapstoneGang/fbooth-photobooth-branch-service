@@ -15,11 +15,6 @@ namespace PhotoboothBranchService.Application.DTOs.Branch
         public string? Town { get; set; } = default!;
         [StringLength(100, ErrorMessage = "Branch address has max length is 100")]
         public string? City { get; set; } = default!;
-        [Required]
-        [TimeSpanValidation]
-        public TimeSpan OpeningTime { get; set; } // Thêm giờ mở cửa
-        [Required]
-        [TimeSpanValidation]
-        public TimeSpan ClosingTime { get; set; } // Thêm giờ đóng cửa
+       
     }
 }

@@ -4,8 +4,7 @@ public enum BoothStatus
 {
     Active = 1,
     Inactive = 2,
-    Maintenance = 3,
-    Booked = 4
+    Booked = 3
 }
 
 public enum AccountStatus

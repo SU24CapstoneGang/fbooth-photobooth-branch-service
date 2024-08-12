@@ -29,7 +29,6 @@ public class BookingService : IBookingService
     private readonly IBookingServiceService _bookingServiceService;
     private readonly IAccountRepository _accountRepository;
     private readonly IRefundService _refundService;
-    private readonly IServiceRepository _serviceRepository;
     private readonly IFullPaymentPolicyRepository _fullPaymentPolicyRepository;
     private readonly IEmailService _emailService;
     private readonly ISlotRepository _slotRepository;
@@ -39,7 +38,6 @@ public class BookingService : IBookingService
         IBoothRepository boothRepository,
         IAccountRepository accountRepository,
         IRefundService refundService,
-        IServiceRepository serviceRepository,
         IFullPaymentPolicyRepository fullPaymentPolicyRepository,
         ISlotRepository slotRepository,
         IEmailService emailService,
@@ -51,7 +49,6 @@ public class BookingService : IBookingService
         _boothRepository = boothRepository;
         _accountRepository = accountRepository;
         _refundService = refundService;
-        _serviceRepository = serviceRepository;
         _fullPaymentPolicyRepository = fullPaymentPolicyRepository;
         _emailService = emailService;
         _slotRepository = slotRepository;
@@ -108,7 +105,7 @@ public class BookingService : IBookingService
             .GetAsync(i => i.BoothID == request.BoothID
                 && (i.BookingStatus == BookingStatus.TakingPhoto || i.BookingStatus == BookingStatus.ExtraService)
                 && i.EndTime > DateTimeHelper.GetVietnamTimeNow()
-                && DateTimeHelper.GetVietnamTimeNow() < i.StartTime))
+                && DateTimeHelper.GetVietnamTimeNow() > i.StartTime))
             .FirstOrDefault();
         if (booking == null)
         {
@@ -182,45 +179,14 @@ public class BookingService : IBookingService
         }
 
         // Ensure services are loaded correctly
-        if (booking.BookingServices == null || !booking.BookingServices.Any() || booking.BookingServices.Any(bs => bs.Service == null))
-        {
-            throw new InvalidOperationException("Booking services not loaded correctly");
-        }
-
-        // Map services to response
-        var bookingServiceResponses = booking.BookingServices.Select(service => new BookingServiceResponse
-        {
-            BookingServiceID = service.BookingServiceID,
-            ServiceID = service.ServiceID,
-            ServiceName = service.Service.ServiceName,
-            Quantity = service.Quantity,
-            Price = service.Price,
-            SubTotal = service.SubTotal,
-        }).ToList();
-
-        // Create the response
-        var response = new BookingResponse
-        {
-            BookingID = booking.BookingID,
-            ValidateCode = booking.ValidateCode,
-            PaymentAmount = booking.TotalPrice,
-            StartTime = booking.StartTime,
-            EndTime = booking.EndTime,
-            BookingType = booking.BookingType,
-            PaymentStatus = booking.PaymentStatus,
-            Status = BookingStatus.TakingPhoto,
-            CancelledDate = booking.CancelledDate,
-            RefundAmount = booking.RefundAmount,
-            CreatedDate = booking.CreatedDate,
-            BoothID = booking.BoothID,
-            CustomerID = booking.CustomerID,
-            BookingServices = bookingServiceResponses
-        };
+        //if (booking.BookingServices == null || !booking.BookingServices.Any() || booking.BookingServices.Any(bs => bs.Service == null))
+        //{
+        //    throw new InvalidOperationException("Booking services not loaded correctly");
+        //}
 
         booking.BookingStatus = BookingStatus.TakingPhoto;
         await _bookingRepository.UpdateAsync(booking);
-        return response;
-
+        return await this.GetByIdAsync(booking.BookingID);
     }
     // Delete a session by ID
     public async Task DeleteAsync(Guid id)
@@ -262,41 +228,55 @@ public class BookingService : IBookingService
         var listSessionresponse = _mapper.Map<IEnumerable<BookingResponse>>(sessions);
         return listSessionresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).ToList().OrderByDescending(i => i.StartTime);
     }
-
+    public async Task<IEnumerable<BookingResponse>> GetBoothFutureBooking(Guid boothID)
+    {
+        var bookings = (await _bookingRepository.GetAsync(i => i.BoothID == boothID && i.StartTime > DateTimeHelper.GetVietnamTimeNow())).ToList();
+        return bookings.Any() ? _mapper.Map<IEnumerable<BookingResponse>>(bookings) : Enumerable.Empty<BookingResponse>();
+    }
+    public async Task<IEnumerable<BookingResponse>> GetBranchFutureBooking(Guid branchID)
+    {
+        var boothIds = (await _boothRepository.GetAsync(i => i.BranchID == branchID)).Select(i => i.BoothID).ToList();
+        var bookings = (await _bookingRepository.GetAsync(i => boothIds.Contains(i.BoothID) && i.StartTime > DateTimeHelper.GetVietnamTimeNow())).ToList();
+        return bookings.Any() ? _mapper.Map<IEnumerable<BookingResponse>>(bookings) : Enumerable.Empty<BookingResponse>();
+    }
     // Get a session by ID
     public async Task<BookingResponse> GetByIdAsync(Guid id)
     {
         var booking = (await _bookingRepository.GetAsync(s => s.BookingID == id,
             includeProperties: new Expression<Func<Booking, object>>[]
             {
-                i => i.BookingServices,
-                 i => i.FullPaymentPolicy
+                 i => i.FullPaymentPolicy,
             })).FirstOrDefault();
 
         if (booking == null)
         {
             throw new NotFoundException("Booking not found.");
         }
+        var slotList = await _bookingSlotRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Slot);
+        booking.BookingSlots = slotList.ToList();
         var list = await _bookingServiceService.GetByBookingIdAsync(booking.BookingID);
         booking.BookingServices = list.ToList();
         return _mapper.Map<BookingResponse>(booking);
     }
-    public async Task<BookingResponse> GetByReferenceIDAsync(string id)
+    public async Task<IEnumerable<BookingResponse>> SearchByReferenceIDAsync(string id)
     {
-        var booking = (await _bookingRepository.GetAsync(s => s.CustomerBusinessID == id,
+        var bookings = (await _bookingRepository.GetAsync(s => s.CustomerBusinessID.Contains(id),
             includeProperties: new Expression<Func<Booking, object>>[]
             {
-                i => i.BookingServices,
                  i => i.FullPaymentPolicy
-            })).FirstOrDefault();
+            })).ToList();
 
-        if (booking == null)
+        if (!bookings.Any())
         {
             throw new KeyNotFoundException("Booking not found.");
         }
-        var list = await _bookingServiceService.GetByBookingIdAsync(booking.BookingID);
-        booking.BookingServices = list.ToList();
-        return _mapper.Map<BookingResponse>(booking);
+        foreach (var booking in bookings)
+        {
+            var list = await _bookingServiceService.GetByBookingIdAsync(booking.BookingID);
+            booking.BookingServices = list.ToList();
+        }
+        
+        return _mapper.Map<IEnumerable<BookingResponse>>(bookings);
     }
     // Update a session
     public async Task<CreateBookingResponse> UpdateAsync(Guid id, UpdateBookingRequest updateModel, string? email)
@@ -569,7 +549,7 @@ public class BookingService : IBookingService
         {
             throw new NotFoundException("Booth not found on server, try again later");
         }
-        else if (booth.Status == BoothStatus.Booked || booth.Status == BoothStatus.Maintenance || booth.Status == BoothStatus.Inactive)
+        else if (booth.Status == BoothStatus.Booked || booth.Status == BoothStatus.Inactive)
         {
             throw new BadRequestException("Booth is used by another or is inactive, in maintenance");
         }

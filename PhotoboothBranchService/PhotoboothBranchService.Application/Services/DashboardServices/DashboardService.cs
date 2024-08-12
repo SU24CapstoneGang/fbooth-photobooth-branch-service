@@ -45,7 +45,8 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             IMapper mapper,
             ILayoutRepository layoutRepository,
             IBackgroundRepository backgroundRepository,
-            IStickerRepository stickerRepository)
+            IStickerRepository stickerRepository, 
+            IServiceRepository serviceRepository)
         {
             _branchRepository = branchRepository;
             _boothRepository = boothRepository;
@@ -59,6 +60,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             _layoutRepository = layoutRepository;
             _backgroundRepository = backgroundRepository;
             _stickerRepository = stickerRepository;
+            _serviceRepository = serviceRepository;
         }
 
         public async Task<BasicBranchDashboardResponse> BasicBranchDashboard(Guid branchID)
@@ -78,24 +80,24 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             {
                 return response;
             }
-            response.BoothDashboard.BoothMaintenance = booths.Select(i => i.Status == BoothStatus.Maintenance).Count();
             response.BoothDashboard.BoothActive = booths.Select(i => i.Status == BoothStatus.Active).Count();
             response.BoothDashboard.BoothInactive = booths.Select(i => i.Status == BoothStatus.Inactive).Count();
-            var orders = await _bookingRepository.GetAsync(i => booths.Select(b => b.BoothID).ToList().Contains(i.BoothID));
-            response.TotalOrder = orders.Count();
+            var bookings = await _bookingRepository.GetAsync(i => booths.Select(b => b.BoothID).ToList().Contains(i.BoothID));
+            response.TotalOrder = bookings.Count();
             if (response.TotalOrder == 0)
             {
                 response.TotalRevenue = 0;
                 response.CountCustomer = 0;
                 return response;
             }
-            response.CountCustomer = orders.GroupBy(o => o.CustomerID).Count();
-            response.TotalRevenue = orders.Sum(o => o.TotalPrice);
+            response.CountCustomer = bookings.GroupBy(o => o.CustomerID).Count();
+            response.TotalRevenue = bookings.Sum(o => o.TotalPrice) - bookings.Sum(i => i.RefundAmount);
             return response;
         }
         public async Task<BasicDashboardResponse> BasicDashboard()
         {
             var response = new BasicDashboardResponse();
+            //infor for branch
             var branchs = await _branchRepository.GetAllAsync();
             response.CountCustomer = (await _accountRepository.GetAsync(i => i.Role == AccountRole.Customer && i.Status == AccountStatus.Active)).Count();
             response.TotalBranch = branchs.Count();
@@ -105,23 +107,24 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
                 response.TotalOrder = 0;
                 return response;
             }
+            //infor for booth
             var booths = await _boothRepository.GetAllAsync();
+            response.BoothDashboard.TotalBooth = booths.Count();
             if (response.BoothDashboard.TotalBooth == 0)
             {
                 return response;
             }
-            response.BoothDashboard.BoothMaintenance = booths.Select(i => i.Status == BoothStatus.Maintenance).Count();
             response.BoothDashboard.BoothActive = booths.Select(i => i.Status == BoothStatus.Active).Count();
             response.BoothDashboard.BoothInactive = booths.Select(i => i.Status == BoothStatus.Inactive).Count();
             response.BoothDashboard.BoothInUse = booths.Select(i => i.Status == BoothStatus.Booked).Count();
-            var orders = await _bookingRepository.GetAsync(i => i.BookingStatus == BookingStatus.PendingChecking);
-            response.TotalOrder = orders.Count();
-            response.TotalRevenue = response.TotalOrder == 0 ? 0 : orders.Sum(i => i.TotalPrice);
+            var bookings = await _bookingRepository.GetAsync();
+            response.TotalOrder = bookings.Count();
+            response.TotalRevenue = response.TotalOrder == 0 ? 0 : bookings.Sum(i => i.TotalPrice) - bookings.Sum(i => i.RefundAmount);
             return response;
         }
         public async Task<List<DashboardServiceResponse>> DashboradService(Guid? branchID, DateOnly? startDate, DateOnly? endDate)
         {
-            var orders = await this.GetBookings(branchID, startDate, endDate);
+            var orders = await this.GetBookings(branchID, startDate, endDate, false);
             var serviceItem = await _bookingServiceRepository.GetAsync(i => orders.Select(o => o.BookingID).ToList().Contains(i.BookingID), i => i.Service);
             if (serviceItem.Count() == 0)
             {
@@ -262,10 +265,10 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             {
                 return (await _photoSessionRepository.GetAsync(null, includeProperties)).ToList();
             }
-            var orders = await this.GetBookings(branchID, startDate, endDate);
+            var orders = await this.GetBookings(branchID, startDate, endDate, false);
             return orders.Count() == 0 ? new List<PhotoSession>() : (await _photoSessionRepository.GetAsync(i => orders.Select(o => o.BookingID).ToList().Contains(i.BookingID), includeProperties)).ToList();
         }
-        private async Task<List<Booking>> GetBookings(Guid? branchID, DateOnly? startDate, DateOnly? endDate, params Expression<Func<Booking, object>>[] includeProperties)
+        private async Task<List<Booking>> GetBookings(Guid? branchID, DateOnly? startDate, DateOnly? endDate, bool getAllState ,params Expression<Func<Booking, object>>[] includeProperties)
         {
             var booths = branchID.HasValue ? await _boothRepository.GetAsync(i => i.BranchID == branchID) : null;
             if (branchID.HasValue && booths.Count() == 0)
@@ -275,7 +278,10 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             bool isEnd = false;
             bool isStart = false;
             Expression<Func<Booking, bool>> pre = branchID.HasValue ? i => booths.Select(b => b.BoothID).ToList().Contains(i.BoothID) : i => true;
-            pre = LinQHelper.AndAlso(pre, i => i.BookingStatus == BookingStatus.PendingChecking);
+            if (!getAllState)
+            {
+                pre = LinQHelper.AndAlso(pre, i => i.BookingStatus != BookingStatus.PendingPayment && i.BookingStatus != BookingStatus.Canceled);
+            }
             if (endDate != null && endDate != default(DateOnly))
             {
                 isEnd = true;

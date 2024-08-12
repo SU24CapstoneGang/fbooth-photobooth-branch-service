@@ -62,8 +62,6 @@ namespace PhotoboothBranchService.Api.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-
-
         // Read
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BookingResponse>>> GetAllSessions()
@@ -90,14 +88,26 @@ namespace PhotoboothBranchService.Api.Controllers
             return Ok(booking);
         }
         [HttpGet("rid/{id}")]
-        public async Task<ActionResult<BookingResponse>> GetBookingByReferenceID(string id)
+        public async Task<ActionResult<IEnumerable<BookingResponse>>> GetBookingByReferenceID(string id)
         {
-            var booking = await _bookingService.GetByReferenceIDAsync(id);
-            if (booking == null)
+            var bookings = await _bookingService.SearchByReferenceIDAsync(id);
+            if (!bookings.Any())
             {
                 return NotFound();
             }
-            return Ok(booking);
+            return Ok(bookings);
+        }
+        [HttpGet("branch-future/{branchID}")]
+        public async Task<ActionResult<IEnumerable<BookingResponse>>> GetBranchFutureBooking(Guid branchID)
+        {
+            var result = await _bookingService.GetBranchFutureBooking(branchID);
+            return Ok(result.OrderBy(i => i.StartTime));
+        }
+        [HttpGet("booth-future/{boothID}")]
+        public async Task<ActionResult<IEnumerable<BookingResponse>>> GetBoothFutureBooking(Guid boothID)
+        {
+            var result = await _bookingService.GetBoothFutureBooking(boothID);
+            return Ok(result.OrderBy(i => i.StartTime));
         }
         // Update
         [HttpPut("{id}")]
