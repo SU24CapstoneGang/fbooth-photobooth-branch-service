@@ -120,29 +120,14 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         }
 
         // Update
-        public async Task UpdateAsync(Guid id, [FromQuery] UpdatePhotoSessionRequest updateModel)
+        public async Task UpdateAsync(Guid id, UpdatePhotoSessionRequest updateModel)
         {
             var photoSession = (await _photoSessionRepository.GetAsync(p => p.PhotoSessionID == id)).FirstOrDefault();
             if (photoSession == null)
             {
                 throw new KeyNotFoundException("Photo session not found.");
             }
-
-            //case update layout
             var updatedPhotoSession = _mapper.Map(updateModel, photoSession);
-            //if (updateModel.LayoutID.HasValue)
-            //{
-            //    var layout = (await _layoutRepository.GetAsync(i => i.LayoutID == updateModel.LayoutID)).FirstOrDefault();
-            //    if (layout != null)
-            //    {
-            //        updatedPhotoSession.TotalPhotoTaken = layout.PhotoSlot;
-            //    }
-            //    else
-            //    {
-            //        throw new NotFoundException("Not found Layout");
-            //    }
-            //}
-            //case end session
             if (updatedPhotoSession.Status == PhotoSessionStatus.Ended)
             {
                 updatedPhotoSession.EndTime = DateTimeHelper.GetVietnamTimeNow();
