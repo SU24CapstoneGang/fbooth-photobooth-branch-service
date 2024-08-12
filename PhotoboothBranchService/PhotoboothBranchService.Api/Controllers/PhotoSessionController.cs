@@ -20,10 +20,8 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Guid>> CreatePhotoSession(CreatePhotoSessionRequest createPhotoSessionRequest)
         {
-
             var createPhotoSessionResponse = await _photoSessionService.CreateAsync(createPhotoSessionRequest);
             return Ok(createPhotoSessionResponse);
-
         }
 
         // Read
@@ -62,7 +60,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdatePhotoSession(Guid id, [FromBody] UpdatePhotoSessionRequest updatePhotoSessionRequest)
+        public async Task<ActionResult> UpdatePhotoSession(Guid id, [FromQuery] UpdatePhotoSessionRequest updatePhotoSessionRequest)
         {
 
             await _photoSessionService.UpdateAsync(id, updatePhotoSessionRequest);
