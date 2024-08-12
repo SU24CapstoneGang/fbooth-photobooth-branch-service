@@ -99,7 +99,7 @@ public class BookingRepository : IBookingRepository
                 totalPrice += item.Price * item.Quantity;
 
             }
-            order.PaymentAmount = totalPrice;
+            order.TotalPrice = totalPrice;
             await UpdateAsync(order);
         }
     }

@@ -13,9 +13,9 @@ namespace PhotoboothBranchService.Api.Controllers
 {
     public class PaymentController : ControllerBaseApi
     {
-        private readonly ITransactionService _paymentService;
+        private readonly IPaymentService _paymentService;
 
-        public PaymentController(ITransactionService paymentService)
+        public PaymentController(IPaymentService paymentService)
         {
             _paymentService = paymentService;
         }

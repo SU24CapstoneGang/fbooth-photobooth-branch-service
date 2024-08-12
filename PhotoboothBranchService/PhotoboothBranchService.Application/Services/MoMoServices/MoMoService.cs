@@ -27,9 +27,9 @@ namespace PhotoboothBranchService.Application.Services.MoMoServices
         //private readonly string redirectUrl;
         private readonly string ipnUrl;
         private readonly string public_key;
-        private readonly ITransactionRepository _paymentRepository;
+        private readonly IPaymentRepository _paymentRepository;
 
-        public MoMoService(ITransactionRepository paymentRepository)
+        public MoMoService(IPaymentRepository paymentRepository)
         {
             momo_Api_Pay = JsonHelper.GetFromAppSettings("MoMo:momo_Api");
             momo_Api_Refund = JsonHelper.GetFromAppSettings("MoMo:momo_refund_endpoint");

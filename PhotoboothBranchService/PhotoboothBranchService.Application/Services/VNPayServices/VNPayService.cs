@@ -22,8 +22,8 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
         private readonly string vnp_Api;
 
         private readonly IMapper _mapper;
-        private readonly ITransactionRepository _paymentRepository;
-        public VNPayService(ITransactionRepository paymentRepository, IMapper mapper)
+        private readonly IPaymentRepository _paymentRepository;
+        public VNPayService(IPaymentRepository paymentRepository, IMapper mapper)
         {
             //vnp_Returnurl = JsonHelper.GetFromAppSettings("VNPay:vnp_Returnurl");//URL nhan ket qua tra ve 
             vnp_Url = JsonHelper.GetFromAppSettings("VNPay:vnp_Url"); //URL thanh toan cua VNPAY 

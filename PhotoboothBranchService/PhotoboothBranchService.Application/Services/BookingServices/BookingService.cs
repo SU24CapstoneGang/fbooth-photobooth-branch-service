@@ -26,8 +26,7 @@ public class BookingService : IBookingService
     private readonly IBookingRepository _bookingRepository;
     private readonly IMapper _mapper;
     private readonly IBoothRepository _boothRepository;
-    private readonly ITransactionService _transactionService;
-    private readonly IBookingServiceRepository _bookingServiceRepository;
+    private readonly IBookingServiceService _bookingServiceService;
     private readonly IAccountRepository _accountRepository;
     private readonly IRefundService _refundService;
     private readonly IServiceRepository _serviceRepository;
@@ -38,29 +37,26 @@ public class BookingService : IBookingService
     public BookingService(IBookingRepository sessionOrderRepository,
         IMapper mapper,
         IBoothRepository boothRepository,
-        ITransactionService paymentService,
-        IBookingServiceRepository bookingServiceRepository,
         IAccountRepository accountRepository,
         IRefundService refundService,
         IServiceRepository serviceRepository,
         IFullPaymentPolicyRepository fullPaymentPolicyRepository,
         ISlotRepository slotRepository,
         IEmailService emailService,
-        IBookingSlotRepository bookingSlotRepository)
+        IBookingSlotRepository bookingSlotRepository,
+        IBookingServiceService bookingServiceService)
     {
         _bookingRepository = sessionOrderRepository;
         _mapper = mapper;
         _boothRepository = boothRepository;
-        _transactionService = paymentService;
-        _bookingServiceRepository = bookingServiceRepository;
         _accountRepository = accountRepository;
         _refundService = refundService;
-        _bookingServiceRepository = bookingServiceRepository;
         _serviceRepository = serviceRepository;
         _fullPaymentPolicyRepository = fullPaymentPolicyRepository;
         _emailService = emailService;
         _slotRepository = slotRepository;
         _bookingSlotRepository = bookingSlotRepository;
+        _bookingServiceService = bookingServiceService;
     }
 
     // Create a new session
@@ -83,7 +79,8 @@ public class BookingService : IBookingService
             throw new BadRequestException("There is another booking in the selected time range, please choose another time");
         }
         // Calculate payment amount
-        var processedServices = await ProcessServiceListAsync(createModel.ServiceList);
+        //var processedServices = await ProcessServiceListAsync(createModel.ServiceList);
+        var processedServices = await _bookingServiceService.CreateServiceListForNewBooking(createModel.ServiceList);
         var processSlot = await this.ProcessHireBoothFee(booth.BoothID, createModel.Date, createModel.StartTime, createModel.EndTime);
        //add the remain field
         booking.CustomerID = account.AccountID;
@@ -91,7 +88,7 @@ public class BookingService : IBookingService
         booking.BookingStatus = BookingStatus.PendingPayment;
         booking.CreatedDate = DateTimeHelper.GetVietnamTimeNow();
         booking.HireBoothFee = processSlot.Item1;
-        booking.PaymentAmount = processedServices.Item1 + booking.HireBoothFee;
+        booking.TotalPrice = processedServices.Item1 + booking.HireBoothFee;
         booking.BookingType = bookingType;
         booking.BookingServices = processedServices.Item2;
         booking.PaymentStatus = PaymentStatus.Processing;
@@ -100,11 +97,39 @@ public class BookingService : IBookingService
         booking.BookingSlots = processSlot.Item2;
         // Save booking
         await _bookingRepository.AddAsync(booking);
-        var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
+        var list = await _bookingServiceService.GetByBookingIdAsync(booking.BookingID);
         booking.BookingServices = list.ToList();
         return _mapper.Map<CreateBookingResponse>(booking);
     }
+    public async Task<BookingResponse> AddExtraService(AddExtraServiceRequest request)
+    {
+        //find now session order of request booth
+        var booking = (await _bookingRepository
+            .GetAsync(i => i.BoothID == request.BoothID
+                && (i.BookingStatus == BookingStatus.TakingPhoto || i.BookingStatus == BookingStatus.ExtraService)
+                && i.EndTime > DateTimeHelper.GetVietnamTimeNow()
+                && DateTimeHelper.GetVietnamTimeNow() < i.StartTime))
+            .FirstOrDefault();
+        if (booking == null)
+        {
+            throw new NotFoundException("Not found booking running in this booth");
+        }
+        if (request.BookingID != booking.BookingID)
+        {
+            throw new Exception("Error on database");
+        }
 
+        var result = await _bookingServiceService.AddExtraService(new AddListBookingServiceRequest
+        {
+            BookingID = request.BookingID,
+            ServiceList = request.ServiceList
+        });
+        booking.TotalPrice += result;
+        booking.BookingStatus = BookingStatus.ExtraService;
+        booking.PaymentStatus = PaymentStatus.PendingPayExtra;
+        await _bookingRepository.UpdateAsync(booking);
+        return await this.GetByIdAsync(booking.BookingID);
+    }
     private async Task<Guid> GetApplicablePolicyIdAsync(DateTime startTime)
     {
         var policies = await _fullPaymentPolicyRepository.GetAsync(p => p.IsActive && (p.StartDate == null || p.StartDate <= DateOnly.FromDateTime(startTime)) && (p.EndDate == null || p.EndDate >= DateOnly.FromDateTime(startTime)));
@@ -125,7 +150,6 @@ public class BookingService : IBookingService
         createSessionOrderRequest.CustomerEmail = email;
         return await CreateAsync(createSessionOrderRequest, BookingType.Online);
     }
-
     public async Task<BookingResponse> Checkin(CheckinCodeRequest validateSessionPhotoRequest)
     {
         var booking = await _bookingRepository.GetBookingByValidateCodeAndBoothIdAsync(
@@ -179,7 +203,7 @@ public class BookingService : IBookingService
         {
             BookingID = booking.BookingID,
             ValidateCode = booking.ValidateCode,
-            PaymentAmount = booking.PaymentAmount,
+            PaymentAmount = booking.TotalPrice,
             StartTime = booking.StartTime,
             EndTime = booking.EndTime,
             BookingType = booking.BookingType,
@@ -198,7 +222,6 @@ public class BookingService : IBookingService
         return response;
 
     }
-
     // Delete a session by ID
     public async Task DeleteAsync(Guid id)
     {
@@ -223,7 +246,7 @@ public class BookingService : IBookingService
             })).ToList();
         foreach (var booking in bookings)
         {
-            var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
+            var list = await _bookingServiceService.GetByBookingIdAsync(booking.BookingID);
             booking.BookingServices = list.ToList();
         }
         return _mapper.Map<IEnumerable<BookingResponse>>(bookings.ToList().OrderByDescending(i => i.StartTime));
@@ -254,7 +277,7 @@ public class BookingService : IBookingService
         {
             throw new NotFoundException("Booking not found.");
         }
-        var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
+        var list = await _bookingServiceService.GetByBookingIdAsync(booking.BookingID);
         booking.BookingServices = list.ToList();
         return _mapper.Map<BookingResponse>(booking);
     }
@@ -271,7 +294,7 @@ public class BookingService : IBookingService
         {
             throw new KeyNotFoundException("Booking not found.");
         }
-        var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
+        var list = await _bookingServiceService.GetByBookingIdAsync(booking.BookingID);
         booking.BookingServices = list.ToList();
         return _mapper.Map<BookingResponse>(booking);
     }
@@ -303,7 +326,7 @@ public class BookingService : IBookingService
         {
             throw new BadRequestException("There is another booking in the selected time range, please choose another time");
         }
-        var processedServices = await ProcessServiceListAsync(updateModel.ServiceList);
+        var processedServices = /*await ProcessServiceListAsync(updateModel.ServiceList);*/ await _bookingServiceService.CreateServiceListForNewBooking(updateModel.ServiceList);
         var processSlot = await this.ProcessHireBoothFee(booth.BoothID, updateModel.Date, updateModel.StartTime, updateModel.EndTime);
         // Map to booking entity
         booking.StartTime = updateBooking.StartTime;
@@ -312,43 +335,34 @@ public class BookingService : IBookingService
         booking.BookingStatus = BookingStatus.PendingPayment;
         booking.CreatedDate = DateTimeHelper.GetVietnamTimeNow();
         booking.HireBoothFee = processSlot.Item1;
-        booking.PaymentAmount = processedServices.Item1 + booking.HireBoothFee;
+        booking.TotalPrice = processedServices.Item1 + booking.HireBoothFee;
         account = account.Role == AccountRole.Customer ? account : (await _accountRepository.GetAsync(i => i.AccountID == booking.CustomerID)).First();
         booking.CustomerBusinessID = this.GenerateCustomerReferenceID(account.FirstName, account.LastName);
         booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(updateBooking.StartTime);
         //delete old booking service
-        var bookingServices = (await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();
-        var removalTasks = bookingServices.Select(bookingService =>
-            _bookingServiceRepository.RemoveAsync(bookingService)
-        );
-        await Task.WhenAll(removalTasks);
+        await _bookingServiceService.DeleteByBookingIdAsync(booking.BookingID);
         // and add new
-        bookingServices = processedServices.Item2.ToList();
-        var addTasks = bookingServices.Select(async bookingService =>
-        {
-            bookingService.BookingID = booking.BookingID;
-            await _bookingServiceRepository.AddAsync(bookingService);
-        });
-        await Task.WhenAll(addTasks);
+        var bookingServices = processedServices.Item2.ToList();
+        await _bookingServiceService.AddByList(bookingServices, booking.BookingID);
 
         //delete booking slot
         var bookingSlots = (await _bookingSlotRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();
-        removalTasks = bookingSlots.Select(bookingSlot =>
+        var removalTasks = bookingSlots.Select(bookingSlot =>
             _bookingSlotRepository.RemoveAsync(bookingSlot)
         );
         await Task.WhenAll(removalTasks);
         // and add new
         bookingSlots = processSlot.Item2.ToList();
-        addTasks = bookingSlots.Select(async bookingSlot =>
+        var addTasks = bookingSlots.Select(async bookingSlot =>
         {
             bookingSlot.BookingID = booking.BookingID;
             await _bookingSlotRepository.AddAsync(bookingSlot);
         });
-
+        await Task.WhenAll(addTasks);
         // Save booking
         await _bookingRepository.UpdateAsync(booking);
 
-        var list = await _bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Service);
+        var list = await _bookingServiceService.GetByBookingIdAsync(booking.BookingID);
         booking.BookingServices = list.ToList();
         return _mapper.Map<CreateBookingResponse>(booking);
     }
@@ -394,7 +408,6 @@ public class BookingService : IBookingService
                         {
                             response.message = $"Cancel booking and the refund successfully, with {booking.FullPaymentPolicy.RefundPercent}% value of booking";
                             booking.PaymentStatus = PaymentStatus.Refunded;
-                            booking.RefundAmount = response.refundList.Sum(i => i.Amount);
                         }
                     }
                     else
@@ -464,6 +477,10 @@ public class BookingService : IBookingService
     {
         var slots = (await _slotRepository.GetAsync(i => i.SlotEndTime <= endTime && i.SlotStartTime >= startTime && i.BoothID == BoothID)).OrderBy(i => i.SlotStartTime).ToList();
         decimal fee = 0;
+        if (!slots.Any()) 
+        {
+            throw new NotFoundException("Not found any slot");
+        }
         var bookingSlotList = new List<BookingSlot>();
         TimeSpan checkTime = slots[0].SlotStartTime;
         foreach (var slot in slots)
@@ -563,38 +580,38 @@ public class BookingService : IBookingService
 
         return booth;
     }
-    private async Task<(decimal, ICollection<Domain.Entities.BookingService>)> ProcessServiceListAsync(Dictionary<Guid, short> serviceList)
-    {
+    //private async Task<(decimal, ICollection<Domain.Entities.BookingService>)> ProcessServiceListAsync(Dictionary<Guid, short> serviceList)
+    //{
 
-        List<Domain.Entities.BookingService> result = new List<Domain.Entities.BookingService>();
+    //    List<Domain.Entities.BookingService> result = new List<Domain.Entities.BookingService>();
 
-        var bookingAmount = 0m;
-        if (serviceList.Any())
-        {
-            var serviceIds = serviceList.Keys.ToList();
-            var services = await _serviceRepository.GetAsync(s => serviceIds.Contains(s.ServiceID));
+    //    var bookingAmount = 0m;
+    //    if (serviceList.Any())
+    //    {
+    //        var serviceIds = serviceList.Keys.ToList();
+    //        var services = await _serviceRepository.GetAsync(s => serviceIds.Contains(s.ServiceID));
            
-            if (serviceList.Count() != services.Count())
-            {
-                throw new BadRequestException("Service(s) from input not found.");
-            }
-            foreach (var service in services)
-            {
-                var subtotal = service.ServicePrice * serviceList[service.ServiceID];
-                Domain.Entities.BookingService bookingService = new Domain.Entities.BookingService
-                {
-                    ServiceID = service.ServiceID,
-                    Quantity = serviceList[service.ServiceID],
-                    SubTotal = subtotal,
-                    Price = service.ServicePrice,
-                };
-                result.Add(bookingService);
-                bookingAmount += subtotal;
-            }
-        }
+    //        if (serviceList.Count() != services.Count())
+    //        {
+    //            throw new BadRequestException("Service(s) from input not found.");
+    //        }
+    //        foreach (var service in services)
+    //        {
+    //            var subtotal = service.ServicePrice * serviceList[service.ServiceID];
+    //            Domain.Entities.BookingService bookingService = new Domain.Entities.BookingService
+    //            {
+    //                ServiceID = service.ServiceID,
+    //                Quantity = serviceList[service.ServiceID],
+    //                SubTotal = subtotal,
+    //                Price = service.ServicePrice,
+    //            };
+    //            result.Add(bookingService);
+    //            bookingAmount += subtotal;
+    //        }
+    //    }
 
-        return (bookingAmount, result);
-    }
+    //    return (bookingAmount, result);
+    //}
 
 }
 

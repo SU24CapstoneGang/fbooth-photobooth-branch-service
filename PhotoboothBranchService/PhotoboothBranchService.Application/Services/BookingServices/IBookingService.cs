@@ -11,6 +11,7 @@ public interface IBookingService : IServiceBase<BookingResponse, BookingFilter, 
 {
     Task<BookingResponse> Checkin(CheckinCodeRequest validateSessionOrderRequest);
     Task<CreateBookingResponse> CreateAsync(BookingRequest createModel, BookingType bookingType);
+    Task<BookingResponse> AddExtraService(AddExtraServiceRequest request);
     Task<CreateBookingResponse> CustomerBooking(CustomerBookingRequest request, string email);
     Task<BookingResponse> GetByReferenceIDAsync(string id);
     Task<CreateBookingResponse> UpdateAsync(Guid id, UpdateBookingRequest updateModel, string? email);

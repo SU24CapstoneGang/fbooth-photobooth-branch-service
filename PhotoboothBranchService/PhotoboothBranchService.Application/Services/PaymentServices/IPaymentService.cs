@@ -7,7 +7,7 @@ using PhotoboothBranchService.Domain.Common.Interfaces;
 
 namespace PhotoboothBranchService.Application.Services.TransactionServices
 {
-    public interface ITransactionService : IServiceBase<PaymentResponse, PaymentFilter, PagingModel>
+    public interface IPaymentService : IServiceBase<PaymentResponse, PaymentFilter, PagingModel>
     {
         Task<CreatePaymentResponse> CreateAsync(CreatePaymentRequest createModel, string ClientIpAddress, string? email);
         Task UpdateAsync(Guid id, UpdatePaymentRequest updateModel);

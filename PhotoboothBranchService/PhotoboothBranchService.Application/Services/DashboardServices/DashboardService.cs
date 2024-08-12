@@ -90,7 +90,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
                 return response;
             }
             response.CountCustomer = orders.GroupBy(o => o.CustomerID).Count();
-            response.TotalRevenue = orders.Sum(o => o.PaymentAmount);
+            response.TotalRevenue = orders.Sum(o => o.TotalPrice);
             return response;
         }
         public async Task<BasicDashboardResponse> BasicDashboard()
@@ -116,7 +116,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             response.BoothDashboard.BoothInUse = booths.Select(i => i.Status == BoothStatus.Booked).Count();
             var orders = await _bookingRepository.GetAsync(i => i.BookingStatus == BookingStatus.PendingChecking);
             response.TotalOrder = orders.Count();
-            response.TotalRevenue = response.TotalOrder == 0 ? 0 : orders.Sum(i => i.PaymentAmount);
+            response.TotalRevenue = response.TotalOrder == 0 ? 0 : orders.Sum(i => i.TotalPrice);
             return response;
         }
         public async Task<List<DashboardServiceResponse>> DashboradService(Guid? branchID, DateOnly? startDate, DateOnly? endDate)

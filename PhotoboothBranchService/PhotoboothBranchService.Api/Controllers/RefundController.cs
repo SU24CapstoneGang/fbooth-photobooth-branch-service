@@ -34,7 +34,7 @@ namespace PhotoboothBranchService.Api.Controllers
         {
             var clientIp = IpAddressHelper.GetClientIpAddress(HttpContext);
             var email = Request.HttpContext.Items["Email"]?.ToString();
-            var response = await _refundService.RefundByTransID(request.transId, request.IsFullRefund, clientIp, email);
+            var response = await _refundService.RefundByTransID(request.transId, request.IsFullRefund, clientIp, email, true);
             return Ok(response);
         }
 

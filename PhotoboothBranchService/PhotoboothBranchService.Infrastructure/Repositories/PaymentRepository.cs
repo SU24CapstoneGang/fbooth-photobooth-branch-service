@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Infrastructure.Repositories
 {
-    public class PaymentRepository : ITransactionRepository
+    public class PaymentRepository : IPaymentRepository
     {
         private readonly AppDbContext _dbContext;
 

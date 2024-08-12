@@ -52,7 +52,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IDeviceService, DeviceService>();
             services.AddScoped<ILayoutService, LayoutService>();
-            services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IPaymentMethodService, PaymentMethodService>();
             services.AddScoped<IPhotoBoxService, PhotoBoxService>();
             services.AddScoped<IPhotoService, PhotoService>();

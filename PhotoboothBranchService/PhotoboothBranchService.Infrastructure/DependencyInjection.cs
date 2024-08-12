@@ -24,7 +24,7 @@ namespace PhotoboothBranchService.Infrastructure
             services.AddScoped<IBackgroundRepository, BackgroundRepository>();
             services.AddScoped<IDeviceRepository, DeviceRepository>();
             services.AddScoped<ILayoutRepository, LayoutRepository>();
-            services.AddScoped<ITransactionRepository, PaymentRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
             services.AddScoped<IPhotoBoxRepository, PhotoBoxRepository>();
             services.AddScoped<IRefundRepository, RefundRepository>();

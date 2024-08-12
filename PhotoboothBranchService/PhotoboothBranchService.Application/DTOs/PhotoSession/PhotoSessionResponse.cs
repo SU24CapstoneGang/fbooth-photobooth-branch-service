@@ -13,6 +13,5 @@ namespace PhotoboothBranchService.Application.DTOs.PhotoSession
         public Guid LayoutID { get; set; }
         public Guid BookingID { get; set; }
         public PhotoSessionStatus Status { get; set; }
-        public long ValidateCode { get; set; }
     }
 }

@@ -16,11 +16,11 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasKey(s => s.BookingID);
             builder.Property(s => s.BookingID).ValueGeneratedOnAdd();
 
-
-            builder.Property(s => s.PaymentAmount)
-                .IsRequired().HasColumnType("decimal(18, 0)"); ; // Tổng giá
+            builder.Property(s => s.TotalPrice).IsRequired().HasColumnType("decimal(18, 0)"); ; // Tổng giá
             builder.Property(s => s.CustomerBusinessID).IsRequired();
             builder.Property(s => s.HireBoothFee).IsRequired().HasColumnType("decimal(18, 0)");
+            builder.Property(s => s.PaidAmount).IsRequired().HasColumnType("decimal(18, 0)").HasDefaultValue(0);
+            builder.Property(s => s.RefundAmount).IsRequired().HasColumnType("decimal(18, 0)").HasDefaultValue(0);
             builder.Property(s => s.StartTime).IsRequired(true);
             builder.Property(s => s.EndTime).IsRequired(true);
 
@@ -32,8 +32,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
                 .ValueGeneratedOnAddOrUpdate();
             builder.Property(u => u.ValidateCode).IsRequired();
-            builder.Property(pb => pb.BookingStatus)
-                .IsRequired();
+            builder.Property(pb => pb.BookingStatus).IsRequired();
 
             // Mối quan hệ một-nhieu giữa Session và Account
             builder.HasOne(s => s.Account)

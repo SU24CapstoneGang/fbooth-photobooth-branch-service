@@ -107,6 +107,13 @@ namespace PhotoboothBranchService.Api.Controllers
             var response = await _bookingService.UpdateAsync(id, updateBookingRequest, email);
             return Ok(response);
         }
+        [HttpPut("extra-service")]
+        public async Task<ActionResult<BookingResponse>> AddExtraService(AddExtraServiceRequest request)
+        {
+            var result = await _bookingService.AddExtraService(request);
+            return Ok(result);
+        }
+
         [HttpPost("cancel")]
         public async Task<ActionResult<CancelBookingResponse>> CancelBooking(Guid BookingID)
         {

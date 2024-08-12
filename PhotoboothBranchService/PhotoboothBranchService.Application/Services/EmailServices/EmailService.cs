@@ -24,7 +24,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
         private string emailHostPassword;
 
         private readonly IAccountRepository _accountRepository;
-        private readonly ITransactionRepository _transactionRepository;
+        private readonly IPaymentRepository _transactionRepository;
         private readonly IBookingRepository _bookingRepository;
         private readonly IBranchRepository _boothBranchRepository;
         private readonly IBookingServiceRepository _bookingServiceRepository;
@@ -32,7 +32,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
         private readonly IBookingSlotRepository _bookingSlotRepository;
 
         public EmailService(IAccountRepository accountRepository, 
-            ITransactionRepository paymentRepository, 
+            IPaymentRepository paymentRepository, 
             IBookingRepository sessionOrderRepository, 
             IBranchRepository boothBranchRepository, 
             IBookingServiceRepository serviceItemRepository,
@@ -199,7 +199,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
 
                     sbBody.AppendLine("<tr>");
                     sbBody.AppendLine("<td colspan='4' style='border: 1px solid black; padding: 8px; text-align: right;'><strong>Total Price:</strong></td>");
-                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'><strong>{booking.PaymentAmount:N0}</strong> VND</td>");
+                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'><strong>{booking.TotalPrice:N0}</strong> VND</td>");
                     sbBody.AppendLine("</tr>");
 
                     sbBody.AppendLine("</table>");
@@ -209,7 +209,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                 }
             }
             else{
-                sbBody.AppendLine($"<p>Total price: {booking.PaymentAmount}</p>");
+                sbBody.AppendLine($"<p>Total price: {booking.TotalPrice}</p>");
             }
 
             sbBody.AppendLine($"<p>This booking was paid thourgh {trans.PaymentMethod.PaymentMethodName} in {trans.PaymentDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
