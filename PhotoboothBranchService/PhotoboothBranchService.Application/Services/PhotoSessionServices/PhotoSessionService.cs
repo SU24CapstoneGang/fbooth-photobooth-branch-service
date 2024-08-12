@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
@@ -32,7 +33,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
             {
                 throw new NotFoundException("Not found Booking");
             }
-            this.ValidateBookingToAdd(booking);
+            //this.ValidateBookingToAdd(booking);
 
             var photoSessions = (await _photoSessionRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();
             if (photoSessions != null && photoSessions.Count > 0)
@@ -54,7 +55,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
                 throw new BadRequestException("Layout from request is unable to use now");
             }
             var photoSession = _mapper.Map<PhotoSession>(createModel);
-            photoSession.TotalPhotoTaken = layout.PhotoSlot;
+            //photoSession.TotalPhotoTaken = layout.PhotoSlot;
             photoSession.SessionIndex = (await _photoSessionRepository.GetAsync(i => i.BookingID == createModel.BookingID)).Count() + 1;
             photoSession.Status = PhotoSessionStatus.Ongoing;
             await _photoSessionRepository.AddAsync(photoSession);
@@ -71,12 +72,12 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
                 throw new BadRequestException("Booking has not Check-in yet");
             }
 
-            if(!(booking.EndTime > timeNow && booking.StartTime < timeNow))
-            {
-                throw new BadRequestException("Start time not come or passed End time");
-            }
-           
-        }
+        //    if(!(booking.EndTime > timeNow && booking.StartTime < timeNow))
+        //    {
+        //        throw new BadRequestException("Start time not come or passed End time");
+        //    }
+
+        //}
         // Delete
         public async Task DeleteAsync(Guid id)
         {
@@ -119,7 +120,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         }
 
         // Update
-        public async Task UpdateAsync(Guid id, UpdatePhotoSessionRequest updateModel)
+        public async Task UpdateAsync(Guid id, [FromQuery] UpdatePhotoSessionRequest updateModel)
         {
             var photoSession = (await _photoSessionRepository.GetAsync(p => p.PhotoSessionID == id)).FirstOrDefault();
             if (photoSession == null)
@@ -129,18 +130,18 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
 
             //case update layout
             var updatedPhotoSession = _mapper.Map(updateModel, photoSession);
-            if (updateModel.LayoutID.HasValue)
-            {
-                var layout = (await _layoutRepository.GetAsync(i => i.LayoutID == updateModel.LayoutID)).FirstOrDefault();
-                if (layout != null)
-                {
-                    updatedPhotoSession.TotalPhotoTaken = layout.PhotoSlot;
-                }
-                else
-                {
-                    throw new NotFoundException("Not found Layout");
-                }
-            }
+            //if (updateModel.LayoutID.HasValue)
+            //{
+            //    var layout = (await _layoutRepository.GetAsync(i => i.LayoutID == updateModel.LayoutID)).FirstOrDefault();
+            //    if (layout != null)
+            //    {
+            //        updatedPhotoSession.TotalPhotoTaken = layout.PhotoSlot;
+            //    }
+            //    else
+            //    {
+            //        throw new NotFoundException("Not found Layout");
+            //    }
+            //}
             //case end session
             if (updatedPhotoSession.Status == PhotoSessionStatus.Ended)
             {
