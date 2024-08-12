@@ -15,7 +15,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(u => u.SessionName).IsRequired();
             builder.Property(u => u.SessionIndex).IsRequired();
-            builder.Property(u => u.TotalPhotoTaken).IsRequired();
+            builder.Property(u => u.TotalPhotoTaken).IsRequired(false);
             builder.Property(u => u.Status).IsRequired();
             builder.Property(a => a.StartTime)
               .ValueGeneratedOnAdd()
