@@ -77,7 +77,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         //        throw new BadRequestException("Start time not come or passed End time");
         //    }
 
-        //}
+        }
         // Delete
         public async Task DeleteAsync(Guid id)
         {
