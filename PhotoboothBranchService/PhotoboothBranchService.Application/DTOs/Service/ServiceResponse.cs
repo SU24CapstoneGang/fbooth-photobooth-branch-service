@@ -10,6 +10,8 @@ namespace PhotoboothBranchService.Application.DTOs.Service
         public string ServiceDescription { get; set; } = default!;
         public string Unit { get; set; } = default!;
         public decimal ServicePrice { get; set; }
+        public string ServiceIamgeURL { get; set; } = default!;
+        public string CouldID { get; set; } = default!;
         public ServiceType ServiceType { get; set; }
         public StatusUse Status { get; set; }
     }

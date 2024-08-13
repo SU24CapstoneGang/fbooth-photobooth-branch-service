@@ -65,20 +65,12 @@ public class BranchService : IBranchService
     //Create
     public async Task<CreateBranchResponse> CreateAsync(CreateBranchRequest createModel, BranchStatus status)
     {
-            //validate input
-            //if (createModel.ManagerID.HasValue)
-            //{
-            //    await ValideManagerForBranch(createModel.ManagerID.Value);
-            //}
-            if (createModel.ClosingTime < createModel.OpeningTime)
-            {
-                throw new BadRequestException("Closing time must after the opening time");
-            }
-            Branch branch = _mapper.Map<Branch>(createModel);
-            branch.Status = status;
-            branch.CreateDate = DateTimeHelper.GetVietnamTimeNow();
-            await _branchRepository.AddAsync(branch);
-            return _mapper.Map<CreateBranchResponse>(branch);
+        Branch branch = _mapper.Map<Branch>(createModel);
+        branch.Status = status;
+        branch.OpeningTime = new TimeSpan(7, 0, 0);
+        branch.ClosingTime = new TimeSpan(23, 0, 0);
+        await _branchRepository.AddAsync(branch);
+        return _mapper.Map<CreateBranchResponse>(branch);
     }
     //Delete
     public async Task DeleteAsync(Guid id)
@@ -138,10 +130,6 @@ public class BranchService : IBranchService
         }
 
         var updateBranch = _mapper.Map(updateModel, branch);
-        //if (updateModel.ManagerID.HasValue)
-        //{
-        //    await ValideManagerForBranch(updateModel.ManagerID.Value);
-        //}
         if (updateBranch.ClosingTime < updateBranch.OpeningTime)
         {
             throw new BadRequestException("Closing time must after the opening time");

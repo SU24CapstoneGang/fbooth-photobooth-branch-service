@@ -72,10 +72,10 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
                 throw new BadRequestException("Booking has not Check-in yet");
             }
 
-        //    if(!(booking.EndTime > timeNow && booking.StartTime < timeNow))
-        //    {
-        //        throw new BadRequestException("Start time not come or passed End time");
-        //    }
+            if (!(booking.EndTime > timeNow && booking.StartTime < timeNow))
+            {
+                throw new BadRequestException("Start time not come or passed End time");
+            }
 
         }
         // Delete
@@ -126,6 +126,9 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
             if (photoSession == null)
             {
                 throw new KeyNotFoundException("Photo session not found.");
+            }
+            if (photoSession.Status == PhotoSessionStatus.Ended) {
+                throw new BadRequestException("Session has ended");
             }
             var updatedPhotoSession = _mapper.Map(updateModel, photoSession);
             if (updatedPhotoSession.Status == PhotoSessionStatus.Ended)

@@ -102,7 +102,6 @@ public class StickerService : IStickerService
             throw new KeyNotFoundException("Sticker not found.");
         }
         var updatedSticker = _mapper.Map(updateModel, sticker);
-        updatedSticker.LastModified = DateTimeHelper.GetVietnamTimeNow();
         await _stickerRepository.UpdateAsync(updatedSticker);
         await _cloudinaryService.UpdatePhotoAsync(file, sticker.CouldID);
     }

@@ -58,7 +58,7 @@ namespace PhotoboothBranchService.Application.Services.SlotServices
         public async Task<IEnumerable<SlotResponse>> GetBoothFreeSlot(Guid boothID, DateOnly date, TimeSpan? startTime, TimeSpan? endTime)
         {
             //get booth's slot for a date
-            Expression<Func<Slot, bool>> pre = i => i.BoothID == boothID && i.Status == StatusUse.Available;
+            Expression<Func<Slot, bool>> pre = i => i.BoothID == boothID;
             if (endTime != null && endTime != default(TimeSpan) && endTime.HasValue)
             {
                 pre = LinQHelper.AndAlso(pre, so => so.SlotEndTime <= endTime);
@@ -70,7 +70,16 @@ namespace PhotoboothBranchService.Application.Services.SlotServices
             var slots = (await _slotRepository.GetAsync(pre)).ToList();
             var idList = slots.Select(i => i.SlotID);
             var usedSlots = await _bookingSlotRepository.GetAsync(i => idList.Contains(i.SlotID) && i.BookingDate == date);
-            slots = slots.ExceptBy(usedSlots.Select(i => i.SlotID), l => l.SlotID).ToList();
+
+            // Create a hash set for quick lookup
+            var usedSlotIds = new HashSet<Guid>(usedSlots.Select(i => i.SlotID));
+            foreach (var slot in slots)
+            {
+                if (usedSlotIds.Contains(slot.SlotID))
+                {
+                    slot.Status = StatusUse.Unusable; 
+                }
+            }
             return _mapper.Map<IEnumerable<SlotResponse>>(slots);
         }
         public async Task<IEnumerable<GetBranchFreeSlotResponse>> GetBranchFreeSlot(Guid BranchID, DateOnly date, TimeSpan? startTime, TimeSpan? endTime)

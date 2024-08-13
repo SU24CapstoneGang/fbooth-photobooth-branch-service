@@ -19,7 +19,12 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(s => s.ServiceDescription);
             builder.Property(s => s.ServicePrice).IsRequired().HasColumnType("decimal(18, 2)");
             builder.Property(s => s.ServiceType).IsRequired();
+            builder.Property(s => s.ServiceIamgeURL)
+               .IsRequired()
+               .HasMaxLength(255);
 
+            builder.Property(s => s.CouldID)
+                .IsRequired();
             builder.Property(a => a.Unit).IsRequired();
             builder.Property(s => s.Status).IsRequired();
             builder.Property(c => c.CreatedDate)
@@ -46,6 +51,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     ServiceType = Domain.ServiceType.Other,
                     CreatedDate = DateTime.Now,
                     LastModified = DateTime.Now,
+                    CouldID = "",
+                    ServiceIamgeURL = "",
                 },
                 new Service
                 {
@@ -58,6 +65,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     ServiceType = Domain.ServiceType.EmailSending,
                     CreatedDate = DateTime.Now,
                     LastModified = DateTime.Now,
+                    CouldID = "",
+                    ServiceIamgeURL = "",
                 },
                 new Service
                 {
@@ -70,6 +79,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     ServiceType = Domain.ServiceType.Printing,
                     CreatedDate = DateTime.Now,
                     LastModified = DateTime.Now,
+                    CouldID = "",
+                    ServiceIamgeURL = "",
                 });
         }
     }

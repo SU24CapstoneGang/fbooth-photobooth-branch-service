@@ -1,23 +1,19 @@
 ﻿using AutoMapper;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Booking;
 using PhotoboothBranchService.Application.DTOs.BookingService;
+using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Application.Services.BookingServiceServices;
 using PhotoboothBranchService.Application.Services.EmailServices;
 using PhotoboothBranchService.Application.Services.RefundServices;
-using PhotoboothBranchService.Application.Services.TransactionServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
 using System.Linq.Expressions;
-using System.Net.WebSockets;
-using System.Runtime.ConstrainedExecution;
 
 namespace PhotoboothBranchService.Application.Services.BookingServices;
 
@@ -27,9 +23,8 @@ public class BookingService : IBookingService
     private readonly IMapper _mapper;
     private readonly IBoothRepository _boothRepository;
     private readonly IBookingServiceService _bookingServiceService;
-    private readonly IAccountRepository _accountRepository;
+    private readonly IAccountService _accountService;
     private readonly IRefundService _refundService;
-    private readonly IServiceRepository _serviceRepository;
     private readonly IFullPaymentPolicyRepository _fullPaymentPolicyRepository;
     private readonly IEmailService _emailService;
     private readonly ISlotRepository _slotRepository;
@@ -37,21 +32,19 @@ public class BookingService : IBookingService
     public BookingService(IBookingRepository sessionOrderRepository,
         IMapper mapper,
         IBoothRepository boothRepository,
-        IAccountRepository accountRepository,
         IRefundService refundService,
-        IServiceRepository serviceRepository,
         IFullPaymentPolicyRepository fullPaymentPolicyRepository,
         ISlotRepository slotRepository,
         IEmailService emailService,
         IBookingSlotRepository bookingSlotRepository,
-        IBookingServiceService bookingServiceService)
+        IBookingServiceService bookingServiceService,
+        IAccountService accountService)
     {
         _bookingRepository = sessionOrderRepository;
         _mapper = mapper;
         _boothRepository = boothRepository;
-        _accountRepository = accountRepository;
+        _accountService = accountService;
         _refundService = refundService;
-        _serviceRepository = serviceRepository;
         _fullPaymentPolicyRepository = fullPaymentPolicyRepository;
         _emailService = emailService;
         _slotRepository = slotRepository;
@@ -63,7 +56,7 @@ public class BookingService : IBookingService
     public async Task<CreateBookingResponse> CreateAsync(BookingRequest createModel, BookingType bookingType)
     {
         // Validate customer
-        var account = await ValidateCustomerAsync(createModel.CustomerPhoneNumber, createModel.CustomerEmail);
+        var account = await _accountService.ValidateCustomerAsync(createModel.CustomerPhoneNumber, createModel.CustomerEmail);
 
         // Validate booth
         var booth = await ValidateBoothAsync(createModel.BoothID);
@@ -108,7 +101,7 @@ public class BookingService : IBookingService
             .GetAsync(i => i.BoothID == request.BoothID
                 && (i.BookingStatus == BookingStatus.TakingPhoto || i.BookingStatus == BookingStatus.ExtraService)
                 && i.EndTime > DateTimeHelper.GetVietnamTimeNow()
-                && DateTimeHelper.GetVietnamTimeNow() < i.StartTime))
+                && DateTimeHelper.GetVietnamTimeNow() > i.StartTime))
             .FirstOrDefault();
         if (booking == null)
         {
@@ -150,6 +143,57 @@ public class BookingService : IBookingService
         createSessionOrderRequest.CustomerEmail = email;
         return await CreateAsync(createSessionOrderRequest, BookingType.Online);
     }
+    public async Task<CreateBookingResponse> GuestBooking(GuestBookingRequest request)
+    {
+        Guid accId;
+        try
+        {
+            var account = await _accountService.ValidateCustomerAsync(request.CustomerPhoneNumber, request.CustomerEmail);
+            throw new BadRequestException("Account existed, can not use this function");
+        } catch (NotFoundException)
+        {
+            //create new account for guest
+            CreateAccountRequestModel requestNewAccount = new CreateAccountRequestModel
+            {
+                Address = request.Address,
+                DateOfBirth = request.DateOfBirth,
+                Email = request.CustomerEmail,
+                FirstName = request.FirstName,
+                LastName = request.LasttName,
+                PhoneNumber = request.CustomerPhoneNumber,
+                Password = PasswordGenerator.GeneratePassword(23),
+            };
+            requestNewAccount.ConfirmPassword = requestNewAccount.Password;
+            accId = (await _accountService.Register(requestNewAccount, AccountRole.Customer)).AccountID;
+        }
+        //create booking request
+        BookingRequest bookingRequest = new BookingRequest
+        {
+            BoothID = request.BoothID,
+            CustomerEmail = request.CustomerEmail,
+            Date = request.Date,
+            ServiceList = request.ServiceList,
+            EndTime = request.EndTime,
+            StartTime = request.StartTime,
+        };
+
+        try //start booking
+        {
+            return await this.CreateAsync(bookingRequest, BookingType.Staff);
+        }
+        catch (Exception ex)
+        {
+            await _accountService.DeleteAsync(accId);
+            if (ex.InnerException != null)
+            {
+                throw ex.InnerException;
+            }
+            else
+            {
+                throw;
+            }
+        }
+    }
     public async Task<BookingResponse> Checkin(CheckinCodeRequest validateSessionPhotoRequest)
     {
         var booking = await _bookingRepository.GetBookingByValidateCodeAndBoothIdAsync(
@@ -182,45 +226,14 @@ public class BookingService : IBookingService
         }
 
         // Ensure services are loaded correctly
-        if (booking.BookingServices == null || !booking.BookingServices.Any() || booking.BookingServices.Any(bs => bs.Service == null))
-        {
-            throw new InvalidOperationException("Booking services not loaded correctly");
-        }
-
-        // Map services to response
-        var bookingServiceResponses = booking.BookingServices.Select(service => new BookingServiceResponse
-        {
-            BookingServiceID = service.BookingServiceID,
-            ServiceID = service.ServiceID,
-            ServiceName = service.Service.ServiceName,
-            Quantity = service.Quantity,
-            Price = service.Price,
-            SubTotal = service.SubTotal,
-        }).ToList();
-
-        // Create the response
-        var response = new BookingResponse
-        {
-            BookingID = booking.BookingID,
-            ValidateCode = booking.ValidateCode,
-            PaymentAmount = booking.TotalPrice,
-            StartTime = booking.StartTime,
-            EndTime = booking.EndTime,
-            BookingType = booking.BookingType,
-            PaymentStatus = booking.PaymentStatus,
-            Status = BookingStatus.TakingPhoto,
-            CancelledDate = booking.CancelledDate,
-            RefundAmount = booking.RefundAmount,
-            CreatedDate = booking.CreatedDate,
-            BoothID = booking.BoothID,
-            CustomerID = booking.CustomerID,
-            BookingServices = bookingServiceResponses
-        };
+        //if (booking.BookingServices == null || !booking.BookingServices.Any() || booking.BookingServices.Any(bs => bs.Service == null))
+        //{
+        //    throw new InvalidOperationException("Booking services not loaded correctly");
+        //}
 
         booking.BookingStatus = BookingStatus.TakingPhoto;
         await _bookingRepository.UpdateAsync(booking);
-        return response;
-
+        return await this.GetByIdAsync(booking.BookingID);
     }
     // Delete a session by ID
     public async Task DeleteAsync(Guid id)
@@ -262,41 +275,55 @@ public class BookingService : IBookingService
         var listSessionresponse = _mapper.Map<IEnumerable<BookingResponse>>(sessions);
         return listSessionresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).ToList().OrderByDescending(i => i.StartTime);
     }
-
+    public async Task<IEnumerable<BookingResponse>> GetBoothFutureBooking(Guid boothID)
+    {
+        var bookings = (await _bookingRepository.GetAsync(i => i.BoothID == boothID && i.StartTime > DateTimeHelper.GetVietnamTimeNow())).ToList();
+        return bookings.Any() ? _mapper.Map<IEnumerable<BookingResponse>>(bookings) : Enumerable.Empty<BookingResponse>();
+    }
+    public async Task<IEnumerable<BookingResponse>> GetBranchFutureBooking(Guid branchID)
+    {
+        var boothIds = (await _boothRepository.GetAsync(i => i.BranchID == branchID)).Select(i => i.BoothID).ToList();
+        var bookings = (await _bookingRepository.GetAsync(i => boothIds.Contains(i.BoothID) && i.StartTime > DateTimeHelper.GetVietnamTimeNow())).ToList();
+        return bookings.Any() ? _mapper.Map<IEnumerable<BookingResponse>>(bookings) : Enumerable.Empty<BookingResponse>();
+    }
     // Get a session by ID
     public async Task<BookingResponse> GetByIdAsync(Guid id)
     {
         var booking = (await _bookingRepository.GetAsync(s => s.BookingID == id,
             includeProperties: new Expression<Func<Booking, object>>[]
             {
-                i => i.BookingServices,
-                 i => i.FullPaymentPolicy
+                 i => i.FullPaymentPolicy,
             })).FirstOrDefault();
 
         if (booking == null)
         {
             throw new NotFoundException("Booking not found.");
         }
+        var slotList = await _bookingSlotRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Slot);
+        booking.BookingSlots = slotList.ToList();
         var list = await _bookingServiceService.GetByBookingIdAsync(booking.BookingID);
         booking.BookingServices = list.ToList();
         return _mapper.Map<BookingResponse>(booking);
     }
-    public async Task<BookingResponse> GetByReferenceIDAsync(string id)
+    public async Task<IEnumerable<BookingResponse>> SearchByReferenceIDAsync(string id)
     {
-        var booking = (await _bookingRepository.GetAsync(s => s.CustomerBusinessID == id,
+        var bookings = (await _bookingRepository.GetAsync(s => s.CustomerBusinessID.Contains(id),
             includeProperties: new Expression<Func<Booking, object>>[]
             {
-                i => i.BookingServices,
                  i => i.FullPaymentPolicy
-            })).FirstOrDefault();
+            })).ToList();
 
-        if (booking == null)
+        if (!bookings.Any())
         {
             throw new KeyNotFoundException("Booking not found.");
         }
-        var list = await _bookingServiceService.GetByBookingIdAsync(booking.BookingID);
-        booking.BookingServices = list.ToList();
-        return _mapper.Map<BookingResponse>(booking);
+        foreach (var booking in bookings)
+        {
+            var list = await _bookingServiceService.GetByBookingIdAsync(booking.BookingID);
+            booking.BookingServices = list.ToList();
+        }
+        
+        return _mapper.Map<IEnumerable<BookingResponse>>(bookings);
     }
     // Update a session
     public async Task<CreateBookingResponse> UpdateAsync(Guid id, UpdateBookingRequest updateModel, string? email)
@@ -307,7 +334,7 @@ public class BookingService : IBookingService
         {
             throw new NotFoundException("Not found Booking");
         }
-        var account = await ValidateCustomerAsync("", email);
+        var account = await _accountService.ValidateCustomerAsync("", email);
         if (account.Role == AccountRole.Customer)
         {
             if (booking.CustomerID != account.AccountID)
@@ -336,8 +363,18 @@ public class BookingService : IBookingService
         booking.CreatedDate = DateTimeHelper.GetVietnamTimeNow();
         booking.HireBoothFee = processSlot.Item1;
         booking.TotalPrice = processedServices.Item1 + booking.HireBoothFee;
-        account = account.Role == AccountRole.Customer ? account : (await _accountRepository.GetAsync(i => i.AccountID == booking.CustomerID)).First();
-        booking.CustomerBusinessID = this.GenerateCustomerReferenceID(account.FirstName, account.LastName);
+        string firstName, lastName;
+        if (account.Role == AccountRole.Customer)
+        {
+            firstName = account.FirstName;
+            lastName = account.LastName;
+        } else
+        {
+            var res = await _accountService.GetByIdAsync(booking.CustomerID);
+            firstName = res.FirstName;
+            lastName = res.LastName;
+        }
+        booking.CustomerBusinessID = this.GenerateCustomerReferenceID(firstName, lastName);
         booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(updateBooking.StartTime);
         //delete old booking service
         await _bookingServiceService.DeleteByBookingIdAsync(booking.BookingID);
@@ -522,45 +559,10 @@ public class BookingService : IBookingService
             .Select(word => word[0]))
             .ToUpper();
 
-        string datePart = DateTimeHelper.GetVietnamTimeNow().ToString("yyyyMMddHHmmss");
+        string datePart = DateTimeHelper.GetVietnamTimeNow().ToString("yyyyMMdd");
         string randomPart = new Random().Next(10009, 99999).ToString();
 
         return $"{initials}-{datePart}-{randomPart}";
-    }
-    private async Task<Account> ValidateCustomerAsync(string? phoneNumber, string? email)
-    {
-        Account? account;
-
-        if (!string.IsNullOrEmpty(phoneNumber) && !string.IsNullOrEmpty(email))
-        {
-            account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(phoneNumber) && i.Email.Equals(email))).FirstOrDefault();
-        }
-        else if (!string.IsNullOrEmpty(phoneNumber))
-        {
-            account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(phoneNumber))).FirstOrDefault();
-        }
-        else if (!string.IsNullOrEmpty(email))
-        {
-            account = (await _accountRepository.GetAsync(i => i.Email.Equals(email))).FirstOrDefault();
-        }
-        else
-        {
-            throw new BadRequestException("No customer value input");
-        }
-        if (account == null)
-        {
-            throw new BadRequestException("Account not found");
-        }
-        if (account.Role != AccountRole.Customer)
-        {
-            throw new BadRequestException("Account is not Customer");
-        }
-        if (account.Status != AccountStatus.Active)
-        {
-            throw new BadRequestException("Account is not active to do this function");
-        }
-
-        return account;
     }
     private async Task<Booth> ValidateBoothAsync(Guid boothID)
     {
@@ -569,7 +571,7 @@ public class BookingService : IBookingService
         {
             throw new NotFoundException("Booth not found on server, try again later");
         }
-        else if (booth.Status == BoothStatus.Booked || booth.Status == BoothStatus.Maintenance || booth.Status == BoothStatus.Inactive)
+        else if (booth.Status == BoothStatus.Booked || booth.Status == BoothStatus.Inactive)
         {
             throw new BadRequestException("Booth is used by another or is inactive, in maintenance");
         }
@@ -580,38 +582,5 @@ public class BookingService : IBookingService
 
         return booth;
     }
-    //private async Task<(decimal, ICollection<Domain.Entities.BookingService>)> ProcessServiceListAsync(Dictionary<Guid, short> serviceList)
-    //{
-
-    //    List<Domain.Entities.BookingService> result = new List<Domain.Entities.BookingService>();
-
-    //    var bookingAmount = 0m;
-    //    if (serviceList.Any())
-    //    {
-    //        var serviceIds = serviceList.Keys.ToList();
-    //        var services = await _serviceRepository.GetAsync(s => serviceIds.Contains(s.ServiceID));
-           
-    //        if (serviceList.Count() != services.Count())
-    //        {
-    //            throw new BadRequestException("Service(s) from input not found.");
-    //        }
-    //        foreach (var service in services)
-    //        {
-    //            var subtotal = service.ServicePrice * serviceList[service.ServiceID];
-    //            Domain.Entities.BookingService bookingService = new Domain.Entities.BookingService
-    //            {
-    //                ServiceID = service.ServiceID,
-    //                Quantity = serviceList[service.ServiceID],
-    //                SubTotal = subtotal,
-    //                Price = service.ServicePrice,
-    //            };
-    //            result.Add(bookingService);
-    //            bookingAmount += subtotal;
-    //        }
-    //    }
-
-    //    return (bookingAmount, result);
-    //}
-
 }
 

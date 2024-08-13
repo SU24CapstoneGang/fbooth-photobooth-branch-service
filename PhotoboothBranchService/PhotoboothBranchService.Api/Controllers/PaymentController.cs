@@ -7,7 +7,7 @@ using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.MoMoPayment;
 using PhotoboothBranchService.Application.DTOs.Transaction;
 using PhotoboothBranchService.Application.Services.MoMoServices;
-using PhotoboothBranchService.Application.Services.TransactionServices;
+using PhotoboothBranchService.Application.Services.PaymentServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {

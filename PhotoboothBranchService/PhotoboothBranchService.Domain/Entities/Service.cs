@@ -9,6 +9,8 @@ namespace PhotoboothBranchService.Domain.Entities
         public string ServiceDescription { get; set; } = default!;
         public string Unit { get; set; } = default!;
         public decimal ServicePrice { get; set; }
+        public string ServiceIamgeURL { get; set; } = default!;
+        public string CouldID { get; set; } = default!;
         public StatusUse Status {  get; set; }
         public ServiceType ServiceType { get; set; }
         public DateTime CreatedDate { get; set; }
