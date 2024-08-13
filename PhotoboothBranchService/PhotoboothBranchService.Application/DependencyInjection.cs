@@ -32,7 +32,7 @@ using PhotoboothBranchService.Application.Services.RefundServices;
 using PhotoboothBranchService.Application.Services.ServiceServices;
 using PhotoboothBranchService.Application.Services.SlotServices;
 using PhotoboothBranchService.Application.Services.StickerServices;
-using PhotoboothBranchService.Application.Services.TransactionServices;
+using PhotoboothBranchService.Application.Services.PaymentServices;
 using PhotoboothBranchService.Application.Services.VNPayServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.IRepository;

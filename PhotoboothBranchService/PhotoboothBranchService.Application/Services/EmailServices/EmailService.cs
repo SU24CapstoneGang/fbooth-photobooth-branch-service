@@ -245,7 +245,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             sbBody.AppendLine("<br>");
             await this.SendEmail(booking.Account.Email, "Booking Cancellation Confirmation", sbBody.ToString(), $"{booking.Account.FirstName} {booking.Account.LastName}");
         }
-
+        public async Task SendResetPasswordEmail(string emai, string link) { }
         private async Task SendEmail(string emailClientAddress, string subject, string body, string customerName)
         {
             try

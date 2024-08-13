@@ -5,7 +5,7 @@ using PhotoboothBranchService.Application.DTOs.Transaction;
 using PhotoboothBranchService.Application.DTOs.VNPayPayment;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 
-namespace PhotoboothBranchService.Application.Services.TransactionServices
+namespace PhotoboothBranchService.Application.Services.PaymentServices
 {
     public interface IPaymentService : IServiceBase<PaymentResponse, PaymentFilter, PagingModel>
     {

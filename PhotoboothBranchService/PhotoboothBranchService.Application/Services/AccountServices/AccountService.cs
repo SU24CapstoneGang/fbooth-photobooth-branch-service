@@ -34,6 +34,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             _branchRepository = branchRepository;
         }
 
+
         public async Task<string> ResetPassword(string email)
         {
             var link = await _firebaseService.GetResetPasswordLink(email);
@@ -171,7 +172,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
                         }
                         if (!await _accountRepository.IsPhoneNumberUnique(request.PhoneNumber))
                         {
-                            throw new Exception("Phone number is already in use. Please choose a different Phone number.");
+                            throw new BadRequestException("Phone number is already in use. Please choose a different Phone number.");
                         }
 
                         var isPhoneExisted = (await _accountRepository.GetAsync(pn => pn.PhoneNumber.Equals(request.PhoneNumber))).FirstOrDefault();
@@ -256,6 +257,57 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             await _accountRepository.UpdateAsync(acc);
         }
 
+        public async Task<Account> ValidateCustomerAsync(string? phoneNumber, string? email)
+        {
+            Account? accountByPhone = null;
+            Account? accountByEmail = null;
+
+            if (!string.IsNullOrEmpty(phoneNumber))
+            {
+                accountByPhone = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(phoneNumber))).FirstOrDefault();
+            }
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                accountByEmail = (await _accountRepository.GetAsync(i => i.Email.Equals(email))).FirstOrDefault();
+            }
+
+            if (accountByPhone == null && accountByEmail == null)
+            {
+                throw new NotFoundException("Account not found");
+            }
+
+            // If both phone and email are provided but only one account is found, throw an error
+            if (!string.IsNullOrEmpty(phoneNumber) && !string.IsNullOrEmpty(email))
+            {
+                if (accountByPhone == null || accountByEmail == null)
+                {
+                    throw new BadRequestException("The provided phone number and email do not match the same account");
+                }
+            }
+
+            // If both are not null but belong to different accounts, throw an error
+            if (accountByPhone != null && accountByEmail != null && accountByPhone.AccountID != accountByEmail.AccountID)
+            {
+                throw new BadRequestException("The provided phone number and email correspond to different accounts");
+            }
+
+            // Get the found account (either by phone or email)
+            Account account = accountByPhone ?? accountByEmail;
+
+            // Validate the account's role and status
+            if (account.Role != AccountRole.Customer)
+            {
+                throw new BadRequestException("Account is not Customer");
+            }
+
+            if (account.Status != AccountStatus.Active)
+            {
+                throw new BadRequestException("Account is not active to do this function");
+            }
+
+            return account;
+        }
 
     }
 }

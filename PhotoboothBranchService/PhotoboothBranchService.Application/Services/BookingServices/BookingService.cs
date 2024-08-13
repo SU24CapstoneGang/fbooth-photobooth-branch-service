@@ -1,23 +1,19 @@
 ﻿using AutoMapper;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Booking;
 using PhotoboothBranchService.Application.DTOs.BookingService;
+using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Application.Services.BookingServiceServices;
 using PhotoboothBranchService.Application.Services.EmailServices;
 using PhotoboothBranchService.Application.Services.RefundServices;
-using PhotoboothBranchService.Application.Services.TransactionServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
-using System;
 using System.Linq.Expressions;
-using System.Net.WebSockets;
-using System.Runtime.ConstrainedExecution;
 
 namespace PhotoboothBranchService.Application.Services.BookingServices;
 
@@ -27,7 +23,7 @@ public class BookingService : IBookingService
     private readonly IMapper _mapper;
     private readonly IBoothRepository _boothRepository;
     private readonly IBookingServiceService _bookingServiceService;
-    private readonly IAccountRepository _accountRepository;
+    private readonly IAccountService _accountService;
     private readonly IRefundService _refundService;
     private readonly IFullPaymentPolicyRepository _fullPaymentPolicyRepository;
     private readonly IEmailService _emailService;
@@ -36,18 +32,18 @@ public class BookingService : IBookingService
     public BookingService(IBookingRepository sessionOrderRepository,
         IMapper mapper,
         IBoothRepository boothRepository,
-        IAccountRepository accountRepository,
         IRefundService refundService,
         IFullPaymentPolicyRepository fullPaymentPolicyRepository,
         ISlotRepository slotRepository,
         IEmailService emailService,
         IBookingSlotRepository bookingSlotRepository,
-        IBookingServiceService bookingServiceService)
+        IBookingServiceService bookingServiceService,
+        IAccountService accountService)
     {
         _bookingRepository = sessionOrderRepository;
         _mapper = mapper;
         _boothRepository = boothRepository;
-        _accountRepository = accountRepository;
+        _accountService = accountService;
         _refundService = refundService;
         _fullPaymentPolicyRepository = fullPaymentPolicyRepository;
         _emailService = emailService;
@@ -60,7 +56,7 @@ public class BookingService : IBookingService
     public async Task<CreateBookingResponse> CreateAsync(BookingRequest createModel, BookingType bookingType)
     {
         // Validate customer
-        var account = await ValidateCustomerAsync(createModel.CustomerPhoneNumber, createModel.CustomerEmail);
+        var account = await _accountService.ValidateCustomerAsync(createModel.CustomerPhoneNumber, createModel.CustomerEmail);
 
         // Validate booth
         var booth = await ValidateBoothAsync(createModel.BoothID);
@@ -146,6 +142,57 @@ public class BookingService : IBookingService
         var createSessionOrderRequest = _mapper.Map<BookingRequest>(request);
         createSessionOrderRequest.CustomerEmail = email;
         return await CreateAsync(createSessionOrderRequest, BookingType.Online);
+    }
+    public async Task<CreateBookingResponse> GuestBooking(GuestBookingRequest request)
+    {
+        Guid accId;
+        try
+        {
+            var account = await _accountService.ValidateCustomerAsync(request.CustomerPhoneNumber, request.CustomerEmail);
+            throw new BadRequestException("Account existed, can not use this function");
+        } catch (NotFoundException)
+        {
+            //create new account for guest
+            CreateAccountRequestModel requestNewAccount = new CreateAccountRequestModel
+            {
+                Address = request.Address,
+                DateOfBirth = request.DateOfBirth,
+                Email = request.CustomerEmail,
+                FirstName = request.FirstName,
+                LastName = request.LasttName,
+                PhoneNumber = request.CustomerPhoneNumber,
+                Password = PasswordGenerator.GeneratePassword(23),
+            };
+            requestNewAccount.ConfirmPassword = requestNewAccount.Password;
+            accId = (await _accountService.Register(requestNewAccount, AccountRole.Customer)).AccountID;
+        }
+        //create booking request
+        BookingRequest bookingRequest = new BookingRequest
+        {
+            BoothID = request.BoothID,
+            CustomerEmail = request.CustomerEmail,
+            Date = request.Date,
+            ServiceList = request.ServiceList,
+            EndTime = request.EndTime,
+            StartTime = request.StartTime,
+        };
+
+        try //start booking
+        {
+            return await this.CreateAsync(bookingRequest, BookingType.Staff);
+        }
+        catch (Exception ex)
+        {
+            await _accountService.DeleteAsync(accId);
+            if (ex.InnerException != null)
+            {
+                throw ex.InnerException;
+            }
+            else
+            {
+                throw;
+            }
+        }
     }
     public async Task<BookingResponse> Checkin(CheckinCodeRequest validateSessionPhotoRequest)
     {
@@ -287,7 +334,7 @@ public class BookingService : IBookingService
         {
             throw new NotFoundException("Not found Booking");
         }
-        var account = await ValidateCustomerAsync("", email);
+        var account = await _accountService.ValidateCustomerAsync("", email);
         if (account.Role == AccountRole.Customer)
         {
             if (booking.CustomerID != account.AccountID)
@@ -316,8 +363,18 @@ public class BookingService : IBookingService
         booking.CreatedDate = DateTimeHelper.GetVietnamTimeNow();
         booking.HireBoothFee = processSlot.Item1;
         booking.TotalPrice = processedServices.Item1 + booking.HireBoothFee;
-        account = account.Role == AccountRole.Customer ? account : (await _accountRepository.GetAsync(i => i.AccountID == booking.CustomerID)).First();
-        booking.CustomerBusinessID = this.GenerateCustomerReferenceID(account.FirstName, account.LastName);
+        string firstName, lastName;
+        if (account.Role == AccountRole.Customer)
+        {
+            firstName = account.FirstName;
+            lastName = account.LastName;
+        } else
+        {
+            var res = await _accountService.GetByIdAsync(booking.CustomerID);
+            firstName = res.FirstName;
+            lastName = res.LastName;
+        }
+        booking.CustomerBusinessID = this.GenerateCustomerReferenceID(firstName, lastName);
         booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(updateBooking.StartTime);
         //delete old booking service
         await _bookingServiceService.DeleteByBookingIdAsync(booking.BookingID);
@@ -502,45 +559,10 @@ public class BookingService : IBookingService
             .Select(word => word[0]))
             .ToUpper();
 
-        string datePart = DateTimeHelper.GetVietnamTimeNow().ToString("yyyyMMddHHmmss");
+        string datePart = DateTimeHelper.GetVietnamTimeNow().ToString("yyyyMMdd");
         string randomPart = new Random().Next(10009, 99999).ToString();
 
         return $"{initials}-{datePart}-{randomPart}";
-    }
-    private async Task<Account> ValidateCustomerAsync(string? phoneNumber, string? email)
-    {
-        Account? account;
-
-        if (!string.IsNullOrEmpty(phoneNumber) && !string.IsNullOrEmpty(email))
-        {
-            account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(phoneNumber) && i.Email.Equals(email))).FirstOrDefault();
-        }
-        else if (!string.IsNullOrEmpty(phoneNumber))
-        {
-            account = (await _accountRepository.GetAsync(i => i.PhoneNumber.Equals(phoneNumber))).FirstOrDefault();
-        }
-        else if (!string.IsNullOrEmpty(email))
-        {
-            account = (await _accountRepository.GetAsync(i => i.Email.Equals(email))).FirstOrDefault();
-        }
-        else
-        {
-            throw new BadRequestException("No customer value input");
-        }
-        if (account == null)
-        {
-            throw new BadRequestException("Account not found");
-        }
-        if (account.Role != AccountRole.Customer)
-        {
-            throw new BadRequestException("Account is not Customer");
-        }
-        if (account.Status != AccountStatus.Active)
-        {
-            throw new BadRequestException("Account is not active to do this function");
-        }
-
-        return account;
     }
     private async Task<Booth> ValidateBoothAsync(Guid boothID)
     {
@@ -560,38 +582,5 @@ public class BookingService : IBookingService
 
         return booth;
     }
-    //private async Task<(decimal, ICollection<Domain.Entities.BookingService>)> ProcessServiceListAsync(Dictionary<Guid, short> serviceList)
-    //{
-
-    //    List<Domain.Entities.BookingService> result = new List<Domain.Entities.BookingService>();
-
-    //    var bookingAmount = 0m;
-    //    if (serviceList.Any())
-    //    {
-    //        var serviceIds = serviceList.Keys.ToList();
-    //        var services = await _serviceRepository.GetAsync(s => serviceIds.Contains(s.ServiceID));
-           
-    //        if (serviceList.Count() != services.Count())
-    //        {
-    //            throw new BadRequestException("Service(s) from input not found.");
-    //        }
-    //        foreach (var service in services)
-    //        {
-    //            var subtotal = service.ServicePrice * serviceList[service.ServiceID];
-    //            Domain.Entities.BookingService bookingService = new Domain.Entities.BookingService
-    //            {
-    //                ServiceID = service.ServiceID,
-    //                Quantity = serviceList[service.ServiceID],
-    //                SubTotal = subtotal,
-    //                Price = service.ServicePrice,
-    //            };
-    //            result.Add(bookingService);
-    //            bookingAmount += subtotal;
-    //        }
-    //    }
-
-    //    return (bookingAmount, result);
-    //}
-
 }
 

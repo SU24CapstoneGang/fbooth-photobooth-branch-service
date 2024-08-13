@@ -19,7 +19,7 @@ using PhotoboothBranchService.Domain.IRepository;
 using System.Formats.Asn1;
 using System.Net;
 
-namespace PhotoboothBranchService.Application.Services.TransactionServices
+namespace PhotoboothBranchService.Application.Services.PaymentServices
 {
     public class PaymentService : IPaymentService
     {
