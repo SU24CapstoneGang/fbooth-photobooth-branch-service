@@ -60,7 +60,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdatePhotoSession(Guid id, [FromQuery] UpdatePhotoSessionRequest updatePhotoSessionRequest)
+        public async Task<ActionResult> UpdatePhotoSession(Guid id, [FromBody] UpdatePhotoSessionRequest updatePhotoSessionRequest)
         {
 
             await _photoSessionService.UpdateAsync(id, updatePhotoSessionRequest);

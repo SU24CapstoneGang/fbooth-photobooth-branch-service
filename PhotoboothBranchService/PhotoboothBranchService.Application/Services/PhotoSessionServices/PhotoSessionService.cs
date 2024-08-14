@@ -120,7 +120,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         }
 
         // Update
-        public async Task UpdateAsync(Guid id, [FromQuery] UpdatePhotoSessionRequest updateModel)
+        public async Task UpdateAsync(Guid id, UpdatePhotoSessionRequest updateModel)
         {
             var photoSession = (await _photoSessionRepository.GetAsync(p => p.PhotoSessionID == id)).FirstOrDefault();
             if (photoSession == null)
