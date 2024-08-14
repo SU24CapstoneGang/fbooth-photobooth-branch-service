@@ -215,15 +215,14 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             }
         }
 
-        public async Task<AccountResponse> GetByEmail(string email)
+        public async Task<Account> GetByEmail(string email)
         {
             var account = (await _accountRepository.GetAsync(a => a.Email.Equals(email))).FirstOrDefault();
             if (account == null)
             {
                 throw new NotFoundException("Account", email, "Email does not exist in the system.");
             }
-            return _mapper.Map<AccountResponse>(account);
-
+            return account;
         }
 
         public async Task<AccountResponse> GetByPhoneNumber(string phoneNumber)

@@ -160,9 +160,13 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                         }
                         if (account.Role != AccountRole.Admin)
                         {
+                            if (!account.BranchID.HasValue)
+                            {
+                                throw new ForbiddenAccessException("Staff are not from any branch to create this transaction");
+                            }
                             if (account.BranchID.Value != booking.Booth.BranchID)
                             {
-                                throw new ForbiddenAccessException("Booking and Staff/Manager are not from same branch to create this transaction");
+                                throw new ForbiddenAccessException("Booking and Staff are not from same branch to create this transaction");
                             }
                         }
 

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
@@ -13,6 +14,7 @@ using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Application.Services.BookingServices;
@@ -405,6 +407,62 @@ public class BookingService : IBookingService
         var list = await _bookingServiceService.GetByBookingIdAsync(booking.BookingID);
         booking.BookingServices = list.ToList();
         return _mapper.Map<CreateBookingResponse>(booking);
+    }
+    public async Task CloseBooking(CloseBookingRequest request)
+    {
+        var booking = (await _bookingRepository
+            .GetAsync(i => i.BoothID == request.BoothID
+            && i.StartTime > DateTimeHelper.GetVietnamTimeNow()
+            && i.EndTime < DateTimeHelper.GetVietnamTimeNow()))
+            .SingleOrDefault();
+        if (booking == null)
+        {
+            throw new NotFoundException("Booking not found");
+        }
+        if (booking.BookingID != request.BookingID)
+        {
+            throw new BadRequestException("Booking id is not match");
+        }
+        if (booking.BookingStatus == BookingStatus.ExtraService || booking.BookingStatus == BookingStatus.TakingPhoto)
+        {
+            booking.EndTime = DateTimeHelper.GetVietnamTimeNow();
+            booking.BookingStatus = BookingStatus.CompleteChecked;
+            await _bookingRepository.UpdateAsync(booking);
+        } else
+        {
+            throw new BadRequestException("Only ongoing booking can close");
+        }
+    }
+
+    public async Task<IEnumerable<BookingResponse>> GetBookings(string email)
+    {
+        var acc = await _accountService.GetByEmail(email);
+        IEnumerable<Booking> responses;
+        if (acc == null)
+        {
+            throw new NotFoundException("Account not found");
+        }
+        if (acc.Role == AccountRole.Customer)
+        {
+            responses = (await _bookingRepository.GetAsync(i => i.CustomerID == acc.AccountID)).ToList();
+        }
+        else if (acc.Role == AccountRole.Staff)
+        {
+            if (!acc.BranchID.HasValue)
+            {
+                throw new ForbiddenAccessException("Staff haven't assigned to any branch");
+            }
+            else
+            {
+                var boothIds = (await _boothRepository.GetAsync(i => i.BranchID == acc.BranchID)).Select(i => i.BoothID).ToList();
+                responses = (await _bookingRepository.GetAsync(i => boothIds.Contains(i.BoothID))).ToList();
+            }
+        }
+        else
+        {
+            throw new ForbiddenAccessException();
+        }
+        return _mapper.Map<IEnumerable<BookingResponse>>(responses.OrderBy(i => i.StartTime).ToList());
     }
     public async Task<CancelBookingResponse> CancelBooking(Guid bookingID, string? ipAddress, string? email)
     {

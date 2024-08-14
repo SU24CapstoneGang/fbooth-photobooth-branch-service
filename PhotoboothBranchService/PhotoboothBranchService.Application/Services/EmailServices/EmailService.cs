@@ -204,7 +204,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             }
             // Notify total price
             sbBody.AppendLine("<br>");
-            sbBody.AppendLine("<p><strong>Total Price:</strong> This booking's total cost is <strong>{booking.TotalPrice:N0} VND</strong>.</p>");
+            sbBody.AppendLine($"<p><strong>Total Price:</strong> This booking's total cost is <strong>{booking.TotalPrice:N0} VND</strong>.</p>");
 
             sbBody.AppendLine($"<p>This booking was paid thourgh {trans.PaymentMethod.PaymentMethodName} in {trans.PaymentDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
 

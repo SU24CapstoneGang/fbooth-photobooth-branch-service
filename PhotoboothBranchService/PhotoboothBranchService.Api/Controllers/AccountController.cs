@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
@@ -14,11 +15,12 @@ public class AccountController : ControllerBaseApi
 {
     private readonly IAccountService _accountService;
     private readonly IFirebaseService _firebaseService;
-
-    public AccountController(IAccountService accountService, IFirebaseService firebaseService)
+    private readonly IMapper _mapper;
+    public AccountController(IAccountService accountService, IFirebaseService firebaseService, IMapper mapper)
     {
         _accountService = accountService;
         _firebaseService = firebaseService;
+        _mapper = mapper;
     }
 
     // Read all
@@ -52,7 +54,7 @@ public class AccountController : ControllerBaseApi
     public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAccountByPhoneNumber(string phone)
     {
         var account = await _accountService.GetByPhoneNumber(phone);
-        return Ok(account);
+        return Ok(_mapper.Map<AccountResponse>(account));
 
     }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Writers;
 using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Api.Common.Helper;
 using PhotoboothBranchService.Application.Common.Exceptions;
@@ -75,7 +76,8 @@ namespace PhotoboothBranchService.Api.Controllers
             }
         }
         // Read
-        [HttpGet]
+        [HttpGet("admin")]
+        [Authorization("ADMIN")]
         public async Task<ActionResult<IEnumerable<BookingResponse>>> GetAllSessions()
         {
             var sessions = await _bookingService.GetAllAsync();
@@ -121,6 +123,16 @@ namespace PhotoboothBranchService.Api.Controllers
             var result = await _bookingService.GetBoothFutureBooking(boothID);
             return Ok(result.OrderBy(i => i.StartTime));
         }
+
+        [HttpGet]
+        [Authorization("STAFF","CUSTOMER")]
+        public async Task<ActionResult<IEnumerable<BookingResponse>>> GetBookings()
+        {
+            var email = Request.HttpContext.Items["Email"]?.ToString();
+            var result = await _bookingService.GetBookings(email);
+            return Ok(result);
+        }
+
         // Update
         [HttpPut("{id}")]
         public async Task<ActionResult<CreateBookingResponse>> UpdateBooking(Guid id, UpdateBookingRequest updateBookingRequest)
@@ -129,6 +141,13 @@ namespace PhotoboothBranchService.Api.Controllers
             var response = await _bookingService.UpdateAsync(id, updateBookingRequest, email);
             return Ok(response);
         }
+        [HttpPut("close-booking")]
+        public async Task<IActionResult> CloseBooking(CloseBookingRequest request)
+        {
+            await _bookingService.CloseBooking(request);
+            return Ok();
+        }
+
         [HttpPut("extra-service")]
         public async Task<ActionResult<BookingResponse>> AddExtraService(AddExtraServiceRequest request)
         {

@@ -13,9 +13,11 @@ public interface IBookingService : IServiceBase<BookingResponse, BookingFilter, 
     Task<CreateBookingResponse> CreateAsync(BookingRequest createModel, BookingType bookingType);
     Task<CreateBookingResponse> GuestBooking(GuestBookingRequest request);
     Task<BookingResponse> AddExtraService(AddExtraServiceRequest request);
+    Task<IEnumerable<BookingResponse>> GetBookings(string email);
     Task<CreateBookingResponse> CustomerBooking(CustomerBookingRequest request, string email);
     Task<IEnumerable<BookingResponse>> SearchByReferenceIDAsync(string id);
     Task<CreateBookingResponse> UpdateAsync(Guid id, UpdateBookingRequest updateModel, string? email);
+    Task CloseBooking(CloseBookingRequest request);
     Task DeleteAsync(Guid id);
     Task<IEnumerable<BookingResponse>> GetBranchFutureBooking(Guid branchID);
     Task<IEnumerable<BookingResponse>> GetBoothFutureBooking(Guid boothID);
