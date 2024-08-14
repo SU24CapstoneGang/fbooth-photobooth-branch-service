@@ -11,6 +11,8 @@ namespace PhotoboothBranchService.Domain.Entities
         public Guid BranchPhotoId { get; set; }
         public string BranchPhotoUrl { get; set; } = default!;
         public string CouldID { get; set; } = default!;
+        public DateTime CreatedDate { get; set; }
+        public DateTime LastModified { get; set; }
         public Guid BranchID { get; set; }
         public virtual Branch Branch { get; set; } = default!;
     }

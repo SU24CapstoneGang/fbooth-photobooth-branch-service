@@ -11,8 +11,10 @@ namespace PhotoboothBranchService.Domain.Entities
         public int stickerHeight { get; set; }
         public int stickerWidth { get; set; }
         public StatusUse Status { get; set; }
+        public Guid StickerTypeID { get; set; }
+        public virtual StickerType StickerType { get; set; }
         public DateTime CreatedDate { get; set; }
-        public DateTime? LastModified { get; set; }
+        public DateTime LastModified { get; set; }
         public virtual ICollection<PhotoSticker> PhotoSticker { get; set; } = default!;
     }
 }

@@ -21,6 +21,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost("staff-create")]
+        [Authorization("STAFF","ADMIN")]
         public async Task<ActionResult<CreateBookingResponse>> StaffCreateSession(BookingRequest bookingRequest)
         {
             if (!ModelState.IsValid)
@@ -28,6 +29,17 @@ namespace PhotoboothBranchService.Api.Controllers
                 return BadRequest(ModelState);
             }
             var createBookingResponse = await _bookingService.CreateAsync(bookingRequest, BookingType.Staff);
+            return Ok(createBookingResponse);
+        }
+        [HttpPost("staff-create-guest")]
+        [Authorization("STAFF", "ADMIN")]
+        public async Task<ActionResult<CreateBookingResponse>> StaffCreateSessionForGuest(GuestBookingRequest bookingRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var createBookingResponse = await _bookingService.GuestBooking(bookingRequest);
             return Ok(createBookingResponse);
         }
         [HttpPost("customer-booking")]

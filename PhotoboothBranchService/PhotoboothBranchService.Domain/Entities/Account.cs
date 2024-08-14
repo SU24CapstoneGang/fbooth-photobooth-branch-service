@@ -16,6 +16,8 @@ public class Account
     public string Address { get; set; } = default!;
     public string Email { get; set; } = default!;
     public string PhoneNumber { get; set; } = default!;
+    public DateTime CreatedDate { get; set; }
+    public DateTime LastModified { get; set; }
     public AccountStatus Status { get; set; }
     public AccountRole Role { get; set; }
     public virtual ICollection<Booking> Bookings { get; set; } = default!;

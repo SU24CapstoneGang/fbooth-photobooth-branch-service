@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 
@@ -21,10 +22,14 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(pb => pb.Status)
                 .IsRequired();
-            builder.Property(s => s.CreateDate)
-             .ValueGeneratedOnAdd()
-             .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
-             .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+            builder.Property(c => c.CreatedDate)
+                 .IsRequired()
+                 .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
+
+            builder.Property(c => c.LastModified)
+                   .IsRequired()
+                   .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
+                   .ValueGeneratedOnAddOrUpdate();
             builder.HasMany(s => s.Bookings)
                 .WithOne(a => a.Booth)
                 .HasForeignKey(c => c.BoothID)
@@ -46,7 +51,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 Status = BoothStatus.Active,
                 Concept = "Hallucination",
                 PeopleInBooth = 5,
-                BackgroundColor = "yellow"
+                BackgroundColor = "yellow",
+                CreatedDate = DateTimeHelper.GetVietnamTimeNow(),
+                LastModified = DateTimeHelper.GetVietnamTimeNow(),
             },
             new Booth
             {
@@ -56,7 +63,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 Status = BoothStatus.Active,
                 Concept = "Nightmare",
                 PeopleInBooth = 6,
-                BackgroundColor = "yellow"
+                BackgroundColor = "yellow",
+                CreatedDate = DateTimeHelper.GetVietnamTimeNow(),
+                LastModified = DateTimeHelper.GetVietnamTimeNow(),
             },
             new Booth
             {
@@ -66,7 +75,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 Status = BoothStatus.Active,
                 Concept = "Nightmare",
                 PeopleInBooth = 4,
-                BackgroundColor = "yellow"
+                BackgroundColor = "yellow",
+                CreatedDate = DateTimeHelper.GetVietnamTimeNow(),
+                LastModified = DateTimeHelper.GetVietnamTimeNow(),
             },
             new Booth
             {
@@ -76,7 +87,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 Status = BoothStatus.Active,
                 Concept = "Hallucination",
                 PeopleInBooth = 3,
-                BackgroundColor = "yellow"
+                BackgroundColor = "yellow",
+                CreatedDate = DateTimeHelper.GetVietnamTimeNow(),
+                LastModified = DateTimeHelper.GetVietnamTimeNow(),
             });
         }
     }

@@ -13,5 +13,6 @@ namespace PhotoboothBranchService.Domain.Enum
         Processing = 2,
         RefundedFull = 3,
         RefundedPartial = 4,
+        Redundant = 5,
     }
 }

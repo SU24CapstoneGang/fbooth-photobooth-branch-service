@@ -19,7 +19,7 @@ namespace PhotoboothBranchService.Application.DTOs.Booking
         public PaymentStatus PaymentStatus { get; set; }
         public BookingStatus BookingStatus { get; set; }
         public DateTime? CancelledDate { get; set; }
-        public decimal? RefundAmount { get; set; }
+        public decimal RefundedAmount { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime LastModified { get; set; }
         public Guid BoothID { get; set; }

@@ -37,6 +37,7 @@ using PhotoboothBranchService.Application.Services.VNPayServices;
 using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.IRepository;
 using System.Reflection;
+using PhotoboothBranchService.Application.Services.StickerTypeServices;
 
 namespace PhotoboothBranchService.Application
 {
@@ -68,6 +69,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IBoothPhotoService, BoothPhotoService>();
             services.AddScoped<IBranchPhotoService, BranchPhotoService>();
             services.AddScoped<ISlotService, SlotService>();
+            services.AddScoped<IStickerTypeService, StickerTypeService>();
 
 
             // cloudinary
@@ -106,6 +108,7 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IEmailService, EmailService>();
             //background service
             services.AddHostedService<BookingStatusService>();
+            services.AddHostedService<AutoRefundService>();
             return services;
         }
     }

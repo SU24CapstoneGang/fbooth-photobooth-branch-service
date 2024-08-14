@@ -41,6 +41,7 @@ namespace PhotoboothBranchService.Infrastructure
             services.AddScoped<IBranchPhotoRepository, BranchPhotoRepository>();
             services.AddScoped<ISlotRepository, SlotRepository>();
             services.AddScoped<IBookingSlotRepository, BookingSlotRepository>();
+            services.AddScoped<IStickerTypeRepository, StickerTypeRepository>();
 
 
             services.AddScoped<IMapper, Mapper>();

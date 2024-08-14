@@ -31,10 +31,10 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
         private readonly IRefundRepository _refundRepository;
         private readonly IBookingSlotRepository _bookingSlotRepository;
 
-        public EmailService(IAccountRepository accountRepository, 
-            IPaymentRepository paymentRepository, 
-            IBookingRepository sessionOrderRepository, 
-            IBranchRepository boothBranchRepository, 
+        public EmailService(IAccountRepository accountRepository,
+            IPaymentRepository paymentRepository,
+            IBookingRepository sessionOrderRepository,
+            IBranchRepository boothBranchRepository,
             IBookingServiceRepository serviceItemRepository,
             IRefundRepository refundRepository, IBookingSlotRepository bookingSlotRepository)
         {
@@ -58,7 +58,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             {
                 throw new NotFoundException("Not found refund");
             }
-            var transaction = (await _transactionRepository.GetAsync(i => i.PaymentID == refund.PaymentID, i=>i.PaymentMethod)).FirstOrDefault();
+            var transaction = (await _transactionRepository.GetAsync(i => i.PaymentID == refund.PaymentID, i => i.PaymentMethod)).FirstOrDefault();
             if (transaction == null)
             {
                 throw new NotFoundException("Not found transaction");
@@ -109,13 +109,13 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                 .GetAsync(i => i.BookingID == bookingID,
                     includeProperties: new Expression<Func<Booking, object>>[]
                         {
-                            i => i.BookingServices,
                             i => i.Booth,
                         }
                 ))
                 .FirstOrDefault();
             var trans = (await _transactionRepository.GetAsync(i => i.PaymentID == transactionID, i => i.PaymentMethod)).SingleOrDefault();
-            if ( trans == null ) {
+            if (trans == null)
+            {
                 throw new NotFoundException("Not found transaction");
             }
             if (booking == null)
@@ -144,76 +144,69 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             sbBody.AppendLine($"<p><strong>Branch Address:</strong> {branch.Address}</p>");
             sbBody.AppendLine($"<p><strong>Booth Name:</strong> {booking.Booth.BoothName}</p>");
 
-            if (booking.BookingServices.Count > 0)
+            var slots = (await _bookingSlotRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Slot)).OrderBy(i => i.Slot.SlotStartTime).ToList();
+            sbBody.AppendLine("<p>Slot(s) in Booking:</p>");
+            sbBody.AppendLine("<br>");
+            sbBody.AppendLine("<table style='width:100%; border-collapse: collapse;'>");
+            sbBody.AppendLine("<tr>");
+            sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Time</th>");
+            sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Price</th>");
+            sbBody.AppendLine("</tr>");
+            // the booking fee
+            foreach (var slot in slots)
             {
-                var bookingServices = (await _bookingServiceRepository
-                    .GetAsync(i => booking.BookingServices.Select(i => i.BookingServiceID).ToList().Contains(i.BookingServiceID), i => i.Service)
-                    ).ToList();
-                if (bookingServices != null && bookingServices.Count == booking.BookingServices.Count)
+                sbBody.AppendLine("<tr>");
+                sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Slot {slot.Slot.SlotStartTime.ToString(@"hh\:mm")} - {slot.Slot.SlotEndTime.ToString(@"hh\:mm")} </td>");
+                sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{slot.Price:N0}</td>");
+                sbBody.AppendLine("</tr>");
+            }
+            sbBody.AppendLine("<tr>");
+            sbBody.AppendLine("<td colspan='1' style='border: 1px solid black; padding: 8px; text-align: right;'><strong>Total:</strong></td>");
+            sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'><strong>{booking.HireBoothFee:N0}</strong> VND</td>");
+            sbBody.AppendLine("</tr>");
+            sbBody.AppendLine("</table>");
+
+
+            var bookingServices = (await _bookingServiceRepository
+                .GetAsync(i => i.BookingID == booking.BookingID, i => i.Service)
+                ).ToList();
+            if (bookingServices.Any())
+            {
+                sbBody.AppendLine("<p>Service(s) in Booking:</p>");
+                sbBody.AppendLine("<br>");
+                sbBody.AppendLine("<table style='width:100%; border-collapse: collapse;'>");
+                sbBody.AppendLine("<tr>");
+                sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Service Name</th>");
+                sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Quantity</th>");
+                sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Unit</th>");
+                sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Price</th>");
+                sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Subtotal</th>");
+                sbBody.AppendLine("</tr>");
+
+                // the rest service
+                foreach (var bookingService in bookingServices)
                 {
-                    sbBody.AppendLine("<p>Service(s) in Booking:</p>");
-                    sbBody.AppendLine("<br>");
-                    sbBody.AppendLine("<table style='width:100%; border-collapse: collapse;'>");
                     sbBody.AppendLine("<tr>");
-                    sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Service Name</th>");
-                    sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Quantity</th>");
-                    sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Unit</th>");
-                    sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Price</th>");
-                    sbBody.AppendLine("<th style='border: 1px solid black; padding: 8px;'>Subtotal</th>");
+                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.Service.ServiceName}</td>");
+                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.Quantity}</td>");
+                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.Service.Unit}</td>");
+                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.Price:N0}</td>");
+                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.SubTotal:N0}</td>");
                     sbBody.AppendLine("</tr>");
-
-                    // the booking fee
-                    var slots = (await _bookingSlotRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Slot)).OrderBy(i => i.Slot.SlotStartTime).ToList();
-                    foreach (var slot in slots)
-                    {
-                        sbBody.AppendLine("<tr>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Slot {slot.Slot.SlotStartTime.ToString(@"hh\:mm")} - {slot.Slot.SlotEndTime.ToString(@"hh\:mm")} </td>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>1</td>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>slot</td>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{slot.Price}</td>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{slot.Price:N0}</td>");
-                        sbBody.AppendLine("</tr>");
-                    }
-
-                    //var duration = (booking.EndTime - booking.StartTime).TotalHours;
-                    //duration = Math.Round(duration, 2);
-                    //sbBody.AppendLine("<tr>");
-                    //sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Hire booth fee</td>");
-                    //sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{duration:N2}</td>");
-                    //sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>Slot</td>");
-                    //sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{booking.Booth.PricePerSlot:N0}</td>");
-                    //sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{booking.HireBoothFee:N0}</td>");
-                    //sbBody.AppendLine("</tr>");
-
-                    // the rest service
-                    foreach (var bookingService in bookingServices)
-                    {
-                        sbBody.AppendLine("<tr>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.Service.ServiceName}</td>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.Quantity}</td>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.Service.Unit}</td>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.Price:N0}</td>");
-                        sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'>{bookingService.SubTotal:N0}</td>");
-                        sbBody.AppendLine("</tr>");
-                    }
-
-                    sbBody.AppendLine("<tr>");
-                    sbBody.AppendLine("<td colspan='4' style='border: 1px solid black; padding: 8px; text-align: right;'><strong>Total Price:</strong></td>");
-                    sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'><strong>{booking.TotalPrice:N0}</strong> VND</td>");
-                    sbBody.AppendLine("</tr>");
-
-                    sbBody.AppendLine("</table>");
-                } else
-                {
-                    throw new Exception("Service not found in Item list");
                 }
+
+                sbBody.AppendLine("<tr>");
+                sbBody.AppendLine("<td colspan='4' style='border: 1px solid black; padding: 8px; text-align: right;'><strong>Total:</strong></td>");
+                sbBody.AppendLine($"<td style='border: 1px solid black; padding: 8px;'><strong>{(booking.TotalPrice - booking.HireBoothFee):N0}</strong> VND</td>");
+                sbBody.AppendLine("</tr>");
+
+                sbBody.AppendLine("</table>");
             }
-            else{
-                sbBody.AppendLine($"<p>Total price: {booking.TotalPrice}</p>");
-            }
+            // Notify total price
+            sbBody.AppendLine("<br>");
+            sbBody.AppendLine("<p><strong>Total Price:</strong> This booking's total cost is <strong>{booking.TotalPrice:N0} VND</strong>.</p>");
 
             sbBody.AppendLine($"<p>This booking was paid thourgh {trans.PaymentMethod.PaymentMethodName} in {trans.PaymentDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
-
 
             sbBody.AppendLine($"<p><strong>Start Time</strong>: {booking.StartTime.ToString("dddd, MMMM dd, yyyy h:mm tt")} (UTC +7)</p>");
             sbBody.AppendLine($"<p><strong>End Time: </strong>{booking.EndTime.ToString("dddd, MMMM dd, yyyy h:mm tt")} (UTC +7)</p>");
@@ -245,7 +238,18 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             sbBody.AppendLine("<br>");
             await this.SendEmail(booking.Account.Email, "Booking Cancellation Confirmation", sbBody.ToString(), $"{booking.Account.FirstName} {booking.Account.LastName}");
         }
-        public async Task SendResetPasswordEmail(string emai, string link) { }
+        public async Task SendAutoRegistEmailNoti(string email, string link, string customerName)
+        {
+            StringBuilder sbBody = new StringBuilder();
+            sbBody.AppendLine($"<p>We are pleased to inform you that an account has been automatically created for you with the email address <strong>{email}</strong> while booking with our staff.</p>");
+            sbBody.AppendLine("<p>This account has been set up to streamline your future bookings and enhance your experience with us. With this account, you can easily manage your bookings, view your history, and access exclusive features.</p>");
+            sbBody.AppendLine($"<p>To complete the setup, we encourage you to <a href=\"{link}\">activate your account</a> by setting a password. This will ensure that your account is secure and accessible only to you.</p>");
+            sbBody.AppendLine("<br>");
+            sbBody.AppendLine("<p>If you have any questions or need assistance with your account, please do not hesitate to contact our customer support team.</p>");
+            sbBody.AppendLine("<p>We look forward to serving you and hope you enjoy the convenience of your new account.</p>");
+            sbBody.AppendLine("<br>");
+            await this.SendEmail(email, "Account auto register notification", sbBody.ToString(), customerName);
+        }
         private async Task SendEmail(string emailClientAddress, string subject, string body, string customerName)
         {
             try
@@ -312,7 +316,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                 sbBody.AppendLine("</div>"); //close div container
 
                 sbBody.AppendLine("</body>");
-                sbBody.AppendLine("</html>"); 
+                sbBody.AppendLine("</html>");
                 mail.Body = sbBody.ToString();
                 mail.IsBodyHtml = true;
 

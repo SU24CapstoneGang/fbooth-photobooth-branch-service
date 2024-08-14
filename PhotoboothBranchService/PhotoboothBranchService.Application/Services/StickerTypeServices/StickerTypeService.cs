@@ -1,0 +1,94 @@
+﻿using AutoMapper;
+using CloudinaryDotNet;
+using PhotoboothBranchService.Application.Common.Exceptions;
+using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.DTOs.Service;
+using PhotoboothBranchService.Application.DTOs.StickerType;
+using PhotoboothBranchService.Application.Services.CloudinaryServices;
+using PhotoboothBranchService.Domain;
+using PhotoboothBranchService.Domain.Common.Helper;
+using PhotoboothBranchService.Domain.Entities;
+using PhotoboothBranchService.Domain.Enum;
+using PhotoboothBranchService.Domain.IRepository;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace PhotoboothBranchService.Application.Services.StickerTypeServices
+{
+    public class StickerTypeService : IStickerTypeService
+    {
+        private readonly IStickerTypeRepository _stickerTypeRepository;
+        private readonly ICloudinaryService _cloudinaryService;
+        private readonly IMapper _mapper;
+
+        public StickerTypeService(IStickerTypeRepository stickerTypeRepository, ICloudinaryService cloudinaryService, IMapper mapper)
+        {
+            _stickerTypeRepository = stickerTypeRepository;
+            _cloudinaryService = cloudinaryService;
+            _mapper = mapper;
+        }
+
+        public async Task<IEnumerable<StickerTypeResponse>> GetAllAsync()
+        {
+            var stickerTypes = (await _stickerTypeRepository.GetAllAsync()).ToList();
+            return _mapper.Map<IEnumerable<StickerTypeResponse>>(stickerTypes).OrderByDescending(i => i.CreatedDate);
+        }
+
+        public async Task<IEnumerable<StickerTypeResponse>> GetAllPagingAsync(StickerTypeFilter filter, PagingModel paging)
+        {
+            var stickerTypes = (await _stickerTypeRepository.GetAllAsync()).ToList().AutoFilter(filter);
+            var listStickerTypeResponse = _mapper.Map<IEnumerable<StickerTypeResponse>>(stickerTypes);
+            return listStickerTypeResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.CreatedDate);
+        }
+
+        public async Task<StickerTypeResponse> GetByIdAsync(Guid id)
+        {
+            var stickerTypes = await _stickerTypeRepository.GetAsync(s => s.StickerTypeID == id);
+            var stickerType = stickerTypes.FirstOrDefault();
+            if (stickerType == null)
+            {
+                throw new NotFoundException("Service not found");
+            }
+            return _mapper.Map<StickerTypeResponse>(stickerType);
+        }
+
+        public async Task<StickerTypeResponse> CreateAsync(CreateStickerTypeRequest createModel, StatusUse status)
+        {
+            var stickerType = _mapper.Map<StickerType>(createModel);
+            stickerType.Status = status;
+
+            //upload to cloudinary
+            var uploadResult = await _cloudinaryService.AddPhotoAsync(createModel.file, "FBooth-Sticker-Type");
+            if (uploadResult.Error != null)
+            {
+                throw new Exception(uploadResult.Error.Message);
+            }
+            stickerType.CouldID = uploadResult.PublicId;
+            stickerType.RepresentImageURL = uploadResult.SecureUrl.AbsoluteUri;
+            await _stickerTypeRepository.AddAsync(stickerType);
+            return _mapper.Map<StickerTypeResponse>(stickerType);
+        }
+
+        public async Task UpdateAsync(Guid id, UpdateStickerTypeRequest updateModel, StatusUse? status)
+        {
+            var stickerType = (await _stickerTypeRepository.GetAsync(s => s.StickerTypeID == id)).FirstOrDefault();
+            if (stickerType == null)
+            {
+                throw new KeyNotFoundException("Sticker type not found.");
+            }
+            if (updateModel.file != null && updateModel.file.Length != 0)
+            {
+                await _cloudinaryService.UpdatePhotoAsync(updateModel.file, stickerType.CouldID);
+            }
+            var updatedStickerType = _mapper.Map(updateModel, stickerType);
+            if (status.HasValue)
+            {
+                updatedStickerType.Status = status.Value;
+            }
+            await _stickerTypeRepository.UpdateAsync(updatedStickerType);
+        }
+    }
+}

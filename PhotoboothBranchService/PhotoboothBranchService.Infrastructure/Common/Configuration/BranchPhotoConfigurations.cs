@@ -30,7 +30,14 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
 
             builder.Property(bp => bp.CouldID)
                 .IsRequired(); // Adjust the length as per your requirements
+            builder.Property(c => c.CreatedDate)
+                .IsRequired()
+                .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
 
+            builder.Property(c => c.LastModified)
+                   .IsRequired()
+                   .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
+                   .ValueGeneratedOnAddOrUpdate();
             // Relationships
             builder.HasOne(bp => bp.Branch)
                 .WithMany(b => b.BranchPhotos)

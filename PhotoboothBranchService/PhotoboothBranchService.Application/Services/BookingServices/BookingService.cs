@@ -145,10 +145,10 @@ public class BookingService : IBookingService
     }
     public async Task<CreateBookingResponse> GuestBooking(GuestBookingRequest request)
     {
-        Guid accId;
+        AccountRegisterResponse account;
         try
         {
-            var account = await _accountService.ValidateCustomerAsync(request.CustomerPhoneNumber, request.CustomerEmail);
+            var accountCheck = await _accountService.ValidateCustomerAsync(request.CustomerPhoneNumber, request.CustomerEmail);
             throw new BadRequestException("Account existed, can not use this function");
         } catch (NotFoundException)
         {
@@ -164,7 +164,7 @@ public class BookingService : IBookingService
                 Password = PasswordGenerator.GeneratePassword(23),
             };
             requestNewAccount.ConfirmPassword = requestNewAccount.Password;
-            accId = (await _accountService.Register(requestNewAccount, AccountRole.Customer)).AccountID;
+            account = await _accountService.Register(requestNewAccount, AccountRole.Customer);
         }
         //create booking request
         BookingRequest bookingRequest = new BookingRequest
@@ -179,11 +179,14 @@ public class BookingService : IBookingService
 
         try //start booking
         {
-            return await this.CreateAsync(bookingRequest, BookingType.Staff);
+            var response =  await this.CreateAsync(bookingRequest, BookingType.Staff);
+            string link = await _accountService.ResetPassword(request.CustomerEmail);
+            await _emailService.SendAutoRegistEmailNoti(request.CustomerEmail, link, $"{account.FirstName} {account.LastName}");
+            return response;
         }
         catch (Exception ex)
         {
-            await _accountService.DeleteAsync(accId);
+            await _accountService.DeleteAsync(account.AccountID);
             if (ex.InnerException != null)
             {
                 throw ex.InnerException;
@@ -412,7 +415,7 @@ public class BookingService : IBookingService
         {
             response.message = "Booking not found";
         }
-        else if (booking.BookingStatus == BookingStatus.TakingPhoto)
+        else if (booking.BookingStatus == BookingStatus.TakingPhoto || booking.BookingStatus == BookingStatus.ExtraService)
         {
             response.message = "Booking is going, cannot cancel.";
         }
@@ -420,7 +423,7 @@ public class BookingService : IBookingService
         {
             response.message = "Booking already canceled.";
         }
-        else if (booking.EndTime < timeNow || booking.BookingStatus == BookingStatus.NoShow)
+        else if (booking.EndTime < timeNow || booking.BookingStatus == BookingStatus.NoShow || booking.BookingStatus == BookingStatus.CompleteChecked)
         {
             response.message = "Booking has ended, can not cancel.";
         }

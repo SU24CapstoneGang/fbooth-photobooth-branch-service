@@ -16,7 +16,7 @@ namespace PhotoboothBranchService.Domain.Entities
         public BookingStatus BookingStatus { get; set; }
         public DateTime? CancelledDate { get; set; }
         public decimal HireBoothFee { get; set; }
-        public decimal RefundAmount { get; set; }
+        public decimal RefundedAmount { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime LastModified { get; set; }
         public Guid? FullPaymentPolicyID { get; set; }

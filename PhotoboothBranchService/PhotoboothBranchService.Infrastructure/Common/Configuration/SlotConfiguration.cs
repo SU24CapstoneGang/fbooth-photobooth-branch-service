@@ -23,6 +23,14 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasMany(i => i.BookingSlots)
                 .WithOne(a => a.Slot)
                 .HasForeignKey(a => a.SlotID).OnDelete(DeleteBehavior.NoAction);
+            builder.Property(c => c.CreatedDate)
+                .IsRequired()
+                .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
+
+            builder.Property(c => c.LastModified)
+                   .IsRequired()
+                   .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
+                   .ValueGeneratedOnAddOrUpdate();
         }
     }
 }

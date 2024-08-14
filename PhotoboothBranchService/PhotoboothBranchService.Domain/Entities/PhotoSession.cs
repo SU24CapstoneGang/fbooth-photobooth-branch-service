@@ -11,6 +11,8 @@ namespace PhotoboothBranchService.Domain.Entities
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public Guid LayoutID { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime LastModified { get; set; }
         public PhotoSessionStatus Status { get; set; }
         public virtual Layout Layout { get; set; } = default!;
         public Guid BookingID { get; set; }

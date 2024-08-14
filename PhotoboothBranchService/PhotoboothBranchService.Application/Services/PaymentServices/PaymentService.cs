@@ -171,7 +171,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                         payment.TransactionID = account.AccountID.ToString();
                         payment.Status = TransactionStatus.Success;
                         await _paymentRepository.AddAsync(payment);
-                        await this.updateAfterSuccessPaymentAsync(payment);
+                        await this.UpdateAfterSuccessPaymentAsync(payment);
                         return createPaymentResponse;
                     default:
                         throw new BadRequestException("Payment method not availbe to use, please try later");
@@ -197,7 +197,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                 try
                 {
 
-                    await updateAfterSuccessPaymentAsync(result.paymentResult);
+                    await UpdateAfterSuccessPaymentAsync(result.paymentResult);
                 }
                 catch (Exception ex)
                 {
@@ -212,7 +212,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             var response = await _moMoService.Return(queryString);
             if (response.Status == TransactionStatus.Success)
             {
-                await updateAfterSuccessPaymentAsync(response);
+                await UpdateAfterSuccessPaymentAsync(response);
             }
         }
         public async Task<MomoIPNResponse> HandleMomoIPN(MoMoResponse moMoResponse)
@@ -220,7 +220,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             var response = (await _moMoService.HandlePaymentResponeIPN(moMoResponse));
             if (response.transaction.Status == TransactionStatus.Success)
             {
-                await updateAfterSuccessPaymentAsync(response.transaction);
+                await UpdateAfterSuccessPaymentAsync(response.transaction);
             }
             return response.iPNResponse;
         }
@@ -353,7 +353,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             var updatedPayment = _mapper.Map(updateModel, payment);
             await _paymentRepository.UpdateAsync(updatedPayment);
         }
-        private async Task updateAfterSuccessPaymentAsync(Payment payment)
+        private async Task UpdateAfterSuccessPaymentAsync(Payment payment)
         {
             var booking = (await _bookingRepository.GetAsync(i => i.BookingID == payment.BookingID)).FirstOrDefault();
             if (booking == null)
@@ -385,6 +385,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             else
             {
                 //do refund
+                payment.Status = TransactionStatus.Redundant;
+                await _paymentRepository.UpdateAsync(payment);
                 await _refundService.RefundByTransID(payment.PaymentID, true, null, null, false);
             }
         }

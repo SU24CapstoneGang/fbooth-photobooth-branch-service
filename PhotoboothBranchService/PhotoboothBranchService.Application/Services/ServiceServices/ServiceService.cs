@@ -102,7 +102,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
             var service = (await _serviceRepository.GetAsync(s => s.ServiceID == id)).FirstOrDefault();
             if (service == null)
             {
-                throw new KeyNotFoundException("Service type not found.");
+                throw new KeyNotFoundException("Service not found.");
             }
             bool check = false;
             if (service.ServiceType == ServiceType.Printing || service.ServiceType == ServiceType.EmailSending) {

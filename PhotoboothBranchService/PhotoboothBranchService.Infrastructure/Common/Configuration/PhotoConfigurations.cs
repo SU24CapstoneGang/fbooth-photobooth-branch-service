@@ -25,9 +25,14 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     v => (PhotoVersion)Enum.Parse(typeof(PhotoVersion), v));
 
             //auto add CreateDate and ignore change after update
-            builder.Property(a => a.CreateDate)
-              .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
-              .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+            builder.Property(c => c.CreatedDate)
+                .IsRequired()
+                .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
+
+            builder.Property(c => c.LastModified)
+                   .IsRequired()
+                   .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
+                   .ValueGeneratedOnAddOrUpdate();
 
             builder.HasMany(a => a.PhotoStickers)
                 .WithOne(b => b.Photo)

@@ -25,7 +25,14 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
         builder.Property(u => u.ResetPasswordToken).IsRequired(false);
         builder.Property(a => a.DateOfBirth).IsRequired();
         builder.Property(a => a.Address).IsRequired().HasMaxLength(100);
+        builder.Property(c => c.CreatedDate)
+                .IsRequired()
+                .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
 
+        builder.Property(c => c.LastModified)
+               .IsRequired()
+               .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
+               .ValueGeneratedOnAddOrUpdate();
         // Account role  enum mapping
         builder.Property(a => a.Role)
             .IsRequired()

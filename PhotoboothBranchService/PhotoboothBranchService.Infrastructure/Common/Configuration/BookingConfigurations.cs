@@ -20,7 +20,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(s => s.CustomerBusinessID).IsRequired();
             builder.Property(s => s.HireBoothFee).IsRequired().HasColumnType("decimal(18, 0)");
             builder.Property(s => s.PaidAmount).IsRequired().HasColumnType("decimal(18, 0)").HasDefaultValue(0);
-            builder.Property(s => s.RefundAmount).IsRequired().HasColumnType("decimal(18, 0)").HasDefaultValue(0);
+            builder.Property(s => s.RefundedAmount).IsRequired().HasColumnType("decimal(18, 0)").HasDefaultValue(0);
             builder.Property(s => s.StartTime).IsRequired(true);
             builder.Property(s => s.EndTime).IsRequired(true);
 

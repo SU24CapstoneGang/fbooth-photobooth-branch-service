@@ -6,7 +6,8 @@ namespace PhotoboothBranchService.Domain.Entities
     {
         public Guid PaymentMethodID { get; set; }
         public string PaymentMethodName { get; set; } = default!;
-        public DateTime CreateDate { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime LastModified { get; set; }
         public PaymentMethodStatus Status { get; set; }
         public virtual ICollection<Payment> Payments { get; set; } = default!;
     }

@@ -13,7 +13,7 @@ namespace PhotoboothBranchService.Domain.Entities
         public int Width { get; set; }
         public short PhotoSlot { get; set; }
         public DateTime CreatedDate { get; set; }
-        public DateTime? LastModified { get; set; }
+        public DateTime LastModified { get; set; }
         public virtual ICollection<PhotoBox> PhotoBoxes { get; set; } = default!;
         public virtual ICollection<Background> Backgrounds { get; set; } = default!;
         public virtual ICollection<PhotoSession> PhotoSessions { get; set; } = default!;

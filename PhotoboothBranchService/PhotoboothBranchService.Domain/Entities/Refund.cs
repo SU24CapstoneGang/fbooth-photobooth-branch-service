@@ -17,6 +17,8 @@ namespace PhotoboothBranchService.Domain.Entities
         public string Description { get; set; } = default!;
         public string ResponseMessage { get; set; } = default!;
         public RefundStatus Status { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime LastModified { get; set; }
         public Guid PaymentID { get; set; }
         public Payment Payment { get; set; } = default!;
     }

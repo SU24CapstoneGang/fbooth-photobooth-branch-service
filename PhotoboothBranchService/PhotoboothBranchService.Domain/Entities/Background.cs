@@ -12,7 +12,7 @@ namespace PhotoboothBranchService.Domain.Entities
         public int Width { get; set; }
         public StatusUse Status { get; set; }
         public DateTime CreatedDate { get; set; }
-        public DateTime? LastModified { get; set; }
+        public DateTime LastModified { get; set; }
         public Guid LayoutID { get; set; }
         public virtual Layout Layout { get; set; }
         public virtual ICollection<Photo> Photos { get; set; } = default!;

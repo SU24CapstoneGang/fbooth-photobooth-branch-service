@@ -9,7 +9,8 @@ public class Branch
     public string Address { get; set; } = default!;
     public string Town { get; set; } = default!;
     public string City { get; set; } = default!;
-    public DateTime CreateDate { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime LastModified { get; set; }
     public TimeSpan OpeningTime { get; set; } // Thêm giờ mở cửa
     public TimeSpan ClosingTime { get; set; } // Thêm giờ đóng cửa
     public BranchStatus Status { get; set; } = default!;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 
@@ -31,13 +32,17 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(pb => pb.OpeningTime).IsRequired();
             builder.Property(pb => pb.ClosingTime).IsRequired();
 
-            builder.Property(pb => pb.CreateDate)
+            builder.Property(pb => pb.CreatedDate)
             .IsRequired();
 
-            builder.Property(s => s.CreateDate)
-              .ValueGeneratedOnAdd()
-              .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
-              .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+            builder.Property(c => c.CreatedDate)
+                .IsRequired()
+                .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
+
+            builder.Property(c => c.LastModified)
+                   .IsRequired()
+                   .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
+                   .ValueGeneratedOnAddOrUpdate();
 
             // ManufactureStatus enum mapping
             builder.Property(pb => pb.Status)
@@ -71,7 +76,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 City = "HCMC",
                 Town = "district 9",
                 OpeningTime = new TimeSpan(8, 0, 0),
-                ClosingTime = new TimeSpan(23, 0, 0)
+                ClosingTime = new TimeSpan(23, 0, 0),
+                CreatedDate = DateTimeHelper.GetVietnamTimeNow(),
+                LastModified = DateTimeHelper.GetVietnamTimeNow(),
             },
             new Branch
             {
@@ -82,7 +89,9 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 City = "Thanh pho Thu Duc",
                 Town = "Thu Duc",
                 OpeningTime = new TimeSpan(8, 0, 0),
-                ClosingTime = new TimeSpan(23, 0, 0)
+                ClosingTime = new TimeSpan(23, 0, 0),
+                CreatedDate = DateTimeHelper.GetVietnamTimeNow(),
+                LastModified = DateTimeHelper.GetVietnamTimeNow(),
             });
         }
     }

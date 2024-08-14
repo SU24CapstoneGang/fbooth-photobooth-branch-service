@@ -14,6 +14,8 @@ namespace PhotoboothBranchService.Domain.Entities
         public TimeSpan SlotEndTime { get; set; }
         public decimal Price { get; set; }
         public StatusUse Status {  get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime LastModified { get; set; }
         public Guid BoothID { get; set; }
         public virtual Booth Booth { get; set; } = default!;
         public virtual ICollection<BookingSlot> BookingSlots { get; set; } = default!;

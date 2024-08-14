@@ -92,7 +92,7 @@ public class BranchService : IBranchService
     public async Task<IEnumerable<BranchResponse>> GetAllAsync()
     {
         var branches = await _branchRepository.GetAsync(null, bth => bth.Booths, bth => bth.BranchPhotos);
-        return _mapper.Map<IEnumerable<BranchResponse>>(branches.ToList().OrderByDescending(i=>i.CreateDate));
+        return _mapper.Map<IEnumerable<BranchResponse>>(branches.ToList().OrderByDescending(i=>i.CreatedDate));
     }
 
     public async Task<IEnumerable<BranchResponse>> GetAllPagingAsync(BranchFilter filter, PagingModel paging)

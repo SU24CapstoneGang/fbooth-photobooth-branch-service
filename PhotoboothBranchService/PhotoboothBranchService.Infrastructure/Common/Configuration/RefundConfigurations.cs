@@ -22,6 +22,14 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(r => r.Description);
             builder.Property(r => r.Status);
             builder.Property(r => r.ResponseMessage).IsRequired(false);
+            builder.Property(c => c.CreatedDate)
+                .IsRequired()
+                .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
+
+            builder.Property(c => c.LastModified)
+                   .IsRequired()
+                   .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
+                   .ValueGeneratedOnAddOrUpdate();
         }
     }
 }

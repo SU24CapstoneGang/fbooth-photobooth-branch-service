@@ -30,8 +30,7 @@ public class AppDbContext : DbContext
     public DbSet<Slot> Slots { get; set; }
     public DbSet<BoothPhoto> BoothPhotos { get; set; }
     public DbSet<BranchPhoto> BranchPhotos { get; set; }
-
-
+    public DbSet<StickerType> StickerTypes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -82,6 +81,7 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new BookingSlotConfiguration());
         modelBuilder.ApplyConfiguration(new BranchPhotoConfigurations());
         modelBuilder.ApplyConfiguration(new BoothPhotoConfigurations());
+        modelBuilder.ApplyConfiguration(new StickerTypeConfiguration());
 
     }
 }

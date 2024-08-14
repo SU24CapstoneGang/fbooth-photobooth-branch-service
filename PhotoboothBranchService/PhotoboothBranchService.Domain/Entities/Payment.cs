@@ -10,6 +10,8 @@ namespace PhotoboothBranchService.Domain.Entities
         public long Amount { get; set; }
         public string Description { get; set; } = default!;
         public TransactionStatus Status { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime LastModified { get; set; }
         public Guid PaymentMethodID { get; set; }
         public virtual PaymentMethod PaymentMethod { get; set; } = default!;
         public Guid BookingID { get; set; }

@@ -13,9 +13,14 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.HasKey(u => u.DeviceID);
             builder.Property(u => u.DeviceID).HasColumnName("DeviceID").ValueGeneratedOnAdd();
             builder.Property(b => b.DeviceName).IsRequired().HasMaxLength(50);
-            builder.Property(a => a.CreatedDate)
-             .ValueGeneratedOnAdd()
-             .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
+            builder.Property(c => c.CreatedDate)
+                .IsRequired()
+                .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");
+
+            builder.Property(c => c.LastModified)
+                   .IsRequired()
+                   .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')")
+                   .ValueGeneratedOnAddOrUpdate();
         }
     }
 }

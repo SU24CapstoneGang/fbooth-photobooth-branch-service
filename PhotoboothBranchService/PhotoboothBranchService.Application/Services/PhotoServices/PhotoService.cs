@@ -132,7 +132,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
         public async Task<IEnumerable<PhotoResponse>> GetAllAsync()
         {
             var photos = await _photoRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<PhotoResponse>>(photos.ToList().OrderByDescending(i => i.CreateDate));
+            return _mapper.Map<IEnumerable<PhotoResponse>>(photos.ToList().OrderByDescending(i => i.CreatedDate));
         }
 
         public async Task<IEnumerable<PhotoResponse>> GetAllPagingAsync(PhotoFilter filter, PagingModel paging)

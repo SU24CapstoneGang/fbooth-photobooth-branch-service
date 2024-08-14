@@ -46,7 +46,6 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                .HasForeignKey(ms => ms.StickerID)
                .IsRequired();
 
-            //auto add CreateDate and ignore change after update
             builder.Property(c => c.CreatedDate)
                 .IsRequired()
                 .HasDefaultValueSql("(GETUTCDATE() AT TIME ZONE 'UTC' AT TIME ZONE 'SE Asia Standard Time')");

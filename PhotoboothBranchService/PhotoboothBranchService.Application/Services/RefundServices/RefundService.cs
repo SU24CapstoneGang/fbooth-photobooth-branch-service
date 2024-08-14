@@ -123,7 +123,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
             {
                 throw new BadRequestException("No booking found");
             }
-            var refundAmount = isFullRefund ? payment.Amount - await this.TotalRefund(payment.PaymentID) : (payment.Amount * booking.FullPaymentPolicy.RefundPercent / 100);
+            var refundAmount = isFullRefund ? payment.Amount - await this.TotalRefund(payment.PaymentID) : (payment.Amount * booking.FullPaymentPolicy.RefundPercent / 100) - await this.TotalRefund(payment.PaymentID);
             switch (payment.PaymentMethod.PaymentMethodName)
             {
                 case "VNPay":
@@ -234,7 +234,8 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                 payment.Status = payment.Amount == await this.TotalRefund(payment.PaymentID) ? TransactionStatus.RefundedFull : TransactionStatus.RefundedPartial;
                 if (isRecord)
                 {
-                    booking.RefundAmount += refund.Amount;
+                    booking.RefundedAmount += refund.Amount;
+                    booking.PaymentStatus = PaymentStatus.Refunded;
                     await _bookingRepository.UpdateAsync(booking);
                 }
             }

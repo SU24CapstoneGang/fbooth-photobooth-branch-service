@@ -49,7 +49,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
                 throw new NotFoundException("Not found Branch to create booth");
             }
             booth.Status = status;
-            booth.CreateDate = DateTimeHelper.GetVietnamTimeNow();
+            booth.CreatedDate = DateTimeHelper.GetVietnamTimeNow();
             await _boothRepository.AddAsync(booth);
             return _mapper.Map<CreateBoothResponse>(booth);
         }
@@ -80,7 +80,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         public async Task<IEnumerable<BoothResponse>> GetAllAsync()
         {
             var booths = await _boothRepository.GetAsync(null, bth => bth.BoothPhotos);
-            return _mapper.Map<IEnumerable<BoothResponse>>(booths.ToList().OrderByDescending(i => i.CreateDate));
+            return _mapper.Map<IEnumerable<BoothResponse>>(booths.ToList().OrderByDescending(i => i.CreatedDate));
         }
         public async Task<IEnumerable<BoothResponse>> StaffGetAllAsync(string? email)
         {
@@ -94,7 +94,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
                 throw new ForbiddenAccessException("Staff has not been assign to any branch");
             }
             var booths = await _boothRepository.GetAsync(i => i.BranchID == acc.BranchID);
-            return _mapper.Map<IEnumerable<BoothResponse>>(booths.ToList().OrderByDescending(i => i.CreateDate));
+            return _mapper.Map<IEnumerable<BoothResponse>>(booths.ToList().OrderByDescending(i => i.CreatedDate));
         }
         public async Task<IEnumerable<BoothResponse>> GetAllPagingAsync(BoothFilter filter, PagingModel paging)
         {
