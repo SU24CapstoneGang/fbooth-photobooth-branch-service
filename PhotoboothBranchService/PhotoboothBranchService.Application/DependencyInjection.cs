@@ -38,6 +38,7 @@ using PhotoboothBranchService.Domain.Common.Interfaces;
 using PhotoboothBranchService.Domain.IRepository;
 using System.Reflection;
 using PhotoboothBranchService.Application.Services.StickerTypeServices;
+using PhotoboothBranchService.Application.Services.AuthenticationServices;
 
 namespace PhotoboothBranchService.Application
 {
@@ -46,6 +47,7 @@ namespace PhotoboothBranchService.Application
         public static IServiceCollection AddApplicaiton(this IServiceCollection services, ConfigurationManager configuration)
         {
             //Service
+            services.AddScoped<IAuthenService, AuthenService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IBoothService, BoothService>();
             services.AddScoped<IBranchService, BranchService>();

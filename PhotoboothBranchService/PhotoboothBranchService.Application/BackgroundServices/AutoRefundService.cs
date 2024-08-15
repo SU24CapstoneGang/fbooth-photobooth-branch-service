@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PhotoboothBranchService.Application.Services.RefundServices;
+using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,15 @@ namespace PhotoboothBranchService.Application.BackgroundServices
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await ProcessRefundAsync();
+                await BackgroundServiceLocks.ServiceLock.WaitAsync(stoppingToken);
+                try
+                {
+                    await ProcessRefundAsync();
+                }
+                finally
+                {
+                    BackgroundServiceLocks.ServiceLock.Release();
+                }
                 await Task.Delay(TimeSpan.FromDays(1), stoppingToken); // Check every day
             }
         }
@@ -34,18 +43,24 @@ namespace PhotoboothBranchService.Application.BackgroundServices
             {
                 var bookingRepository = scope.ServiceProvider.GetRequiredService<IBookingRepository>();
                 var refundService = scope.ServiceProvider.GetRequiredService<IRefundService>();
-                var bookings = (await bookingRepository.GetAsync(i => i.PaymentStatus == Domain.Enum.PaymentStatus.PendingRefund)).ToList();
+                var bookings = (await bookingRepository.GetAsync(i => i.PaymentStatus == PaymentStatus.PendingRefund)).ToList();
                 foreach (var booking in bookings)
                 {
                     try
                     {
-                        await refundService.RefundByBookingID(booking.BookingID, false, null, null);
+                        if (booking.BookingStatus == BookingStatus.Canceled)
+                        {
+                            await refundService.RefundByBookingID(booking.BookingID, false, null, null);
+                        } else if (booking.BookingStatus == BookingStatus.CancelledBySystem)
+                        {
+                            await refundService.RefundByBookingID(booking.BookingID, true, null, null);
+                        }
                     }
                     catch {}
                 }
 
                 var paymentRepository = scope.ServiceProvider.GetRequiredService<IPaymentRepository>();
-                var payments = (await paymentRepository.GetAsync(i => i.Status == Domain.Enum.TransactionStatus.Redundant)).ToList();
+                var payments = (await paymentRepository.GetAsync(i => i.Status == TransactionStatus.Redundant)).ToList();
                 foreach (var payment in payments)
                 {
                     try

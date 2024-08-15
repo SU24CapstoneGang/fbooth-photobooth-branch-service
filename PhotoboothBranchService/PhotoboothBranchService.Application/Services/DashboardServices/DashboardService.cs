@@ -280,7 +280,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             Expression<Func<Booking, bool>> pre = branchID.HasValue ? i => booths.Select(b => b.BoothID).ToList().Contains(i.BoothID) : i => true;
             if (!getAllState)
             {
-                pre = LinQHelper.AndAlso(pre, i => i.BookingStatus != BookingStatus.PendingPayment && i.BookingStatus != BookingStatus.Canceled);
+                pre = LinQHelper.AndAlso(pre, i => i.BookingStatus != BookingStatus.PendingPayment && i.BookingStatus != BookingStatus.Canceled && i.BookingStatus != BookingStatus.CancelledBySystem);
             }
             if (endDate != null && endDate != default(DateOnly))
             {

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
+    [Route("api/sticker-type")]
     public class StickerTypeController : ControllerBaseApi
     {
         private readonly IStickerTypeService _stickerTypeService;

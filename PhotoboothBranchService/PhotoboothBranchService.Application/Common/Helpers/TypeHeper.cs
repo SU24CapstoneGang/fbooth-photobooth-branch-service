@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using PhotoboothBranchService.Application.DTOs;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace PhotoboothBranchService.Application.Common.Helpers;
 
@@ -32,4 +35,28 @@ public static class TypeHelper
             }
         });
     }
+
+    public static (UserNameInputType, string) DetectAndFormatInput(string input)
+    {
+        string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+        string phonePattern = @"^(0|\+84)[0-9]{9}$";
+
+        if (Regex.IsMatch(input, emailPattern))
+        {
+            return (UserNameInputType.Email, input);
+        }
+        else if (Regex.IsMatch(input, phonePattern))
+        {
+            if (input.StartsWith("+84"))
+            {
+                input = "0" + input.Substring(3);
+            }
+            return (UserNameInputType.PhoneNumber, input);
+        }
+        else
+        {
+            return (UserNameInputType.Unknown, input);
+        }
+    }
 }
+

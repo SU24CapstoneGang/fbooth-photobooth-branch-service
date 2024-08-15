@@ -250,6 +250,18 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             sbBody.AppendLine("<br>");
             await this.SendEmail(email, "Account auto register notification", sbBody.ToString(), customerName);
         }
+        public async Task SendResetPasswordEmail(string email, string resetLink, string customerName)
+        {
+            StringBuilder sbBody = new StringBuilder();
+            sbBody.AppendLine("<p>We received a request to reset your password for your account associated with this email address.</p>");
+            sbBody.AppendLine("<p>If you made this request, please click the link below to reset your password:</p>");
+            sbBody.AppendLine($"<p><a href=\"{resetLink}\">Reset your password</a></p>");
+            sbBody.AppendLine("<p>If you did not request a password reset, you can safely ignore this email. Your account will remain secure.</p>");
+            sbBody.AppendLine("<br>");
+            sbBody.AppendLine("<p>If you have any questions or need further assistance, please feel free to contact our support team.</p>");
+            sbBody.AppendLine("<br>");
+            await this.SendEmail(email, "Password Reset Request", sbBody.ToString(), customerName);
+        }
         private async Task SendEmail(string emailClientAddress, string subject, string body, string customerName)
         {
             try
@@ -297,8 +309,8 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
                 sbBody.AppendLine("</div>");
                 // Greeting message
                 sbBody.AppendLine("<div class=\"content\">");
-                sbBody.AppendLine($"<h1>Hi, {customerName}</h1>");
-                sbBody.AppendLine("<p>Thank you for using our photo booth.</p>");
+                sbBody.AppendLine($"<h1>Dear, {customerName}</h1>");
+                sbBody.AppendLine("<p>Thank you for using our services.</p>");
 
                 //insert body need to send
                 sbBody.AppendLine(body);

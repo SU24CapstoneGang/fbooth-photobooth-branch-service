@@ -11,10 +11,6 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
     {
         Task<Account> GetByEmail(string Email);
         Task<AccountResponse> GetByPhoneNumber(string phoneNumber);
-        Task<AccountRegisterResponse> Register(CreateAccountRequestModel request, AccountRole userRole);
-        Task<LoginResponeModel> Login(LoginRequestModel request);
-        Task<LoginResponeModel> RefreshToken(RefreshTokenRequestModel request);
-        Task<string> ResetPassword(string email);
         Task UpdateAsync(UpdateAccountRequestModel updateModel, string? email);
         Task DeleteAsync(Guid id);
         Task AssignBranchForStaff(AssignBranchForStaffRequest request);

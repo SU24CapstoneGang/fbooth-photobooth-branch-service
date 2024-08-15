@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FirebaseAdmin.Messaging;
 using Microsoft.IdentityModel.Tokens;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
@@ -7,6 +8,7 @@ using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Booking;
 using PhotoboothBranchService.Application.DTOs.BookingService;
 using PhotoboothBranchService.Application.Services.AccountServices;
+using PhotoboothBranchService.Application.Services.AuthenticationServices;
 using PhotoboothBranchService.Application.Services.BookingServiceServices;
 using PhotoboothBranchService.Application.Services.EmailServices;
 using PhotoboothBranchService.Application.Services.RefundServices;
@@ -16,6 +18,8 @@ using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Net;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace PhotoboothBranchService.Application.Services.BookingServices;
 
@@ -31,6 +35,7 @@ public class BookingService : IBookingService
     private readonly IEmailService _emailService;
     private readonly ISlotRepository _slotRepository;
     private readonly IBookingSlotRepository _bookingSlotRepository;
+    private readonly IAuthenService _authenticationService;
     public BookingService(IBookingRepository sessionOrderRepository,
         IMapper mapper,
         IBoothRepository boothRepository,
@@ -40,7 +45,8 @@ public class BookingService : IBookingService
         IEmailService emailService,
         IBookingSlotRepository bookingSlotRepository,
         IBookingServiceService bookingServiceService,
-        IAccountService accountService)
+        IAccountService accountService,
+        IAuthenService authenticationService)
     {
         _bookingRepository = sessionOrderRepository;
         _mapper = mapper;
@@ -52,6 +58,7 @@ public class BookingService : IBookingService
         _slotRepository = slotRepository;
         _bookingSlotRepository = bookingSlotRepository;
         _bookingServiceService = bookingServiceService;
+        _authenticationService = authenticationService;
     }
 
     // Create a new session
@@ -125,16 +132,6 @@ public class BookingService : IBookingService
         await _bookingRepository.UpdateAsync(booking);
         return await this.GetByIdAsync(booking.BookingID);
     }
-    private async Task<Guid> GetApplicablePolicyIdAsync(DateTime startTime)
-    {
-        var policies = await _fullPaymentPolicyRepository.GetAsync(p => p.IsActive && (p.StartDate == null || p.StartDate <= DateOnly.FromDateTime(startTime)) && (p.EndDate == null || p.EndDate >= DateOnly.FromDateTime(startTime)));
-        var policy = policies.FirstOrDefault();
-        if (policy == null)
-        {
-            throw new Exception("Not found policy");
-        }
-        return policy.FullPaymentPolicyID;
-    }
     public async Task<CreateBookingResponse> CustomerBooking(CustomerBookingRequest request, string email)
     {
         //if ((request.StartTime - DateTimeHelper.GetVietnamTimeNow()).TotalMinutes <= 30)
@@ -166,7 +163,7 @@ public class BookingService : IBookingService
                 Password = PasswordGenerator.GeneratePassword(23),
             };
             requestNewAccount.ConfirmPassword = requestNewAccount.Password;
-            account = await _accountService.Register(requestNewAccount, AccountRole.Customer);
+            account = await _authenticationService.Register(requestNewAccount, AccountRole.Customer);
         }
         //create booking request
         BookingRequest bookingRequest = new BookingRequest
@@ -182,7 +179,7 @@ public class BookingService : IBookingService
         try //start booking
         {
             var response =  await this.CreateAsync(bookingRequest, BookingType.Staff);
-            string link = await _accountService.ResetPassword(request.CustomerEmail);
+            string link = await _authenticationService.ResetPassword(request.CustomerEmail);
             await _emailService.SendAutoRegistEmailNoti(request.CustomerEmail, link, $"{account.FirstName} {account.LastName}");
             return response;
         }
@@ -199,48 +196,8 @@ public class BookingService : IBookingService
             }
         }
     }
-    public async Task<BookingResponse> Checkin(CheckinCodeRequest validateSessionPhotoRequest)
-    {
-        var booking = await _bookingRepository.GetBookingByValidateCodeAndBoothIdAsync(
-            validateSessionPhotoRequest.Code, validateSessionPhotoRequest.BoothID
-        );
 
-        if (booking == null)
-        {
-            throw new BadRequestException("Wrong validate code, please try again");
-        }
-
-        if (booking.BookingStatus == BookingStatus.Canceled)
-        {
-            throw new BadRequestException("This booking has been cancelled. Please contact our staff for further assistance.");
-        }
-        var timeNow = DateTimeHelper.GetVietnamTimeNow();
-        if (booking.EndTime <= timeNow)
-        {
-            throw new BadRequestException("This booking has already ended. Please contact our staff for further assistance.");
-        }
-
-        if (booking.PaymentStatus != PaymentStatus.Paid)
-        {
-            throw new BadRequestException("This booking has not been paid for. Please complete the payment to proceed.");
-        }
-
-        if (booking.StartTime > timeNow)
-        {
-            throw new BadRequestException("The time for your session has not come yet, please check with our staff and try again later");
-        }
-
-        // Ensure services are loaded correctly
-        //if (booking.BookingServices == null || !booking.BookingServices.Any() || booking.BookingServices.Any(bs => bs.Service == null))
-        //{
-        //    throw new InvalidOperationException("Booking services not loaded correctly");
-        //}
-
-        booking.BookingStatus = BookingStatus.TakingPhoto;
-        await _bookingRepository.UpdateAsync(booking);
-        return await this.GetByIdAsync(booking.BookingID);
-    }
-    // Delete a session by ID
+    // Delete 
     public async Task DeleteAsync(Guid id)
     {
         var session = (await _bookingRepository.GetAsync(s => s.BookingID == id)).FirstOrDefault();
@@ -253,8 +210,7 @@ public class BookingService : IBookingService
             throw new KeyNotFoundException("Session not found.");
         }
     }
-
-    // Get all sessions
+    // Get 
     public async Task<IEnumerable<BookingResponse>> GetAllAsync()
     {
         var bookings = (await _bookingRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
@@ -269,7 +225,6 @@ public class BookingService : IBookingService
         }
         return _mapper.Map<IEnumerable<BookingResponse>>(bookings.ToList().OrderByDescending(i => i.StartTime));
     }
-
     public async Task<IEnumerable<BookingResponse>> GetAllPagingAsync(BookingFilter filter, PagingModel paging)
     {
         var sessions = (await _bookingRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
@@ -291,7 +246,6 @@ public class BookingService : IBookingService
         var bookings = (await _bookingRepository.GetAsync(i => boothIds.Contains(i.BoothID) && i.StartTime > DateTimeHelper.GetVietnamTimeNow())).ToList();
         return bookings.Any() ? _mapper.Map<IEnumerable<BookingResponse>>(bookings) : Enumerable.Empty<BookingResponse>();
     }
-    // Get a session by ID
     public async Task<BookingResponse> GetByIdAsync(Guid id)
     {
         var booking = (await _bookingRepository.GetAsync(s => s.BookingID == id,
@@ -329,6 +283,71 @@ public class BookingService : IBookingService
         }
         
         return _mapper.Map<IEnumerable<BookingResponse>>(bookings);
+    }
+    public async Task<BookingResponse> Checkin(CheckinCodeRequest validateSessionPhotoRequest)
+    {
+        var booking = await _bookingRepository.GetBookingByValidateCodeAndBoothIdAsync(
+            validateSessionPhotoRequest.Code, validateSessionPhotoRequest.BoothID
+        );
+
+        if (booking == null)
+        {
+            throw new BadRequestException("Wrong validate code, please try again");
+        }
+
+        if (booking.BookingStatus == BookingStatus.Canceled)
+        {
+            throw new BadRequestException("This booking has been cancelled. Please contact our staff for further assistance.");
+        }
+        var timeNow = DateTimeHelper.GetVietnamTimeNow();
+        if (booking.EndTime <= timeNow)
+        {
+            throw new BadRequestException("This booking has already ended. Please contact our staff for further assistance.");
+        }
+
+        if (booking.PaymentStatus != PaymentStatus.Paid)
+        {
+            throw new BadRequestException("This booking has not been paid for. Please complete the payment to proceed.");
+        }
+
+        if (booking.StartTime > timeNow)
+        {
+            throw new BadRequestException("The time for your session has not come yet, please check with our staff and try again later");
+        }
+
+        booking.BookingStatus = BookingStatus.TakingPhoto;
+        await _bookingRepository.UpdateAsync(booking);
+        return await this.GetByIdAsync(booking.BookingID);
+    }
+    public async Task<IEnumerable<BookingResponse>> GetBookings(string email)
+    {
+        var acc = await _accountService.GetByEmail(email);
+        IEnumerable<Booking> responses;
+        if (acc == null)
+        {
+            throw new NotFoundException("Account not found");
+        }
+        if (acc.Role == AccountRole.Customer)
+        {
+            responses = (await _bookingRepository.GetAsync(i => i.CustomerID == acc.AccountID)).ToList();
+        }
+        else if (acc.Role == AccountRole.Staff)
+        {
+            if (!acc.BranchID.HasValue)
+            {
+                throw new ForbiddenAccessException("Staff haven't assigned to any branch");
+            }
+            else
+            {
+                var boothIds = (await _boothRepository.GetAsync(i => i.BranchID == acc.BranchID)).Select(i => i.BoothID).ToList();
+                responses = (await _bookingRepository.GetAsync(i => boothIds.Contains(i.BoothID))).ToList();
+            }
+        }
+        else
+        {
+            throw new ForbiddenAccessException();
+        }
+        return _mapper.Map<IEnumerable<BookingResponse>>(responses.OrderBy(i => i.StartTime).ToList());
     }
     // Update a session
     public async Task<CreateBookingResponse> UpdateAsync(Guid id, UpdateBookingRequest updateModel, string? email)
@@ -433,110 +452,109 @@ public class BookingService : IBookingService
             throw new BadRequestException("Only ongoing booking can close");
         }
     }
-
-    public async Task<IEnumerable<BookingResponse>> GetBookings(string email)
-    {
-        var acc = await _accountService.GetByEmail(email);
-        IEnumerable<Booking> responses;
-        if (acc == null)
-        {
-            throw new NotFoundException("Account not found");
-        }
-        if (acc.Role == AccountRole.Customer)
-        {
-            responses = (await _bookingRepository.GetAsync(i => i.CustomerID == acc.AccountID)).ToList();
-        }
-        else if (acc.Role == AccountRole.Staff)
-        {
-            if (!acc.BranchID.HasValue)
-            {
-                throw new ForbiddenAccessException("Staff haven't assigned to any branch");
-            }
-            else
-            {
-                var boothIds = (await _boothRepository.GetAsync(i => i.BranchID == acc.BranchID)).Select(i => i.BoothID).ToList();
-                responses = (await _bookingRepository.GetAsync(i => boothIds.Contains(i.BoothID))).ToList();
-            }
-        }
-        else
-        {
-            throw new ForbiddenAccessException();
-        }
-        return _mapper.Map<IEnumerable<BookingResponse>>(responses.OrderBy(i => i.StartTime).ToList());
-    }
     public async Task<CancelBookingResponse> CancelBooking(Guid bookingID, string? ipAddress, string? email)
     {
         CancelBookingResponse response = new CancelBookingResponse();
         var timeNow = DateTimeHelper.GetVietnamTimeNow();
-        var booking = (await _bookingRepository.GetAsync(i => i.BookingID == bookingID, i => i.FullPaymentPolicy)).FirstOrDefault();
-        if (null == booking)
+
+        try
         {
-            response.message = "Booking not found";
-        }
-        else if (booking.BookingStatus == BookingStatus.TakingPhoto || booking.BookingStatus == BookingStatus.ExtraService)
-        {
-            response.message = "Booking is going, cannot cancel.";
-        }
-        else if (booking.BookingStatus == BookingStatus.Canceled)
-        {
-            response.message = "Booking already canceled.";
-        }
-        else if (booking.EndTime < timeNow || booking.BookingStatus == BookingStatus.NoShow || booking.BookingStatus == BookingStatus.CompleteChecked)
-        {
-            response.message = "Booking has ended, can not cancel.";
-        }
-        else
-        {
-            try
+            var booking = await this.ValidateBookingToCancel(bookingID);
+            if (booking.StartTime > timeNow)
             {
-                if (booking.StartTime > timeNow)
+                if (booking.BookingStatus == BookingStatus.PendingChecking && (booking.StartTime.Date - timeNow).TotalDays > booking.FullPaymentPolicy.RefundDaysBefore)
                 {
-                    if (booking.BookingStatus == BookingStatus.PendingChecking && (booking.StartTime.Date - timeNow).TotalDays > booking.FullPaymentPolicy.RefundDaysBefore)
+                    //doing refund
+                    var refundRes = await _refundService.RefundByBookingID(bookingID, false, ipAddress, email);
+                    response.isRefund = true;
+                    response.refundList = refundRes.ToList();
+                    if (response.refundList.Any(i => i.Status == RefundStatus.Fail))
                     {
-                        //doing refund
-                        var refundRes = await _refundService.RefundByBookingID(bookingID, false, ipAddress, email);
-                        response.isRefund = true;
-                        response.refundList = refundRes.ToList();
-                        if (response.refundList.Any(i => i.Status == RefundStatus.Fail))
-                        {
-                            response.message = "Success cancel booking but not refund success, please contact our staff.";
-                            booking.PaymentStatus = PaymentStatus.PendingRefund;
-                        }
-                        else
-                        {
-                            response.message = $"Cancel booking and the refund successfully, with {booking.FullPaymentPolicy.RefundPercent}% value of booking";
-                            booking.PaymentStatus = PaymentStatus.Refunded;
-                        }
+                        response.message = "Success cancel booking but not refund success, please contact our staff.";
+                        booking.PaymentStatus = PaymentStatus.PendingRefund;
                     }
                     else
                     {
-                        response.message = $"Cancel booking successfully, but the cancel date does not meet our policy (must be more than {booking.FullPaymentPolicy.RefundDaysBefore} days before) to be eligible for a refund.";
+                        response.message = $"Cancel booking and the refund successfully, with {booking.FullPaymentPolicy.RefundPercent}% value of booking";
+                        booking.PaymentStatus = PaymentStatus.Refunded;
                     }
                 }
                 else
                 {
-                    response.message = $"Cancel booking successfully, but the cancel date is not meet our policy (must before {booking.FullPaymentPolicy.RefundDaysBefore}) to refund.";
+                    response.message = $"Cancel booking successfully, but the cancel date does not meet our policy (must be more than {booking.FullPaymentPolicy.RefundDaysBefore} days before) to be eligible for a refund.";
                 }
-                var booth = (await _boothRepository.GetAsync(i => i.BoothID == booking.BoothID)).FirstOrDefault();
-                if (booth != null && booth.Status == BoothStatus.Booked && timeNow > booking.StartTime && timeNow < booking.EndTime) 
-                { 
-                    booth.Status = BoothStatus.Active;
-                    await _boothRepository.UpdateAsync(booth);
-                }
-                response.isSuccess = true;
-                booking.BookingStatus = BookingStatus.Canceled;
-                booking.CancelledDate = DateTimeHelper.GetVietnamTimeNow();
-                await _bookingRepository.UpdateAsync(booking);
-                await _emailService.SendCancelBookingInformation(bookingID);
             }
-            catch (Exception ex)
+            else
             {
-                response.message = ex.Message;
+                response.message = $"Cancel booking successfully, but the cancel date is not meet our policy (must before {booking.FullPaymentPolicy.RefundDaysBefore}) to refund.";
             }
+            var booth = (await _boothRepository.GetAsync(i => i.BoothID == booking.BoothID)).FirstOrDefault();
+            if (booth != null && booth.Status == BoothStatus.Booked && timeNow > booking.StartTime && timeNow < booking.EndTime)
+            {
+                booth.Status = BoothStatus.Active;
+                await _boothRepository.UpdateAsync(booth);
+            }
+            response.isSuccess = true;
+            booking.BookingStatus = BookingStatus.Canceled;
+            booking.CancelledDate = DateTimeHelper.GetVietnamTimeNow();
+            await _bookingRepository.UpdateAsync(booking);
+            await _emailService.SendCancelBookingInformation(bookingID);
         }
+        catch (Exception ex)
+        {
+            response.message = ex.Message;
+        }
+
         return response;
     }
+    public async Task TerminateBookingBySystem(Guid bookingID)
+    {
+        try
+        {
+            var booking = await this.ValidateBookingToCancel(bookingID);
+
+            var refundRes = await _refundService.RefundByBookingID(bookingID, true, null, null);
+            if (refundRes.Any(i => i.Status == RefundStatus.Fail))
+            {
+                booking.PaymentStatus = PaymentStatus.PendingRefund;
+            }
+            else
+            {
+                booking.PaymentStatus = PaymentStatus.Refunded;
+            }
+
+            booking.BookingStatus = BookingStatus.CancelledBySystem;
+            booking.CancelledDate = DateTimeHelper.GetVietnamTimeNow();
+            await _bookingRepository.UpdateAsync(booking);
+        } catch
+        {
+
+        }
+    }
     //private method
+    private async Task<Booking> ValidateBookingToCancel(Guid bookingID)
+    {
+        var booking = (await _bookingRepository.GetAsync(i => i.BookingID == bookingID, i => i.FullPaymentPolicy)).FirstOrDefault();
+        if (null == booking)
+        {
+            throw new Exception("Booking not found");
+        }
+        if (booking.BookingStatus == BookingStatus.TakingPhoto || booking.BookingStatus == BookingStatus.ExtraService)
+        {
+            throw new Exception("Booking is going, cannot cancel.");
+        }
+        if (booking.BookingStatus == BookingStatus.Canceled)
+        {
+            throw new Exception("Booking already canceled.");
+        }
+        if (booking.EndTime < DateTimeHelper.GetVietnamTimeNow() || booking.BookingStatus == BookingStatus.NoShow || booking.BookingStatus == BookingStatus.CompleteChecked)
+        {
+            throw new Exception("Booking has ended, can not cancel.");
+        }
+
+        return booking;
+
+    }
     private void ValidateTimeRange(DateTime startTime, DateTime endTime, TimeSpan openTime, TimeSpan closeTime)
     {
         if (startTime >= endTime)
@@ -568,7 +586,7 @@ public class BookingService : IBookingService
     {
         var bookings = (await _bookingRepository.GetAsync(i => i.BoothID == boothId
                                  && ((startTime < i.StartTime && i.StartTime < endTime) || (endTime > i.EndTime && i.EndTime > startTime))
-                                 && i.BookingStatus != BookingStatus.Canceled)).ToList();
+                                 && i.BookingStatus != BookingStatus.Canceled && i.BookingStatus != BookingStatus.CancelledBySystem)).ToList();
         return bookings?.ToList() ?? new List<Booking>();
     }
     private async Task<(decimal, List<BookingSlot>)> ProcessHireBoothFee(Guid BoothID, DateOnly date, TimeSpan startTime,  TimeSpan endTime)
@@ -598,7 +616,7 @@ public class BookingService : IBookingService
     {
         long code = 0;
         var timeNow = DateTimeHelper.GetVietnamTimeNow();
-        var existedCodes = (await _bookingRepository.GetAsync(i => i.BookingStatus != BookingStatus.Canceled && (i.StartTime > timeNow || i.EndTime > timeNow))).ToList().Select(i => i.ValidateCode);
+        var existedCodes = (await _bookingRepository.GetAsync(i => (i.BookingStatus != BookingStatus.Canceled && i.BookingStatus != BookingStatus.CancelledBySystem) && (i.StartTime > timeNow || i.EndTime > timeNow))).ToList().Select(i => i.ValidateCode);
         while (code == 0)
         {
             code = new Random().Next(100000, 1000000);
@@ -642,6 +660,16 @@ public class BookingService : IBookingService
         }
 
         return booth;
+    }
+    private async Task<Guid> GetApplicablePolicyIdAsync(DateTime startTime)
+    {
+        var policies = await _fullPaymentPolicyRepository.GetAsync(p => p.IsActive && (p.StartDate == null || p.StartDate <= DateOnly.FromDateTime(startTime)) && (p.EndDate == null || p.EndDate >= DateOnly.FromDateTime(startTime)));
+        var policy = policies.FirstOrDefault();
+        if (policy == null)
+        {
+            throw new Exception("Not found policy");
+        }
+        return policy.FullPaymentPolicyID;
     }
 }
 

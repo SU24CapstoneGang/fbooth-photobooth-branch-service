@@ -11,6 +11,5 @@ namespace PhotoboothBranchService.Application.DTOs.Photo
         public DateTime CreateDate { get; set; }
         public Guid PhotoSessionID { get; set; }
         public Guid? BackgroundID { get; set; }
-        public Dictionary<Guid, int> StickerList { get; set; } = new Dictionary<Guid, int>();
     }
 }

@@ -24,12 +24,20 @@ namespace PhotoboothBranchService.Application.BackgroundServices
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await ProcessSessionOrdersAsync();
+                await BackgroundServiceLocks.ServiceLock.WaitAsync(stoppingToken);
+                try
+                {
+                    await ProcessBookingsAsync();
+                }
+                finally
+                {
+                    BackgroundServiceLocks.ServiceLock.Release();
+                }
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // Check every minute
             }
         }
 
-        private async Task ProcessSessionOrdersAsync()
+        private async Task ProcessBookingsAsync()
         {
             using (var scope = _serviceProvider.CreateScope())
             {

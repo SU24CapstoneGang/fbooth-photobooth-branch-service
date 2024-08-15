@@ -13,5 +13,6 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
         Task SendBookingInformation(Guid sessionOrderId, Guid transactionID);
         Task SendCancelBookingInformation(Guid bookingID);
         Task SendAutoRegistEmailNoti(string email, string link, string customerName);
+        Task SendResetPasswordEmail(string email, string resetLink, string customerName);
     }
 }

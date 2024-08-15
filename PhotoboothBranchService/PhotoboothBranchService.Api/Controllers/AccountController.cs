@@ -91,49 +91,6 @@ public class AccountController : ControllerBaseApi
         return Ok();
     }
 
-    [AllowAnonymous]
-    [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginRequestModel request)
-    {
-        var token = await _accountService.Login(request);
-        if (token != null)
-            return Ok(token);
-        return BadRequest("Login fail!!!");
-    }
-
-    [AllowAnonymous]
-    [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] CreateAccountRequestModel request, AccountRole userRole)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        var result = await _accountService.Register(request, userRole);
-        if (result != null)
-            return Ok(result);
-        return BadRequest("Registration failed. Please try again.");
-
-    }
-
-    [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestModel request)
-    {
-        var token = await _accountService.RefreshToken(request);
-        if (token != null)
-            return Ok(token);
-        return BadRequest("Login fail!!!");
-    }
-
-    [HttpGet("profile/reset-password-link")]
-    public async Task<IActionResult> ResetPassword()
-    {
-        var email = Request.HttpContext.Items["Email"]?.ToString();
-        var result = await _accountService.ResetPassword(email);
-        if (result != null)
-            return Ok(result);
-        return BadRequest();
-    }
-
     [HttpGet("firebase-users")]
     public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAllFirebaseUsers()
     {
