@@ -4,6 +4,7 @@ using PhotoboothBranchService.Application.Services.BranchPhotoServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
+    [Route("api/branch-photo")]
     public class BranchPhotoController : ControllerBaseApi
     {
         private readonly IBranchPhotoService _branchPhotoService;

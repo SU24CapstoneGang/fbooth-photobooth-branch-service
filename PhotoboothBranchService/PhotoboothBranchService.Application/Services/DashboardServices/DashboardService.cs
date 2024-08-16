@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PhotoboothBranchService.Application.Common.Exceptions;
+using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.Background;
 using PhotoboothBranchService.Application.DTOs.Dashboard;
 using PhotoboothBranchService.Application.DTOs.Layout;
@@ -104,7 +105,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             if (response.TotalBranch == 0)
             {
                 response.TotalRevenue = 0;
-                response.TotalOrder = 0;
+                response.TotalBookings = 0;
                 return response;
             }
             //infor for booth
@@ -118,9 +119,21 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             response.BoothDashboard.BoothInactive = booths.Select(i => i.Status == BoothStatus.Inactive).Count();
             response.BoothDashboard.BoothInUse = booths.Select(i => i.Status == BoothStatus.Booked).Count();
             var bookings = await _bookingRepository.GetAsync();
-            response.TotalOrder = bookings.Count();
-            response.TotalRevenue = response.TotalOrder == 0 ? 0 : bookings.Sum(i => i.TotalPrice) - bookings.Sum(i => i.RefundedAmount);
+            response.TotalBookings = bookings.Count();
+            response.TotalRevenue = response.TotalBookings == 0 ? 0 : bookings.Sum(i => i.TotalPrice) - bookings.Sum(i => i.RefundedAmount);
             return response;
+        }
+        public async Task<BookingDashboardResponse> BookingDashboard(Guid? branchID, DateOnly? startDate, DateOnly? endDate)
+        {
+            var result = new BookingDashboardResponse();
+            var bookings = await this.GetBookings(branchID, startDate, endDate, true);
+            if (bookings.Count() == 0)
+            {
+                return result;
+            }
+            result.InFuture = bookings.Select(i => i.BookingStatus == BookingStatus.PendingChecking && i.StartTime > DateTimeHelper.GetVietnamTimeNow()).Count();
+            result.Completed = bookings.Select(i => i.PaymentStatus == PaymentStatus.Paid).Count();
+            return result;
         }
         public async Task<List<DashboardServiceResponse>> DashboradService(Guid? branchID, DateOnly? startDate, DateOnly? endDate)
         {
@@ -241,6 +254,8 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             }
             return stickerCount.OrderByDescending(i => i.Count).ToList();
         }
+
+        //private methods
         private async Task<List<PhotoSticker>> GetPhotoStickers(Guid? branchID, DateOnly? startDate, DateOnly? endDate, params Expression<Func<PhotoSticker, object>>[] includeProperties)
         {
             if (startDate == null && branchID == null && endDate == null)
@@ -270,10 +285,15 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
         }
         private async Task<List<Booking>> GetBookings(Guid? branchID, DateOnly? startDate, DateOnly? endDate, bool getAllState ,params Expression<Func<Booking, object>>[] includeProperties)
         {
-            var booths = branchID.HasValue ? await _boothRepository.GetAsync(i => i.BranchID == branchID) : null;
-            if (branchID.HasValue && booths.Count() == 0)
+            IEnumerable<Booth> booths = new List<Booth>();
+
+            if (branchID.HasValue)
             {
-                return new List<Booking>();
+                booths = await _boothRepository.GetAsync(i => i.BranchID == branchID);
+                if (!booths.Any()) // Use Any() to check if there are any booths
+                {
+                    return new List<Booking>(); // Return an empty list if no booths are found
+                }
             }
             bool isEnd = false;
             bool isStart = false;

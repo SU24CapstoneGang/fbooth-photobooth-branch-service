@@ -15,6 +15,7 @@ namespace PhotoboothBranchService.Application.DTOs.Branch
         public string? Town { get; set; } = default!;
         [StringLength(100, ErrorMessage = "Branch address has max length is 100")]
         public string? City { get; set; } = default!;
-       
+        public BranchStatus? Status { get; set; } = default!;
+
     }
 }

@@ -63,10 +63,9 @@ public class BranchService : IBranchService
     }
 
     //Create
-    public async Task<CreateBranchResponse> CreateAsync(CreateBranchRequest createModel, BranchStatus status)
+    public async Task<CreateBranchResponse> CreateAsync(CreateBranchRequest createModel)
     {
         Branch branch = _mapper.Map<Branch>(createModel);
-        branch.Status = status;
         branch.OpeningTime = new TimeSpan(7, 0, 0);
         branch.ClosingTime = new TimeSpan(23, 0, 0);
         await _branchRepository.AddAsync(branch);
@@ -121,7 +120,7 @@ public class BranchService : IBranchService
     }
 
     //update
-    public async Task UpdateAsync(Guid id, UpdateBranchRequest updateModel, BranchStatus? status)
+    public async Task UpdateAsync(Guid id, UpdateBranchRequest updateModel)
     {
         var branch = (await _branchRepository.GetAsync(p => p.BranchID == id)).FirstOrDefault();
         if (branch == null)
@@ -133,10 +132,6 @@ public class BranchService : IBranchService
         if (updateBranch.ClosingTime < updateBranch.OpeningTime)
         {
             throw new BadRequestException("Closing time must after the opening time");
-        }
-        if (status.HasValue)
-        {
-            updateBranch.Status = status.Value;
         }
         await _branchRepository.UpdateAsync(updateBranch);
     }

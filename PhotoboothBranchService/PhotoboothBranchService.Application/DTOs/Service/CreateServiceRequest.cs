@@ -16,5 +16,9 @@ namespace PhotoboothBranchService.Application.DTOs.Service
         public decimal ServicePrice { get; set; }
         [Required]
         public IFormFile imgFile { get; set; }
+        [Required]
+        public ServiceTypeForInput ServiceType { get; set; }
+        [Required]
+        public StatusUse Status { get; set; }
     }
 }

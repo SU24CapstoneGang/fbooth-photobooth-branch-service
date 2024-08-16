@@ -23,9 +23,9 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<StickerTypeResponse>> CreateStickerType([FromForm] CreateStickerTypeRequest createStickerTypeRequest, StatusUse status)
+        public async Task<ActionResult<StickerTypeResponse>> CreateStickerType([FromForm] CreateStickerTypeRequest createStickerTypeRequest)
         {
-            var createStickerTypeResponse = await _stickerTypeService.CreateAsync(createStickerTypeRequest, status);
+            var createStickerTypeResponse = await _stickerTypeService.CreateAsync(createStickerTypeRequest);
             return Ok(createStickerTypeResponse);
         }
 
@@ -58,9 +58,9 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateStickerType(Guid id, [FromForm] UpdateStickerTypeRequest updateStickerTypeRequest, [FromQuery] StatusUse? status)
+        public async Task<ActionResult> UpdateStickerType(Guid id, [FromForm] UpdateStickerTypeRequest updateStickerTypeRequest)
         {
-            await _stickerTypeService.UpdateAsync(id, updateStickerTypeRequest, status);
+            await _stickerTypeService.UpdateAsync(id, updateStickerTypeRequest);
             return Ok();
         }
 

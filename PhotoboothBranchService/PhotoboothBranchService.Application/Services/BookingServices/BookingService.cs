@@ -329,7 +329,7 @@ public class BookingService : IBookingService
         }
         if (acc.Role == AccountRole.Customer)
         {
-            responses = (await _bookingRepository.GetAsync(i => i.CustomerID == acc.AccountID)).ToList();
+            responses = (await _bookingRepository.GetAsync(i => i.CustomerID == acc.AccountID, i => i.FullPaymentPolicy)).ToList();
         }
         else if (acc.Role == AccountRole.Staff)
         {
@@ -340,7 +340,7 @@ public class BookingService : IBookingService
             else
             {
                 var boothIds = (await _boothRepository.GetAsync(i => i.BranchID == acc.BranchID)).Select(i => i.BoothID).ToList();
-                responses = (await _bookingRepository.GetAsync(i => boothIds.Contains(i.BoothID))).ToList();
+                responses = (await _bookingRepository.GetAsync(i => boothIds.Contains(i.BoothID), i => i.FullPaymentPolicy)).ToList();
             }
         }
         else
@@ -650,9 +650,9 @@ public class BookingService : IBookingService
         {
             throw new NotFoundException("Booth not found on server, try again later");
         }
-        else if (booth.Status == BoothStatus.Booked || booth.Status == BoothStatus.Inactive)
+        else if (booth.Status == BoothStatus.Inactive)
         {
-            throw new BadRequestException("Booth is used by another or is inactive, in maintenance");
+            throw new BadRequestException("Booth is inactive");
         }
         else if (booth.Branch.Status == BranchStatus.Inactive)
         {

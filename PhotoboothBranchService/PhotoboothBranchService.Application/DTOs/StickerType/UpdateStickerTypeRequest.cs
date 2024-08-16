@@ -11,6 +11,7 @@ namespace PhotoboothBranchService.Application.DTOs.StickerType
     public class UpdateStickerTypeRequest
     {
         public string? StickerTypeName { get; set; } = default!;
-        public IFormFile? file { get; set; }
+        public IFormFile? File { get; set; }
+        public StatusUse? Status { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using PhotoboothBranchService.Application.Common.Helpers;
+using PhotoboothBranchService.Domain.Enum;
 using System.ComponentModel.DataAnnotations;
 
 namespace PhotoboothBranchService.Application.DTOs.Branch
@@ -14,6 +15,7 @@ namespace PhotoboothBranchService.Application.DTOs.Branch
         public string Town { get; set; } = default!;
         [Required, StringLength(100, ErrorMessage = "Branch address has max length is 100")]
         public string City { get; set; } = default!;
-       
+        [Required]
+        public BranchStatus Status { get; set; } = default!;
     }
 }

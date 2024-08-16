@@ -55,13 +55,12 @@ namespace PhotoboothBranchService.Application.Services.StickerTypeServices
             return _mapper.Map<StickerTypeResponse>(stickerType);
         }
 
-        public async Task<StickerTypeResponse> CreateAsync(CreateStickerTypeRequest createModel, StatusUse status)
+        public async Task<StickerTypeResponse> CreateAsync(CreateStickerTypeRequest createModel)
         {
             var stickerType = _mapper.Map<StickerType>(createModel);
-            stickerType.Status = status;
 
             //upload to cloudinary
-            var uploadResult = await _cloudinaryService.AddPhotoAsync(createModel.file, "FBooth-Sticker-Type");
+            var uploadResult = await _cloudinaryService.AddPhotoAsync(createModel.File, "FBooth-Sticker-Type");
             if (uploadResult.Error != null)
             {
                 throw new Exception(uploadResult.Error.Message);
@@ -72,22 +71,18 @@ namespace PhotoboothBranchService.Application.Services.StickerTypeServices
             return _mapper.Map<StickerTypeResponse>(stickerType);
         }
 
-        public async Task UpdateAsync(Guid id, UpdateStickerTypeRequest updateModel, StatusUse? status)
+        public async Task UpdateAsync(Guid id, UpdateStickerTypeRequest updateModel)
         {
             var stickerType = (await _stickerTypeRepository.GetAsync(s => s.StickerTypeID == id)).FirstOrDefault();
             if (stickerType == null)
             {
                 throw new KeyNotFoundException("Sticker type not found.");
             }
-            if (updateModel.file != null && updateModel.file.Length != 0)
+            if (updateModel.File != null && updateModel.File.Length != 0)
             {
-                await _cloudinaryService.UpdatePhotoAsync(updateModel.file, stickerType.CouldID);
+                await _cloudinaryService.UpdatePhotoAsync(updateModel.File, stickerType.CouldID);
             }
             var updatedStickerType = _mapper.Map(updateModel, stickerType);
-            if (status.HasValue)
-            {
-                updatedStickerType.Status = status.Value;
-            }
             await _stickerTypeRepository.UpdateAsync(updatedStickerType);
         }
     }

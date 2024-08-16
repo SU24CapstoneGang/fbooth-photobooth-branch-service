@@ -12,7 +12,7 @@ namespace PhotoboothBranchService.Application.Services.StickerTypeServices
 {
     public interface IStickerTypeService : IServiceBase<StickerTypeResponse, StickerTypeFilter, PagingModel>
     {
-        Task<StickerTypeResponse> CreateAsync(CreateStickerTypeRequest createModel, StatusUse status);
-        Task UpdateAsync(Guid id, UpdateStickerTypeRequest updateModel, StatusUse? status);
+        Task<StickerTypeResponse> CreateAsync(CreateStickerTypeRequest createModel);
+        Task UpdateAsync(Guid id, UpdateStickerTypeRequest updateModel);
     }
 }

@@ -8,5 +8,6 @@ namespace PhotoboothBranchService.Application.DTOs.Sticker
         public int stickerHeight { get; set; }
         public int stickerWidth { get; set; }
         public StatusUse Status { get; set; }
+        public Guid StickerTypeID { get; set; }
     }
 }

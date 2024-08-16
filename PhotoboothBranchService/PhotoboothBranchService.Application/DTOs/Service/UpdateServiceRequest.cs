@@ -15,5 +15,7 @@ namespace PhotoboothBranchService.Application.DTOs.Service
         [Range(10000, 5000000, ErrorMessage = "Price is from 100000 to 5 000 000")]
         public decimal? ServicePrice { get; set; }
         public IFormFile? imgFile { get; set; }
+        public StatusUse? Status { get; set; }
+        public ServiceTypeForInput? ServiceType { get; set; }
     }
 }

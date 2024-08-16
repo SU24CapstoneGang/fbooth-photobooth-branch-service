@@ -40,7 +40,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         }
 
         // Create
-        public async Task<CreateBoothResponse> CreateAsync(CreateBoothRequest createModel, BoothStatus status)
+        public async Task<CreateBoothResponse> CreateAsync(CreateBoothRequest createModel)
         {
             Booth booth = _mapper.Map<Booth>(createModel);
             var branch = (await _branchRepository.GetAsync(i => i.BranchID == createModel.BranchID)).SingleOrDefault();
@@ -48,8 +48,6 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
             {
                 throw new NotFoundException("Not found Branch to create booth");
             }
-            booth.Status = status;
-            booth.CreatedDate = DateTimeHelper.GetVietnamTimeNow();
             await _boothRepository.AddAsync(booth);
             return _mapper.Map<CreateBoothResponse>(booth);
         }
@@ -129,7 +127,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         }
 
         // Update
-        public async Task UpdateAsync(Guid id, UpdateBoothRequest updateModel, BoothStatus? status)
+        public async Task UpdateAsync(Guid id, UpdateBoothRequest updateModel)
         {
             var booth = (await _boothRepository.GetAsync(b => b.BoothID == id)).FirstOrDefault();
             if (booth == null)
@@ -138,10 +136,6 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
             }
 
             var updatedBooth = _mapper.Map(updateModel, booth);
-            if (status.HasValue)
-            {
-                updatedBooth.Status = status.Value;
-            }
             await _boothRepository.UpdateAsync(updatedBooth);
         }
 

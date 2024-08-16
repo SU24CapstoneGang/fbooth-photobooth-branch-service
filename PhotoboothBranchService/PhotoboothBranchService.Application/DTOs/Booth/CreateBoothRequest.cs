@@ -16,6 +16,10 @@ namespace PhotoboothBranchService.Application.DTOs.Booth
         public string Concept { get; set; } = default!;
         [Range(1, 10, ErrorMessage ="Range for people in booth is from 1 to 10 people.")]
         public short PeopleInBooth { get; set; }
+        [Required]
         public Guid BranchID { get; set; }
+        [Required]
+        public BoothStatus Status { get; set; }
+
     }
 }

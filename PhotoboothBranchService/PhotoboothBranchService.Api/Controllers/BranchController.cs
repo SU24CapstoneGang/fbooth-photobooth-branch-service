@@ -19,9 +19,9 @@ public class BranchController : ControllerBaseApi
 
     //Create
     [HttpPost]
-    public async Task<ActionResult<CreateBranchResponse>> CreateBranch(CreateBranchRequest createPhotoBoothBranchRequest, BranchStatus status)
+    public async Task<ActionResult<CreateBranchResponse>> CreateBranch(CreateBranchRequest createPhotoBoothBranchRequest)
     {
-        var createBoothBranchResponse = await _branchService.CreateAsync(createPhotoBoothBranchRequest, status);
+        var createBoothBranchResponse = await _branchService.CreateAsync(createPhotoBoothBranchRequest);
         return Ok(createBoothBranchResponse);
     }
 
@@ -70,19 +70,15 @@ public class BranchController : ControllerBaseApi
     [HttpGet("status/{status}")]
     public async Task<ActionResult<IEnumerable<BranchResponse>>> GetBranchesByStatus(BranchStatus status)
     {
-
         var branches = await _branchService.GetByStatus(status);
         return Ok(branches);
-
     }
 
     [HttpGet("name/{name}")]
     public async Task<ActionResult<IEnumerable<BranchResponse>>> GetBranchesByName(string name)
     {
-
         var branches = await _branchService.SearchByName(name);
         return Ok(branches);
-
     }
 
     [HttpGet("{id}")]
@@ -98,9 +94,9 @@ public class BranchController : ControllerBaseApi
 
     //Update
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateBranch(Guid id, [FromBody] UpdateBranchRequest updatePhotoBoothBranchRequest, [FromQuery] BranchStatus? status)
+    public async Task<ActionResult> UpdateBranch(Guid id, [FromBody] UpdateBranchRequest updatePhotoBoothBranchRequest)
     {
-        await _branchService.UpdateAsync(id, updatePhotoBoothBranchRequest, status);
+        await _branchService.UpdateAsync(id, updatePhotoBoothBranchRequest);
         return Ok();
     }
 

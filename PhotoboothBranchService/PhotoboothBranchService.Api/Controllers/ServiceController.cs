@@ -18,9 +18,9 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Create
         [HttpPost]
-        public async Task<ActionResult<CreateServiceResponse>> CreateServiceType([FromForm] CreateServiceRequest createServiceTypeRequest, StatusUse status)
+        public async Task<ActionResult<CreateServiceResponse>> CreateServiceType([FromForm] CreateServiceRequest createServiceTypeRequest)
         {
-            var createServiceTypeResponse = await _serviceTypeService.CreateAsync(createServiceTypeRequest, status);
+            var createServiceTypeResponse = await _serviceTypeService.CreateAsync(createServiceTypeRequest);
             return Ok(createServiceTypeResponse);
         }
 
@@ -66,9 +66,9 @@ namespace PhotoboothBranchService.Api.Controllers
 
         // Update
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateServiceType(Guid id, [FromForm] UpdateServiceRequest updateServiceTypeRequest, [FromQuery] StatusUse status)
+        public async Task<ActionResult> UpdateServiceType(Guid id, [FromForm] UpdateServiceRequest updateServiceTypeRequest)
         {
-            await _serviceTypeService.UpdateAsync(id, updateServiceTypeRequest, status);
+            await _serviceTypeService.UpdateAsync(id, updateServiceTypeRequest);
             return Ok();
         }
 

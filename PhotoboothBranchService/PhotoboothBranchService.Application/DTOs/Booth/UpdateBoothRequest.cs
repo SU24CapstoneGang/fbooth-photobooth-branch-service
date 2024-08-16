@@ -15,5 +15,6 @@ namespace PhotoboothBranchService.Application.DTOs.Booth
         [StringLength(50, ErrorMessage = "Concept color has max length is 50")]
         public string? Concept { get; set; } = default!;
         public short? PeopleInBooth { get; set; }
+        public BoothStatus? Status { get; set; }
     }
 }

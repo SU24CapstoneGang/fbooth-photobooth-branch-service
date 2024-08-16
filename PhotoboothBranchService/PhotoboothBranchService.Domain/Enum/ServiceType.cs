@@ -4,6 +4,9 @@
     {
         Printing = 1,
         EmailSending = 2,
-        Other = 3,
+        ClothingRental = 3,
+        Drinking = 4,
+        MakeupKitRental = 5,
+        Other = 6,
     }
 }

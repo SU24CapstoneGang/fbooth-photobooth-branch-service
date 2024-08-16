@@ -27,11 +27,10 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
         }
 
         // Create
-        public async Task<CreateServiceResponse> CreateAsync(CreateServiceRequest createModel, StatusUse status)
+        public async Task<CreateServiceResponse> CreateAsync(CreateServiceRequest createModel)
         {
             var service = _mapper.Map<Service>(createModel);
-            service.Status = status;
-            service.ServiceType = ServiceType.Other;
+            service.ServiceType = (ServiceType)createModel.ServiceType;
 
             //upload to cloudinary
             var uploadResult = await _cloudinaryService.AddPhotoAsync(createModel.imgFile, "FBooth-Service");
@@ -97,7 +96,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
         }
 
         // Update
-        public async Task UpdateAsync(Guid id, UpdateServiceRequest updateModel, StatusUse? status)
+        public async Task UpdateAsync(Guid id, UpdateServiceRequest updateModel)
         {
             var service = (await _serviceRepository.GetAsync(s => s.ServiceID == id)).FirstOrDefault();
             if (service == null)
@@ -106,7 +105,7 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
             }
             bool check = false;
             if (service.ServiceType == ServiceType.Printing || service.ServiceType == ServiceType.EmailSending) {
-                if (status.HasValue && status == StatusUse.Unusable)
+                if (updateModel.Status.HasValue && updateModel.Status == StatusUse.Unusable)
                 {
                     throw new BadRequestException("Cannot set this service is Unuseable");
                 }
@@ -124,17 +123,13 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
                 {
                     await _cloudinaryService.UpdatePhotoAsync(updateModel.imgFile, service.CouldID);
                 }
-                await Update(id, updateModel, status, service);
+                await Update(updateModel, service);
             }
         }
 
-        private async Task Update(Guid id, UpdateServiceRequest updateModel, StatusUse? status, Service service)
+        private async Task Update(UpdateServiceRequest updateModel, Service service)
         {
             var updatedServiceType = _mapper.Map(updateModel, service);
-            if (status.HasValue)
-            {
-                updatedServiceType.Status = status.Value;
-            }
             await _serviceRepository.UpdateAsync(updatedServiceType);
         }
     }
