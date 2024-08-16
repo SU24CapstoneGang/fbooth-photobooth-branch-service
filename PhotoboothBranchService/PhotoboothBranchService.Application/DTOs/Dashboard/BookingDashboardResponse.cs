@@ -1,12 +1,15 @@
-﻿namespace PhotoboothBranchService.Application.DTOs.Dashboard
+﻿using PhotoboothBranchService.Application.DTOs.Booking;
+
+namespace PhotoboothBranchService.Application.DTOs.Dashboard
 {
     public class BookingDashboardResponse
     {
-        public int Canceleded { get; set; } = 0;
-        public int Completed { get; set; } = 0;
-        public int OnGoing { get; set; } = 0;
-        public int InFuture { get; set; } = 0;
-        public int NeedPayExtra { get; set; } = 0;
+        public List<BookingResponse> Canceleded { get; set; } = new List<BookingResponse>();
+        public List<BookingResponse> Completed { get; set; } = new List<BookingResponse>();
+        public List<BookingResponse> OnGoing { get; set; } = new List<BookingResponse>();
+        public List<BookingResponse> InFuture { get; set; } = new List<BookingResponse>();
+        public List<BookingResponse> NeedPayExtra { get; set; } = new List<BookingResponse>();
+        public List<BookingResponse> NeedRefund { get; set; } = new List<BookingResponse>();
         public decimal TotalRevenue { get; set; } = 0;
         public decimal TotalRefunded { get; set; } = 0;
     }

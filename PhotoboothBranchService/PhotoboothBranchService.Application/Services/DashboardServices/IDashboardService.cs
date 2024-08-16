@@ -11,6 +11,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
     {
         Task<BasicBranchDashboardResponse> BasicBranchDashboard(Guid branchID);
         Task<BasicDashboardResponse> BasicDashboard();
+        Task<BookingDashboardResponse> BookingDashboard(Guid? branchID, DateOnly? startDate, DateOnly? endDate);
         Task<List<DashboardServiceResponse>> DashboradService(Guid? branchID, DateOnly? startDate, DateOnly? endDate);
         Task<List<DashboardLayoutResponse>> DashboardLayout(Guid? branchID, DateOnly? startDate, DateOnly? endDate);
         Task<List<DashboardBackgroundResponse>> DashboardBackground(Guid? branchID, DateOnly? startDate, DateOnly? endDate);

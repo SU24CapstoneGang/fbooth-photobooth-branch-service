@@ -462,7 +462,7 @@ public class BookingService : IBookingService
             var booking = await this.ValidateBookingToCancel(bookingID);
             if (booking.StartTime > timeNow)
             {
-                if (booking.BookingStatus == BookingStatus.PendingChecking && (booking.StartTime.Date - timeNow).TotalDays > booking.FullPaymentPolicy.RefundDaysBefore)
+                if (booking.BookingStatus == BookingStatus.PendingChecking && (booking.StartTime.Date - timeNow).TotalHours > booking.FullPaymentPolicy.RefundDaysBefore*24)
                 {
                     //doing refund
                     var refundRes = await _refundService.RefundByBookingID(bookingID, false, ipAddress, email);

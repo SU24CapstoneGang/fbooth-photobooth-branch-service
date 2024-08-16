@@ -17,7 +17,8 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
                 .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => CombineDateAndTime(src.Date, src.StartTime)))
                 .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => CombineDateAndTime(src.Date, src.EndTime)))
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<Booking, BookingResponse>().HandleNullProperty();
+            CreateMap<Booking, BookingResponse>();
+            CreateMap<Booking, BookingShortReponse>().HandleNullProperty();
             CreateMap<Booking, CreateBookingResponse>().HandleNullProperty();
             CreateMap<CustomerBookingRequest, BookingRequest>().HandleNullProperty();
         }

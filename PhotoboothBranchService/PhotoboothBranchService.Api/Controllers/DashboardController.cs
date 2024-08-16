@@ -5,6 +5,7 @@ using PhotoboothBranchService.Application.Services.DashboardServices;
 
 namespace PhotoboothBranchService.Api.Controllers
 {
+    [Authorization("ADMIN")]
     public class DashboardController : ControllerBaseApi
     {
         private readonly IDashboardService _dashboardService;
@@ -23,6 +24,17 @@ namespace PhotoboothBranchService.Api.Controllers
         public async Task<ActionResult<BasicDashboardResponse>> BasicDashboard()
         {
             return await _dashboardService.BasicDashboard();
+        }
+        //booking
+        [HttpGet("branch-booking")]
+        public async Task<ActionResult<BookingDashboardResponse>> BranchDashboradBooking([FromQuery] Guid branchID, [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate)
+        {
+            return await _dashboardService.BookingDashboard(branchID, startDate, endDate);
+        }
+        [HttpGet("booking")]
+        public async Task<ActionResult<BookingDashboardResponse>> DashboradBooking([FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate)
+        {
+            return await _dashboardService.BookingDashboard(null, startDate, endDate);
         }
         //service
         [HttpGet("branch-service")]

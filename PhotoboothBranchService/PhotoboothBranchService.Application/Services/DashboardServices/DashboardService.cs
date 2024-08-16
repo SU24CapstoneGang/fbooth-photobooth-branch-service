@@ -2,6 +2,7 @@
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs.Background;
+using PhotoboothBranchService.Application.DTOs.Booking;
 using PhotoboothBranchService.Application.DTOs.Dashboard;
 using PhotoboothBranchService.Application.DTOs.Layout;
 using PhotoboothBranchService.Application.DTOs.Service;
@@ -126,13 +127,31 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
         public async Task<BookingDashboardResponse> BookingDashboard(Guid? branchID, DateOnly? startDate, DateOnly? endDate)
         {
             var result = new BookingDashboardResponse();
-            var bookings = await this.GetBookings(branchID, startDate, endDate, true);
+            var bookings = await this.GetBookings(branchID, startDate, endDate, true, i => i.FullPaymentPolicy);
             if (bookings.Count() == 0)
             {
                 return result;
             }
-            result.InFuture = bookings.Select(i => i.BookingStatus == BookingStatus.PendingChecking && i.StartTime > DateTimeHelper.GetVietnamTimeNow()).Count();
-            result.Completed = bookings.Select(i => i.PaymentStatus == PaymentStatus.Paid).Count();
+            //classify the booking
+            var inFuture = bookings.Where(i => i.BookingStatus == BookingStatus.PendingChecking && i.StartTime > DateTimeHelper.GetVietnamTimeNow()).ToList();
+            var completed = bookings.Where(i => i.PaymentStatus == PaymentStatus.Paid && i.BookingStatus == BookingStatus.CompleteChecked).ToList();
+            var canceleded = bookings.Where(i => i.BookingStatus == BookingStatus.Canceled || i.BookingStatus == BookingStatus.CancelledBySystem).ToList();
+            var needPayExtra = bookings.Where(i => i.PaymentStatus == PaymentStatus.PendingPayExtra).ToList();
+            var onGoing = bookings.Where(i => i.BookingStatus == BookingStatus.CompleteChecked).ToList();
+            var needRefund = bookings.Where(i => i.PaymentStatus == PaymentStatus.PendingRefund).ToList();
+            //caculate money
+            result.TotalRevenue = bookings.Sum(i => i.TotalPrice); 
+            result.TotalRefunded = canceleded.Where(i => i.BookingStatus == BookingStatus.Canceled && (i.PaymentStatus == PaymentStatus.Refunded || i.PaymentStatus == PaymentStatus.Refunded)).Sum(i => i.TotalPrice*i.FullPaymentPolicy.RefundPercent);
+            result.TotalRefunded += canceleded.Where(i => i.BookingStatus == BookingStatus.CancelledBySystem).Sum(i => i.TotalPrice);
+            result.TotalRevenue -= result.TotalRefunded;
+
+            //mapping
+            result.InFuture = _mapper.Map<List<BookingResponse>>(inFuture);
+            result.Completed = _mapper.Map<List<BookingResponse>>(completed);
+            result.Canceleded = _mapper.Map<List<BookingResponse>>(canceleded);
+            result.NeedPayExtra = _mapper.Map<List<BookingResponse>>(needPayExtra);
+            result.OnGoing = _mapper.Map<List<BookingResponse>>(onGoing);
+            result.NeedRefund = _mapper.Map<List<BookingResponse>>(needRefund);
             return result;
         }
         public async Task<List<DashboardServiceResponse>> DashboradService(Guid? branchID, DateOnly? startDate, DateOnly? endDate)
