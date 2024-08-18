@@ -68,9 +68,32 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
         }
 
         //refund 
-        public async Task<IEnumerable<RefundResponse>> RefundByBookingID(Guid orderId, bool isFullRefund, string? ipAddress, string? email)
+        public async Task<IEnumerable<RefundResponse>> RefundPending(Guid bookingId, string? ipAddress, string? email)
         {
-            var payments = (await _paymentRepository.GetAsync(i => i.BookingID == orderId && i.Status == TransactionStatus.Success)).ToList();
+            var booking = (await _bookingRepository.GetAsync(i => i.BookingID == bookingId)).SingleOrDefault();
+            if (booking == null)
+            {
+                throw new NotFoundException("Not found booking");
+            }
+            if (booking.PaymentStatus != PaymentStatus.PendingRefund)
+            {
+                throw new BadRequestException("Booking not in pending refund state to refund");
+            }
+            if (booking.BookingStatus == BookingStatus.Canceled)
+            {
+               return await this.RefundByBookingID(booking.BookingID, false, ipAddress, email);
+            }
+            else if (booking.BookingStatus == BookingStatus.CancelledBySystem)
+            {
+                return await this.RefundByBookingID(booking.BookingID, true, ipAddress, email);
+            } else
+            {
+                throw new BadRequestException("Booking not in cancel state to refund");
+            }
+        }
+        public async Task<IEnumerable<RefundResponse>> RefundByBookingID(Guid bookingId, bool isFullRefund, string? ipAddress, string? email)
+        {
+            var payments = (await _paymentRepository.GetAsync(i => i.BookingID == bookingId && i.Status == TransactionStatus.Success)).ToList();
             var responseList = new List<RefundResponse>();
             foreach (var trans in payments)
             {
@@ -218,7 +241,7 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                         PaymentID = payment.PaymentID,
                         Amount = refundAmount,
                         RefundDateTime = DateTimeHelper.GetVietnamTimeNow(),
-                        TransactionID = account.AccountID.ToString(),
+                        TransactionID = await this.GenerateTransactionIDForCash(account.AccountID),
                         ResponseMessage = "Success",
                         Description = $"Refund for transaction {payment.PaymentID}",
                         Status = RefundStatus.Success,
@@ -246,6 +269,23 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
         private async Task<long> TotalRefund(Guid transID) {
             var refunds = await _refundRepository.GetAsync(i => i.PaymentID == transID && i.Status != RefundStatus.Fail);
             return refunds.Sum(i => i.Amount);
+        }
+
+        private async Task<string> GenerateTransactionIDForCash(Guid accountID)
+        {
+            string result = "";
+            while (result.Equals(""))
+            {
+                Random random = new Random();
+                int randomDigits = random.Next(10000000, 100000000);
+                result = $"{accountID}-{randomDigits}";
+                var check = (await _refundRepository.GetAsync(i => i.TransactionID.Equals(result))).FirstOrDefault();
+                if (check != null)
+                {
+                    result = "";
+                }
+            }
+            return result;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
         Task<CreatePaymentResponse> CreateAsync(CreatePaymentRequest createModel, string ClientIpAddress, string? email);
         Task UpdateAsync(Guid id, UpdatePaymentRequest updateModel);
         Task DeleteAsync(Guid id);
-        Task<IEnumerable<PaymentResponse>> GetByBookingAsync(Guid sessionOrderID);
+        Task<IEnumerable<PaymentResponse>> GetByBookingAsync(Guid sessionOrderID, Guid? accountID);
         Task<IEnumerable<PaymentResponse>> GetCustomerTransaction(string? email);
         Task HandleMomoResponse(IQueryCollection queryString);
         Task<MomoIPNResponse> HandleMomoIPN(MoMoResponse moMoResponse);

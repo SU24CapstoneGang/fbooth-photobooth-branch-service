@@ -158,10 +158,6 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
         {
             var orders = await this.GetBookings(branchID, startDate, endDate, false);
             var serviceItem = await _bookingServiceRepository.GetAsync(i => orders.Select(o => o.BookingID).ToList().Contains(i.BookingID), i => i.Service);
-            if (serviceItem.Count() == 0)
-            {
-                return new List<DashboardServiceResponse>();
-            }
             var ServiceCount = serviceItem
                 .GroupBy(i => i.Service)
                 .Select(g => new DashboardServiceResponse
@@ -188,10 +184,6 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
         public async Task<List<DashboardLayoutResponse>> DashboardLayout(Guid? branchID, DateOnly? startDate, DateOnly? endDate)
         {
             var photoSessions = await this.GetPhotoSessions(branchID, startDate, endDate, i => i.Layout);
-            if (photoSessions.Count() == 0)
-            {
-                return new List<DashboardLayoutResponse>();
-            }
             var layoutCount = photoSessions
                 .GroupBy(i => i.Layout)
                 .Select(g => new DashboardLayoutResponse
@@ -218,10 +210,6 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
         public async Task<List<DashboardBackgroundResponse>> DashboardBackground(Guid? branchID, DateOnly? startDate, DateOnly? endDate)
         {
             var photos = await this.GetPhotos(branchID, startDate, endDate, i => i.Background);
-            if (photos.Count() == 0)
-            {
-                return new List<DashboardBackgroundResponse>();
-            }
             var backgroundCount = photos
                 .GroupBy(i => i.Background)
                 .Select(g => new DashboardBackgroundResponse
@@ -247,10 +235,6 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
         public async Task<List<DashboardStickerResponse>> DashboardSticker(Guid? branchID, DateOnly? startDate, DateOnly? endDate)
         {
             var photoStickers = await this.GetPhotoStickers(branchID, startDate, endDate, i => i.Sticker);
-            if (photoStickers.Count() == 0)
-            {
-                return new List<DashboardStickerResponse>();
-            }
             var stickerCount = photoStickers
                 .GroupBy(i => i.Sticker)
                 .Select(g => new DashboardStickerResponse

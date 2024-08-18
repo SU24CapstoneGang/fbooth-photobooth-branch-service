@@ -62,9 +62,11 @@ namespace PhotoboothBranchService.Api.Controllers
 
         }
         [HttpGet("booking/{bookingId}")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<PaymentResponse>>> GetPaymentsByBookingId(Guid bookingId)
         {
-            var payments = await _paymentService.GetByBookingAsync(bookingId);
+            var customerid = Request.HttpContext.Items["CustomerId"]?.ToString();
+            var payments = await _paymentService.GetByBookingAsync(bookingId, Guid.Parse(customerid));
             return Ok(payments);
 
         }

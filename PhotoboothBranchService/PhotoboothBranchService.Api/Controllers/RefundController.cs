@@ -37,6 +37,15 @@ namespace PhotoboothBranchService.Api.Controllers
             var response = await _refundService.RefundByTransID(request.transId, request.IsFullRefund, clientIp, email, true);
             return Ok(response);
         }
+        [HttpPost("/pending/{bookingID}")]
+        [Authorization("STAFF","ADMIN")]
+        public async Task<ActionResult<IEnumerable<RefundResponse>>> RefundByBookingID(Guid bookingID)
+        {
+            var clientIp = IpAddressHelper.GetClientIpAddress(HttpContext);
+            var email = Request.HttpContext.Items["Email"]?.ToString();
+            var response = await _refundService.RefundPending(bookingID, clientIp, email);
+            return Ok(response);
+        }
 
         //[HttpPost("/session-order")]
         //public async Task<ActionResult<(IEnumerable<RefundResponse> refundResponses, IEnumerable<PaymentResponse> failPayment)>> RefundByOrderID(RefundRequest request)

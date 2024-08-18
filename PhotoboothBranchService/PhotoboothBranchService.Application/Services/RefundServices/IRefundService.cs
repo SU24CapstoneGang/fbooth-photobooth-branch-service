@@ -14,5 +14,6 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
     {
         Task<RefundResponse> RefundByTransID(Guid transId, bool isFullRefund, string? ipAddress, string? email, bool isRecord);
         Task<IEnumerable<RefundResponse>> RefundByBookingID(Guid orderId, bool isFullRefund, string? ipAddress, string? email);
+        Task<IEnumerable<RefundResponse>> RefundPending(Guid bookingId, string? ipAddress, string? email);
     }
 }

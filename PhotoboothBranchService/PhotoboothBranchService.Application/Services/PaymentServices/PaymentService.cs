@@ -16,6 +16,7 @@ using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
+using System;
 using System.Formats.Asn1;
 using System.Net;
 
@@ -172,7 +173,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
 
                         createPaymentResponse.PaymentID = payment.PaymentID;
                         createPaymentResponse.TransactionUlr = createModel.ReturnUrl;
-                        payment.TransactionID = account.AccountID.ToString();
+                        payment.TransactionID = await this.GenerateTransactionIDForCash(account.AccountID);
                         payment.Status = TransactionStatus.Success;
                         await _paymentRepository.AddAsync(payment);
                         await this.UpdateAfterSuccessPaymentAsync(payment);
@@ -258,8 +259,25 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             var listPaymentResponse = _mapper.Map<IEnumerable<PaymentResponse>>(payments);
             return listPaymentResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.PaymentDateTime);
         }
-        public async Task<IEnumerable<PaymentResponse>> GetByBookingAsync(Guid bookingID)
+        public async Task<IEnumerable<PaymentResponse>> GetByBookingAsync(Guid bookingID, Guid? accountID)
         {
+            var acc = (await _accountRepository.GetAsync(i => i.AccountID == accountID)).FirstOrDefault();
+            if (acc == null || acc.Status == AccountStatus.Blocked)
+            {
+                throw new ForbiddenAccessException();
+            }
+            if (acc.Role == AccountRole.Customer)
+            {
+                var booking = (await _bookingRepository.GetAsync(i => i.BookingID == bookingID)).FirstOrDefault();
+                if (booking == null)
+                {
+                    throw new NotFoundException("Not found booking");
+                }
+                if (booking.CustomerID != accountID)
+                {
+                    throw new ForbiddenAccessException();
+                }
+            }
             var payments = await _paymentRepository.GetAsync(i => i.BookingID == bookingID);
             return _mapper.Map<IEnumerable<PaymentResponse>>(payments.ToList());
         }
@@ -393,6 +411,22 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                 await _paymentRepository.UpdateAsync(payment);
                 await _refundService.RefundByTransID(payment.PaymentID, true, null, null, false);
             }
+        }
+        private async Task<string> GenerateTransactionIDForCash(Guid accountID)
+        {
+            string result = "";
+            while (result.Equals(""))
+            {
+                Random random = new Random();
+                int randomDigits = random.Next(10000000, 100000000);
+                result = $"{accountID}-{randomDigits}";
+                var check = (await _paymentRepository.GetAsync(i => i.TransactionID.Equals(result))).FirstOrDefault();
+                if (check != null)
+                {
+                    result = "";
+                }
+            }
+            return result;
         }
     }
 }

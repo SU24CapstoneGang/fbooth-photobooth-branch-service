@@ -22,7 +22,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
         private readonly IBookingRepository _bookingRepository;
         public PhotoService(IPhotoRepository photoRepository, IMapper mapper,
             ICloudinaryService cloudinaryService, IPhotoSessionRepository photoSessionRepository,
-            IBackgroundRepository backgroundRepository, IStickerRepository stickerRepository)
+            IBackgroundRepository backgroundRepository, IStickerRepository stickerRepository, IBookingRepository bookingRepository)
         {
             _photoRepository = photoRepository;
             _mapper = mapper;
@@ -30,6 +30,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
             _photoSessionRepository = photoSessionRepository;
             _backgroundRepository = backgroundRepository;
             _stickerRepository = stickerRepository;
+            _bookingRepository = bookingRepository;
         }
 
         public async Task<PhotoResponse> CreatePhotoAsync(IFormFile file, CreatePhotoRequest createPhotoRequest)
