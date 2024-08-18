@@ -1,4 +1,5 @@
-﻿using PhotoboothBranchService.Domain.Enum;
+﻿using PhotoboothBranchService.Application.DTOs.Sticker;
+using PhotoboothBranchService.Domain.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,6 @@ namespace PhotoboothBranchService.Application.DTOs.StickerType
         public StatusUse Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime LastModified { get; set; }
+        public virtual ICollection<StickerResponse> Stickers { get; set; }
     }
 }

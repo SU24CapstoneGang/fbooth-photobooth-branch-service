@@ -33,20 +33,20 @@ namespace PhotoboothBranchService.Application.Services.StickerTypeServices
 
         public async Task<IEnumerable<StickerTypeResponse>> GetAllAsync()
         {
-            var stickerTypes = (await _stickerTypeRepository.GetAllAsync()).ToList();
+            var stickerTypes = (await _stickerTypeRepository.GetAsync(null, s => s.Stickers)).ToList();
             return _mapper.Map<IEnumerable<StickerTypeResponse>>(stickerTypes).OrderByDescending(i => i.CreatedDate);
         }
 
         public async Task<IEnumerable<StickerTypeResponse>> GetAllPagingAsync(StickerTypeFilter filter, PagingModel paging)
         {
-            var stickerTypes = (await _stickerTypeRepository.GetAllAsync()).ToList().AutoFilter(filter);
+            var stickerTypes = (await _stickerTypeRepository.GetAsync(null, s => s.Stickers)).ToList().AutoFilter(filter);
             var listStickerTypeResponse = _mapper.Map<IEnumerable<StickerTypeResponse>>(stickerTypes);
             return listStickerTypeResponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.CreatedDate);
         }
 
         public async Task<StickerTypeResponse> GetByIdAsync(Guid id)
         {
-            var stickerTypes = await _stickerTypeRepository.GetAsync(s => s.StickerTypeID == id);
+            var stickerTypes = await _stickerTypeRepository.GetAsync(s => s.StickerTypeID == id, s => s.Stickers);
             var stickerType = stickerTypes.FirstOrDefault();
             if (stickerType == null)
             {
