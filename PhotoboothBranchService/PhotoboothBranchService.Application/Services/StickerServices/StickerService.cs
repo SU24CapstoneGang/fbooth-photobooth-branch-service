@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Sticker;
@@ -16,20 +17,30 @@ public class StickerService : IStickerService
     private readonly IStickerRepository _stickerRepository;
     private readonly IMapper _mapper;
     private readonly ICloudinaryService _cloudinaryService;
+    private readonly IStickerTypeRepository _stickerTypeRepository;
 
-    public StickerService(IStickerRepository stickerRepository, IMapper mapper, ICloudinaryService cloudinaryService)
+    public StickerService(IStickerRepository stickerRepository, IMapper mapper, ICloudinaryService cloudinaryService, IStickerTypeRepository stickerTypeRepository)
     {
         _stickerRepository = stickerRepository;
         _mapper = mapper;
         _cloudinaryService = cloudinaryService;
+        _stickerTypeRepository = stickerTypeRepository;
     }
 
 
-    public async Task<StickerResponse> CreateStickerAsync(IFormFile file)
+    public async Task<StickerResponse> CreateStickerAsync(CreateStickerRequest request)
     {
-
+        var type = (await _stickerTypeRepository.GetAsync(i => i.StickerTypeID == request.StickerTypeID)).FirstOrDefault();
+        if (type == null)
+        {
+            throw new NotFoundException("Not found type to add");
+        }
+        if (type.Status == StatusUse.Unusable)
+        {
+            throw new BadRequestException("Type is unuseable, cannot add");
+        }
         //upload to cloudinary
-        var uploadResult = await _cloudinaryService.AddPhotoAsync(file, "FBooth-Sticker");
+        var uploadResult = await _cloudinaryService.AddPhotoAsync(request.File, "FBooth-Sticker");
         if (uploadResult.Error != null)
         {
             throw new Exception(uploadResult.Error.Message);
@@ -38,12 +49,13 @@ public class StickerService : IStickerService
         //create object from cloudinary's return 
         var sticker = new Sticker
         {
-            StickerCode = file.FileName,
+            StickerCode = request.File.FileName,
             stickerHeight = uploadResult.Height,
             stickerWidth = uploadResult.Width,
             StickerURL = uploadResult.SecureUrl.AbsoluteUri,
             CouldID = uploadResult.PublicId,
             Status = StatusUse.Available,
+            StickerTypeID = request.StickerTypeID,
         };
 
         await _stickerRepository.AddAsync(sticker);
