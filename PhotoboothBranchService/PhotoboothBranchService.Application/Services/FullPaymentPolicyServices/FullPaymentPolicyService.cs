@@ -80,8 +80,10 @@ namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
         public async Task ValidatePolicy()
         {
             var policyList = await _repository.GetAllAsync();
-            if (policyList.Any())
+            var checkList = policyList.Where(i => i.IsDefaultPolicy || i.IsActive);
+            if (checkList.Any() && checkList.Count() == 1)
             {
+
             }
         }
 

@@ -131,7 +131,7 @@ namespace PhotoboothBranchService.Application.Services.VNPayServices
             var vnp_TransactionType = request.RefundCategory;
             var vnp_Amount = request.Amount * 100;
             var vnp_TxnRef = request.PaymentID;
-            var vnp_OrderInfo = "Hoan tien giao dich:" + request.PaymentID;
+            var vnp_OrderInfo = "Hoan tien giao dich: " + request.PaymentID;
             var vnp_TransactionNo = request.TransId;
             var vnp_TransactionDate = request.PayDate.ToString("yyyyMMddHHmmss");
             var vnp_CreateDate = DateTimeHelper.GetVietnamTimeNow().ToString("yyyyMMddHHmmss");

@@ -68,12 +68,12 @@ namespace PhotoboothBranchService.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] CreateAccountRequestModel request, AccountRole userRole)
+        public async Task<IActionResult> Register([FromBody] CreateAccountRequestModel request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _authenticationService.Register(request, userRole);
+            var result = await _authenticationService.Register(request, AccountRole.Customer);
             if (result != null)
                 return Ok(result);
             return BadRequest("Registration failed. Please try again.");

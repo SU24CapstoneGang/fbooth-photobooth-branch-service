@@ -10,7 +10,5 @@ namespace PhotoboothBranchService.Application.DTOs.Slot
     {
         public Guid BoothID { get; set; }
         public DateOnly date {  get; set; }
-        public TimeSpan? startTime { get; set; }
-        public TimeSpan? endTime { get; set; }
     }
 }

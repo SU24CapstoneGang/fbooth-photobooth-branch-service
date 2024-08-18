@@ -32,13 +32,13 @@ namespace PhotoboothBranchService.Api.Controllers
         [HttpGet("booth")]
         public async Task<ActionResult<IEnumerable<SlotResponse>>> GetBoothFreeSLot([FromQuery]GetBoothFreeSlotRequest request)
         {
-            var slots = await _slotService.GetBoothFreeSlot(request.BoothID, request.date, request.startTime, request.endTime);
+            var slots = await _slotService.GetBoothFreeSlot(request.BoothID, request.date);
             return Ok(slots);
         }
         [HttpGet("branch")]
         public async Task<ActionResult<IEnumerable<SlotResponse>>> GetBranchFreeSLot([FromQuery] GetBranchFreeSlotRequest request)
         {
-            var slots = await _slotService.GetBranchFreeSlot(request.BranchID, request.date, request.startTime, request.endTime);
+            var slots = await _slotService.GetBranchFreeSlot(request.BranchID, request.date);
             return Ok(slots);
         }
     }

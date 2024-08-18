@@ -11,8 +11,8 @@ namespace PhotoboothBranchService.Application.Services.SlotServices
 {
     public interface ISlotService : IServiceBase<SlotResponse,SlotFilter,PagingModel>
     {
-        Task<IEnumerable<SlotResponse>> GetBoothFreeSlot(Guid boothID, DateOnly date, TimeSpan? startTime, TimeSpan? endTime);
+        Task<IEnumerable<SlotResponse>> GetBoothFreeSlot(Guid boothID, DateOnly date);
         Task<IEnumerable<SlotResponse>> AutoCreateSlotByBooth(AutoCreateSlotRequest request);
-        Task<IEnumerable<GetBranchFreeSlotResponse>> GetBranchFreeSlot(Guid BranchID, DateOnly date, TimeSpan? startTime, TimeSpan? endTime);
+        Task<IEnumerable<GetBranchFreeSlotResponse>> GetBranchFreeSlot(Guid BranchID, DateOnly date);
     }
 }

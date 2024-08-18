@@ -22,13 +22,15 @@ namespace PhotoboothBranchService.Application.Services.SlotServices
         private readonly IMapper _mapper;
         private readonly IBookingSlotRepository _bookingSlotRepository;
         private readonly IBoothRepository _boothRepository;
+        private readonly IBookingRepository _bookingRepository;
 
-        public SlotService(ISlotRepository slotRepository, IMapper mapper, IBookingSlotRepository bookingSlotRepository, IBoothRepository boothRepository)
+        public SlotService(ISlotRepository slotRepository, IMapper mapper, IBookingSlotRepository bookingSlotRepository, IBoothRepository boothRepository, IBookingRepository bookingRepository)
         {
             _slotRepository = slotRepository;
             _mapper = mapper;
             _bookingSlotRepository = bookingSlotRepository;
             _boothRepository = boothRepository;
+            _bookingRepository = bookingRepository;
         }
 
         public async Task<IEnumerable<SlotResponse>> GetAllAsync()
@@ -55,21 +57,20 @@ namespace PhotoboothBranchService.Application.Services.SlotServices
             return _mapper.Map<SlotResponse>(slot);
         }
 
-        public async Task<IEnumerable<SlotResponse>> GetBoothFreeSlot(Guid boothID, DateOnly date, TimeSpan? startTime, TimeSpan? endTime)
+        public async Task<IEnumerable<SlotResponse>> GetBoothFreeSlot(Guid boothID, DateOnly date)
         {
             //get booth's slot for a date
-            Expression<Func<Slot, bool>> pre = i => i.BoothID == boothID;
-            if (endTime != null && endTime != default(TimeSpan) && endTime.HasValue)
-            {
-                pre = LinQHelper.AndAlso(pre, so => so.SlotEndTime <= endTime);
-            }
-            if (endTime != null && endTime != default(TimeSpan) && endTime.HasValue)
-            {
-                pre = LinQHelper.AndAlso(pre, so => so.SlotEndTime <= endTime);
-            }
-            var slots = (await _slotRepository.GetAsync(pre)).ToList();
-            var idList = slots.Select(i => i.SlotID);
-            var usedSlots = await _bookingSlotRepository.GetAsync(i => idList.Contains(i.SlotID) && i.BookingDate == date);
+            var slots = (await _slotRepository.GetAsync(i => i.BoothID == boothID)).ToList();
+            var slotIdList = slots.Select(i => i.SlotID);
+
+
+            //get booking of date of the booth
+            var bookingIds = (await _bookingRepository.GetAsync(i => i.BoothID == boothID
+                                 && i.StartTime.Date == new DateTime(date.Year,date.Month,date.Day).Date
+                                 && i.BookingStatus != BookingStatus.Canceled && i.BookingStatus != BookingStatus.CancelledBySystem)).Select(i => i.BookingID).ToList();
+            
+            //get slot from booking id
+            var usedSlots = await _bookingSlotRepository.GetAsync(i => bookingIds.Contains(i.BookingID));
 
             // Create a hash set for quick lookup
             var usedSlotIds = new HashSet<Guid>(usedSlots.Select(i => i.SlotID));
@@ -82,7 +83,7 @@ namespace PhotoboothBranchService.Application.Services.SlotServices
             }
             return _mapper.Map<IEnumerable<SlotResponse>>(slots);
         }
-        public async Task<IEnumerable<GetBranchFreeSlotResponse>> GetBranchFreeSlot(Guid BranchID, DateOnly date, TimeSpan? startTime, TimeSpan? endTime)
+        public async Task<IEnumerable<GetBranchFreeSlotResponse>> GetBranchFreeSlot(Guid BranchID, DateOnly date)
         {
             var booths = (await _boothRepository.GetAsync(i => i.BranchID == BranchID && i.Status == BoothStatus.Active)).ToList();
             List<GetBranchFreeSlotResponse> results = new List<GetBranchFreeSlotResponse>();
@@ -95,7 +96,7 @@ namespace PhotoboothBranchService.Application.Services.SlotServices
                 results.Add(new GetBranchFreeSlotResponse
                 {
                     BoothID = booth.BoothID,
-                    Slots = await this.GetBoothFreeSlot(booth.BoothID, date, startTime, endTime)
+                    Slots = await this.GetBoothFreeSlot(booth.BoothID, date)
                 });
             }
             return results;
