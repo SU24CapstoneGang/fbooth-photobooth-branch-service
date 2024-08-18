@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using PhotoboothBranchService.Application.Common.Enum;
 using PhotoboothBranchService.Domain.Enum;
 using System.ComponentModel.DataAnnotations;
 

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Api.Common;
+using PhotoboothBranchService.Application.Common.Enum;
 using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Authentication;
 using PhotoboothBranchService.Application.Services.AccountServices;
@@ -73,6 +74,20 @@ namespace PhotoboothBranchService.Api.Controllers
                 return BadRequest(ModelState);
 
             var result = await _authenticationService.Register(request, userRole);
+            if (result != null)
+                return Ok(result);
+            return BadRequest("Registration failed. Please try again.");
+
+        }
+
+        [Authorization("ADMIN")]
+        [HttpPost("admin/register")]
+        public async Task<IActionResult> AdminRegister([FromBody] CreateAccountRequestModel request, AccountRoleForInput userRole)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _authenticationService.Register(request, (AccountRole)userRole);
             if (result != null)
                 return Ok(result);
             return BadRequest("Registration failed. Please try again.");

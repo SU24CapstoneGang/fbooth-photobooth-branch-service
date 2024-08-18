@@ -82,11 +82,11 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
                 {
                     responseList.Add(new RefundResponse
                     {
-                        TransactionID = new Guid(),
+                        PaymentID = new Guid(),
                         Status = RefundStatus.Fail,
                         Description = "",
                         RefundDateTime = DateTimeHelper.GetVietnamTimeNow(),
-                        GatewayTransactionID = trans.TransactionID,
+                        TransactionID = trans.TransactionID,
                         ResponseMessage = ex.Message,
                     });
                 }

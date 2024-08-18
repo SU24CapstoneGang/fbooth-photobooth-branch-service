@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
+using PhotoboothBranchService.Application.Common.Enum;
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
-using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Authentication;
 using PhotoboothBranchService.Application.Services.EmailServices;

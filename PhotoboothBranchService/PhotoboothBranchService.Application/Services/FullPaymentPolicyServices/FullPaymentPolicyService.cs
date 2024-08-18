@@ -77,6 +77,13 @@ namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
             }
             await _repository.RemoveAsync(policy);
         }
+        public async Task ValidatePolicy()
+        {
+            var policyList = await _repository.GetAllAsync();
+            if (policyList.Any())
+            {
+            }
+        }
 
         public async Task<IEnumerable<FullPaymentPolicyResponse>> GetAllAsync()
         {

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using PhotoboothBranchService.Application.DTOs;
+using PhotoboothBranchService.Application.Common.Enum;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
