@@ -14,7 +14,5 @@ namespace PhotoboothBranchService.Application.DTOs.Sticker
         public DateTime CreatedDate { get; set; }
         public DateTime LastModified { get; set; }
         public Guid StickerTypeID { get; set; }
-
-
     }
 }
