@@ -431,8 +431,8 @@ public class BookingService : IBookingService
     {
         var booking = (await _bookingRepository
             .GetAsync(i => i.BoothID == request.BoothID
-            && i.StartTime > DateTimeHelper.GetVietnamTimeNow()
-            && i.EndTime < DateTimeHelper.GetVietnamTimeNow()))
+            && i.StartTime < DateTimeHelper.GetVietnamTimeNow()
+            && i.EndTime > DateTimeHelper.GetVietnamTimeNow()))
             .SingleOrDefault();
         if (booking == null)
         {

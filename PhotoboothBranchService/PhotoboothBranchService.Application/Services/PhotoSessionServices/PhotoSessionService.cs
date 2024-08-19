@@ -65,7 +65,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
         {
             var timeNow = DateTimeHelper.GetVietnamTimeNow();
             var validStatus = new[] { BookingStatus.TakingPhoto, BookingStatus.ExtraService };
-            if (booking.BookingStatus == BookingStatus.Canceled)
+            if (booking.BookingStatus == BookingStatus.Canceled || booking.BookingStatus == BookingStatus.CancelledBySystem)
             {
                 throw new BadRequestException("Booking is cancelled!");
             } else if (!validStatus.Contains(booking.BookingStatus)) {

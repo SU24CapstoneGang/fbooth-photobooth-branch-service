@@ -95,6 +95,20 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
         {
             var payments = (await _paymentRepository.GetAsync(i => i.BookingID == bookingId && i.Status == TransactionStatus.Success)).ToList();
             var responseList = new List<RefundResponse>();
+            if (!payments.Any()) 
+            {
+                payments = (await _paymentRepository.GetAsync(i => i.BookingID == bookingId)).ToList();
+                if (payments.All(i => i.Status == TransactionStatus.RefundedFull || i.Status == TransactionStatus.RefundedPartial))
+                {
+                    var booking = (await _bookingRepository.GetAsync(i => i.BookingID == bookingId)).FirstOrDefault();
+                    if (booking != null)
+                    {
+                        booking.PaymentStatus = PaymentStatus.Refunded;
+                        await _bookingRepository.UpdateAsync(booking);
+                    }
+                    return responseList;
+                }
+            }
             foreach (var trans in payments)
             {
                 try

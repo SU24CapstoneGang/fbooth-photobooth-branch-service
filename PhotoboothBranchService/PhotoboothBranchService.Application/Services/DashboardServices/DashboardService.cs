@@ -141,7 +141,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             var needRefund = bookings.Where(i => i.PaymentStatus == PaymentStatus.PendingRefund).ToList();
             //caculate money
             result.TotalRevenue = bookings.Sum(i => i.TotalPrice); 
-            result.TotalRefunded = canceleded.Where(i => i.BookingStatus == BookingStatus.Canceled && (i.PaymentStatus == PaymentStatus.Refunded || i.PaymentStatus == PaymentStatus.Refunded)).Sum(i => i.TotalPrice*i.FullPaymentPolicy.RefundPercent);
+            result.TotalRefunded = canceleded.Where(i => i.BookingStatus == BookingStatus.Canceled && (i.PaymentStatus == PaymentStatus.Refunded || i.PaymentStatus == PaymentStatus.PendingRefund)).Sum(i => i.TotalPrice*i.FullPaymentPolicy.RefundPercent/100);
             result.TotalRefunded += canceleded.Where(i => i.BookingStatus == BookingStatus.CancelledBySystem).Sum(i => i.TotalPrice);
             result.TotalRevenue -= result.TotalRefunded;
 
