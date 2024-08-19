@@ -430,10 +430,8 @@ public class BookingService : IBookingService
     public async Task CloseBooking(CloseBookingRequest request)
     {
         var booking = (await _bookingRepository
-            .GetAsync(i => i.BoothID == request.BoothID
-            && i.StartTime > DateTimeHelper.GetVietnamTimeNow()
-            && i.EndTime < DateTimeHelper.GetVietnamTimeNow()))
-            .SingleOrDefault();
+            .GetAsync(i => i.BoothID == request.BoothID))
+            .FirstOrDefault();
         if (booking == null)
         {
             throw new NotFoundException("Booking not found");
