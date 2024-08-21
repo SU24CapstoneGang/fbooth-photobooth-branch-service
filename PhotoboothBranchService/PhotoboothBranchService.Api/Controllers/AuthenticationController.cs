@@ -48,13 +48,12 @@ namespace PhotoboothBranchService.Api.Controllers
 
         [HttpGet("forget-password")]
         [AllowAnonymous]
-        public async Task<IActionResult> ForgetPassword(string email)
+        public async Task<IActionResult> ForgetPassword(string username)
         {
-            var result = await _authenticationService.ResetPassword(email);
-            if (result != null)
-                return Ok(result);
-            return BadRequest();
+            await _authenticationService.ForgetPassword(username);
+            return Ok();
         }
+
         [HttpGet("profile/reset-password-link")]
         [Authorize]
         public async Task<IActionResult> ResetPassword()
@@ -68,7 +67,7 @@ namespace PhotoboothBranchService.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] CreateAccountRequestModel request)
+        public async Task<IActionResult> CustomerRegister([FromBody] CreateAccountRequestModel request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -81,7 +80,7 @@ namespace PhotoboothBranchService.Api.Controllers
         }
 
         [Authorization("ADMIN")]
-        [HttpPost("admin/register")]
+        [HttpPost("admin/register/{userRole}")]
         public async Task<IActionResult> AdminRegister([FromBody] CreateAccountRequestModel request, AccountRoleForInput userRole)
         {
             if (!ModelState.IsValid)
@@ -91,7 +90,6 @@ namespace PhotoboothBranchService.Api.Controllers
             if (result != null)
                 return Ok(result);
             return BadRequest("Registration failed. Please try again.");
-
         }
 
         [HttpPost("refresh-token")]

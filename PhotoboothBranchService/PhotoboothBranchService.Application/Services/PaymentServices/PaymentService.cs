@@ -281,7 +281,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             var payments = await _paymentRepository.GetAsync(i => i.BookingID == bookingID);
             return _mapper.Map<IEnumerable<PaymentResponse>>(payments.ToList());
         }
-        public async Task<IEnumerable<PaymentResponse>> GetByOrderIdAsync(Guid id)
+        public async Task<IEnumerable<PaymentResponse>> GetByBookingIdAsync(Guid id)
         {
             var payments = await _paymentRepository.GetAsync(p => p.BookingID == id);
             return _mapper.Map<IEnumerable<PaymentResponse>>(payments);

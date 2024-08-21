@@ -180,5 +180,6 @@ namespace PhotoboothBranchService.Application.Services.AuthenticationServices
             throw new BadRequestException("Refresh token fail!!!");
 
         }
+
     }
 }

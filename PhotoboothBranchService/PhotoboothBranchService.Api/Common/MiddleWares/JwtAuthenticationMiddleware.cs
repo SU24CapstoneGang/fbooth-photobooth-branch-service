@@ -1,4 +1,5 @@
 ﻿using FirebaseAdmin.Auth;
+using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Domain.IRepository;
 
@@ -37,7 +38,12 @@ namespace PhotoboothBranchService.Api.Common.MiddleWares
                         {
                             role = account.Role.ToString();
                             accountId = account.AccountID;
+                            if (account.Status == Domain.Enum.AccountStatus.Blocked)
+                            {
+                                throw new ForbiddenAccessException("Account has been blocked by system");
+                            }
                         }
+
                     }
                     context.Items["Role"] = role;
                     context.Items["Email"] = email;

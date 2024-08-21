@@ -86,7 +86,16 @@ namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
 
             }
         }
-
+        public async Task<Guid> GetApplicablePolicyIdAsync(DateTime startTime)
+        {
+            var policies = await _repository.GetAsync(p => p.IsActive && (p.StartDate == null || p.StartDate <= DateOnly.FromDateTime(startTime)) && (p.EndDate == null || p.EndDate >= DateOnly.FromDateTime(startTime)));
+            var policy = policies.FirstOrDefault();
+            if (policy == null)
+            {
+                throw new Exception("Not found policy");
+            }
+            return policy.FullPaymentPolicyID;
+        }
         public async Task<IEnumerable<FullPaymentPolicyResponse>> GetAllAsync()
         {
             var policy = await _repository.GetAllAsync();

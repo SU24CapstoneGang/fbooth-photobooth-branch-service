@@ -11,5 +11,6 @@ namespace PhotoboothBranchService.Application.Services.FullPaymentPolicyServices
         Task<FullPaymentPolicyResponse> CreatePolicy(CreatePolicyRequestModel layoutRequest);
         Task DeleteAsync(Guid id);
         Task UpdatePolicyAsync(Guid id, UpdatePolicyRequestModel policyRequest );
+        Task<Guid> GetApplicablePolicyIdAsync(DateTime startTime);
     }
 }

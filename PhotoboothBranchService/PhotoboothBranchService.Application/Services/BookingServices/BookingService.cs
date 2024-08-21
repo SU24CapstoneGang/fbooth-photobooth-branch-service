@@ -11,6 +11,7 @@ using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Application.Services.AuthenticationServices;
 using PhotoboothBranchService.Application.Services.BookingServiceServices;
 using PhotoboothBranchService.Application.Services.EmailServices;
+using PhotoboothBranchService.Application.Services.FullPaymentPolicyServices;
 using PhotoboothBranchService.Application.Services.RefundServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
@@ -31,7 +32,7 @@ public class BookingService : IBookingService
     private readonly IBookingServiceService _bookingServiceService;
     private readonly IAccountService _accountService;
     private readonly IRefundService _refundService;
-    private readonly IFullPaymentPolicyRepository _fullPaymentPolicyRepository;
+    private readonly IFullPaymentPolicyService _fullPaymentPolicyService;
     private readonly IEmailService _emailService;
     private readonly ISlotRepository _slotRepository;
     private readonly IBookingSlotRepository _bookingSlotRepository;
@@ -40,7 +41,7 @@ public class BookingService : IBookingService
         IMapper mapper,
         IBoothRepository boothRepository,
         IRefundService refundService,
-        IFullPaymentPolicyRepository fullPaymentPolicyRepository,
+        IFullPaymentPolicyService fullPaymentPolicyService,
         ISlotRepository slotRepository,
         IEmailService emailService,
         IBookingSlotRepository bookingSlotRepository,
@@ -53,7 +54,7 @@ public class BookingService : IBookingService
         _boothRepository = boothRepository;
         _accountService = accountService;
         _refundService = refundService;
-        _fullPaymentPolicyRepository = fullPaymentPolicyRepository;
+        _fullPaymentPolicyService = fullPaymentPolicyService;
         _emailService = emailService;
         _slotRepository = slotRepository;
         _bookingSlotRepository = bookingSlotRepository;
@@ -95,7 +96,7 @@ public class BookingService : IBookingService
         booking.BookingServices = processedServices.Item2;
         booking.PaymentStatus = PaymentStatus.Processing;
         booking.CustomerBusinessID = this.GenerateCustomerReferenceID(account.FirstName, account.LastName);
-        booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(booking.StartTime);
+        booking.FullPaymentPolicyID = await _fullPaymentPolicyService.GetApplicablePolicyIdAsync(booking.StartTime);
         booking.BookingSlots = processSlot.Item2;
         // Save booking
         await _bookingRepository.AddAsync(booking);
@@ -399,7 +400,7 @@ public class BookingService : IBookingService
             lastName = res.LastName;
         }
         booking.CustomerBusinessID = this.GenerateCustomerReferenceID(firstName, lastName);
-        booking.FullPaymentPolicyID = await GetApplicablePolicyIdAsync(updateBooking.StartTime);
+        booking.FullPaymentPolicyID = await _fullPaymentPolicyService.GetApplicablePolicyIdAsync(updateBooking.StartTime);
         //delete old booking service
         await _bookingServiceService.DeleteByBookingIdAsync(booking.BookingID);
         // and add new
@@ -537,19 +538,19 @@ public class BookingService : IBookingService
         var booking = (await _bookingRepository.GetAsync(i => i.BookingID == bookingID, i => i.FullPaymentPolicy)).FirstOrDefault();
         if (null == booking)
         {
-            throw new Exception("Booking not found");
+            throw new NotFoundException("Booking not found");
         }
         if (booking.BookingStatus == BookingStatus.TakingPhoto || booking.BookingStatus == BookingStatus.ExtraService)
         {
-            throw new Exception("Booking is going, cannot cancel.");
+            throw new BadRequestException("Booking is going, cannot cancel.");
         }
         if (booking.BookingStatus == BookingStatus.Canceled)
         {
-            throw new Exception("Booking already canceled.");
+            throw new BadRequestException("Booking already canceled.");
         }
         if (booking.EndTime < DateTimeHelper.GetVietnamTimeNow() || booking.BookingStatus == BookingStatus.NoShow || booking.BookingStatus == BookingStatus.CompleteChecked)
         {
-            throw new Exception("Booking has ended, can not cancel.");
+            throw new BadRequestException("Booking has ended, can not cancel.");
         }
 
         return booking;
@@ -627,7 +628,7 @@ public class BookingService : IBookingService
         }
         return code;
     }
-    public string GenerateCustomerReferenceID(string firstName, string lastName)
+    private string GenerateCustomerReferenceID(string firstName, string lastName)
     {
         // Combine firstName and lastName
         string fullName = $"{firstName} {lastName}";
@@ -660,16 +661,6 @@ public class BookingService : IBookingService
         }
 
         return booth;
-    }
-    private async Task<Guid> GetApplicablePolicyIdAsync(DateTime startTime)
-    {
-        var policies = await _fullPaymentPolicyRepository.GetAsync(p => p.IsActive && (p.StartDate == null || p.StartDate <= DateOnly.FromDateTime(startTime)) && (p.EndDate == null || p.EndDate >= DateOnly.FromDateTime(startTime)));
-        var policy = policies.FirstOrDefault();
-        if (policy == null)
-        {
-            throw new Exception("Not found policy");
-        }
-        return policy.FullPaymentPolicyID;
     }
 }
 
