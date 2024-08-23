@@ -22,6 +22,12 @@ public class StickerController : ControllerBaseApi
         var stickers = await _stickerService.GetAllAsync();
         return Ok(stickers);
     }
+    [HttpGet("active-sticker")]
+    public async Task<ActionResult<IEnumerable<StickerResponse>>> CustomerGetAllStickers()
+    {
+        var stickers = await _stickerService.CustomerGetAll();
+        return Ok(stickers);
+    }
 
     //get all with filter and paging
     [HttpGet("paging")]

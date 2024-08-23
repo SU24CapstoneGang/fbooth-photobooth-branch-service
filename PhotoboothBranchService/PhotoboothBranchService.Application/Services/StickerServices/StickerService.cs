@@ -9,6 +9,7 @@ using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
+using System.Xml.Linq;
 
 namespace PhotoboothBranchService.Application.Services.StickerServices;
 
@@ -103,6 +104,12 @@ public class StickerService : IStickerService
     public async Task<IEnumerable<StickerResponse>> GetByName(string name)
     {
         var stickers = await _stickerRepository.GetAsync(s => s.StickerCode.Contains(name));
+        return _mapper.Map<IEnumerable<StickerResponse>>(stickers.ToList());
+    }
+    public async Task<IEnumerable<StickerResponse>> CustomerGetAll()
+    {
+        var types = (await _stickerTypeRepository.GetAsync(i => i.Status == StatusUse.Available, i => i.Stickers)).ToList();
+        var stickers = types.SelectMany(i => i.Stickers).Where(i => i.Status == StatusUse.Available);
         return _mapper.Map<IEnumerable<StickerResponse>>(stickers.ToList());
     }
 

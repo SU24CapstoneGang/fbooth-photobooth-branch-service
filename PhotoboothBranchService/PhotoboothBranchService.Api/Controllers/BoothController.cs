@@ -54,7 +54,6 @@ public class BoothController : ControllerBaseApi
         var booths = await _boothService.GetAllAsync();
         return Ok(booths);
     }
-
     [HttpGet("staff")]
     [Authorization("STAFF")]
     public async Task<ActionResult<IEnumerable<BoothResponse>>> StaffGetAllBooths()
@@ -82,9 +81,9 @@ public class BoothController : ControllerBaseApi
 
     }
     [HttpGet("active-booth")]
-    public async Task<ActionResult<IEnumerable<BoothResponse>>> GetAvtiveBoothByTime([FromQuery]GetAvtiveBoothByTimeRequest request)
+    public async Task<ActionResult<IEnumerable<BoothResponse>>> CustomerGetAll()
     {
-        var booths = await _boothService.GetAvtiveBoothByTime(request);
+        var booths = await _boothService.CustomerGetAllAsync();
         return Ok(booths);
     }
 

@@ -317,7 +317,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             }
 
             //make sure endtime after start time
-            if (endDate <= startDate && isStart && isEnd)
+            if (endDate < startDate && isStart && isEnd)
             {
                 throw new BadRequestException("The end date must be later than the start date.");
             }

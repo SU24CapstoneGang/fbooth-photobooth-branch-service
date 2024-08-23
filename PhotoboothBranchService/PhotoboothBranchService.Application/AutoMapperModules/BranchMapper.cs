@@ -11,20 +11,15 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
         {
             CreateMap<CreateBranchRequest, Branch>().ReverseMap().HandleNullProperty();
             CreateMap<UpdateBranchRequest, Branch>()
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+     .ForMember(dest => dest.BranchName, opt => opt.MapFrom((src, dest) => src.BranchName ?? dest.BranchName))
+     .ForMember(dest => dest.Address, opt => opt.MapFrom((src, dest) => src.Address ?? dest.Address))
+     .ForMember(dest => dest.Town, opt => opt.MapFrom((src, dest) => src.Town ?? dest.Town))
+     .ForMember(dest => dest.City, opt => opt.MapFrom((src, dest) => src.City ?? dest.City))
+     .ForMember(dest => dest.Status, opt => opt.MapFrom((src, dest) => src.Status.HasValue ? src.Status.Value : dest.Status));
             CreateMap<Branch, BranchResponse>()
-                //.ForMember(des => des.AccountName, opt => opt.MapFrom<FullNameResolver>())
                 .ReverseMap()
                 .HandleNullProperty();
             CreateMap<Branch, CreateBranchResponse>().HandleNullProperty();
         }
     }
-
-    //public class FullNameResolver : IValueResolver<PhotoBoothBranch, PhotoBoothBranchresponse, string>
-    //{
-    //    public string Resolve(PhotoBoothBranch source, PhotoBoothBranchresponse destination, string destMember, ResolutionContext context)
-    //    {
-    //        return $"{source.Account.FirstName} {source.Account.LastName}";
-    //    }
-    //}
 }

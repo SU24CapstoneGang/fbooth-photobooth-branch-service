@@ -214,25 +214,12 @@ public class BookingService : IBookingService
     // Get 
     public async Task<IEnumerable<BookingResponse>> GetAllAsync()
     {
-        var bookings = (await _bookingRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
-            {
-                i => i.BookingServices,
-                i => i.FullPaymentPolicy
-            })).ToList();
-        foreach (var booking in bookings)
-        {
-            var list = await _bookingServiceService.GetByBookingIdAsync(booking.BookingID);
-            booking.BookingServices = list.ToList();
-        }
+        var bookings = (await _bookingRepository.GetAsync()).ToList();
         return _mapper.Map<IEnumerable<BookingResponse>>(bookings.ToList().OrderByDescending(i => i.StartTime));
     }
     public async Task<IEnumerable<BookingResponse>> GetAllPagingAsync(BookingFilter filter, PagingModel paging)
     {
-        var sessions = (await _bookingRepository.GetAsync(null, includeProperties: new Expression<Func<Booking, object>>[]
-            {
-                i => i.BookingServices,
-                i => i.FullPaymentPolicy
-            })).ToList().AutoFilter(filter);
+        var sessions = (await _bookingRepository.GetAsync()).ToList().AutoFilter(filter);
         var listSessionresponse = _mapper.Map<IEnumerable<BookingResponse>>(sessions);
         return listSessionresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).ToList().OrderByDescending(i => i.StartTime);
     }
@@ -348,7 +335,7 @@ public class BookingService : IBookingService
         {
             throw new ForbiddenAccessException();
         }
-        return _mapper.Map<IEnumerable<BookingResponse>>(responses.OrderBy(i => i.StartTime).ToList());
+        return _mapper.Map<IEnumerable<BookingResponse>>(responses.OrderBy(i => i.CreatedDate).ToList());
     }
     // Update a session
     public async Task<CreateBookingResponse> UpdateAsync(Guid id, UpdateBookingRequest updateModel, string? email)

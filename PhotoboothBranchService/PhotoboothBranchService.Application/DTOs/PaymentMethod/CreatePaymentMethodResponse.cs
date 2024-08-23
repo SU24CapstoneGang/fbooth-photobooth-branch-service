@@ -6,7 +6,7 @@ namespace PhotoboothBranchService.Application.DTOs.PaymentMethod
     {
         public Guid PaymentMethodID { get; set; }
         public string PaymentMethodName { get; set; } = default!;
-        public DateTime CreateDate { get; set; }
+        public DateTime CreatedDate { get; set; }
         public PaymentMethodStatus Status { get; set; }
     }
 }

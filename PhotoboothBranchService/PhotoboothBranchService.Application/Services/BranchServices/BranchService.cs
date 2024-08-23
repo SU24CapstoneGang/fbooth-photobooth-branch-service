@@ -98,7 +98,7 @@ public class BranchService : IBranchService
     {
         var branches = (await _branchRepository.GetAsync(null, bth => bth.Booths, bth => bth.BranchPhotos)).ToList().AutoFilter(filter);
         var listBranchresponse = _mapper.Map<IEnumerable<BranchResponse>>(branches);
-        return listBranchresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.CreateDate);
+        return listBranchresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.CreatedDate);
     }
 
     public async Task<BranchResponse> GetByIdAsync(Guid id)
@@ -129,10 +129,6 @@ public class BranchService : IBranchService
         }
 
         var updateBranch = _mapper.Map(updateModel, branch);
-        if (updateBranch.ClosingTime < updateBranch.OpeningTime)
-        {
-            throw new BadRequestException("Closing time must after the opening time");
-        }
         await _branchRepository.UpdateAsync(updateBranch);
     }
 

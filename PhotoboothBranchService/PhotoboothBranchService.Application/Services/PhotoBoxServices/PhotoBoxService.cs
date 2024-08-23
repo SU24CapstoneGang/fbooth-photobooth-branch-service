@@ -84,7 +84,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoBoxServices
             var photoBox = (await _photoBoxRepository.GetAsync(m => m.PhotoBoxID == id)).FirstOrDefault();
             if (photoBox == null)
             {
-                throw new KeyNotFoundException("Map Sticker not found.");
+                throw new KeyNotFoundException("Photo box not found.");
             }
 
             var updatePhotoBox = _mapper.Map(updateModel, photoBox);

@@ -80,6 +80,12 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
             var booths = await _boothRepository.GetAsync(null, bth => bth.BoothPhotos);
             return _mapper.Map<IEnumerable<BoothResponse>>(booths.ToList().OrderByDescending(i => i.CreatedDate));
         }
+        public async Task<IEnumerable<BoothResponse>> CustomerGetAllAsync()
+        {
+            var branchIdList = (await _branchRepository.GetAsync(i => i.Status == BranchStatus.Active, i => i.Booths)).ToList();
+            var booths = branchIdList.SelectMany(i => i.Booths).Where(i => i.Status != BoothStatus.Inactive);
+            return _mapper.Map<IEnumerable<BoothResponse>>(booths.ToList().OrderByDescending(i => i.CreatedDate));
+        }
         public async Task<IEnumerable<BoothResponse>> StaffGetAllAsync(string? email)
         {
             var acc = (await _accountRepository.GetAsync(i => i.Email.Equals(email) && i.Status == AccountStatus.Active)).FirstOrDefault();
@@ -98,21 +104,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         {
             var booths = (await _boothRepository.GetAsync(null, bth => bth.BoothPhotos)).ToList().AutoFilter(filter);
             var listBoothresponse = _mapper.Map<IEnumerable<BoothResponse>>(booths);
-            return listBoothresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.PricePerHour);
-        }
-        public async Task<IEnumerable<BoothResponse>> GetAvtiveBoothByTime(GetAvtiveBoothByTimeRequest request)
-        {
-            var booths = (await _boothRepository.GetAsync(i => i.BranchID == request.BranchID)).ToList(); //get booth from branch
-
-            var boothid = booths.Select(i => i.BoothID).ToList();//convert to id list 
-            var bookingBoothid = (await _bookingRepository.GetAsync(i => boothid.Contains(i.BoothID) //id list used here
-                         && ((request.StartTime < i.StartTime && i.StartTime < request.EndTime.AddMinutes(5)) || (request.EndTime.AddMinutes(5) > i.EndTime.AddMinutes(5) && i.EndTime.AddMinutes(5) > request.StartTime))
-                         && i.BookingStatus != BookingStatus.Canceled && i.BookingStatus != BookingStatus.CancelledBySystem)).Select(i => i.Booth).Distinct().ToList();
-
-            var result = booths.Except(bookingBoothid); // branch booth's collectiong - findout booth's collection = active booth's collection
-
-            var listBoothresponse = _mapper.Map<IEnumerable<BoothResponse>>(result).ToList();
-            return listBoothresponse;
+            return listBoothresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
         }
         public async Task<BoothResponse> GetByIdAsync(Guid id)
         {

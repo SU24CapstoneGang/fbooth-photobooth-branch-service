@@ -87,9 +87,9 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                     }
                 }
 
-                //no showing & booking
+                //no showing & finish booking
                 bookings = (await bookingRepository.GetAsync(o =>
-                    (o.BookingStatus == BookingStatus.PendingChecking || o.BookingStatus == BookingStatus.TakingPhoto) &&
+                    (o.BookingStatus == BookingStatus.PendingChecking || o.BookingStatus == BookingStatus.TakingPhoto || o.BookingStatus == BookingStatus.ExtraService) &&
                      o.EndTime <= now)).ToList();
                 foreach (var booking in bookings)
                 {

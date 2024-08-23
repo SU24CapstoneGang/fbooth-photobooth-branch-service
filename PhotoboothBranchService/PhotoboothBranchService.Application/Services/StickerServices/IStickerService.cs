@@ -12,5 +12,5 @@ public interface IStickerService : IServiceBase<StickerResponse, StickerFilter, 
     Task DeleteAsync(Guid id);
     Task<StickerResponse> CreateStickerAsync(CreateStickerRequest request);
     Task UpdateStickerAsync(IFormFile file, Guid StickerId, UpdateStickerRequest updateStickerRequest);
-
+    Task<IEnumerable<StickerResponse>> CustomerGetAll();
 }

@@ -12,7 +12,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         Task<CreateBoothResponse> CreateAsync(CreateBoothRequest createModel);
         Task<BoothResponse> AddPhotoForBooth(Guid boothID, IFormFile file);
         Task<IEnumerable<BoothResponse>> StaffGetAllAsync(string? email);
-        Task<IEnumerable<BoothResponse>> GetAvtiveBoothByTime(GetAvtiveBoothByTimeRequest request);
+        Task<IEnumerable<BoothResponse>> CustomerGetAllAsync();
         Task UpdateAsync(Guid id, UpdateBoothRequest updateModel);
         Task DeleteAsync(Guid id);
     }

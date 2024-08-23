@@ -8,7 +8,7 @@ namespace PhotoboothBranchService.Application.DTOs.Photo
         public string PhotoURL { get; set; } = default!;
         public PhotoVersion Version { get; set; }
         public string CouldID { get; set; } = default!;
-        public DateTime CreateDate { get; set; }
+        public DateTime CreatedDate { get; set; }
         public Guid PhotoSessionID { get; set; }
         public Guid BackgroundID { get; set; }
         public Dictionary<Guid, int> StickerList { get; set; } = new Dictionary<Guid, int>();

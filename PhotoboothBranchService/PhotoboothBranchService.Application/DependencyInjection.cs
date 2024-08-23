@@ -88,7 +88,8 @@ namespace PhotoboothBranchService.Application
             services.AddHttpClient<IJwtService, JwtService>();
 
             //Mapper config
-            services.AddAutoMapper(cfg => cfg.Internal().MethodMappingEnabled = false, Assembly.GetExecutingAssembly());
+            services.AddAutoMapper(cfg => cfg.Internal().MethodMappingEnabled = true, Assembly.GetExecutingAssembly());
+            //services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //firebase authen config
             FirebaseApp.Create(new AppOptions
             {

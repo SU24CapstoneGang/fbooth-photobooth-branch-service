@@ -80,7 +80,7 @@ namespace PhotoboothBranchService.Api.Controllers
         }
 
         [Authorization("ADMIN")]
-        [HttpPost("admin/register/{userRole}")]
+        [HttpPost("admin/register")]
         public async Task<IActionResult> AdminRegister([FromBody] CreateAccountRequestModel request, AccountRoleForInput userRole)
         {
             if (!ModelState.IsValid)
