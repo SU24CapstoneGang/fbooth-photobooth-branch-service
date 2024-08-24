@@ -11,7 +11,6 @@ using PhotoboothBranchService.Application.Services.AccountServices;
 using PhotoboothBranchService.Application.Services.AuthenticationServices;
 using PhotoboothBranchService.Application.Services.BookingServiceServices;
 using PhotoboothBranchService.Application.Services.EmailServices;
-using PhotoboothBranchService.Application.Services.FullPaymentPolicyServices;
 using PhotoboothBranchService.Application.Services.RefundServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
@@ -32,7 +31,6 @@ public class BookingService : IBookingService
     private readonly IBookingServiceService _bookingServiceService;
     private readonly IAccountService _accountService;
     private readonly IRefundService _refundService;
-    private readonly IFullPaymentPolicyService _fullPaymentPolicyService;
     private readonly IEmailService _emailService;
     private readonly ISlotRepository _slotRepository;
     private readonly IBookingSlotRepository _bookingSlotRepository;
@@ -41,7 +39,6 @@ public class BookingService : IBookingService
         IMapper mapper,
         IBoothRepository boothRepository,
         IRefundService refundService,
-        IFullPaymentPolicyService fullPaymentPolicyService,
         ISlotRepository slotRepository,
         IEmailService emailService,
         IBookingSlotRepository bookingSlotRepository,
@@ -54,7 +51,6 @@ public class BookingService : IBookingService
         _boothRepository = boothRepository;
         _accountService = accountService;
         _refundService = refundService;
-        _fullPaymentPolicyService = fullPaymentPolicyService;
         _emailService = emailService;
         _slotRepository = slotRepository;
         _bookingSlotRepository = bookingSlotRepository;
@@ -96,7 +92,6 @@ public class BookingService : IBookingService
         booking.BookingServices = processedServices.Item2;
         booking.PaymentStatus = PaymentStatus.Processing;
         booking.CustomerBusinessID = this.GenerateCustomerReferenceID(account.FirstName, account.LastName);
-        booking.FullPaymentPolicyID = await _fullPaymentPolicyService.GetApplicablePolicyIdAsync(booking.StartTime);
         booking.BookingSlots = processSlot.Item2;
         // Save booking
         await _bookingRepository.AddAsync(booking);
@@ -236,11 +231,7 @@ public class BookingService : IBookingService
     }
     public async Task<BookingResponse> GetByIdAsync(Guid id)
     {
-        var booking = (await _bookingRepository.GetAsync(s => s.BookingID == id,
-            includeProperties: new Expression<Func<Booking, object>>[]
-            {
-                 i => i.FullPaymentPolicy,
-            })).FirstOrDefault();
+        var booking = (await _bookingRepository.GetAsync(s => s.BookingID == id)).FirstOrDefault();
 
         if (booking == null)
         {
@@ -254,11 +245,7 @@ public class BookingService : IBookingService
     }
     public async Task<IEnumerable<BookingResponse>> SearchByReferenceIDAsync(string id)
     {
-        var bookings = (await _bookingRepository.GetAsync(s => s.CustomerBusinessID.Contains(id),
-            includeProperties: new Expression<Func<Booking, object>>[]
-            {
-                 i => i.FullPaymentPolicy
-            })).ToList();
+        var bookings = (await _bookingRepository.GetAsync(s => s.CustomerBusinessID.Contains(id))).ToList();
 
         if (!bookings.Any())
         {
@@ -317,7 +304,7 @@ public class BookingService : IBookingService
         }
         if (acc.Role == AccountRole.Customer)
         {
-            responses = (await _bookingRepository.GetAsync(i => i.CustomerID == acc.AccountID, i => i.FullPaymentPolicy)).ToList();
+            responses = (await _bookingRepository.GetAsync(i => i.CustomerID == acc.AccountID)).ToList();
         }
         else if (acc.Role == AccountRole.Staff)
         {
@@ -328,7 +315,7 @@ public class BookingService : IBookingService
             else
             {
                 var boothIds = (await _boothRepository.GetAsync(i => i.BranchID == acc.BranchID)).Select(i => i.BoothID).ToList();
-                responses = (await _bookingRepository.GetAsync(i => boothIds.Contains(i.BoothID), i => i.FullPaymentPolicy)).ToList();
+                responses = (await _bookingRepository.GetAsync(i => boothIds.Contains(i.BoothID))).ToList();
             }
         }
         else
@@ -387,7 +374,6 @@ public class BookingService : IBookingService
             lastName = res.LastName;
         }
         booking.CustomerBusinessID = this.GenerateCustomerReferenceID(firstName, lastName);
-        booking.FullPaymentPolicyID = await _fullPaymentPolicyService.GetApplicablePolicyIdAsync(updateBooking.StartTime);
         //delete old booking service
         await _bookingServiceService.DeleteByBookingIdAsync(booking.BookingID);
         // and add new
@@ -450,7 +436,7 @@ public class BookingService : IBookingService
             var booking = await this.ValidateBookingToCancel(bookingID);
             if (booking.StartTime > timeNow)
             {
-                if (booking.BookingStatus == BookingStatus.PendingChecking && (booking.StartTime.Date - timeNow).TotalHours > booking.FullPaymentPolicy.RefundDaysBefore*24)
+                if (booking.BookingStatus == BookingStatus.PendingChecking && (booking.StartTime.Date - timeNow).TotalHours > 24)
                 {
                     //doing refund
                     var refundRes = await _refundService.RefundByBookingID(bookingID, false, ipAddress, email);
@@ -463,18 +449,18 @@ public class BookingService : IBookingService
                     }
                     else
                     {
-                        response.message = $"Cancel booking and the refund successfully, with {booking.FullPaymentPolicy.RefundPercent}% value of booking";
+                        response.message = $"Cancel booking and the refund successfully, with 50% value of booking";
                         booking.PaymentStatus = PaymentStatus.Refunded;
                     }
                 }
                 else
                 {
-                    response.message = $"Cancel booking successfully, but the cancel date does not meet our policy (must be more than {booking.FullPaymentPolicy.RefundDaysBefore} days before) to be eligible for a refund.";
+                    response.message = $"Cancel booking successfully, but the cancel date does not meet our policy (must before more than 24 hours) to be eligible for a refund.";
                 }
             }
             else
             {
-                response.message = $"Cancel booking successfully, but the cancel date is not meet our policy (must before {booking.FullPaymentPolicy.RefundDaysBefore}) to refund.";
+                response.message = $"Cancel booking successfully, but the cancel date is not meet our policy (must before more than 24) hours to refund.";
             }
             var booth = (await _boothRepository.GetAsync(i => i.BoothID == booking.BoothID)).FirstOrDefault();
             if (booth != null && booth.Status == BoothStatus.Booked && timeNow > booking.StartTime && timeNow < booking.EndTime)
@@ -522,7 +508,7 @@ public class BookingService : IBookingService
     //private method
     private async Task<Booking> ValidateBookingToCancel(Guid bookingID)
     {
-        var booking = (await _bookingRepository.GetAsync(i => i.BookingID == bookingID, i => i.FullPaymentPolicy)).FirstOrDefault();
+        var booking = (await _bookingRepository.GetAsync(i => i.BookingID == bookingID)).FirstOrDefault();
         if (null == booking)
         {
             throw new NotFoundException("Booking not found");

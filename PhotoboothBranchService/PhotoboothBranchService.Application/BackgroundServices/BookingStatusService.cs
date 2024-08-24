@@ -46,6 +46,7 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                 var boothRepository = scope.ServiceProvider.GetRequiredService<IBoothRepository>();
                 var photoSessionRepository = scope.ServiceProvider.GetRequiredService<IPhotoSessionRepository>();
                 var bookingSlotRepository = scope.ServiceProvider.GetRequiredService<IBookingSlotRepository>();
+                var paymentRepository = scope.ServiceProvider.GetRequiredService<IPaymentRepository>();
                 //delete service
                 var now = DateTimeHelper.GetVietnamTimeNow();
                 var bookings = (await bookingRepository.GetAsync(o =>
@@ -57,7 +58,9 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                     {
                         var bookingServices = (await bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();
                         var bookingSlots = (await bookingSlotRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();
-                        
+                        var payments = (await paymentRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();
+
+
                         var removalTasks = bookingServices.Select(bookingService =>
                             bookingServiceRepository.RemoveAsync(bookingService)
                             );
@@ -65,6 +68,11 @@ namespace PhotoboothBranchService.Application.BackgroundServices
                         
                         removalTasks = bookingSlots.Select(bookingSlot =>
                             bookingSlotRepository.RemoveAsync(bookingSlot)
+                            );
+                        await Task.WhenAll(removalTasks);
+
+                        removalTasks = payments.Select(payment =>
+                            paymentRepository.RemoveAsync(payment)
                             );
                         await Task.WhenAll(removalTasks);
 

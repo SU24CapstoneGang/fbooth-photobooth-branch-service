@@ -153,14 +153,13 @@ namespace PhotoboothBranchService.Application.Services.RefundServices
             Refund? refund;
             var booking = (await _bookingRepository.GetAsync(i => i.BookingID == payment.BookingID, includeProperties: new Expression<Func<Booking, object>>[]
             {
-                u => u.FullPaymentPolicy,
                 u => u.Account
             })).FirstOrDefault();
             if (booking == null)
             {
                 throw new BadRequestException("No booking found");
             }
-            var refundAmount = isFullRefund ? payment.Amount - await this.TotalRefund(payment.PaymentID) : (payment.Amount * booking.FullPaymentPolicy.RefundPercent / 100) - await this.TotalRefund(payment.PaymentID);
+            var refundAmount = isFullRefund ? payment.Amount - await this.TotalRefund(payment.PaymentID) : (payment.Amount * 50/100) - await this.TotalRefund(payment.PaymentID);
             switch (payment.PaymentMethod.PaymentMethodName)
             {
                 case "VNPay":

@@ -80,26 +80,27 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             sbBody.AppendLine("<hr>");
 
             sbBody.AppendLine("<h3>Transaction Information</h3>");
-            sbBody.AppendLine("<ul>");
-            sbBody.AppendLine($"<li><strong>Payment Method:</strong> {transaction.PaymentMethod.PaymentMethodName}</li>");
-            sbBody.AppendLine($"<li><strong>Original Transaction Amount:</strong> {transaction.Amount}</li>");
-            sbBody.AppendLine($"<li><strong>Transaction Date & Time:</strong> {transaction.PaymentDateTime:dddd, MMMM dd, yyyy h:mm tt}</li>");
-            sbBody.AppendLine($"<li><strong>Transaction Code:</strong> {transaction.TransactionID}</li>");
-            sbBody.AppendLine("</ul>");
+            sbBody.AppendLine("<div style='text-align: left;'>");
+            sbBody.AppendLine($"<p><strong>Payment Method:</strong> {transaction.PaymentMethod.PaymentMethodName}</p>");
+            sbBody.AppendLine($"<p><strong>Original Transaction Amount:</strong> <span style='color: green;'>{transaction.Amount}</span></p>");
+            sbBody.AppendLine($"<p><strong>Transaction Date & Time:</strong> {transaction.PaymentDateTime:dddd, MMMM dd, yyyy h:mm tt}</p>");
+            sbBody.AppendLine($"<p><strong>Transaction Code:</strong> {transaction.TransactionID}</p>");
+            sbBody.AppendLine("</div>");
             sbBody.AppendLine("<hr>");
 
             sbBody.AppendLine("<h3>Refund Information</h3>");
-            sbBody.AppendLine("<ul>");
-            sbBody.AppendLine($"<li><strong>Refund Description:</strong> {refund.Description}</li>");
-            sbBody.AppendLine($"<li><strong>Refund Amount:</strong> {refund.Amount}</li>");
-            sbBody.AppendLine($"<li><strong>Refund Status:</strong> {refund.Status}</li>");
-            sbBody.AppendLine($"<li><strong>Refund Message:</strong> {refund.ResponseMessage}</li>");
-            sbBody.AppendLine($"<li><strong>Refund Date & Time:</strong> {refund.RefundDateTime:dddd, MMMM dd, yyyy h:mm tt}</li>");
-            sbBody.AppendLine("</ul>");
+            sbBody.AppendLine("<div style='text-align: left;'>");
+            sbBody.AppendLine($"<p><strong>Refund Description:</strong> {refund.Description}</p>");
+            sbBody.AppendLine($"<p><strong>Refund Amount:</strong> <span style='color: red;'>{refund.Amount}</span></p>");
+            sbBody.AppendLine($"<p><strong>Refund Status:</strong> {refund.Status}</p>");
+            sbBody.AppendLine($"<p><strong>Refund Message:</strong> {refund.ResponseMessage}</p>");
+            sbBody.AppendLine($"<p><strong>Refund Date & Time:</strong> {refund.RefundDateTime:dddd, MMMM dd, yyyy h:mm tt}</p>");
+            sbBody.AppendLine("</div>");
             sbBody.AppendLine("<hr>");
 
             sbBody.AppendLine("<p>If you have any questions or need further assistance, please do not hesitate to contact our customer support team.</p>");
             sbBody.AppendLine("<p>Thank you for your understanding, and we apologize for any inconvenience this may have caused.</p>");
+
             await this.SendEmail(user.Email, subject, sbBody.ToString(), $"{user.FirstName}{user.LastName}");
         }
 
@@ -140,9 +141,9 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             sbBody.AppendLine($"<p><strong>Booking Code:</strong> {booking.CustomerBusinessID}</p>");
 
             sbBody.AppendLine("<h3>Branch Details</h3>");
-            sbBody.AppendLine($"<p><strong>Branch Name:</strong> {branch.BranchName}</p>");
-            sbBody.AppendLine($"<p><strong>Branch Address:</strong> {branch.Address}</p>");
-            sbBody.AppendLine($"<p><strong>Booth Name:</strong> {booking.Booth.BoothName}</p>");
+            sbBody.AppendLine($"<p style='text-align: left;'><strong>Branch Name:</strong> {branch.BranchName}</p>");
+            sbBody.AppendLine($"<p style='text-align: left;'><strong>Branch Address:</strong> {branch.Address}</p>");
+            sbBody.AppendLine($"<p style='text-align: left;'><strong>Booth Name:</strong> {booking.Booth.BoothName}</p>");
 
             var slots = (await _bookingSlotRepository.GetAsync(i => i.BookingID == booking.BookingID, i => i.Slot)).OrderBy(i => i.Slot.SlotStartTime).ToList();
             sbBody.AppendLine("<p>Slot(s) in Booking:</p>");
@@ -204,13 +205,13 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
             }
             // Notify total price
             sbBody.AppendLine("<br>");
-            sbBody.AppendLine($"<p><strong>Total Price:</strong> This booking's total cost is <strong>{booking.TotalPrice:N0} VND</strong>.</p>");
+            sbBody.AppendLine($"<p style='text-align: left;'><strong>Total Price:</strong> This booking's total cost is <strong style='color: blue;'>{booking.TotalPrice:N0} VND</strong>.</p>");
 
-            sbBody.AppendLine($"<p>This booking was paid thourgh {trans.PaymentMethod.PaymentMethodName} in {trans.PaymentDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
+            sbBody.AppendLine($"<p style='text-align: left;'>This booking was paid thourgh {trans.PaymentMethod.PaymentMethodName} in {trans.PaymentDateTime.ToString("dddd, MMMM dd, yyyy h:mm tt")}</p>");
 
-            sbBody.AppendLine($"<p><strong>Start Time</strong>: {booking.StartTime.ToString("dddd, MMMM dd, yyyy h:mm tt")} (UTC +7)</p>");
-            sbBody.AppendLine($"<p><strong>End Time: </strong>{booking.EndTime.ToString("dddd, MMMM dd, yyyy h:mm tt")} (UTC +7)</p>");
-            sbBody.AppendLine($"<p>Validate code (Enter this code to booth):<strong style='font-size: 1.2em; color: blue; font-weight: bold;'> {booking.ValidateCode}</strong> </p>");
+            sbBody.AppendLine($"<p style='text-align: left;'><strong>Start Time</strong>: {booking.StartTime.ToString("dddd, MMMM dd, yyyy h:mm tt")} (UTC +7)</p>");
+            sbBody.AppendLine($"<p style='text-align: left;'><strong>End Time: </strong>{booking.EndTime.ToString("dddd, MMMM dd, yyyy h:mm tt")} (UTC +7)</p>");
+            sbBody.AppendLine($"<p style='text-align: left;'><strong>Validate code </strong>(Enter this code to booth):<strong style='font-size: 1.2em; color: blue; font-weight: bold;'> {booking.ValidateCode}</strong> </p>");
             sbBody.AppendLine($"<p>We hope you arrive 5 minutes before the start time to receive instructions from the staff.</p>");
             await this.SendEmail(user.Email, subject, sbBody.ToString(), $"{user.FirstName}{user.LastName}");
         }
@@ -322,7 +323,7 @@ namespace PhotoboothBranchService.Application.Services.EmailServices
 
                 // Footer section
                 sbBody.AppendLine("<div class=\"footer\">");
-                sbBody.AppendLine("<p>&copy; 2023 FBooth. All rights reserved.</p>");
+                sbBody.AppendLine("<p>&copy; 2024 FBooth. All rights reserved.</p>");
                 sbBody.AppendLine("</div>");
 
                 sbBody.AppendLine("</div>"); //close div container

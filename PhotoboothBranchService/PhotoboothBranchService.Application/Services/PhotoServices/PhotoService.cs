@@ -113,7 +113,6 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
             return _mapper.Map<PhotoResponse>(photo);
         }
 
-
         public async Task DeleteAsync(Guid id)
         {
             var Photos = await _photoRepository.GetAsync(f => f.PhotoID == id);
@@ -177,7 +176,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoServices
             {
                 return Enumerable.Empty<PhotoResponse>();
             }
-            var photos = await _photoRepository.GetAsync(i => photoSessionIds.Contains(i.PhotoSessionID) && i.Version == PhotoVersion.Edited);
+            var photos = await _photoRepository.GetAsync(i => photoSessionIds.Contains(i.PhotoSessionID) && i.Version == PhotoVersion.Edited && i.PhotoURL != "");
             if (!photos.Any())
             {
                 return Enumerable.Empty<PhotoResponse>();

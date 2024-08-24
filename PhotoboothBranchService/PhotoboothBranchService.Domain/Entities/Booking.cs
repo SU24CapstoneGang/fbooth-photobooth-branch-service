@@ -19,8 +19,6 @@ namespace PhotoboothBranchService.Domain.Entities
         public decimal RefundedAmount { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime LastModified { get; set; }
-        public Guid? FullPaymentPolicyID { get; set; }
-        public virtual FullPaymentPolicy FullPaymentPolicy { get; set; } = default!;
         public Guid BoothID { get; set; }
         public virtual Booth Booth { get; set; } = default!;
         public Guid CustomerID { get; set; }

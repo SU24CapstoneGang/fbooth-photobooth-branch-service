@@ -16,10 +16,8 @@ using PhotoboothBranchService.Application.Services.BranchPhotoServices;
 using PhotoboothBranchService.Application.Services.BranchServices;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Application.Services.DashboardServices;
-using PhotoboothBranchService.Application.Services.DeviceServices;
 using PhotoboothBranchService.Application.Services.EmailServices;
 using PhotoboothBranchService.Application.Services.FirebaseServices;
-using PhotoboothBranchService.Application.Services.FullPaymentPolicyServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
 using PhotoboothBranchService.Application.Services.LayoutServices;
 using PhotoboothBranchService.Application.Services.MoMoServices;
@@ -53,7 +51,6 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IBranchService, BranchService>();
             services.AddScoped<IBackgroundService, BackgroundService>();
             services.AddScoped<IDashboardService, DashboardService>();
-            services.AddScoped<IDeviceService, DeviceService>();
             services.AddScoped<ILayoutService, LayoutService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IPaymentMethodService, PaymentMethodService>();
@@ -67,7 +64,6 @@ namespace PhotoboothBranchService.Application
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IStickerService, StickerService>();
             services.AddScoped<IPhotoBoxService, PhotoBoxService>();
-            services.AddScoped<IFullPaymentPolicyService, FullPaymentPolicyService>();
             services.AddScoped<IBoothPhotoService, BoothPhotoService>();
             services.AddScoped<IBranchPhotoService, BranchPhotoService>();
             services.AddScoped<ISlotService, SlotService>();

@@ -12,7 +12,6 @@ public class AppDbContext : DbContext
     public DbSet<Booth> Booths { get; set; }
     public DbSet<Branch> Branches { get; set; }
     public DbSet<Background> Backgrounds { get; set; }
-    public DbSet<Device> Devices { get; set; }
     public DbSet<Layout> Layouts { get; set; }
     public DbSet<Payment> Transactions { get; set; }
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
@@ -25,7 +24,6 @@ public class AppDbContext : DbContext
     public DbSet<Service> Services { get; set; }
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<Sticker> Stickers { get; set; }
-    public DbSet<FullPaymentPolicy> FullPaymentPolicies { get; set; }
     public DbSet<BookingSlot> BookingSlots { get; set; }
     public DbSet<Slot> Slots { get; set; }
     public DbSet<BoothPhoto> BoothPhotos { get; set; }
@@ -62,7 +60,6 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new AccountConfigurations());
         modelBuilder.ApplyConfiguration(new BoothConfigurations());
         modelBuilder.ApplyConfiguration(new BackgroundConfigurations());
-        modelBuilder.ApplyConfiguration(new DeviceConfigurations());
         modelBuilder.ApplyConfiguration(new LayoutConfigurations());
         modelBuilder.ApplyConfiguration(new PaymentConfigurations());
         modelBuilder.ApplyConfiguration(new PaymentMethodConfigurations());
@@ -76,7 +73,6 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ServiceConfigurations());
         modelBuilder.ApplyConfiguration(new BookingConfigurations());
         modelBuilder.ApplyConfiguration(new StickerConfigurations());
-        modelBuilder.ApplyConfiguration(new FullPaymentPolicyConfigurations());
         modelBuilder.ApplyConfiguration(new SlotConfiguration());
         modelBuilder.ApplyConfiguration(new BookingSlotConfiguration());
         modelBuilder.ApplyConfiguration(new BranchPhotoConfigurations());

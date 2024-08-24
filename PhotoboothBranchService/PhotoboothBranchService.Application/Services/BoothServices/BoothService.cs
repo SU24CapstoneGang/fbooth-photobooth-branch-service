@@ -5,8 +5,10 @@ using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Booth;
+using PhotoboothBranchService.Application.DTOs.Slot;
 using PhotoboothBranchService.Application.DTOs.Sticker;
 using PhotoboothBranchService.Application.Services.CloudinaryServices;
+using PhotoboothBranchService.Application.Services.SlotServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -18,21 +20,20 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
     {
         private readonly IBoothRepository _boothRepository;
         private readonly IBranchRepository _branchRepository;
-        private readonly IDeviceRepository _deviceRepository;
         private readonly IBookingRepository _bookingRepository;
         private readonly IAccountRepository _accountRepository;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IBoothPhotoRepository _boothPhotoRepository;
+        private readonly ISlotService _slotService;
         private readonly IMapper _mapper;
 
         public BoothService(IBoothRepository boothRepository, IMapper mapper, IBranchRepository branchRepository, 
-            IDeviceRepository deviceRepository, IBookingRepository bookingRepository, IAccountRepository accountRepository, 
+            IBookingRepository bookingRepository, IAccountRepository accountRepository, 
             ICloudinaryService cloudinaryService, IBoothPhotoRepository boothPhotoRepository)
         {
             _boothRepository = boothRepository;
             _mapper = mapper;
             _branchRepository = branchRepository;
-            _deviceRepository = deviceRepository;
             _bookingRepository = bookingRepository;
             _accountRepository = accountRepository;
             _cloudinaryService = cloudinaryService;
@@ -49,6 +50,11 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
                 throw new NotFoundException("Not found Branch to create booth");
             }
             await _boothRepository.AddAsync(booth);
+            await _slotService.AutoCreateSlotByBooth(new AutoCreateSlotRequest
+                { 
+                    BoothID = booth.BoothID, 
+                    Price = createModel.PricePerSlot
+                });
             return _mapper.Map<CreateBoothResponse>(booth);
         }
 
@@ -60,12 +66,10 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
                 Booth? booth = (await _boothRepository.GetAsync(f => f.BoothID == id)).FirstOrDefault();
                 if (booth != null)
                 {
-                    var devices = (await _deviceRepository.GetAsync(i => i.BoothID == id)).ToList();
-                    foreach (var device in devices)
-                    {
-                        await _deviceRepository.RemoveAsync(device);
-                    }
                     await _boothRepository.RemoveAsync(booth);
+                } else
+                {
+                    throw new NotFoundException("Booth not found");
                 }
             }
             catch
@@ -82,8 +86,8 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
         }
         public async Task<IEnumerable<BoothResponse>> CustomerGetAllAsync()
         {
-            var branchIdList = (await _branchRepository.GetAsync(i => i.Status == BranchStatus.Active, i => i.Booths)).ToList();
-            var booths = branchIdList.SelectMany(i => i.Booths).Where(i => i.Status != BoothStatus.Inactive);
+            var branchIdList = (await _branchRepository.GetAsync(i => i.Status == BranchStatus.Active)).Select(i => i.BranchID).ToList();
+            var booths = await _boothRepository.GetAsync(i => branchIdList.Contains(i.BranchID) && i.Status != BoothStatus.Inactive, i => i.BoothPhotos);
             return _mapper.Map<IEnumerable<BoothResponse>>(booths.ToList().OrderByDescending(i => i.CreatedDate));
         }
         public async Task<IEnumerable<BoothResponse>> StaffGetAllAsync(string? email)

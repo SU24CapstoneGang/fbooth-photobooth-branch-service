@@ -127,7 +127,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
         public async Task<BookingDashboardResponse> BookingDashboard(Guid? branchID, DateOnly? startDate, DateOnly? endDate)
         {
             var result = new BookingDashboardResponse();
-            var bookings = await this.GetBookings(branchID, startDate, endDate, true, i => i.FullPaymentPolicy);
+            var bookings = await this.GetBookings(branchID, startDate, endDate, true);
             if (bookings.Count() == 0)
             {
                 return result;
@@ -141,7 +141,7 @@ namespace PhotoboothBranchService.Application.Services.DashboardServices
             var needRefund = bookings.Where(i => i.PaymentStatus == PaymentStatus.PendingRefund).ToList();
             //caculate money
             result.TotalRevenue = bookings.Sum(i => i.TotalPrice); 
-            result.TotalRefunded = canceleded.Where(i => i.BookingStatus == BookingStatus.Canceled && (i.PaymentStatus == PaymentStatus.Refunded || i.PaymentStatus == PaymentStatus.PendingRefund)).Sum(i => i.TotalPrice*i.FullPaymentPolicy.RefundPercent/100);
+            result.TotalRefunded = canceleded.Where(i => i.BookingStatus == BookingStatus.Canceled && (i.PaymentStatus == PaymentStatus.Refunded || i.PaymentStatus == PaymentStatus.PendingRefund)).Sum(i => i.TotalPrice*50/100);
             result.TotalRefunded += canceleded.Where(i => i.BookingStatus == BookingStatus.CancelledBySystem).Sum(i => i.TotalPrice);
             result.TotalRevenue -= result.TotalRefunded;
 
