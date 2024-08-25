@@ -1,4 +1,5 @@
 ﻿using PhotoboothBranchService.Application.DTOs.BoothPhoto;
+using PhotoboothBranchService.Application.DTOs.Slot;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 

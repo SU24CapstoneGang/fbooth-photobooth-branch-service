@@ -10,5 +10,7 @@ namespace PhotoboothBranchService.Domain.IRepository
 {
     public interface ISlotRepository : IRepositoryBase<Slot>
     {
+        Task AddRangeAsync(IEnumerable<Slot> entities);
+        Task UpdateRangeAsync(IEnumerable<Slot> entities);
     }
 }

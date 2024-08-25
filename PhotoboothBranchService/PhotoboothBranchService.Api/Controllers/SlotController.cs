@@ -29,6 +29,13 @@ namespace PhotoboothBranchService.Api.Controllers
             return Ok(slots);
         }
 
+        [HttpGet("{boothID}")]
+        public async Task<ActionResult<IEnumerable<SlotResponse>>> GetByBoothId(Guid boothID)
+        {
+            var slots = await _slotService.GetByBoothId(boothID);
+            return Ok(slots);
+        }
+
         [HttpGet("booth")]
         public async Task<ActionResult<IEnumerable<SlotResponse>>> GetBoothFreeSLot([FromQuery]GetBoothFreeSlotRequest request)
         {
@@ -40,6 +47,20 @@ namespace PhotoboothBranchService.Api.Controllers
         {
             var slots = await _slotService.GetBranchFreeSlot(request.BranchID, request.date);
             return Ok(slots);
+        }
+
+        [HttpPut("slot/{slotID}")]
+        public async Task<IActionResult> UpdateSlotPrice(Guid slotID, [FromBody] decimal price)
+        {
+            await _slotService.UpdateSlotPrice(slotID, price);
+            return Ok();
+        }
+
+        [HttpPut("booth/{boothID}")]
+        public async Task<IActionResult> UpdateSlotPriceForBooth(Guid boothID, [FromBody] decimal price)
+        {
+            await _slotService.UpdateSlotPriceForBooth(boothID, price);
+            return Ok();
         }
     }
 }

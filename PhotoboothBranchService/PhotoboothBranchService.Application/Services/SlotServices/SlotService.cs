@@ -131,13 +131,49 @@ namespace PhotoboothBranchService.Application.Services.SlotServices
                         Status = StatusUse.Available,
                         BoothID = request.BoothID
                     };
-                    await _slotRepository.AddAsync(slot);
                     slots.Add(slot);
                 }
                 currentTime = slotEndTime; // Move to the next time slot
             }
+            if (slots.Count > 0)
+            {
+                await _slotRepository.AddRangeAsync(slots);
+            }
 
             return _mapper.Map<IEnumerable<SlotResponse>>(slots);
+        }
+        public async Task<IEnumerable<SlotResponse>> GetByBoothId(Guid boothID)
+        {
+            var slots = (await _slotRepository.GetAsync(i => i.BoothID == boothID)).ToList();
+            return _mapper.Map<IEnumerable<SlotResponse>>(slots);
+        }
+
+        public async Task UpdateSlotPrice(Guid slotID, decimal price)
+        {
+            var slot = (await _slotRepository.GetAsync(i => i.SlotID == slotID)).SingleOrDefault();
+            if (slot == null)
+            {
+                throw new NotFoundException("Slot not found");
+            } 
+            if (price <= 0)
+            {
+                throw new BadRequestException("Slot price must grater than 0");
+            }
+            slot.Price = price;
+            await _slotRepository.UpdateAsync(slot);
+        }
+        public async Task UpdateSlotPriceForBooth(Guid boothID, decimal price)
+        {
+            if (price <= 0)
+            {
+                throw new BadRequestException("Slot price must grater than 0");
+            }
+            var slots = (await _slotRepository.GetAsync(i => i.BoothID == boothID)).ToList();
+            Parallel.ForEach(slots, i =>
+            {
+                i.Price = price;
+            });
+            await _slotRepository.UpdateRangeAsync(slots);
         }
     }
 }

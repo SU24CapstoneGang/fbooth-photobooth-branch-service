@@ -26,7 +26,11 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
             return result.Entity;
         }
-
+        public async Task AddRangeAsync(IEnumerable<Slot> entities)
+        {
+            await _dbContext.AddRangeAsync(entities);
+            await _dbContext.SaveChangesAsync();
+        }
         // Read
         public async Task<IQueryable<Slot>> GetAllAsync()
         {
@@ -71,7 +75,14 @@ namespace PhotoboothBranchService.Infrastructure.Repositories
             _dbContext.Update(entity);
             await _dbContext.SaveChangesAsync();
         }
-
+        public async Task UpdateRangeAsync(IEnumerable<Slot> entities)
+        {
+            foreach (var entity in entities)
+            {
+                _dbContext.Entry(entity).State = EntityState.Modified;
+            }
+            await _dbContext.SaveChangesAsync();
+        }
         // Delete
         public async Task RemoveAsync(Slot entity)
         {
