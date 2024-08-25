@@ -29,7 +29,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
 
         public BoothService(IBoothRepository boothRepository, IMapper mapper, IBranchRepository branchRepository, 
             IBookingRepository bookingRepository, IAccountRepository accountRepository, 
-            ICloudinaryService cloudinaryService, IBoothPhotoRepository boothPhotoRepository)
+            ICloudinaryService cloudinaryService, IBoothPhotoRepository boothPhotoRepository, ISlotService slotService)
         {
             _boothRepository = boothRepository;
             _mapper = mapper;
@@ -38,6 +38,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
             _accountRepository = accountRepository;
             _cloudinaryService = cloudinaryService;
             _boothPhotoRepository = boothPhotoRepository;
+            _slotService = slotService;
         }
 
         // Create
