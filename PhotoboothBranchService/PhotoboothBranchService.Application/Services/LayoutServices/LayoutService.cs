@@ -203,7 +203,8 @@ public class LayoutService : ILayoutService
             updateLayout.Height = templayout.Height;
             updateLayout.Width = templayout.Width;
             updateLayout.PhotoSlot = templayout.PhotoSlot;
-            await _cloudinaryService.UpdatePhotoAsync(file, layout.CouldID);
+            var result = await _cloudinaryService.UpdatePhotoAsync(file, layout.CouldID);
+            updateLayout.LayoutURL = result.SecureUrl.AbsoluteUri;
         }
         await _layoutRepository.UpdateAsync(updateLayout);
     }

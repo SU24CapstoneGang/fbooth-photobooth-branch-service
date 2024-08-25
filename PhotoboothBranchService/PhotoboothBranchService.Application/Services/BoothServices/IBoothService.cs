@@ -8,12 +8,14 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
 {
     public interface IBoothService : IServiceBase<BoothResponse, BoothFilter, PagingModel>
     {
+        Task<IEnumerable<AdminBoothResponse>> AdminGetAllAsync();
         Task<IEnumerable<BoothResponse>> GetByName(string name);
         Task<CreateBoothResponse> CreateAsync(CreateBoothRequest createModel);
         Task<BoothResponse> AddPhotoForBooth(Guid boothID, IFormFile file);
         Task<IEnumerable<BoothResponse>> StaffGetAllAsync(string? email);
         Task<IEnumerable<BoothResponse>> CustomerGetAllAsync();
         Task UpdateAsync(Guid id, UpdateBoothRequest updateModel);
+        Task<BoothResponse> ActiveBooth(string code);
         Task DeleteAsync(Guid id);
     }
 }

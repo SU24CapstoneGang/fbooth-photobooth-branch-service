@@ -22,7 +22,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(pm => pm.PaymentMethodName)
                 .IsRequired()
                 .HasMaxLength(50);
-
+            builder.Property(pm => pm.MethodIconUrl)
+                .IsRequired();
             builder.Property(pm => pm.CreatedDate)
                 .IsRequired();
 
@@ -55,6 +56,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     PaymentMethodName = "VNPay",
                     CreatedDate = DateTime.UtcNow,
                     Status = PaymentMethodStatus.Active,
+                    MethodIconUrl = "https://res.cloudinary.com/dfxvccyje/image/upload/v1724593032/Logo/Fbooth-Payment-Method-Icon/vnpay-logo-inkythuatso-01_kipo9q.jpg",
+                    CouldID = "Logo/Fbooth-Payment-Method-Icon/vnpay-logo-inkythuatso-01_kipo9q"
                 },
                 new PaymentMethod
                 {
@@ -62,6 +65,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     PaymentMethodName = "MoMo",
                     CreatedDate = DateTime.UtcNow,
                     Status = PaymentMethodStatus.Active,
+                    MethodIconUrl = "https://res.cloudinary.com/dfxvccyje/image/upload/v1724593005/Logo/Fbooth-Payment-Method-Icon/momo_icon_square_pinkbg_RGB_kmsxyu.png",
+                    CouldID = "Logo/Fbooth-Payment-Method-Icon/momo_icon_square_pinkbg_RGB_kmsxyu"
                 },
                 new PaymentMethod
                 {
@@ -69,6 +74,8 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                     PaymentMethodName = "Cash",
                     CreatedDate = DateTime.UtcNow,
                     Status = PaymentMethodStatus.Active,
+                    MethodIconUrl = "https://res.cloudinary.com/dfxvccyje/image/upload/v1724593057/Logo/Fbooth-Payment-Method-Icon/PngItem_4661926_yocrhe.png",
+                    CouldID = "Logo/Fbooth-Payment-Method-Icon/PngItem_4661926_yocrhe"
                 });
         }
     }

@@ -46,14 +46,21 @@ public class BoothController : ControllerBaseApi
             return StatusCode(500, ex.Message);
         }
     }
-
+    [HttpPost("active/{code}")]
+    public async Task<ActionResult<BoothResponse>> ActiveBooth(string code)
+    {
+        var response = await _boothService.ActiveBooth(code);
+        return Ok(response);
+    }
     // Read
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<BoothResponse>>> GetAllBooths()
+    [Authorization("ADMIN")]
+    public async Task<ActionResult<IEnumerable<AdminBoothResponse>>> GetAllBooths()
     {
-        var booths = await _boothService.GetAllAsync();
+        var booths = await _boothService.AdminGetAllAsync();
         return Ok(booths);
     }
+
     [HttpGet("staff")]
     [Authorization("STAFF")]
     public async Task<ActionResult<IEnumerable<BoothResponse>>> StaffGetAllBooths()

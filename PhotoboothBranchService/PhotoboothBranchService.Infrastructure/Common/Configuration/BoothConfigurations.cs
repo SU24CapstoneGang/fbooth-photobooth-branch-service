@@ -19,6 +19,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
             builder.Property(b => b.BackgroundColor).IsRequired();
             builder.Property(b => b.Concept).IsRequired();
             builder.Property(b => b.PeopleInBooth).IsRequired();
+            builder.Property(b => b.ActiveCode).IsRequired();
 
             builder.Property(pb => pb.Status)
                 .IsRequired();
@@ -50,6 +51,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 BackgroundColor = "yellow",
                 CreatedDate = DateTimeHelper.GetVietnamTimeNow(),
                 LastModified = DateTimeHelper.GetVietnamTimeNow(),
+                ActiveCode = "Y8K2-Pq3W-X4mL"
             },
             new Booth
             {
@@ -62,6 +64,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 BackgroundColor = "yellow",
                 CreatedDate = DateTimeHelper.GetVietnamTimeNow(),
                 LastModified = DateTimeHelper.GetVietnamTimeNow(),
+                ActiveCode = "D4jH-N7gF-vP6t"
             },
             new Booth
             {
@@ -74,6 +77,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 BackgroundColor = "yellow",
                 CreatedDate = DateTimeHelper.GetVietnamTimeNow(),
                 LastModified = DateTimeHelper.GetVietnamTimeNow(),
+                ActiveCode = "pQ5R-s3fA-Mn2L"
             },
             new Booth
             {
@@ -86,6 +90,7 @@ namespace PhotoboothBranchService.Infrastructure.Common.Configuration
                 BackgroundColor = "yellow",
                 CreatedDate = DateTimeHelper.GetVietnamTimeNow(),
                 LastModified = DateTimeHelper.GetVietnamTimeNow(),
+                ActiveCode = "Z7X1-T9gJ-Y8hK"
             });
         }
     }

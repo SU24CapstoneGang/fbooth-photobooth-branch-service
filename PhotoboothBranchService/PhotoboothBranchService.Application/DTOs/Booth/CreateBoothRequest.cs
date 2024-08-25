@@ -17,8 +17,6 @@ namespace PhotoboothBranchService.Application.DTOs.Booth
         public long PricePerSlot { get; set; }
         [Required]
         public Guid BranchID { get; set; }
-        [Required]
-        public BoothStatus Status { get; set; }
 
     }
 }

@@ -118,9 +118,10 @@ public class BackgroundService : IBackgroundService
         }
 
         var updateBackGround = _mapper.Map(updateBackgroundRequest, backGround);
-        updateBackGround.LastModified = DateTimeHelper.GetVietnamTimeNow();
+        var result = await _cloudinaryService.UpdatePhotoAsync(file, backGround.CouldID);
+        updateBackGround.BackgroundURL = result.SecureUrl.AbsoluteUri;
         await _backgroundRepository.UpdateAsync(updateBackGround);
-        await _cloudinaryService.UpdatePhotoAsync(file, backGround.CouldID);
+        
     }
 }
 

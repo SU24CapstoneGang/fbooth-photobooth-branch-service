@@ -80,7 +80,8 @@ namespace PhotoboothBranchService.Application.Services.StickerTypeServices
             }
             if (updateModel.File != null && updateModel.File.Length != 0)
             {
-                await _cloudinaryService.UpdatePhotoAsync(updateModel.File, stickerType.CouldID);
+                var result = await _cloudinaryService.UpdatePhotoAsync(updateModel.File, stickerType.CouldID);
+                stickerType.RepresentImageURL = result.SecureUrl.AbsoluteUri;
             }
             var updatedStickerType = _mapper.Map(updateModel, stickerType);
             await _stickerTypeRepository.UpdateAsync(updatedStickerType);

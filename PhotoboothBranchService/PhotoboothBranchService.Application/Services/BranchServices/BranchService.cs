@@ -98,7 +98,7 @@ public class BranchService : IBranchService
     {
         var branches = (await _branchRepository.GetAsync(null, bth => bth.Booths, bth => bth.BranchPhotos)).ToList().AutoFilter(filter);
         var listBranchresponse = _mapper.Map<IEnumerable<BranchResponse>>(branches);
-        return listBranchresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex).OrderByDescending(i => i.CreatedDate);
+        return listBranchresponse.AsQueryable().OrderByDescending(i => i.CreatedDate).AutoPaging(paging.PageSize, paging.PageIndex);
     }
 
     public async Task<BranchResponse> GetByIdAsync(Guid id)

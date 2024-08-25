@@ -16,6 +16,7 @@ namespace PhotoboothBranchService.Application.AutoMapperModules
                 .ForMember(dest => dest.PeopleInBooth, opt => opt.MapFrom((source, dest) => source.PeopleInBooth ?? dest.PeopleInBooth))
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Booth, BoothResponse>().HandleNullProperty();
+            CreateMap<Booth, AdminBoothResponse>().HandleNullProperty();
             CreateMap<Booth, CreateBoothResponse>().HandleNullProperty();
         }
     }

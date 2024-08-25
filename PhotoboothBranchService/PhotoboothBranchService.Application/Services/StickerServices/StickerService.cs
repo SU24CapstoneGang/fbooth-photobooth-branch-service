@@ -113,7 +113,7 @@ public class StickerService : IStickerService
         return _mapper.Map<IEnumerable<StickerResponse>>(stickers.ToList());
     }
 
-    public async Task UpdateStickerAsync(IFormFile file, Guid id, UpdateStickerRequest updateModel)
+    public async Task UpdateStickerAsync(IFormFile? file, Guid id, UpdateStickerRequest updateModel)
     {
         var sticker = (await _stickerRepository.GetAsync(s => s.StickerID == id)).FirstOrDefault();
         if (sticker == null)
@@ -121,8 +121,12 @@ public class StickerService : IStickerService
             throw new KeyNotFoundException("Sticker not found.");
         }
         var updatedSticker = _mapper.Map(updateModel, sticker);
+        if (file != null && file.Length > 0)
+        {
+            var result = await _cloudinaryService.UpdatePhotoAsync(file, sticker.CouldID);
+            updatedSticker.StickerURL = result.SecureUrl.AbsoluteUri;
+        }
         await _stickerRepository.UpdateAsync(updatedSticker);
-        await _cloudinaryService.UpdatePhotoAsync(file, sticker.CouldID);
     }
 }
 

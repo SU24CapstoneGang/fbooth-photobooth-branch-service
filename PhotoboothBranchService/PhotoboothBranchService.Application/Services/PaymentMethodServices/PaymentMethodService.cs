@@ -2,6 +2,7 @@
 using PhotoboothBranchService.Application.Common.Exceptions;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.PaymentMethod;
+using PhotoboothBranchService.Application.Services.CloudinaryServices;
 using PhotoboothBranchService.Domain.Common.Helper;
 using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
@@ -12,23 +13,30 @@ namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
     public class PaymentMethodService : IPaymentMethodService
     {
         private readonly IPaymentMethodRepository _paymentMethodRepository;
+        private readonly ICloudinaryService _cloudinaryService;
         private readonly IMapper _mapper;
 
-        public PaymentMethodService(IPaymentMethodRepository paymentMethodRepository, IMapper mapper)
+        public PaymentMethodService(IPaymentMethodRepository paymentMethodRepository, IMapper mapper, ICloudinaryService cloudinaryService)
         {
             _paymentMethodRepository = paymentMethodRepository;
+            _cloudinaryService = cloudinaryService;
             _mapper = mapper;
         }
 
-        public async Task<CreatePaymentMethodResponse> CreateAsync(CreatePaymentMethodRequest createModel, PaymentMethodStatus status)
+        public async Task<CreatePaymentMethodResponse> CreateAsync(CreatePaymentMethodRequest createModel)
         {
             try
             {
                 var isPaymentExist = (await _paymentMethodRepository.GetAsync(p => p.PaymentMethodName.Equals(createModel.PaymentMethodName))).FirstOrDefault();
                 if (isPaymentExist != null) throw new BadRequestException("Payment method is already existed");
-
+                //upload to cloudinary
+                var uploadResult = await _cloudinaryService.AddPhotoAsync(createModel.IconImage, "Logo/Fbooth-Payment-Method-Icon");
+                if (uploadResult.Error != null)
+                {
+                    throw new Exception(uploadResult.Error.Message);
+                }
                 PaymentMethod paymentMethod = _mapper.Map<PaymentMethod>(createModel);
-                paymentMethod.Status = status;
+                paymentMethod.MethodIconUrl = uploadResult.SecureUrl.AbsoluteUri;
                 await _paymentMethodRepository.AddAsync(paymentMethod);
                 return _mapper.Map<CreatePaymentMethodResponse>(createModel);
             }
@@ -109,19 +117,21 @@ namespace PhotoboothBranchService.Application.Services.PaymentMethodServices
             }
         }
 
-        public async Task UpdateAsync(Guid id, UpdatePaymentMethodRequest updateModel, PaymentMethodStatus? status)
+        public async Task UpdateAsync(Guid id, UpdatePaymentMethodRequest updateModel)
         {
             try
             {
                 var paymentMethod = (await _paymentMethodRepository.GetAsync(p => p.PaymentMethodID == id)).FirstOrDefault();
-                if (paymentMethod == null){
-                    throw new NotFoundException("Payment method", id, "Payment method id not found");
-}
-                var updatedPaymentMethod = _mapper.Map(updateModel, paymentMethod);
-                if (status.HasValue)
+                if (paymentMethod == null)
                 {
-                    updatedPaymentMethod.Status = status.Value;
+                    throw new NotFoundException("Payment method", id, "Payment method id not found");
                 }
+                if (updateModel.IconImage != null && updateModel.IconImage.Length != 0)
+                {
+                    var result = await _cloudinaryService.UpdatePhotoAsync(updateModel.IconImage, paymentMethod.CouldID);
+                    paymentMethod.MethodIconUrl = result.SecureUrl.AbsoluteUri;
+                }
+                var updatedPaymentMethod = _mapper.Map(updateModel, paymentMethod);
                 await _paymentMethodRepository.UpdateAsync(updatedPaymentMethod);
             }
             catch (Exception ex)

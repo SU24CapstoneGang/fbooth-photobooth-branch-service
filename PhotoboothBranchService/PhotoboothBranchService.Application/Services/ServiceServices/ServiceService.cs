@@ -121,7 +121,8 @@ namespace PhotoboothBranchService.Application.Services.ServiceServices
             {
                 if (updateModel.imgFile != null && updateModel.imgFile.Length != 0)
                 {
-                    await _cloudinaryService.UpdatePhotoAsync(updateModel.imgFile, service.CouldID);
+                    var result = await _cloudinaryService.UpdatePhotoAsync(updateModel.imgFile, service.CouldID);
+                    service.ServiceIamgeURL = result.SecureUrl.AbsoluteUri;
                 }
                 await Update(updateModel, service);
             }

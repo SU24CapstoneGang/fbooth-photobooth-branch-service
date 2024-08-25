@@ -20,10 +20,10 @@ namespace PhotoboothBranchService.Api.Controllers
         // Create
         [HttpPost]
         [Authorization("ADMIN")]
-        public async Task<ActionResult<CreatePaymentMethodResponse>> CreatePaymentMethod(CreatePaymentMethodRequest createPaymentMethodRequest, PaymentMethodStatus status)
+        public async Task<ActionResult<CreatePaymentMethodResponse>> CreatePaymentMethod([FromForm]CreatePaymentMethodRequest createPaymentMethodRequest)
         {
 
-            var createPaymentMethodResponse = await _paymentMethodService.CreateAsync(createPaymentMethodRequest, status);
+            var createPaymentMethodResponse = await _paymentMethodService.CreateAsync(createPaymentMethodRequest);
             return Ok(createPaymentMethodResponse);
 
         }
@@ -90,23 +90,23 @@ namespace PhotoboothBranchService.Api.Controllers
         // Update
         [HttpPut("{id}")]
         [Authorization("ADMIN")]
-        public async Task<ActionResult> UpdatePaymentMethod(Guid id, UpdatePaymentMethodRequest updatePaymentMethodRequest, [FromQuery]PaymentMethodStatus? status)
+        public async Task<ActionResult> UpdatePaymentMethod(Guid id, [FromForm]UpdatePaymentMethodRequest updatePaymentMethodRequest)
         {
 
-            await _paymentMethodService.UpdateAsync(id, updatePaymentMethodRequest,status);
+            await _paymentMethodService.UpdateAsync(id, updatePaymentMethodRequest);
             return Ok();
 
         }
 
-        // Delete
-        [Authorization("ADMIN")]
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeletePaymentMethod(Guid id)
-        {
+        //// Delete
+        //[Authorization("ADMIN")]
+        //[HttpDelete("{id}")]
+        //public async Task<ActionResult> DeletePaymentMethod(Guid id)
+        //{
 
-            await _paymentMethodService.DeleteAsync(id);
-            return Ok();
+        //    await _paymentMethodService.DeleteAsync(id);
+        //    return Ok();
 
-        }
+        //}
     }
 }
