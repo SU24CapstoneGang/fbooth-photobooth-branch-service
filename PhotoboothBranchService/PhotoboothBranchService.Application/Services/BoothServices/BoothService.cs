@@ -91,6 +91,11 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
             var booths = await _boothRepository.GetAsync(null, bth => bth.BoothPhotos);
             return _mapper.Map<IEnumerable<AdminBoothResponse>>(booths.ToList().OrderByDescending(i => i.CreatedDate));
         }
+        public async Task<AdminBoothResponse> AdminGetByIdAsync(Guid id)
+        {
+            var booth = (await _boothRepository.GetAsync(b => b.BoothID == id, b => b.BoothPhotos)).FirstOrDefault();
+            return _mapper.Map<AdminBoothResponse>(booth);
+        }
         public async Task<IEnumerable<BoothResponse>> CustomerGetAllAsync()
         {
             var branchIdList = (await _branchRepository.GetAsync(i => i.Status == BranchStatus.Active)).Select(i => i.BranchID).ToList();
@@ -190,7 +195,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
             while (code.Equals(""))
             {
                 code = generator.GenerateCode();
-                var booth =  await _boothRepository.GetAsync(i => i.ActiveCode == code);
+                var booth =  (await _boothRepository.GetAsync(i => i.ActiveCode == code)).SingleOrDefault();
                 if (booth != null)
                 {
                     code = "";

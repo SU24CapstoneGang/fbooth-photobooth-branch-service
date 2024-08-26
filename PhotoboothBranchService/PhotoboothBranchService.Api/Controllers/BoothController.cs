@@ -60,6 +60,13 @@ public class BoothController : ControllerBaseApi
         var booths = await _boothService.AdminGetAllAsync();
         return Ok(booths);
     }
+    [HttpGet("admin/{id}")]
+    [Authorization("ADMIN")]
+    public async Task<ActionResult<IEnumerable<AdminBoothResponse>>> AdminGetBoothById(Guid id)
+    {
+        var booths = await _boothService.AdminGetByIdAsync(id);
+        return Ok(booths);
+    }
 
     [HttpGet("staff")]
     [Authorization("STAFF")]

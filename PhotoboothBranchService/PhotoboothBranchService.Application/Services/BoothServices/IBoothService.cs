@@ -9,6 +9,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
     public interface IBoothService : IServiceBase<BoothResponse, BoothFilter, PagingModel>
     {
         Task<IEnumerable<AdminBoothResponse>> AdminGetAllAsync();
+        Task<AdminBoothResponse> AdminGetByIdAsync(Guid id);
         Task<IEnumerable<BoothResponse>> GetByName(string name);
         Task<CreateBoothResponse> CreateAsync(CreateBoothRequest createModel);
         Task<BoothResponse> AddPhotoForBooth(Guid boothID, IFormFile file);

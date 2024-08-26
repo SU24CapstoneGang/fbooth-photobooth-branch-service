@@ -5,6 +5,7 @@ using PhotoboothBranchService.Application.Common.Helpers;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Account;
 using PhotoboothBranchService.Application.DTOs.Authentication;
+using PhotoboothBranchService.Application.Services.BookingServices;
 using PhotoboothBranchService.Application.Services.EmailServices;
 using PhotoboothBranchService.Application.Services.FirebaseServices;
 using PhotoboothBranchService.Application.Services.JwtServices;
@@ -23,7 +24,6 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
         private readonly IPasswordHasher _passwordHasher;
         private readonly IFirebaseService _firebaseService;
         private readonly IBranchRepository _branchRepository;
-
         public AccountService(IAccountRepository accountRepository,
             IMapper mapper, IPasswordHasher passwordHasher, IFirebaseService firebaseService, IBranchRepository branchRepository)
         {
