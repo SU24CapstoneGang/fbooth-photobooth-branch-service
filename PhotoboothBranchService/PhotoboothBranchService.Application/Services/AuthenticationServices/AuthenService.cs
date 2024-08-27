@@ -109,6 +109,21 @@ namespace PhotoboothBranchService.Application.Services.AuthenticationServices
         }
         public async Task<AccountRegisterResponse> Register(CreateAccountRequestModel request, AccountRole role)
         {
+            if (!await _accountRepository.IsEmailUnique(request.Email))
+            {
+                throw new BadRequestException("Email is already in use. Please choose a different email.");
+            }
+            if (!await _accountRepository.IsPhoneNumberUnique(request.PhoneNumber))
+            {
+                throw new BadRequestException("Phone number is already in use. Please choose a different Phone number.");
+            }
+
+            var isPhoneExisted = (await _accountRepository.GetAsync(pn => pn.PhoneNumber.Equals(request.PhoneNumber))).FirstOrDefault();
+            if (isPhoneExisted != null)
+            {
+                throw new BadRequestException("PhoneNumber is already in use. Please choose a different PhoneNumber.");
+            }
+
             try
             {
                 //validation in db
@@ -117,21 +132,6 @@ namespace PhotoboothBranchService.Application.Services.AuthenticationServices
                     var uid = await _firebaseService.RegisterAsync(request.Email, request.Password);
                     if (uid != null)
                     {
-                        if (!await _accountRepository.IsEmailUnique(request.Email))
-                        {
-                            throw new BadRequestException("Email is already in use. Please choose a different email.");
-                        }
-                        if (!await _accountRepository.IsPhoneNumberUnique(request.PhoneNumber))
-                        {
-                            throw new BadRequestException("Phone number is already in use. Please choose a different Phone number.");
-                        }
-
-                        var isPhoneExisted = (await _accountRepository.GetAsync(pn => pn.PhoneNumber.Equals(request.PhoneNumber))).FirstOrDefault();
-                        if (isPhoneExisted != null)
-                        {
-                            throw new BadRequestException("PhoneNumber is already in use. Please choose a different PhoneNumber.");
-                        }
-
 
                         var newAccount = _mapper.Map<Account>(request);
                         newAccount.AccountFBID = uid;
