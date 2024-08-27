@@ -390,10 +390,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                     booking.BookingStatus = BookingStatus.PendingChecking;
                     try
                     {
-                        if (booking.StartTime > DateTimeHelper.GetVietnamTimeNow())
-                        {
-                            await _emailService.SendBookingInformation(booking.BookingID, payment.PaymentID);
-                        }
+                        await _emailService.SendBookingInformation(booking.BookingID, payment.PaymentID);
                     }
                     catch (Exception ex)
                     {

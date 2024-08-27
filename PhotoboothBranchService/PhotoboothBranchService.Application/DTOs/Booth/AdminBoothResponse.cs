@@ -1,4 +1,5 @@
-﻿using PhotoboothBranchService.Domain.Enum;
+﻿using PhotoboothBranchService.Application.DTOs.BoothPhoto;
+using PhotoboothBranchService.Domain.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +20,6 @@ namespace PhotoboothBranchService.Application.DTOs.Booth
         public Guid BranchID { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime LastModified { get; set; }
+        public ICollection<BoothPhotoResponse> BoothPhotos { get; set; } = default!;
     }
 }
