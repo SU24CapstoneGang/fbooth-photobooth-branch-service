@@ -165,6 +165,17 @@ public class LayoutService : ILayoutService
         var layouts = await _layoutRepository.GetAllAsync();
         return _mapper.Map<IEnumerable<LayoutResponse>>(layouts.ToList().OrderByDescending(i => i.LastModified));
     }
+    public async Task<IEnumerable<LayoutResponse>> GetAvailbleAsync()
+    {
+        var layouts = await _layoutRepository.GetAsync(i => i.Status == StatusUse.Available, i => i.Backgrounds);
+        await Parallel.ForEachAsync(layouts, (layout, cancellationToken) =>
+        {
+            // Filter stickers based on a condition, e.g., only active stickers
+            layout.Backgrounds = layout.Backgrounds.Where(sticker => sticker.Status == StatusUse.Available).ToList();
+            return ValueTask.CompletedTask;
+        });
+        return _mapper.Map<IEnumerable<LayoutResponse>>(layouts.ToList().OrderByDescending(i => i.LastModified));
+    }
 
     public async Task<IEnumerable<LayoutResponse>> GetAllPagingAsync(LayoutFilter filter, PagingModel paging)
     {

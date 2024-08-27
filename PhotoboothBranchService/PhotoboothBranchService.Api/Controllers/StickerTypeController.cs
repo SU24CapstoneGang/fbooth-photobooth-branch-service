@@ -55,7 +55,12 @@ namespace PhotoboothBranchService.Api.Controllers
             }
             return Ok(stickerType);
         }
-
+        [HttpGet("customer")]
+        public async Task<ActionResult<IEnumerable<StickerTypeResponse>>> GetAvailbleStickerTypes()
+        {
+            var stickerTypes = await _stickerTypeService.GetAllAvailbleAsync();
+            return Ok(stickerTypes);
+        }
         // Update
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateStickerType(Guid id, [FromForm] UpdateStickerTypeRequest updateStickerTypeRequest)

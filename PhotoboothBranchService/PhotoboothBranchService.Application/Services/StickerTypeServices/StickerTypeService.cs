@@ -38,8 +38,13 @@ namespace PhotoboothBranchService.Application.Services.StickerTypeServices
         }
         public async Task<IEnumerable<StickerTypeResponse>> GetAllAvailbleAsync()
         {
-            var stickerTypes = (await _stickerTypeRepository.GetAsync(null, s => s.Stickers)).ToList();
-           /* Parallel.ForEachAsync(stickerTypes, )*/
+            var stickerTypes = (await _stickerTypeRepository.GetAsync(i => i.Status == StatusUse.Available, s => s.Stickers)).ToList();
+            await Parallel.ForEachAsync(stickerTypes, (stickerType, cancellationToken) =>
+            {
+                // Filter stickers based on a condition, e.g., only active stickers
+                 stickerType.Stickers = stickerType.Stickers.Where(sticker => sticker.Status == StatusUse.Available).ToList();
+                return ValueTask.CompletedTask;
+            });
             return _mapper.Map<IEnumerable<StickerTypeResponse>>(stickerTypes).OrderByDescending(i => i.CreatedDate);
         }
         public async Task<IEnumerable<StickerTypeResponse>> GetAllPagingAsync(StickerTypeFilter filter, PagingModel paging)

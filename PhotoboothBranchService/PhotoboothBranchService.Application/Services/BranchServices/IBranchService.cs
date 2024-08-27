@@ -13,6 +13,7 @@ public interface IBranchService : IServiceBase<BranchResponse, BranchFilter, Pag
     Task<IEnumerable<BranchResponse>> SearchByName(string name);
     Task<IEnumerable<BranchResponse>> GetByStatus(BranchStatus status);
     Task<CreateBranchResponse> CreateAsync(CreateBranchRequest createModel);
+    Task<IEnumerable<BranchResponse>> GetAvailbleAsync();
     Task<BranchResponse> AddPhotoForBranch(Guid branchID, IFormFile file);
 
     Task UpdateAsync(Guid id, UpdateBranchRequest updateModel);
