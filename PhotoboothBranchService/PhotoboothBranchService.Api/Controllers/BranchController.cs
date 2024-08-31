@@ -92,13 +92,23 @@ public class BranchController : ControllerBaseApi
         }
         return Ok(branch);
     }
-
+    [HttpGet("customer/{id}")]
+    public async Task<ActionResult<BranchResponse>> CustomerGetBranchById(Guid id)
+    {
+        var branch = await _branchService.CustomerGetByIdAsync(id);
+        if (branch == null)
+        {
+            return NotFound();
+        }
+        return Ok(branch);
+    }
     [HttpGet("customer")]
     public async Task<ActionResult<IEnumerable<BranchResponse>>> GetAvailbleStickerTypes()
     {
         var branches = await _branchService.GetAvailbleAsync();
         return Ok(branches);
     }
+
     //Update
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateBranch(Guid id, [FromBody] UpdateBranchRequest updatePhotoBoothBranchRequest)

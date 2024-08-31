@@ -16,7 +16,7 @@ namespace PhotoboothBranchService.Application.DTOs.Layout
         public short PhotoSlot { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? LastModified { get; set; }
-        public List<PhotoBoxResponse> PhotoBoxes { get; set; }
+        public List<PhotoBoxResponse> PhotoBoxes { get; set; } = default!;
         public List<BackgroundResponse> Backgrounds { get; set; } = default!;
 
     }

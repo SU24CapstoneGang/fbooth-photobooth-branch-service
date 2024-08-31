@@ -60,7 +60,7 @@ namespace PhotoboothBranchService.Application.Services.StickerTypeServices
             var stickerType = stickerTypes.FirstOrDefault();
             if (stickerType == null)
             {
-                throw new NotFoundException("Service not found");
+                throw new NotFoundException("Sticker type not found");
             }
             return _mapper.Map<StickerTypeResponse>(stickerType);
         }

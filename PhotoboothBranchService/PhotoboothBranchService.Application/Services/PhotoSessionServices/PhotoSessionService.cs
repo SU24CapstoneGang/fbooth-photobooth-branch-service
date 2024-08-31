@@ -125,7 +125,7 @@ namespace PhotoboothBranchService.Application.Services.PhotoSessionServices
             var photoSession = (await _photoSessionRepository.GetAsync(p => p.PhotoSessionID == id)).FirstOrDefault();
             if (photoSession == null)
             {
-                throw new KeyNotFoundException("Photo session not found.");
+                throw new NotFoundException("Photo session not found.");
             }
             if (photoSession.Status == PhotoSessionStatus.Ended) {
                 throw new BadRequestException("Session has ended");

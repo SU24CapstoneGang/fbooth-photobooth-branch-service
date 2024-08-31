@@ -203,7 +203,7 @@ public class BookingService : IBookingService
         }
         else
         {
-            throw new KeyNotFoundException("Session not found.");
+            throw new NotFoundException("Booking not found.");
         }
     }
     // Get 

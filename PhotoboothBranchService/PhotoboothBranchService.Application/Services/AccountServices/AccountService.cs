@@ -58,32 +58,18 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<IEnumerable<AccountResponse>> GetAllAsync()
         {
-            try
-            {
                 var accounts = await _accountRepository.GetAllAsync();
                 return _mapper.Map<IEnumerable<AccountResponse>>(accounts.ToList());
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while getting the account: " + ex.Message);
-            }
         }
 
         public async Task<AccountResponse> GetByIdAsync(Guid id)
         {
-            try
-            {
                 var account = (await _accountRepository.GetAsync(a => a.AccountID == id)).FirstOrDefault();
                 if (account == null)
                 {
                     throw new NotFoundException("Account", id, "Account ID not found");
                 }
                 return _mapper.Map<AccountResponse>(account);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while getting the account: " + ex.Message);
-            }
         }
 
         public async Task UpdateAsync(UpdateAccountRequestModel updateModel, string? email)
@@ -106,16 +92,9 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
 
         public async Task<IEnumerable<AccountResponse>> GetAllPagingAsync(AccountFilter filter, PagingModel paging)
         {
-            try
-            {
                 var account = (await _accountRepository.GetAllAsync()).ToList().AutoFilter(filter);
                 var listAccountresponse = _mapper.Map<IEnumerable<AccountResponse>>(account);
                 return listAccountresponse.AsQueryable().AutoPaging(paging.PageSize, paging.PageIndex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while getting the account: " + ex.Message);
-            }
         }
 
         public async Task<Account> GetByEmail(string email)
@@ -153,7 +132,7 @@ namespace PhotoboothBranchService.Application.Services.AccountServices
             }
             if (branch == null)
             {
-                throw new NotFoundException("Not found brnach");
+                throw new NotFoundException("Not found branch");
             }
             acc.BranchID = branch.BranchID;
             await _accountRepository.UpdateAsync(acc);

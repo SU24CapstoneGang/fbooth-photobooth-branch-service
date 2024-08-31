@@ -12,6 +12,7 @@ using PhotoboothBranchService.Domain.Entities;
 using PhotoboothBranchService.Domain.Enum;
 using PhotoboothBranchService.Domain.IRepository;
 using System;
+using System.Linq.Expressions;
 
 namespace PhotoboothBranchService.Application.Services.LayoutServices;
 
@@ -167,7 +168,11 @@ public class LayoutService : ILayoutService
     }
     public async Task<IEnumerable<LayoutResponse>> GetAvailbleAsync()
     {
-        var layouts = await _layoutRepository.GetAsync(i => i.Status == StatusUse.Available, i => i.Backgrounds);
+        var layouts = await _layoutRepository.GetAsync(i => i.Status == StatusUse.Available, new Expression<Func<Layout, object>>[]
+            {
+                i => i.Backgrounds,
+                u => u.PhotoBoxes
+            });
         await Parallel.ForEachAsync(layouts, (layout, cancellationToken) =>
         {
             // Filter stickers based on a condition, e.g., only active stickers

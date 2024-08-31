@@ -55,7 +55,7 @@ public class BackgroundService : IBackgroundService
             await _backgroundRepository.AddAsync(background);
             return _mapper.Map<BackgroundResponse>(background);
         }
-        throw new NotFoundException($"backgound not created");
+        throw new Exception($"Backgound not created");
     }
 
     // Delete
@@ -114,7 +114,7 @@ public class BackgroundService : IBackgroundService
         var backGround = (await _backgroundRepository.GetAsync(f => f.BackgroundID == BackGroundID)).FirstOrDefault();
         if (backGround == null)
         {
-            throw new KeyNotFoundException("BackGround not found.");
+            throw new NotFoundException("Background not found.");
         }
 
         var updateBackGround = _mapper.Map(updateBackgroundRequest, backGround);

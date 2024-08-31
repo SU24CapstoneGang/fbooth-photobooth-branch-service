@@ -113,7 +113,7 @@ namespace PhotoboothBranchService.Application.Services.BoothServices
             {
                 throw new ForbiddenAccessException("Staff has not been assign to any branch");
             }
-            var booths = await _boothRepository.GetAsync(i => i.BranchID == acc.BranchID && i.Status == BoothStatus.Active);
+            var booths = await _boothRepository.GetAsync(i => i.BranchID == acc.BranchID && i.Status == BoothStatus.Active, i => i.BoothPhotos);
             return _mapper.Map<IEnumerable<BoothResponse>>(booths.ToList().OrderByDescending(i => i.CreatedDate));
         }
         public async Task<IEnumerable<BoothResponse>> GetAllPagingAsync(BoothFilter filter, PagingModel paging)

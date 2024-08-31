@@ -118,7 +118,7 @@ public class StickerService : IStickerService
         var sticker = (await _stickerRepository.GetAsync(s => s.StickerID == id)).FirstOrDefault();
         if (sticker == null)
         {
-            throw new KeyNotFoundException("Sticker not found.");
+            throw new NotFoundException("Sticker not found.");
         }
         var updatedSticker = _mapper.Map(updateModel, sticker);
         if (file != null && file.Length > 0)

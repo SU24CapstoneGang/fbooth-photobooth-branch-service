@@ -15,7 +15,7 @@ public interface IBranchService : IServiceBase<BranchResponse, BranchFilter, Pag
     Task<CreateBranchResponse> CreateAsync(CreateBranchRequest createModel);
     Task<IEnumerable<BranchResponse>> GetAvailbleAsync();
     Task<BranchResponse> AddPhotoForBranch(Guid branchID, IFormFile file);
-
+    Task<BranchResponse> CustomerGetByIdAsync(Guid id);
     Task UpdateAsync(Guid id, UpdateBranchRequest updateModel);
     Task DeleteAsync(Guid id);
 }

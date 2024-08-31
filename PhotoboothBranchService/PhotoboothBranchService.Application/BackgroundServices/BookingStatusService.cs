@@ -54,7 +54,7 @@ namespace PhotoboothBranchService.Application.BackgroundServices
 
                 foreach (var booking in bookings)
                 {
-                    if ((now - booking.LastModified).TotalMinutes > 15)
+                    if ((now - booking.LastModified).TotalMinutes > 10)
                     {
                         var bookingServices = (await bookingServiceRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();
                         var bookingSlots = (await bookingSlotRepository.GetAsync(i => i.BookingID == booking.BookingID)).ToList();

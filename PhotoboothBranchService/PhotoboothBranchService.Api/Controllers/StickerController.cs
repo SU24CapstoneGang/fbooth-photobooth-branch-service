@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Sticker;
@@ -76,5 +77,15 @@ public class StickerController : ControllerBaseApi
     {
         var result = await _stickerService.CreateStickerAsync(request);
         return Ok(result);
+    }
+
+    [HttpPost("add-sticker-cloud-list")]
+    public async Task<ActionResult> AddStickerlist([FromForm]Guid StickerTypeID,[FromForm] List<IFormFile> formFiles)
+    {
+        foreach (var file in formFiles)
+        {
+            var result = await _stickerService.CreateStickerAsync(new CreateStickerRequest { StickerTypeID = StickerTypeID, File = file});
+        }
+        return Ok();
     }
 }

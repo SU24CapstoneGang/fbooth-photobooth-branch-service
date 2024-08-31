@@ -129,9 +129,34 @@ public class BranchService : IBranchService
     public async Task<BranchResponse> GetByIdAsync(Guid id)
     {
         var photoBoothBranch = (await _branchRepository.GetAsync(p => p.BranchID == id, p => p.BranchPhotos, p => p.Booths)).FirstOrDefault();
+        if (photoBoothBranch == null)
+        {
+            throw new NotFoundException("Branch not found");
+        }
+        foreach (var booth in photoBoothBranch.Booths)
+        {
+            booth.BoothPhotos = (await _boothPhotoRepository.GetAsync(i => i.BoothID == booth.BoothID)).ToList();
+        }
         return _mapper.Map<BranchResponse>(photoBoothBranch);
     }
-
+    public async Task<BranchResponse> CustomerGetByIdAsync(Guid id)
+    {
+        var photoBoothBranch = (await _branchRepository.GetAsync(p => p.BranchID == id, p => p.BranchPhotos, p => p.Booths)).FirstOrDefault();
+        if (photoBoothBranch == null)
+        {
+            throw new NotFoundException("Branch not found");
+        }
+        if (photoBoothBranch.Status == BranchStatus.Inactive)
+        {
+            throw new BadRequestException("Branch is inactive");
+        }
+        photoBoothBranch.Booths = photoBoothBranch.Booths.Where(i => i.Status != BoothStatus.Inactive).ToList();
+        foreach (var booth in photoBoothBranch.Booths)
+        {
+            booth.BoothPhotos = (await _boothPhotoRepository.GetAsync(i => i.BoothID == booth.BoothID)).ToList();
+        }
+        return _mapper.Map<BranchResponse>(photoBoothBranch);
+    }
     public async Task<IEnumerable<BranchResponse>> GetByStatus(BranchStatus status)
     {
         var photoBoothBranch = await _branchRepository.GetAsync(p => p.Status == status);
