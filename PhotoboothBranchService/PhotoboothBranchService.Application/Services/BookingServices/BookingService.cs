@@ -452,6 +452,9 @@ public class BookingService : IBookingService
                         response.message = $"Cancel booking and the refund successfully, with 50% value of booking";
                         booking.PaymentStatus = PaymentStatus.Refunded;
                     }
+                } if (booking.BookingStatus == BookingStatus.PendingPayment)
+                {
+                    booking.PaymentStatus = PaymentStatus.Fail;
                 }
                 else
                 {

@@ -73,7 +73,14 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
             {
                 throw new BadRequestException("Booking already paid.");
             }
-
+            if (booking.BookingStatus == BookingStatus.ExtraService)
+            {
+                createModel.Description = $"Payment extra for booking {booking.BookingID}";
+            }
+            else
+            {
+                createModel.Description = $"Payment for booking {booking.BookingID}";
+            }
             var account = (await _accountRepository.GetAsync(i => i.Email.Equals(email))).FirstOrDefault();
             if (account == null)
             {
@@ -127,11 +134,8 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                             PaymentID = payment.PaymentID,
                             PaymentDateTime = payment.PaymentDateTime,
                             ReturnUrl = createModel.ReturnUrl,
+                            BankCode = ""
                         };
-                        if (!createModel.BankCode.IsNullOrEmpty())
-                        {
-                            vnpayRequest.BankCode = createModel.BankCode;
-                        }
                         createPaymentResponse.TransactionUlr = _vNPayService.Pay(vnpayRequest);
                         break;
 
@@ -390,10 +394,7 @@ namespace PhotoboothBranchService.Application.Services.PaymentServices
                     booking.BookingStatus = BookingStatus.PendingChecking;
                     try
                     {
-                        if (booking.StartTime > DateTimeHelper.GetVietnamTimeNow())
-                        {
-                            await _emailService.SendBookingInformation(booking.BookingID, payment.PaymentID);
-                        }
+                        await _emailService.SendBookingInformation(booking.BookingID, payment.PaymentID);
                     }
                     catch (Exception ex)
                     {

@@ -83,7 +83,7 @@ public class AccountController : ControllerBaseApi
     }
 
     // Delete
-    [AdminAuthorization]
+    [Authorization("ADMIN")]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteAccount(Guid id)
     {

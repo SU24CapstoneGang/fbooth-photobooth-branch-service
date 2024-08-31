@@ -14,5 +14,6 @@ namespace PhotoboothBranchService.Application.Services.StickerTypeServices
     {
         Task<StickerTypeResponse> CreateAsync(CreateStickerTypeRequest createModel);
         Task UpdateAsync(Guid id, UpdateStickerTypeRequest updateModel);
+        Task<IEnumerable<StickerTypeResponse>> GetAllAvailbleAsync();
     }
 }

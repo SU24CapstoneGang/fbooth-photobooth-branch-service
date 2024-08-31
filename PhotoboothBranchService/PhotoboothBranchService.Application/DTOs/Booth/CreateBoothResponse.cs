@@ -9,6 +9,7 @@ namespace PhotoboothBranchService.Application.DTOs.Booth
         public string BackgroundColor { get; set; } = default!;
         public string Concept { get; set; } = default!;
         public short PeopleInBooth { get; set; }
+        public string ActiveCode { get; set; } = default!;
         public BoothStatus Status { get; set; }
         public Guid BranchID { get; set; }
     }

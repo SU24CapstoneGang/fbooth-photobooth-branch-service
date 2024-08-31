@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Branch;
+using PhotoboothBranchService.Application.DTOs.Layout;
 using PhotoboothBranchService.Application.Services.BranchServices;
 using PhotoboothBranchService.Domain.Enum;
 
@@ -92,6 +93,12 @@ public class BranchController : ControllerBaseApi
         return Ok(branch);
     }
 
+    [HttpGet("customer")]
+    public async Task<ActionResult<IEnumerable<BranchResponse>>> GetAvailbleStickerTypes()
+    {
+        var branches = await _branchService.GetAvailbleAsync();
+        return Ok(branches);
+    }
     //Update
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateBranch(Guid id, [FromBody] UpdateBranchRequest updatePhotoBoothBranchRequest)

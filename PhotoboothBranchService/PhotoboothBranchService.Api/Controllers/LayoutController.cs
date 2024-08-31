@@ -2,6 +2,7 @@
 using PhotoboothBranchService.Api.Common;
 using PhotoboothBranchService.Application.DTOs;
 using PhotoboothBranchService.Application.DTOs.Layout;
+using PhotoboothBranchService.Application.DTOs.StickerType;
 using PhotoboothBranchService.Application.Services.LayoutServices;
 
 namespace PhotoboothBranchService.Api.Controllers;
@@ -43,6 +44,13 @@ public class LayoutController : ControllerBaseApi
         }
         return Ok(layout);
 
+    }
+
+    [HttpGet("customer")]
+    public async Task<ActionResult<IEnumerable<LayoutResponse>>> GetAvailbleStickerTypes()
+    {
+        var layouts = await _layoutService.GetAvailbleAsync();
+        return Ok(layouts);
     }
 
     // Update
